@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Button, Input, Card, Container, Stack, Grid, Nav } from '@nexus-engineering/shared';
+import { ArtifactViewer } from './views/ArtifactViewer';
 
-type Section = 'overview' | 'buttons' | 'forms' | 'cards';
+type Section = 'overview' | 'buttons' | 'forms' | 'cards' | 'artefacts';
 
 function App() {
   const [dark, setDark] = useState(false);
@@ -42,6 +43,7 @@ function App() {
     { label: 'Buttons', href: '#buttons', active: activeSection === 'buttons' },
     { label: 'Forms', href: '#forms', active: activeSection === 'forms' },
     { label: 'Cards', href: '#cards', active: activeSection === 'cards' },
+    { label: 'Artefacts', href: '#artefacts', active: activeSection === 'artefacts' },
   ];
 
   return (
@@ -71,19 +73,22 @@ function App() {
         </Container>
       </header>
 
-      <Container size="lg" className="py-8">
-        <Stack gap={10}>
-          <Nav
-            items={navItems.map((item) => ({
-              label: item.label,
-              href: item.href,
-              active: item.active,
-            }))}
-            variant="horizontal"
-          />
+       <Container size="lg" className="py-8">
+         {activeSection === 'artefacts' ? (
+           <ArtifactViewer />
+         ) : (
+           <>
+             <Nav
+               items={navItems.map((item) => ({
+                 label: item.label,
+                 href: item.href,
+                 active: item.active,
+               }))}
+               variant="horizontal"
+             />
 
-          <Stack gap={12}>
-            <Stack gap={4}>
+             <Stack gap={12}>
+               <Stack gap={4}>
               <h2 className="text-2xl font-bold text-text-primary">Button component</h2>
               <p className="text-text-secondary">
                 4 variants, 3 sizes, loading state, icon support. Uses semantic
@@ -273,12 +278,14 @@ function App() {
                 </Stack>
               </Card>
             </Grid>
-          </Stack>
-        </Stack>
-      </Container>
-    </div>
-  );
-}
+              </Stack>
+            </Stack>
+           </>
+         )}
+       </Container>
+     </div>
+   );
+ }
 
 function SunIcon() {
   return (

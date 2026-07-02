@@ -33,4 +33,9 @@ export type {
   ArchitectureElement,
   ArchitectureRelationship,
   TestStep,
+  Document,
+  DocumentOperation,
+  RepositoryDocumentOperation,
+  DocumentType,
+  Operation
 } from './types';
