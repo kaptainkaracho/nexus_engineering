@@ -51,7 +51,7 @@ export async function artifactApiRoutes(server: FastifyInstance) {
       for (const repo of repositories) {
         const artifacts = artifactsRepository.getArtifacts(repo)
         if (artifacts) {
-          const artifact = artifacts.find(a => a.id === id || a.documents?.some(d => d.id === id))
+          const artifact = artifacts.find(a => a.documents?.some(d => d.id === id))
           if (artifact) {
             foundArtifact = artifact
             break
@@ -109,7 +109,7 @@ export async function artifactApiRoutes(server: FastifyInstance) {
       return reply.status(400).send({ error: 'ID and documents are required' })
     }
     
-    if (operation.repositoryPath && !operation.documents[0].repositoryPath) {
+    if (!operation.repositoryPath) {
       return reply.status(400).send({ error: 'Repository path must match document repository path' })
     }
 
@@ -130,7 +130,7 @@ export async function artifactApiRoutes(server: FastifyInstance) {
           if (artifact.documents?.some(d => d.id === id)) {
             // Update the document
             const updatedDocuments = artifact.documents.map(doc =>
-              doc.id === id ? operation.documents[0] : doc
+              doc.id === id ? operation.documents![0] : doc
             )
             artifactsToKeep.push({
               ...artifact,
