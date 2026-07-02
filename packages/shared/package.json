@@ -7,10 +7,12 @@
   "types": "./src/index.ts",
   "scripts": {
     "build": "tsc",
-    "lint": "echo 'lint ok'",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@nexus-engineering/eslint-config": "workspace:*",
+    "eslint": "^9.0.0",
     "typescript": "~5.7.0"
   }
 }

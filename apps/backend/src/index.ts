@@ -9,7 +9,7 @@ server.get('/health', async () => {
 const start = async () => {
   try {
     await server.listen({ port: 3001 });
-    console.log('Nexus Engineering backend running on http://localhost:3001');
+    server.log.info('Nexus Engineering backend running on http://localhost:3001');
   } catch (err) {
     server.log.error(err);
     process.exit(1);
