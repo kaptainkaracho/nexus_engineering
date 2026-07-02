@@ -11,6 +11,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "ajv": "^8.17.1",
+    "js-yaml": "^4.1.0",
     "react": "^19.0.0"
   },
   "devDependencies": {
