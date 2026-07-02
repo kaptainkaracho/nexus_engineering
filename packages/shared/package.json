@@ -10,9 +10,16 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "react": "^19.0.0"
+  },
   "devDependencies": {
     "@nexus-engineering/eslint-config": "workspace:*",
+    "@types/react": "^19.0.0",
     "eslint": "^9.0.0",
     "typescript": "~5.7.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
   }
 }
