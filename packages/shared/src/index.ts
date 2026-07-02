@@ -32,10 +32,14 @@ export type {
   TraceLink,
   ArchitectureElement,
   ArchitectureRelationship,
-  TestStep,
-  Document,
-  DocumentOperation,
-  RepositoryDocumentOperation,
-  DocumentType,
-  Operation
+  TestStep
 } from './types';
+
+export type {
+  NexusMetadata,
+  NexusDocument
+} from './requirements/format';
+
+export type {
+  RequirementSchema
+} from './requirements/schema';

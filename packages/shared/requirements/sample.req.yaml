@@ -1,0 +1,25 @@
+nexus:
+  schema: req-doc/v1
+  metadata:
+    domain: Sample
+    version: 1.0.0
+    source: packages/shared/requirements/sample.req.yaml
+
+requirements:
+  - id: REQ-SAMPLE-001
+    type: functional
+    title: Sample Requirement
+    description: This is a test requirement for validation.
+    priority: low
+    status: proposed
+    tags:
+      - sample
+  - id: REQ-SAMPLE-002
+    type: non-functional
+    title: Performance Goal
+    description: The system should respond within 500ms under normal load.
+    priority: medium
+    status: approved
+    tags:
+      - performance
+      - speed

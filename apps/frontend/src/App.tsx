@@ -278,7 +278,6 @@ function App() {
                 </Stack>
               </Card>
             </Grid>
-              </Stack>
             </Stack>
            </>
          )}
