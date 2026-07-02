@@ -120,8 +120,19 @@ export default {
         },
         surface: {
           DEFAULT: 'var(--surface-primary)',
+          primary: 'var(--surface-primary)',
           secondary: 'var(--surface-secondary)',
           tertiary: 'var(--surface-tertiary)',
+        },
+        text: {
+          primary: 'var(--text-primary)',
+          secondary: 'var(--text-secondary)',
+          tertiary: 'var(--text-tertiary)',
+          inverse: 'var(--text-inverse)',
+        },
+        border: {
+          DEFAULT: 'var(--border-default)',
+          hover: 'var(--border-hover)',
         },
       },
       borderRadius: {
@@ -148,6 +159,8 @@ export default {
       },
       transitionTimingFunction: {
         DEFAULT: 'var(--ease-default)',
+        in: 'var(--ease-in)',
+        out: 'var(--ease-out)',
         spring: 'var(--ease-spring)',
       },
     },
