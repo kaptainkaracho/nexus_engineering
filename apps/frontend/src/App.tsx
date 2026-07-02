@@ -1,18 +1,15 @@
 import { useState } from 'react';
-import {
-  Button,
-  Input,
-  Card,
-  Container,
-  Stack,
-  Grid,
-  Nav,
-} from '@nexus-engineering/shared';
+import { Button, Input, Card, Container, Stack, Grid, Nav } from '@nexus-engineering/shared';
+
+type Section = 'overview' | 'buttons' | 'forms' | 'cards';
 
 function App() {
   const [dark, setDark] = useState(false);
+  const [activeSection, setActiveSection] = useState<Section>('overview');
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const toggleDark = () => {
     setDark((prev) => {
@@ -31,173 +28,255 @@ function App() {
     }
   };
 
+  const handleSubmit = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setSubmitted(true);
+      setTimeout(() => setSubmitted(false), 3000);
+    }, 1500);
+  };
+
   const navItems = [
-    { label: 'Dashboard', href: '#', icon: <HomeIcon />, active: true },
-    { label: 'Rides', href: '#', icon: <RideIcon />, badge: 3 as const },
-    { label: 'Routes', href: '#', icon: <RouteIcon /> },
-    { label: 'Settings', href: '#', icon: <SettingsIcon /> },
+    { label: 'Overview', href: '#overview', active: activeSection === 'overview' },
+    { label: 'Buttons', href: '#buttons', active: activeSection === 'buttons' },
+    { label: 'Forms', href: '#forms', active: activeSection === 'forms' },
+    { label: 'Cards', href: '#cards', active: activeSection === 'cards' },
   ];
 
   return (
-    <Container>
-      <Stack gap={8} className="py-8">
-        <header className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-50">
-            The Bike App
-          </h1>
-          <Button
-            variant="ghost"
-            size="sm"
-            icon={dark ? <SunIcon /> : <MoonIcon />}
-            onClick={toggleDark}
-            aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
-          >
-            {dark ? 'Light' : 'Dark'}
-          </Button>
-        </header>
+    <div className="min-h-screen bg-surface-secondary">
+      <header className="border-b border-border bg-surface-primary">
+        <Container size="lg">
+          <div className="flex items-center justify-between py-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-500 text-sm font-bold text-white">
+                B
+              </div>
+              <div>
+                <h1 className="text-lg font-bold text-text-primary">The Bike App</h1>
+                <p className="text-sm text-text-tertiary">Design System v0.1</p>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              icon={dark ? <SunIcon /> : <MoonIcon />}
+              onClick={toggleDark}
+              aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {dark ? 'Light' : 'Dark'}
+            </Button>
+          </div>
+        </Container>
+      </header>
 
-        <Nav items={navItems} />
+      <Container size="lg" className="py-8">
+        <Stack gap={10}>
+          <Nav
+            items={navItems.map((item) => ({
+              label: item.label,
+              href: item.href,
+              active: item.active,
+            }))}
+            variant="horizontal"
+          />
 
-        <Stack gap={6}>
-          <Card variant="default" padding="lg">
-            <Stack gap={6}>
-              <h2 className="text-xl font-semibold text-neutral-900 dark:text-neutral-50">
-                Button Variants
-              </h2>
-              <Stack direction="row" gap={3} wrap>
-                <Button variant="primary">Primary</Button>
-                <Button variant="secondary">Secondary</Button>
-                <Button variant="ghost">Ghost</Button>
-                <Button variant="danger">Danger</Button>
-                <Button variant="primary" loading>
-                  Loading
-                </Button>
-                <Button variant="primary" disabled>
-                  Disabled
-                </Button>
-              </Stack>
-
-              <Stack direction="row" gap={3} align="center">
-                <Button size="sm">Small</Button>
-                <Button size="md">Medium</Button>
-                <Button size="lg">Large</Button>
-              </Stack>
-
-              <Stack direction="row" gap={3} wrap>
-                <Button icon={<SendIcon />}>Send</Button>
-                <Button variant="secondary" icon={<HeartIcon />} iconPosition="right">
-                  Like
-                </Button>
-                <Button variant="ghost" icon={<TrashIcon />} iconPosition="left">
-                  Delete
-                </Button>
-              </Stack>
-            </Stack>
-          </Card>
-
-          <Card variant="elevated" padding="lg">
-            <Stack gap={6}>
-              <h2 className="text-xl font-semibold text-neutral-900 dark:text-neutral-50">
-                Input Fields
-              </h2>
-
-              <Grid cols={2} gap={6}>
-                <Input
-                  label="Full Name"
-                  placeholder="Enter your name"
-                  leftIcon={<UserIcon />}
-                  fullWidth
-                />
-
-                <Input
-                  label="Email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={handleEmailChange}
-                  error={emailError}
-                  leftIcon={<MailIcon />}
-                  fullWidth
-                />
-
-                <Input
-                  label="Password"
-                  type="password"
-                  placeholder="••••••••"
-                  rightIcon={<EyeIcon />}
-                  fullWidth
-                />
-
-                <Input
-                  label="Disabled"
-                  placeholder="This field is disabled"
-                  disabled
-                  fullWidth
-                />
-              </Grid>
-
-              <Input
-                label="Bio"
-                placeholder="Tell us about yourself..."
-                helperText="Brief description for your profile"
-                fullWidth
-              />
-            </Stack>
-          </Card>
-
-          <Card variant="outlined" padding="md">
+          <Stack gap={12}>
             <Stack gap={4}>
-              <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-50">
-                Layout Grid
-              </h2>
-              <Grid cols={3} gap={4}>
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="rounded-lg bg-primary-50 p-4 text-center text-sm font-medium text-primary-700 dark:bg-primary-950 dark:text-primary-300"
-                  >
-                    Grid Item {i + 1}
-                  </div>
-                ))}
-              </Grid>
+              <h2 className="text-2xl font-bold text-text-primary">Button component</h2>
+              <p className="text-text-secondary">
+                4 variants, 3 sizes, loading state, icon support. Uses semantic
+                tokens for dark mode compatibility.
+              </p>
             </Stack>
-          </Card>
+
+            <Card padding="lg">
+              <Stack gap={8}>
+                <Stack gap={3}>
+                  <p className="text-sm font-medium text-text-tertiary uppercase tracking-wide">
+                    Variants
+                  </p>
+                  <Stack direction="row" gap={3} wrap>
+                    <Button variant="primary">Primary</Button>
+                    <Button variant="secondary">Secondary</Button>
+                    <Button variant="ghost">Ghost</Button>
+                    <Button variant="danger">Danger</Button>
+                  </Stack>
+                </Stack>
+
+                <Stack gap={3}>
+                  <p className="text-sm font-medium text-text-tertiary uppercase tracking-wide">
+                    Sizes
+                  </p>
+                  <Stack direction="row" gap={3} align="center">
+                    <Button size="sm">Small</Button>
+                    <Button size="md">Medium</Button>
+                    <Button size="lg">Large</Button>
+                  </Stack>
+                </Stack>
+
+                <Stack gap={3}>
+                  <p className="text-sm font-medium text-text-tertiary uppercase tracking-wide">
+                    With icons
+                  </p>
+                  <Stack direction="row" gap={3} wrap>
+                    <Button icon={<SendIcon />}>Send</Button>
+                    <Button variant="secondary" icon={<HeartIcon />} iconPosition="right">
+                      Like
+                    </Button>
+                    <Button variant="ghost" icon={<TrashIcon />}>
+                      Delete
+                    </Button>
+                  </Stack>
+                </Stack>
+
+                <Stack gap={3}>
+                  <p className="text-sm font-medium text-text-tertiary uppercase tracking-wide">
+                    States
+                  </p>
+                  <Stack direction="row" gap={3} wrap>
+                    <Button variant="primary" loading>
+                      Loading
+                    </Button>
+                    <Button variant="primary" disabled>
+                      Disabled
+                    </Button>
+                    <Button variant="secondary" disabled>
+                      Disabled
+                    </Button>
+                    <Button variant="ghost" disabled>
+                      Disabled
+                    </Button>
+                  </Stack>
+                </Stack>
+              </Stack>
+            </Card>
+
+            <Stack gap={4}>
+              <h2 className="text-2xl font-bold text-text-primary">Form components</h2>
+              <p className="text-text-secondary">
+                Input with label, helper text, error state, icons, and ARIA
+                attributes. Inline validation on blur.
+              </p>
+            </Stack>
+
+            <Card padding="lg">
+              <Stack gap={6}>
+                <Stack gap={4}>
+                  <Input
+                    label="Full Name"
+                    placeholder="Enter your name"
+                    leftIcon={<UserIcon />}
+                    fullWidth
+                  />
+
+                  <Input
+                    label="Email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={handleEmailChange}
+                    error={emailError}
+                    leftIcon={<MailIcon />}
+                    fullWidth
+                  />
+
+                  <Input
+                    label="Password"
+                    type="password"
+                    placeholder="Create a password"
+                    helperText="At least 8 characters"
+                    rightIcon={<EyeIcon />}
+                    fullWidth
+                  />
+
+                  <Input
+                    label="Bio"
+                    placeholder="Tell us about yourself..."
+                    helperText="Brief description for your profile"
+                    fullWidth
+                  />
+
+                  <Input
+                    label="Team (disabled)"
+                    placeholder="You cannot edit this field"
+                    disabled
+                    fullWidth
+                  />
+                </Stack>
+
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant="primary"
+                    onClick={handleSubmit}
+                    loading={loading}
+                    disabled={submitted}
+                    icon={submitted ? <CheckIcon /> : undefined}
+                  >
+                    {submitted ? 'Saved' : 'Save Profile'}
+                  </Button>
+                  <Button variant="ghost">Cancel</Button>
+                </div>
+              </Stack>
+            </Card>
+
+            <Stack gap={4}>
+              <h2 className="text-2xl font-bold text-text-primary">Card component</h2>
+              <p className="text-text-secondary">
+                Three card variants: default (bordered), elevated (shadow), and outlined
+                (transparent). Use with Container, Stack, and Grid for layout.
+              </p>
+            </Stack>
+
+            <Grid cols={3} gap={6}>
+              <Card variant="default" padding="lg">
+                <Stack gap={3}>
+                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary-50 text-primary-600 dark:bg-primary-950 dark:text-primary-300">
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                  </div>
+                  <h3 className="text-base font-semibold text-text-primary">Default</h3>
+                  <p className="text-sm text-text-tertiary">
+                    Bordered card with surface background. Use for standard content containers.
+                  </p>
+                </Stack>
+              </Card>
+
+              <Card variant="elevated" padding="lg">
+                <Stack gap={3}>
+                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary-50 text-secondary-600 dark:bg-secondary-950 dark:text-secondary-300">
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-base font-semibold text-text-primary">Elevated</h3>
+                  <p className="text-sm text-text-tertiary">
+                    Shadowed card that lifts above the surface. Use for dialogs and feature highlights.
+                  </p>
+                </Stack>
+              </Card>
+
+              <Card variant="outlined" padding="lg">
+                <Stack gap={3}>
+                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-warning-50 text-warning-600 dark:bg-warning-950 dark:text-warning-300">
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-base font-semibold text-text-primary">Outlined</h3>
+                  <p className="text-sm text-text-tertiary">
+                    Transparent background with border. Use for secondary content and sidebar sections.
+                  </p>
+                </Stack>
+              </Card>
+            </Grid>
+          </Stack>
         </Stack>
-      </Stack>
-    </Container>
-  );
-}
-
-function HomeIcon() {
-  return (
-    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-    </svg>
-  );
-}
-
-function RideIcon() {
-  return (
-    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-    </svg>
-  );
-}
-
-function RouteIcon() {
-  return (
-    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-    </svg>
-  );
-}
-
-function SettingsIcon() {
-  return (
-    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-    </svg>
+      </Container>
+    </div>
   );
 }
 
@@ -262,6 +341,14 @@ function EyeIcon() {
     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
     </svg>
   );
 }
