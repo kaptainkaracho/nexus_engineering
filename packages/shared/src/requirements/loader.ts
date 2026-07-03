@@ -7,7 +7,8 @@ import Ajv from 'ajv';
  * Load and validate requirement documents from filesystem
  */
 export class RequirementsLoader {
-  private ajv: Ajv.Ajv;
+  private ajv: Ajv;
+  
   
   constructor() {
     this.ajv = new Ajv();
