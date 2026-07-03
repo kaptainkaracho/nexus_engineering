@@ -8,8 +8,7 @@ import Ajv from 'ajv';
  */
 export class RequirementsLoader {
   private ajv: Ajv;
-  
-  
+ 
   constructor() {
     this.ajv = new Ajv();
   }
@@ -59,7 +58,146 @@ export class RequirementsLoader {
   }
 }
 
+// Import validator here to avoid circular dependency
+let traceValidator: any = null;
+async function importValidator() {
+  if (!traceValidator) {
+    // Note: Dynamic import will be resolved at runtime since this is an ESM module
+    const mod = await import('./validator');
+    traceValidator = mod;
+  }
+  return traceValidator;
+}
+
+export interface LoadResult {
+  document: any;
+  errors: Map<string, string[]>;
+  violations?: any[]; // Trace link violations
+}
+
+export class ValidatedRequirementsLoader extends RequirementsLoader {
+  
+  /**
+   * Load and validate a requirement file with trace links
+   */
+  async loadWithTraceValidation(filePath: string): Promise<LoadResult> {
+    let doc: any;
+    try {
+      doc = await super.loadRequirementFile(filePath);
+    } catch (error) {
+      return {
+        document: null,
+        errors: new Map([['file', ['Failed to load file']]]),
+        violations: []
+      };
+    }
+    
+    const validator = await importValidator();
+    
+    try {
+      const validationResult = await validator.validateRequirementDocument(doc);
+      return {
+        document: doc,
+        errors: validationResult.errors || new Map(),
+        violations: validationResult.errors ? Array.from(validationResult.errors.entries()) : []
+      };
+    } catch (error) {
+      console.error(`Trace link validation failed for ${filePath}:`, error);
+      return {
+        document: doc,
+        errors: new Map([['validator', [error.message || 'Validation error']]]),
+        violations: []
+      };
+    }
+  }
+ 
+  /**
+   * Load multiple requirement files and validate trace links across them
+   */
+  async loadAllWithTraceValidation(dirPath: string): Promise<LoadResult[]> {
+    const filePaths = await this.findRequirementFiles(dirPath);
+    const results: LoadResult[] = [];
+    
+    if (!filePaths || filePaths.length === 0) {
+      throw new Error(`No requirement files found in ${dirPath}`);
+    }
+    
+    // First load all documents without validation
+    const allDocs: any[] = [];
+    for (const filePath of filePaths) {
+      try {
+        const doc = await super.loadRequirementFile(filePath);
+        allDocs.push(doc);
+      } catch (error) {
+        results.push({
+          document: null,
+          errors: new Map([['file', [error.message || 'Load error']]]),
+          violations: []
+        });
+      }
+    }
+    
+    // Validate each document against all others
+    const validator = await importValidator();
+    for (let i = 0; i < filePaths.length; i++) {
+      try {
+        // Load other documents for cross-validation
+        const otherDocs = allDocs.filter((_, idx) => idx !== i);
+        
+        const doc = allDocs[i];
+        const validationResult = await validator.validateRequirementDocument(
+          doc,
+          otherDocs.length > 0 ? otherDocs : undefined,
+          this.getExternalArtifactLookup(allDocs)
+        );
+        
+        results.push({
+          document: doc,
+          errors: validationResult.errors || new Map(),
+          violations: validationResult.errors ? Array.from(validationResult.errors.entries()) : []
+        });
+      } catch (error) {
+        console.error(`Cross-document validation failed for ${filePaths[i]}`, error);
+        results.push({
+          document: allDocs[i],
+          errors: new Map([['validator', ['Cross-validation failed']]]),
+          violations: []
+        });
+      }
+    }
+    
+    return results;
+  }
+  
+  /**
+   * Create lookup map of external artifacts from requirement documents
+   */
+  private getExternalArtifactLookup(docs: any[]): Record<string, string[]> {
+    const result: Record<string, string[]> = {};
+    for (const doc of docs) {
+      const docId = this.getDocumentId(doc);
+      if (!docId || !result[docId]) continue;
+      
+      // Include requirement IDs as "artifacts" that can be referenced
+      result[docId] = [];
+    }
+    return result;
+  }
+  
+  /**
+   * Helper to extract document ID from a requirement document
+   */
+  private getDocumentId(doc: any): string {
+    try {
+      return doc.nexus?.metadata?.documentId || doc.nexus?.metadata?.domain || 'unknown';
+    } catch (e) {
+      return 'unknown';
+    }
+  }
+}
+
 /**
  * Singleton instance for global use
  */
 export const requirementsLoader = new RequirementsLoader();
+export const validatedRequirementsLoader = new ValidatedRequirementsLoader();

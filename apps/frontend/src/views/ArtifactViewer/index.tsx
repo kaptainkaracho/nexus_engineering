@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { Card } from '@nexus-engineering/shared';
+import { useState, useMemo, useCallback } from 'react';
+import { Card, cn } from '@nexus-engineering/shared';
 import {
   sampleRequirements,
   sampleArchitectures,
