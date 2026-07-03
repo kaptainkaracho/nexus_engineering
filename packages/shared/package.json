@@ -17,6 +17,8 @@
   },
   "devDependencies": {
     "@nexus-engineering/eslint-config": "workspace:*",
+    "@types/js-yaml": "^4.0.5",
+    "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "eslint": "^9.0.0",
     "typescript": "~5.7.0"
