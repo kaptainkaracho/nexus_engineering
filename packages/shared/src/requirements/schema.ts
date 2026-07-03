@@ -50,6 +50,33 @@ export const reqDocSchema: any = {
           tags: {
             type: 'array',
             items: { type: 'string' }
+          },
+          traceLinks: {
+            type: 'array',
+            items: {
+              $schema: 'http://json-schema.org/draft-07/schema#',
+              type: 'object',
+              properties: {
+                type: { 
+                  type: 'string',
+                  enum: ['verifies', 'satisfies', 'dependsOn', 'tracesTo', 'refines', 'conflictsWith'] 
+                },
+                target: {
+                  type: 'object',
+                  properties: {
+                    id: { type: 'string' },
+                    documentId: { type: 'string' }
+                  },
+                  required: ['id', 'documentId']
+                },
+                confidence: { 
+                  type: 'string',
+                  enum: ['high', 'medium', 'low'] 
+                },
+                description: { type: 'string' }
+              },
+              required: ['type', 'target']
+            }
           }
         },
         required: ['id', 'type', 'title', 'description', 'priority', 'status']
