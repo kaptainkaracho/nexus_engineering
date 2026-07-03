@@ -1,13 +1,8 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Card, cn } from '@nexus-engineering/shared';
-import {
-  sampleRequirements,
-  sampleArchitectures,
-  sampleComponents,
-  sampleTestCases,
-  sampleTraces,
-  type ArtefactTab,
-} from './sample-data';
+import { fetchArtefacts } from '../../api/client';
+
+type ArtefactTab = 'requirements' | 'architecture' | 'components' | 'testcases' | 'traceability';
 
 // Tab config
 const TABS: { key: ArtefactTab; label: string }[] = [
@@ -203,6 +198,42 @@ export function ArtifactViewer() {
   const [activeTab, setActiveTab] = useState<ArtefactTab>('requirements');
   const [query, setQuery] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [requirements, setRequirements] = useState<any[]>([]);
+  const [architectures, setArchitectures] = useState<any[]>([]);
+  const [components, setComponents] = useState<any[]>([]);
+  const [testCases, setTestCases] = useState<any[]>([]);
+  const [traces, setTraces] = useState<any[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    fetchArtefacts().then((data) => {
+      if (cancelled) return;
+      setRequirements(data.requirements || []);
+      setArchitectures(data.architectures || []);
+      setComponents(data.components || []);
+      setTestCases(data.testCases || []);
+      setTraces(data.traces || []);
+      setLoading(false);
+    }).catch((e) => {
+      if (cancelled) return;
+      setError(e.message || 'Failed to load artefacts');
+      setLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  /** Empty/error states shown while loading or when API is unavailable */
+  const renderPlaceholder = useCallback(() => (
+    <div className="flex h-48 items-center justify-center" role="status" aria-live="polite">
+      <p className="text-sm text-text-tertiary">
+        {loading ? 'Loading...' : error ? 'Could not load artefacts. Backend API may be unavailable.' : 'No data available from backend.'}
+      </p>
+    </div>
+  ), [loading, error]);
 
   const filterItems = useCallback(<T extends { title?: string; name?: string; description: string }>(items: T[], q: string): T[] => {
     if (!q.trim()) return items;
@@ -210,18 +241,18 @@ export function ArtifactViewer() {
     return items.filter((i) => i.title?.toLowerCase().includes(lower) || i.name?.toLowerCase().includes(lower) || i.description.toLowerCase().includes(lower));
   }, []);
 
-  const filteredReqs = useMemo(() => filterItems(sampleRequirements), [sampleRequirements, query]);
-  const filteredArchs = useMemo(() => filterItems(sampleArchitectures), [sampleArchitectures, query]);
-  const filteredComps = useMemo(() => filterItems(sampleComponents), [sampleComponents, query]);
-  const filteredTests = useMemo(() => filterItems(sampleTestCases), [sampleTestCases, query]);
+  const filteredReqs = useMemo(() => filterItems(requirements, query), [requirements, query, filterItems]);
+  const filteredArchs = useMemo(() => filterItems(architectures, query), [architectures, query, filterItems]);
+  const filteredComps = useMemo(() => filterItems(components, query), [components, query, filterItems]);
+  const filteredTests = useMemo(() => filterItems(testCases, query), [testCases, query, filterItems]);
 
   /** Find item by ID from active tab data */
   const findItem = (id: string) => {
     switch (activeTab) {
-      case 'requirements': return sampleRequirements.find((r) => r.id === id);
-      case 'architecture': return sampleArchitectures.find((a) => a.id === id);
-      case 'components': return sampleComponents.find((c) => c.id === id);
-      case 'testcases': return sampleTestCases.find((t) => t.id === id);
+      case 'requirements': return requirements.find((r) => r.id === id);
+      case 'architecture': return architectures.find((a) => a.id === id);
+      case 'components': return components.find((c) => c.id === id);
+      case 'testcases': return testCases.find((t) => t.id === id);
       default: return undefined;
     }
   };
@@ -312,12 +343,12 @@ export function ArtifactViewer() {
   };
 
   /** Traceability view: shows cross-artefact links */
-  const renderTraceability = () => (
-    <table className="w-full caption-bottom text-left text-sm" aria-label="Traceability links">
-      <caption className="mb-3 text-sm font-semibold text-text-primary">All Trace Links</caption>
-      {!sampleTraces.length ? (
-        <EmptyState message="No trace links." />
-      ) : (
+  const renderTraceability = () => {
+    if (!traces.length) return <EmptyState message="No trace links." />;
+
+    return (
+      <table className="w-full caption-bottom text-left text-sm" aria-label="Traceability links">
+        <caption className="mb-3 text-sm font-semibold text-text-primary">All Trace Links</caption>
         <thead>
           <tr className="border-b border-border text-xs uppercase tracking-wide text-text-tertiary">
             <th className="p-3 font-semibold" scope="col">Source</th>
@@ -326,11 +357,17 @@ export function ArtifactViewer() {
             <th className="p-3 font-semibold" scope="col">Confidence</th>
           </tr>
         </thead>
-      )}
-      <tbody>
-        {sampleTraces.map((t: any) => {
-          const src = sampleRequirements.find((r) => r.id === t.sourceId) || sampleArchitectures[0] || sampleComponents[0];
-          const tgt = sampleTestCases.find((tc) => tc.id === t.targetId) || sampleArchitectures[1] || sampleComponents[1];
+        <tbody>
+          {traces.map((t) => {
+            const reqFind = requirements.find((r) => r.id === t.sourceId);
+            const archFind = architectures.find((a) => a.id === t.sourceId);
+            const compFind = components.find((c) => c.id === t.sourceId);
+            const src: { title?: string; name?: string } | undefined | null = reqFind ?? archFind ?? compFind ?? null;
+
+            const tcFind = testCases.find((tc) => tc.id === t.targetId);
+            const archFind2 = architectures.find((a) => a.id === t.targetId);
+            const compFind2 = components.find((c) => c.id === t.targetId);
+            const tgt: { name?: string; title?: string } | undefined | null = tcFind ?? archFind2 ?? compFind2 ?? null;
           return (
             <tr key={t.id} className="border-b border-border transition-colors hover:bg-surface-secondary/50">
               <td className="p-3" data-label="Source">
@@ -354,9 +391,10 @@ export function ArtifactViewer() {
             </tr>
           );
         })}
-      </tbody>
-    </table>
-  );
+        </tbody>
+      </table>
+    );
+  };
 
   return (
     <section className="flex h-full flex-col gap-6" aria-label="Artifact Viewer">
