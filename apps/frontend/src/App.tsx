@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button, Input, Card, Container, Stack, Grid, Nav } from '@nexus-engineering/shared';
 import { ArtifactViewer } from './views/ArtifactViewer';
 
@@ -37,6 +37,18 @@ function App() {
       setTimeout(() => setSubmitted(false), 3000);
     }, 1500);
   };
+
+  // Sync activeSection with URL hash on load and hash changes
+  useEffect(() => {
+    const hashToSection = (hash: string): Section => {
+      const section = hash.replace('#', '') as Section;
+      return ['overview', 'buttons', 'forms', 'cards', 'artefacts'].includes(section) ? section : 'overview';
+    };
+    setActiveSection(hashToSection(window.location.hash));
+    const onHashChange = () => setActiveSection(hashToSection(window.location.hash));
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
 
   const navItems = [
     { label: 'Overview', href: '#overview', active: activeSection === 'overview' },

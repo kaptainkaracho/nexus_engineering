@@ -145,9 +145,36 @@ jobs:
       - name: Test
         run: pnpm test || exit 1
 
+  requirements-validate:
+    name: Requirements Validation
+    needs: [setup, test]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate Requirements
+        run: node scripts/validate-requirements.mts
+        continue-on-error: true
+
   validate:
-    name: Validate
-    needs: [setup, build, test]
+    name: Final Validation
+    needs: [setup, build, test, requirements-validate]
     runs-on: ubuntu-latest
     steps:
       - name: All checks passed

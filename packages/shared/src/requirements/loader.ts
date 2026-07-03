@@ -174,17 +174,19 @@ export class ValidatedRequirementsLoader extends RequirementsLoader {
   /**
    * Create lookup map of external artifacts from requirement documents
    */
-  private getExternalArtifactLookup(docs: any[]): Record<string, string[]> {
-    const result: Record<string, string[]> = {};
-    for (const doc of docs) {
-      const docId = this.getDocumentId(doc);
-      if (!docId || !result[docId]) continue;
-      
-      // Include requirement IDs as "artifacts" that can be referenced
-      result[docId] = [];
-    }
-    return result;
-  }
+   private getExternalArtifactLookup(docs: any[]): Record<string, string[]> {
+     const result: Record<string, string[]> = {};
+     for (const doc of docs) {
+       const docId = this.getDocumentId(doc);
+       if (!docId || !result[docId]) {
+         continue; // Skip uninitialized documents
+       }
+       
+       // Include requirement IDs as "artifacts" that can be referenced
+       result[docId] = [];
+     }
+     return result;
+   }
   
   /**
    * Helper to extract document ID from a requirement document

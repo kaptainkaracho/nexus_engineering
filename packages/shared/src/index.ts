@@ -43,3 +43,20 @@ export type {
 export type {
   RequirementSchema
 } from './requirements/schema';
+
+export type {
+  DocumentOperation,
+  RepositoryDocumentOperation
+} from './operations';
+
+export type {
+  DocumentType
+} from './operations';
+
+export type {
+  Document
+} from './operations';
+
+// NOTE: requirementsLoader uses Node.js fs and must not be imported in browser
+// export { requirementsLoader, validatedRequirementsLoader } from './requirements/loader';
+
