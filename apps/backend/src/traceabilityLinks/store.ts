@@ -95,21 +95,27 @@ class TraceLinkStore {
     if (idx === -1) return undefined
 
     const existing = links[idx]
-    const merged = {
-      ...existing,
-      ...updates as StoredTraceLink,
-      updatedAt: new Date().toISOString(),
-      version: (existing.version as string) || '1.0'
+    const version = (existing.version as string) || '1.0'
+    const verParts = version.split('.')
+    const newVersion = `${verParts[0]}.${Number(verParts[1]) + 1}`
+    
+    const storedUpdates: Partial<StoredTraceLink> = {
+      ...updates,
+      createdAt: updates.createdAt instanceof Date ? updates.createdAt.toISOString() : updates.createdAt as string | undefined,
+      updatedAt: updates.updatedAt instanceof Date ? updates.updatedAt.toISOString() : updates.updatedAt as string | undefined
     }
     
-    // increment version suffix
-    const verParts = (merged.version as string).split('.')
-    merged.version = `${verParts[0]}.${Number(verParts[1]) + 1}`
+    const merged: StoredTraceLink = {
+      ...existing,
+      ...storedUpdates,
+      updatedAt: new Date().toISOString(),
+      version: newVersion
+    }
 
     links[idx] = merged
     this.save(links)
 
-    return { ...existing, ...updates, updatedAt: new Date() }
+    return this.mapToTraceLink(merged)
   }
 
   delete(id: string): boolean {

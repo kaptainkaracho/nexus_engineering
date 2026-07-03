@@ -64,9 +64,22 @@ function getBadgeClasses(variant: string): string {
   return `${base} ${isKnown ? palette[variant as BadgeVariant] : 'bg-neutral-400/10 text-neutral-600'}`;
 }
 
+/** Badge category for visual grouping (Gestalt Common Region) */
+type BadgeCategory = 'priority' | 'automation-status' | 'trace-relation' | 'default';
+
 /** Status/priority badge */
-function Badge({ variant, children }: { variant: string; children: React.ReactNode }) {
-  return <span className={getBadgeClasses(variant)}>{children}</span>;
+function Badge({ variant, children, category }: { variant: string; children: React.ReactNode; category?: BadgeCategory }) {
+  const baseClasses = getBadgeClasses(variant);
+  // Per-category color shift for semantically distinct badges (M1 fix)
+  let extraClasses = '';
+  if (category === 'automation-status') {
+    // Automation badges use primary tint so they don't visually collide with trace relation badges
+    extraClasses = '!bg-primary-500/10 !text-primary-700 dark:!bg-primary-950 dark:!text-primary-300' + (variant === 'partially-automated' && variant !== 'automated' ? ' !border-l-2 !border-l-warning-500 !pl-1.5' : '');
+  } else if (category === 'trace-relation') {
+    // Trace relation badges get secondary tint for visual separation from status badges
+    extraClasses = '!bg-secondary-500/10 !text-secondary-700 dark:!bg-secondary-950 dark:!text-secondary-300';
+  }
+  return <span className={cn(baseClasses, extraClasses)}>{children}</span>;
 }
 
 /** A single artefact card */
@@ -363,7 +376,7 @@ export function ArtifactViewer() {
       if (!filteredReqs.length) return <EmptyState key="e" message="No requirements match your search." />;
       return (
         <>
-          <div className="mb-3 text-xs text-text-tertiary hidden sm:block">
+          <div className="mb-3 text-xs text-text-tertiary">
             Showing {getTabFilteredCount()} of {getTabTotalCount()} requirements
           </div>
           {filteredReqs.map((r: any) => (
