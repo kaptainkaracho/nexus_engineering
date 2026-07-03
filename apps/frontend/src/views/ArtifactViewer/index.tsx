@@ -18,10 +18,26 @@ const TABS: { key: ArtefactTab; label: string }[] = [
   { key: 'traceability', label: 'Traceability' },
 ];
 
-/** Status/priority badges */
-function Badge({ variant, children }: { variant: string; children: React.ReactNode }) {
-  const base = 'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium';
-  const palette: Record<string, string> = {
+// Design-system-approved badge variants
+type BadgeVariant =
+  | 'high' | 'critical' | 'medium' | 'low'
+  | 'approved' | 'implemented' | 'verified' | 'proposed' | 'rejected'
+  | 'completed' | 'draft' | 'ready' | 'automated' | 'manual' | 'partially-automated'
+  | 'satisfies' | 'verifies' | 'tracesTo' | 'dependsOn' | 'refines' | 'conflictsWith'
+  | 'block' | 'part' | 'port' | 'unit' | 'info';
+
+const BADGE_VARIANTS: ReadonlySet<BadgeVariant> = new Set([
+  'high','critical','medium','low',
+  'approved','implemented','verified','proposed','rejected',
+  'completed','draft','ready','automated','manual','partially-automated',
+  'satisfies','verifies','tracesTo','dependsOn','refines','conflictsWith',
+  'block','part','port','unit','info',
+] as const);
+
+/** Get badge classes from design tokens */
+function getBadgeClasses(variant: string): string {
+  const base = 'inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium';
+  const palette: Record<BadgeVariant, string> = {
     high: 'bg-warning-500/10 text-warning-700 dark:bg-warning-950 dark:text-warning-300',
     critical: 'bg-error-500/10 text-error-700 dark:bg-error-950 dark:text-error-300',
     medium: 'bg-neutral-500/10 text-neutral-700 dark:bg-neutral-950 dark:text-neutral-300',
@@ -36,7 +52,7 @@ function Badge({ variant, children }: { variant: string; children: React.ReactNo
     ready: 'bg-information-500/10 text-information-700',
     automated: 'bg-primary-500/10 text-primary-700 dark:bg-primary-950 dark:text-primary-300',
     manual: 'bg-neutral-500/10 text-neutral-600 dark:bg-neutral-950 dark:text-neutral-400',
-    partially-automated: 'bg-information-500/10 text-information-700',
+    'partially-automated': 'bg-information-500/10 text-information-700',
     satisfies: 'bg-success-500/10 text-success-700 dark:bg-success-950 dark:text-success-300',
     verifies: 'bg-information-500/10 text-information-700',
     tracesTo: 'bg-info-500/10 text-info-700',
@@ -47,8 +63,15 @@ function Badge({ variant, children }: { variant: string; children: React.ReactNo
     part: 'bg-information-500/10 text-information-700',
     port: 'bg-information-500/10 text-information-700',
     unit: 'bg-success-500/10 text-success-700 dark:bg-success-950 dark:text-success-300',
+    info: 'bg-info-500/10 text-info-700',
   };
-  return <span className={`${base} ${palette[variant] ?? 'bg-neutral-400/10 text-neutral-600'}`}>{children}</span>;
+  const isKnown = variant in palette;
+  return `${base} ${isKnown ? palette[variant as BadgeVariant] : 'bg-neutral-400/10 text-neutral-600'}`;
+}
+
+/** Status/priority badge */
+function Badge({ variant, children }: { variant: string; children: React.ReactNode }) {
+  return <span className={getBadgeClasses(variant)}>{children}</span>;
 }
 
 /** A single artefact card */
@@ -181,10 +204,10 @@ export function ArtifactViewer() {
   const [query, setQuery] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const filterItems = useMemo(() => <T extends { title?: string; name?: string; description: string }>(items: T[]): T[] => {
-    if (!query.trim()) return items;
-    const q = query.toLowerCase();
-    return items.filter((i) => i.title?.toLowerCase().includes(q) || i.name?.toLowerCase().includes(q) || i.description.toLowerCase().includes(q));
+  const filterItems = useCallback(<T extends { title?: string; name?: string; description: string }>(items: T[], q: string): T[] => {
+    if (!q.trim()) return items;
+    const lower = q.toLowerCase();
+    return items.filter((i) => i.title?.toLowerCase().includes(lower) || i.name?.toLowerCase().includes(lower) || i.description.toLowerCase().includes(lower));
   }, []);
 
   const filteredReqs = useMemo(() => filterItems(sampleRequirements), [sampleRequirements, query]);
@@ -205,7 +228,7 @@ export function ArtifactViewer() {
 
   const selectedItem = selectedId ? findItem(selectedId) : null;
 
-  /** Tab key navigation */
+  /** Tab key navigation with Home/End support */
   const handleTabKeyDown = (index: number, e: React.KeyboardEvent) => {
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
       e.preventDefault();
@@ -215,8 +238,18 @@ export function ArtifactViewer() {
       e.preventDefault();
       setActiveTab(TABS[(index - 1 + TABS.length) % TABS.length].key);
       setSelectedId(null);
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      setActiveTab(TABS[0].key);
+      setSelectedId(null);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      setActiveTab(TABS[TABS.length - 1].key);
+      setSelectedId(null);
     }
   };
+
+  const tabBaseClasses = 'shrink-0 border-b-[3px] px-4 py-3 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2';
 
   /** Artefact list for the active tab */
   const renderList = () => {
@@ -280,33 +313,49 @@ export function ArtifactViewer() {
 
   /** Traceability view: shows cross-artefact links */
   const renderTraceability = () => (
-    <div className="col-span-full" role="table" aria-label="Traceability links">
-      <h3 className="mb-3 text-sm font-semibold text-text-primary">All Trace Links</h3>
+    <table className="w-full caption-bottom text-left text-sm" aria-label="Traceability links">
+      <caption className="mb-3 text-sm font-semibold text-text-primary">All Trace Links</caption>
       {!sampleTraces.length ? (
         <EmptyState message="No trace links." />
       ) : (
-        <div className="space-y-2">
-          {sampleTraces.map((t: any) => {
-            const src = sampleRequirements.find((r) => r.id === t.sourceId) || sampleArchitectures[0] || sampleComponents[0];
-            const tgt = sampleTestCases.find((tc) => tc.id === t.targetId) || sampleArchitectures[1] || sampleComponents[1];
-            return (
-              <div key={t.id} className="flex flex-wrap items-center gap-2 rounded-lg border border-border px-4 py-3">
+        <thead>
+          <tr className="border-b border-border text-xs uppercase tracking-wide text-text-tertiary">
+            <th className="p-3 font-semibold" scope="col">Source</th>
+            <th className="p-3 font-semibold" scope="col">Relationship</th>
+            <th className="p-3 font-semibold" scope="col">Target</th>
+            <th className="p-3 font-semibold" scope="col">Confidence</th>
+          </tr>
+        </thead>
+      )}
+      <tbody>
+        {sampleTraces.map((t: any) => {
+          const src = sampleRequirements.find((r) => r.id === t.sourceId) || sampleArchitectures[0] || sampleComponents[0];
+          const tgt = sampleTestCases.find((tc) => tc.id === t.targetId) || sampleArchitectures[1] || sampleComponents[1];
+          return (
+            <tr key={t.id} className="border-b border-border transition-colors hover:bg-surface-secondary/50">
+              <td className="p-3" data-label="Source">
                 <span className="shrink-0 rounded bg-primary-50 dark:bg-primary-950 px-2 py-0.5 text-xs font-medium text-primary-700 dark:text-primary-300">
                   {t.sourceType === 'requirement' ? 'REQ' : t.sourceType === 'architectureModel' ? 'ARCH' : t.sourceType === 'softwareComponent' ? 'COMP' : 'TC'}
                 </span>
-                <span className="text-sm text-text-primary truncate max-w-[200px]">{src?.title || src?.name || 'Unknown'}</span>
+                <span className="ml-1 text-text-primary">{src?.title || src?.name || 'Unknown'}</span>
+              </td>
+              <td className="p-3" data-label="Relationship">
                 <Badge variant={t.relationshipType}>{t.relationshipType}</Badge>
+              </td>
+              <td className="p-3" data-label="Target">
                 <span className="shrink-0 rounded bg-info-50 dark:bg-info-950 px-2 py-0.5 text-xs font-medium text-info-700">
                   {t.targetType === 'requirement' ? 'REQ' : t.targetType === 'architectureModel' ? 'ARCH' : t.targetType === 'softwareComponent' ? 'COMP' : 'TC'}
                 </span>
-                <span className="text-sm text-text-secondary truncate max-w-[200px]">{tgt?.name || tgt?.title || 'Unknown'}</span>
+                <span className="ml-1 text-text-secondary">{tgt?.name || tgt?.title || 'Unknown'}</span>
+              </td>
+              <td className="p-3" data-label="Confidence">
                 <Badge variant={t.confidence}>{t.confidence}</Badge>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
   );
 
   return (
@@ -323,11 +372,7 @@ export function ArtifactViewer() {
             tabIndex={activeTab === tab.key ? 0 : -1}
             onKeyDown={(e) => handleTabKeyDown(i, e)}
             onClick={() => { setActiveTab(tab.key); setSelectedId(null); }}
-            className="shrink-0 border-b-[3px] px-4 py-3 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
-            style={{
-              borderColor: activeTab === tab.key ? 'rgb(37, 99, 235)' : 'transparent',
-              color: activeTab === tab.key ? 'var(--color-primary-600)' : 'var(--text-secondary)',
-            } as React.CSSProperties}
+            className={cn(tabBaseClasses, activeTab === tab.key ? 'border-primary-600 text-primary-600' : 'border-transparent text-text-secondary hover:text-text-primary')}
           >
             {tab.label}
           </button>
@@ -348,19 +393,24 @@ export function ArtifactViewer() {
         />
       </div>
 
-      {/* Content area */}
-      <section id={`panel-${activeTab}`} role="tabpanel" aria-labelledby={`tab-${activeTab}`}>
-        <div className="grid gap-4 lg:grid-cols-2">
+      {/* Content area with detail panel — 8/4 split on larger screens */}
+      {selectedItem ? (
+        <section aria-labelledby={`tab-${activeTab}`}>
+          <div className="grid gap-6" style={{ gridTemplateColumns: '1fr auto' }}>
+            <div role="tabpanel" className="min-w-0">
+              {renderList()}
+            </div>
+            <aside role="region" aria-label="Details panel" className="sticky top-6 w-[32rem] shrink-0">
+              <DetailPanel item={selectedItem} onBack={() => setSelectedId(null)} />
+            </aside>
+          </div>
+        </section>
+      ) : (
+        <section id={`panel-${activeTab}`} role="tabpanel" aria-labelledby={`tab-${activeTab}`}>
           {renderList()}
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* Detail sidebar (on desktop) or full-width below selected item */}
-      <div className={`${selectedItem ? 'block' : 'hidden'} w-full xl:w-96 xl:flex-shrink-0`}>
-        {selectedItem && (
-          <DetailPanel item={selectedItem} onBack={() => setSelectedId(null)} />
-        )}
-      </div>
     </section>
   );
 }

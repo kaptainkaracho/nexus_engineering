@@ -101,11 +101,12 @@ export class ValidatedRequirementsLoader extends RequirementsLoader {
         errors: validationResult.errors || new Map(),
         violations: validationResult.errors ? Array.from(validationResult.errors.entries()) : []
       };
-    } catch (error) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Validation error';
       console.error(`Trace link validation failed for ${filePath}:`, error);
       return {
         document: doc,
-        errors: new Map([['validator', [error.message || 'Validation error']]]),
+        errors: new Map([['validator', [message]]]),
         violations: []
       };
     }
@@ -128,10 +129,11 @@ export class ValidatedRequirementsLoader extends RequirementsLoader {
       try {
         const doc = await super.loadRequirementFile(filePath);
         allDocs.push(doc);
-      } catch (error) {
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Load error';
         results.push({
           document: null,
-          errors: new Map([['file', [error.message || 'Load error']]]),
+          errors: new Map([['file', [message]]]),
           violations: []
         });
       }

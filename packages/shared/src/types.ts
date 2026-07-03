@@ -16,6 +16,19 @@ export interface Requirement extends BaseEntity {
   priority: 'low' | 'medium' | 'high' | 'critical';
   status: 'proposed' | 'approved' | 'rejected' | 'implemented' | 'verified';
   tags?: string[];
+  traceLinks?: RequirementTraceLink[];
+}
+
+export interface RequirementTraceLink {
+  type: 'verifies' | 'satisfies' | 'dependsOn' | 'tracesTo' | 'refines' | 'conflictsWith';
+  target: RequirementReference;
+  confidence?: 'high' | 'medium' | 'low';
+  description?: string;
+}
+
+export interface RequirementReference {
+  id: string;
+  documentId: string;
 }
 
 export interface ArchitectureModel extends BaseEntity {

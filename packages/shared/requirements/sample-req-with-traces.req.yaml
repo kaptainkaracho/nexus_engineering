@@ -1,0 +1,119 @@
+nexus:
+  schema: req-doc/v1
+  metadata:
+    domain: Traceability Demo
+    version: 2.0.0
+    source: packages/shared/requirements/sample-req-with-traces.req.yaml
+    documentId: TRACE-DEMO-001
+
+requirements:
+  - id: AUTH-001
+    type: functional
+    title: User Authentication
+    description: System must authenticate users via credentials
+    priority: high
+    status: approved
+    tags:
+      - authentication
+      - security
+    traceLinks:
+      - type: verifies
+        target:
+          id: SEC-001
+          documentId: TRACE-DEMO-002
+        confidence: high
+        description: Verifies security requirements are met
+      - type: satisfies
+        target:
+          id: AUTH-REQ-001
+          documentId: TRACE-DEMO-001
+        confidence: medium
+        description: Satisfies existing authentication requirement
+      - type: tracesTo
+        target:
+          id: PERF-001
+          documentId: TRACE-DEMO-002
+        confidence: low
+        description: Traces to performance requirement
+
+  - id: PERF-001
+    type: non-functional
+    title: Performance Requirements
+    description: System must handle 1000 concurrent users
+    priority: critical
+    status: approved
+    tags:
+      - performance
+      - scalability
+    traceLinks:
+      - type: tracesTo
+        target:
+          id: AUTH-001
+          documentId: TRACE-DEMO-001
+        confidence: high
+        description: Traced back to authentication requirement
+      - type: refines
+        target:
+          id: SYS-001
+          documentId: TRACE-DEMO-002
+        confidence: medium
+        description: Refines system architecture requirements
+      - type: conflictsWith
+        target:
+          id: SCALING-002
+          documentId: TRACE-DEMO-003
+        confidence: high
+        description: Conflicts with current scaling approach
+
+  - id: SCALING-002
+    type: functional
+    title: Alternative Scaling Approach
+    description: Alternative method for handling concurrent users
+    priority: medium
+    status: proposed
+    tags:
+      - scaling
+      - alternative
+    traceLinks:
+      - type: conflictsWith
+        target:
+          id: PERF-001
+          documentId: TRACE-DEMO-002
+        confidence: high
+        description: Conflicts with performance requirements
+      - type: refines
+        target:
+          id: SYS-001
+          documentId: TRACE-DEMO-002
+        confidence: medium
+        description: Refines same system requirements
+
+  - id: SEC-001
+    type: functional
+    title: Security Standards
+    description: System must meet security compliance standards
+    priority: high
+    status: approved
+    tags:
+      - security
+      - compliance
+
+  - id: SYS-001
+    type: system
+    title: System Architecture
+    description: Define system architecture patterns
+    priority: medium
+    status: approved
+    tags:
+      - architecture
+      - design
+
+  - id: AUTH-REQ-001
+    type: functional
+    title: Legacy Authentication
+    description: Legacy authentication pattern to update
+    priority: low
+    status: approved
+    tags:
+      - authentication
+      - legacy
