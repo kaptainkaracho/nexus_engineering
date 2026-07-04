@@ -2,6 +2,7 @@ import * as yaml from 'js-yaml';
 import { promises as fs } from 'fs';
 import path from 'path';
 import Ajv from 'ajv';
+import { reqDocSchema } from './schema';
 
 /**
  * Load and validate requirement documents from filesystem
@@ -44,11 +45,13 @@ export class RequirementsLoader {
       const fileContents = await fs.readFile(filePath, 'utf-8');
       const doc = yaml.load(fileContents) as any;
       
-      // TODO: Add schema validation when reqDocSchema is available
-      // const validate = this.ajv.compile(schema);
-      // if (!validate(doc)) {
-      //   throw new Error(`Validation failed: ${validate.errors?.map(e => e.message).join(', ')}`);
-      // }
+      const validate = this.ajv.compile(reqDocSchema);
+      if (!validate(doc)) {
+        throw new Error(
+          `Schema validation failed for ${filePath}: ` +
+          validate.errors?.map(e => `${e.instancePath} ${e.message}`).join('; ')
+        );
+      }
       
       return doc;
     } catch (error) {
