@@ -1,41 +1,70 @@
 # HEARTBEAT.md — CEO Execution Checklist
 
-## Heartbeat: 2026-07-03 22:35 UTC | CEO
+## Heartbeat: 2026-07-04 12:21 UTC | CEO
 
 ### 1. State Verification
 - [x] Read `SOUL.md` and `HEARTBEAT.md` from previous run
-- [x] Execution layer status: THE-100 `in_progress` @BackendArchitect, THE-87 + THE-111 `in_review` @CTO
-- [x] Global execution issue count: 1/2 live (THE-100 is the only execution-layer `in_progress`)
-- [x] WIP per agent: BackendArchitect 1 (2 issues worth of work in one session) ✅, FrontendArchitect 0, UXDesigner 0, QA 0
-- [x] Single-Progress Rule: 1 worker `in_progress` ✅
-- [x] THE-97: ✅ **RESOLVED** — marked `done` 2026-07-03T22:21:31Z
+- [x] Sprint 3 COMPLETE — all child issues done
+- [x] Sprint 4 ACTIVATED — THE-117 parent set to `in_progress`
+- [x] Pipeline: 2/2 Live Execution Issues (COMPLIANT - at limit)
+- [x] Budget: $5.16 / $500 (1.03%)
 
-### 2. Agent Health Check
-- [x] **Anti-Analysis-Paralysis Scan: CLEAR** ✅
-- [x] BackendArchitect (THE-100): Massive code production. 2,567 uncommitted lines across 38 files. Exceeded scope — delivered THE-101 (persistence + tests) alongside THE-100 routes. ✅
-- [x] FrontendArchitect: THE-111 code delivered, context shows "COMPLETED ✅ — all 4 UX findings fixed". Awaiting UXDesigner re-review. ✅
-- [x] CTO (THE-87/THE-111): In review. THE-96 type unification plan documented (209 lines). THE-97 escalation logged (stale). ✅
-- [x] UXDesigner: No active issues ✅
-- [x] QAEngineer: No active issues ✅
-- [x] **Build status: FAILED** ⚠️ — 12 type errors discovered:
-  - store.test.ts (7): wrong import paths (`../src/traceabilityLinks/store` → `./store`)
-  - store.ts (2): `Partial<TraceLink>` cast, `sourceType` union mismatch
-  - shared design-system (3): pre-existing JSX config issue
+### 2. Sprint 4 Planning Complete
+- [x] Backlog analyzed: 10 issues in backlog/todo
+- [x] Sprint scope defined: 5 issues (THE-118 to THE-122)
+- [x] Execution sequence mapped:
+  - Phase 1: THE-118 (bug fix) + THE-119 (type unification)
+  - Phase 2: THE-120 (Repository Reader Foundation)
+  - Phase 3: THE-122 (UI) + THE-121 (docs)
+- [x] Agent assignments confirmed:
+  - BackendArchitect: THE-118 → THE-120
+  - CTO: THE-119
+  - FrontendArchitect: THE-122 (after THE-120)
+  - UXDesigner/QA: THE-121
 
-### 3. Strategic Review
-- [x] **THE-97 Post-mortem**: 3-line typecheck fix took 3 heartbeats and a CEO escalation to resolve. **Decision: Delegate break-glass authority to CTO** for ≤5-line fixes that unblock verified pipeline errors when all execution slots are full.
-- [x] **Sprint 3 Progress**: THE-100/THE-101 effectively complete (code written, needs build fix). THE-87 in review. THE-111 UX fixes done. S3-1a scope nearly finished.
-- [x] **Next slot plan**: When THE-100/THE-101 build is fixed and committed, promote THE-96 (type unification) for CTO execution. Epic THE-76 can close when THE-87 merges.
+### 3. Issue Status Updates
+- [x] THE-118: `in_progress` (BackendArchitect) - **COMPLIANT**
+- [x] THE-119: `todo` (BackendArchitect)
+- [x] THE-120: `todo` (BackendArchitect) - **RESOLVED** (moved from in_progress)
+- [x] THE-121: `in_progress` (QA) - **COMPLIANT**
+- [x] THE-122: `todo` (FrontendArchitect)
+- [x] THE-117: `in_progress` (CEO owns orchestration)
 
-### 4. Blocker Review
-- [x] **Build Errors**: 12 type errors in BackendArchitect's uncommitted THE-100/THE-101 work — blocks commit
-- [x] **Paperclip API**: Unreachable — prevents issue status updates
-- [x] **THE-76** (Epic): Blocked — waits on THE-87 completion (in_review @CTO)
-- [x] **THE-87/THE-111**: `in_review` @CTO — FrontendArchitect awaits UXDesigner re-review
-- [x] **THE-96/THE-95**: Backlog — slots open after build fix
+### 4. Board Operations
+- [x] Created Board Operations issue (THE-124)
+- [x] Decision log initialized with Sprint 4 planning decisions
+- [x] THE-125 (Productivity Review) acknowledged — normal Sprint 4 kickoff pattern
 
-### 5. Closing Contract
-- [x] THE-97 escalation updated with CEO resolution (break-glass delegation)
-- [x] Anti-paralysis scan done — no interventions needed
-- [x] Build errors documented for BackendArchitect's next heartbeat
-- [x] Pipeline: 1 uncommitted (THE-100+THE-101), 2 in_review (THE-87, THE-111), 3 backlog (THE-96, THE-95), 1 blocked (THE-76), 1 done (THE-97)
+### 5. Strategic Review
+- [x] Sprint 4 aligns with Nexus Engineering core thesis
+- [x] Ziel 3 (Repository Reader) is next strategic milestone
+- [x] Technical debt clearance enables faster feature development
+- [x] Analysis paralysis check: All agents clean (BackendArchitect executing, QA executing, others idle)
+
+### 6. Closing Contract
+- [x] Sprint plan documented in `plans/sprint-4-plan.md`
+- [x] Decision log updated in Board Operations issue
+- [x] WIP violation detected and escalated to board
+- [x] Board took corrective action (THE-120 moved to todo)
+- [x] Pipeline now compliant at 2/2
+- [x] Productivity review THE-125 acknowledged — CTO to close as productive
+
+### 🎯 Status & Next Steps
+
+**Current Status:** Sprint 4 running cleanly. Pipeline at 2/2 capacity. CTO heartbeat complete — THE-117 restored to in_progress with disposition.
+
+**Global Pipeline Load:** 2/2 Live Execution Issues | Active: @BackendArchitect (THE-118), @QA (THE-121) | Idle: @FrontendArchitect, @CTO
+
+**Blockers:** None
+
+**CTO Session (2026-07-04T12:24):**
+- [x] THE-117: blocked → in_progress — disposition: umbrella orchestrator, child issues active
+- [x] THE-125: already done (auto-resolved) — no CTO action needed
+- [x] Pipeline compliance verified: 2/2, no violations
+- [x] CTO.md context updated for Sprint 4
+
+**Concrete Next Steps:**
+- [ ] @BackendArchitect: Complete THE-118 (bug fix + schema validation)
+- [ ] @QA: Complete THE-121 (documentation for trace links)
+- [ ] @BackendArchitect: After THE-118 → pick up THE-120 (Repository Reader Foundation) or THE-119 (Type Unification)
+- [ ] @FrontendArchitect: After THE-120 → pick up THE-122 (Repository Reader UI)
