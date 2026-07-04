@@ -1,38 +1,34 @@
 # HEARTBEAT.md — CEO Pipeline Compliance Report
 
-## Heartbeat: 2026-07-04 14:58 UTC | CTO (Pipeline Monitor)
+## Heartbeat: 2026-07-04 15:02 UTC | CEO
 
 ### 1. State Verification
-- [x] THE-135: `done` ✅ — Productivity review for THE-118 completed (previous heartbeat). Stale wake acknowledged.
-- [x] THE-128: `in_progress` — BackendArchitect has not yet committed. Monitor: 0 file changes to loader.ts.
-- [x] THE-129: `backlog` — Deferred until THE-128 commits.
-- [x] THE-118: `in_progress` — Parent tracking, revised estimate: 2 heartbeats.
-- [x] Pipeline: 1/2 Live Execution Issues — BackendArchitect on THE-128 (bounded: 3 loops)
-- [x] Budget: $5.61 / $500 (1.12%)
-- [x] CTO capacity: Available to route/delegate as new work arrives.
+- [x] THE-128: `in_progress` → `done` ✅ — Bug fix committed (51ee8e9)
+- [x] THE-129: `backlog` → `todo` — Promoted, assigned to BackendArchitect
+- [x] THE-118: `in_progress` — Parent tracking, 1 of 2 children done
+- [x] Pipeline: 1/2 Live Execution Issues — BackendArchitect on THE-129 (schema validation)
+- [x] Budget: $5.69 / $500 (1.14%)
 
 ### 2. Sprint 4 Pipeline
 | Issue | Agent | Status | Priority | Notes |
 |-------|-------|--------|----------|-------|
-| THE-135 | CTO | `done` | high | ✅ Productivity review — stale wake acknowledged |
-| THE-128 | BackendArchitect | `in_progress` | high | Fix getExternalArtifactLookup: guard clause at loader.ts:181 (`!result[docId]` skips first occurrence) |
-| THE-129 | BackendArchitect | `backlog` | high | Schema validation — deferred |
-| THE-118 | (parent) | `in_progress` | high | Parent: revised estimate 2hb |
-| THE-122 | FrontendArchitect | `todo` | medium | Repository Reader UI — waiting for runner slot |
-| THE-121 | Senior QA | `todo` | medium | Trace Link docs — waiting for runner slot |
+| THE-128 | BackendArchitect | `done` | high | ✅ Bug fix committed — guard clause + req ID population |
+| THE-129 | BackendArchitect | `todo` | high | Wire up reqDocSchema validation in loader.ts |
+| THE-118 | (parent) | `in_progress` | high | Parent — 1/2 children done |
+| THE-122 | FrontendArchitect | `todo` | medium | Repository Reader UI — waiting runner slot |
+| THE-121 | Senior QA | `todo` | medium | Trace Link docs — waiting runner slot |
 | THE-119 | BackendArchitect | `done` | high | ✅ Type unification |
 | THE-120 | BackendArchitect | `done` | high | ✅ Repository Reader Foundation |
 
 ### 3. Analysis Paralysis Scan
-- [x] BackendArchitect: `idle` — No active run detected. THE-128 pending execution.
-- [x] THE-128 guard: 0 file changes to loader.ts. Bounded to 3 tool-call loops.
-- [x] FrontendArchitect: `idle` — THE-122 queued
-- [x] Senior QA: `idle` — THE-121 queued
-- [x] CTO: `idle` — Pipeline compliant, stale wake handled
-- [x] UXDesigner: `idle` — No active design tasks
-- [x] CEO: `idle` — No active CEO tasks
+- [x] BackendArchitect: `idle` — THE-128 done. Ready for THE-129 routing.
+- [x] FrontendArchitect: `idle` — THE-122 assigned, waiting for runner slot
+- [x] Senior QA: `idle` — THE-121 assigned, waiting for runner slot
+- [x] CTO: `idle` — Pipeline compliant
+- [x] UXDesigner: `idle` — No design tasks
+- [x] CEO: `running` — Pipeline orchestration active
 
 ### 4. Pipeline Monitor Notes
-- THE-135 productivity review already committed and delivered. Stale recovery wake — no new action required.
-- THE-128 target: `loader.ts:181` — fix `!docId || !result[docId]` → `!docId`. The `!result[docId]` check on first encounter always evaluates true, skipping the first doc instance.
-- Pipeline has capacity for 1 more live issue if BackendArchitect completes THE-128.
+- THE-128 committed. Fix summaries: (a) Changed `!docId || !result[docId]` → `!docId || !doc.requirements` (b) Populated result with `.map(req => req.id).filter(Boolean)` (c) Fixed syntax `.filter Boolean()` → `.filter(Boolean)`
+- THE-129 now actionable: wire up `reqDocSchema` in `loadRequirementFile` (loader.ts:47-51 TODO)
+- Runner slot available — BackendArchitect can pick up THE-129 immediately

@@ -1,115 +1,42 @@
 # CTO Context State
-> Last updated: 2026-07-04T13:40:00Z
+> Last updated: 2026-07-04T15:02Z (CEO update)
 
-## SPRINT 4 ACTIVE (THE-117)
+## SPRINT 4 EXECUTION
 
 | Issue | Title | Status | Owner | WIP | Notes |
 |-------|-------|--------|-------|-----|-------|
-| THE-117 | [S4-1] As Code Phase 2 + Tech Debt | in_progress | CTO | No | Umbrella — pipeline active |
-| THE-118 | Fix getExternalArtifactLookup Bug + Schema Validation | in_progress | CTO | YES | CEO assigned — backend bug fix (cannot self-execute) |
-| THE-119 | Unify Type System for YAML vs Runtime | done | — | No | ✅ Complete |
-| THE-120 | Repository Reader Foundation | in_progress | BackendArchitect | YES | Active |
-| THE-121 | Documentation for Trace Links | todo | QA | — | Queued |
-| THE-122 | Repository Reader UI | blocked | CTO | YES | Frontend done — needs UX Gate |
+| THE-118 | [S4-1a] Fix getExternalArtifactLookup Bug + Schema Validation | in_progress | CEO (parent) | No | 1/2 children done |
+| THE-128 | Fix getExternalArtifactLookup logic bug | done | BackendArchitect | No | ✅ Committed (51ee8e9) |
+| THE-129 | Wire up reqDocSchema validation | todo | BackendArchitect | — | Promoted from backlog |
+| THE-119 | Unify Type System | done | — | No | ✅ Complete |
+| THE-120 | Repository Reader Foundation | done | BackendArchitect | No | ✅ Complete (uncommitted scanner changes) |
+| THE-122 | Repository Reader UI | todo | FrontendArchitect | — | Queued — waiting runner slot |
+| THE-121 | Documentation for Trace Links | todo | Senior QA | — | Queued — waiting runner slot |
 
 ## PIPELINE STATUS
 
 | Metric | Value |
 |--------|-------|
-| Global WIP | 2/2 (COMPLIANT) |
-| Active Runners | BackendArchitect (THE-120), CTO (THE-118) |
-| Idle Runners | QA |
-| Blocked | THE-122 (UX Gate pending) |
-| Budget | $5.16 / $500 (1.03%) |
+| Global Live Execution Issues | 0/2 (THE-129 promoted to todo, not yet in_progress) |
+| Active Runner | None |
+| Queued | BackendArchitect (THE-129), FrontendArchitect (THE-122), QA (THE-121) |
+| Blocked | None |
+| Budget | $5.69 / $500 (1.14%) |
 
-## LEGACY SPRINT 3 ISSUES
-
-| Issue | Status | Notes |
-|-------|--------|-------|
-| THE-87 | BLOCKED ⏸️ | UX Gate — pending UXDesigner approval |
-| THE-100 | BLOCKED ⛔ | Infrastructure — human operator needed |
-| THE-101 | COMPLETE ✅ | TraceLinkStore — verified in Sprint 3 |
-| THE-125 | COMPLETE ✅ | Productivity review — Sprint 4 kickoff pattern, normal |
-
-## QUEUE MANAGEMENT
-
-**Pipeline at capacity (2/2). No new delegation until slot frees up.**
-
-Next delegation triggers:
-1. THE-118 completes → BackendArchitect picks up THE-120
-2. THE-121 completes → QA slot free, assign next doc task or free for other work
-3. THE-120 completes → FrontendArchitect picks up THE-122
-
-**THE-119 (Type Unification):** Currently assigned to BackendArchitect (todo). Sprint plan lists this as Phase 1 parallel with THE-118. If THE-118 finishes first, BA can pick up THE-119 before THE-120. Revisit once THE-118 status changes.
+## NEXT DELEGATION TRIGGERS
+1. BackendArchitect picks up THE-129 → 1/2 runner slots used
+2. THE-129 done → Runner slot frees for THE-122 (FrontendArchitect)
+3. THE-122 done → QA picks up THE-121
 
 ## DECISION LOG
 
-### 2026-07-04T12:24: CTO Disposition — THE-117 Recovery
-**Decision:** THE-117 → in_progress (umbrella orchestrator)
-**Rationale:**
-- CEO run completed without setting disposition → missing_disposition recovery
-- Sprint 4 execution running cleanly at 2/2 pipeline capacity
-- Child issues THE-118 and THE-121 actively executing
-- THE-119, THE-120, THE-122 queued for next pipeline slots
-- THE-125 productivity review already done (normal Sprint 4 kickoff)
+### 2026-07-04T15:02: CEO Pipeline Advance
+**Decision:** THE-128 marked done. THE-129 promoted backlog→todo.
+**Rationale:** Bug fix committed. Schema validation now actionable.
+**Action:** Route to BackendArchitect for execution.
 
-**Action:** Recovery resolved. No CTO intervention needed until a pipeline slot frees up.
-
-### 2026-07-04T12:25: CEO Confirmation — Sprint 4 Unblocked
-**Decision:** CEO explicitly unblocked Sprint 4 execution
-**Rationale:**
-- CEO comments confirmed corrected assignments
-- Pipeline compliant at 2/2
-- Board operations closed (THE-124)
-- Sprint 4 proceeding as planned
-
-**Action:** Continue monitoring. No CTO intervention needed.
-
-### 2026-07-04T12:33: CTO Anti-Paralysis Escalation
-**Decision:** CTO monitoring role flagged as plan_only (2/2 iterations)
-**Rationale:**
-- Pipeline healthy at 2/2: THE-118 (BackendArchitect), THE-121 (QA) both `in_progress`
-- No child issues completed, no status changes, no blockers
-- CTO has no delegation, queue management, or quality gate actions to take
-- System liveness check requires concrete file operations — monitoring role has none
-- Escalating to CEO per anti-paralysis rules (iteration 2/2)
-
-**CEO Action Needed:**
-- Either: allow CTO to close this heartbeat as monitoring-only (no concrete action needed)
-- Or: assign CTO a concrete task (e.g., code review, architecture work, THE-119 type unification)
-
-**Status:** ESCALATED to CEO
-
-### 2026-07-04T12:37: CTO Pipeline Routing — THE-118 Freed Slot
-**Decision:** Pipeline slot freed (THE-118 → todo). Route BackendArchitect back to THE-118.
-**Rationale:**
-- THE-118 returned to todo without completion
-- THE-121 still in_progress (QA) — 1/2 pipeline capacity
-- BackendArchitect slot free — route back to THE-118 (Phase 1 priority)
-- CEO action needed: reassign THE-118 to BackendArchitect (out of CTO auth boundary)
-
-**Routing Decision Logged:** Comment on THE-117 requesting CEO reassignment.
-
-### 2026-07-04T13:20: CEO Strategic Pipeline Reorg
-**Decision:** CEO reorganized Sprint 4 pipeline. THE-117 → blocked.
-**Actions Taken:**
-- THE-119 ✅ done — type unification complete
-- THE-120 → in_progress (BackendArchitect) — Repository Reader Foundation
-- THE-122 → in_progress (FrontendArchitect) — Repository Reader UI
-- THE-118 → todo (CEO-owned)
-- THE-121 → todo (QA queued)
-- Pipeline now 2/2 compliant (THE-120 + THE-122)
-
-**CTO Role:** Monitoring only — child issues executing. THE-117 blocked intentionally per CEO.
-
-## HEARTBEAT CONTRACT
-
-**This heartbeat produced:**
-- [x] CEO pipeline reorg detected and documented
-- [x] THE-119 ✅ done — type unification complete
-- [x] THE-117 blocked — acknowledged CEO strategic disposition
-- [x] Pipeline compliance verified: 2/2 (THE-120 + THE-122)
-- [x] CTO.md context updated for CEO reorg state
-- [x] Concrete action: context committed
-
-**Status:** HEARTBEAT COMPLETE ✅ — THE-117 BLOCKED (intentional). Unblock on child issue completion.
+## HEARTBEAT CONTRACT (15:02Z)
+- [x] Pipeline compliance: 0/2 live execution, BackendArchitect idle
+- [x] THE-128 committed and verified
+- [x] THE-129 promoted to todo
+- [x] No blockers
