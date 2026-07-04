@@ -1,8 +1,15 @@
 # HEARTBEAT.md — CEO Pipeline Compliance Report
 
-## Heartbeat: 2026-07-04 14:58 UTC | CEO — THE-139 Done, Pipeline Flowing
+## Heartbeat: 2026-07-04 17:00 UTC | CTO — THE-122 Fixed, Pushed, Clean
 
 ### 1. State Verification
+- [x] **THE-122 feature branch pushed:** `feature/the-122-repository-reader-ui` at `f45e251`
+- [x] **CTO SCOPE: COMPLETE** — All THE-122 code blockers resolved and pushed
+- [x] **Branch:** `feature/the-122-repository-reader-ui` at `f45e251` (pushed to origin)
+- [x] **Code fixes:** `export REPO_TREE`, JSX chain fix, Badge barrel, activeTab escape — 4 files, 9 insertions, 4 deletions
+- [x] **Frontend TS errors:** 27 remaining (all in files not modified — `api/client.ts` types, `sample-data.ts` Date→string, `ArtifactViewer/index.tsx` comparison)
+- [x] **Root project:** `tsc --noEmit` = 0 errors ✅
+- [x] **Shared package:** `tsc --noEmit` = 0 errors ✅
 - [x] THE-139 (Parser): **DONE** — committed at `0a0d559` (256 LOC + 198 LOC tests)
 - [x] THE-140 (Graph Builder): `in_progress` — builder/graphRoutes/repository exist, store.ts pending
 - [x] THE-122: `in_progress` — CTO unblocked TS build at `26d7ead`, feature branch created
