@@ -53,6 +53,7 @@ const start = async () => {
       await artifactApiRoutes(server)
       requirementsRoutes(server)
       await import('./routes/traceabilityLinks').then(module => module.traceabilityLinksRoutes(server))
+      await import('./routes/graphRoutes').then(module => module.graphBuilderRoutes(server))
     
       await server.listen({ port: 3001 })
     server.log.info('Nexus Engineering backend running on http://localhost:3001')

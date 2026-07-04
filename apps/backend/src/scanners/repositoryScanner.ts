@@ -2,16 +2,7 @@
 // Implements file system scanning for engineering artifacts
 
 import { randomUUID } from 'node:crypto'
-import type {
-  Document,
-  DocumentType,
-  FileMetadata,
-  ScanOptions,
-  ScanResult,
-  ScanReport,
-  RepositoryReader,
-  FileEntry,
-} from '@nexus-engineering/shared'
+import { Document, DocumentType, FileMetadata, ScanOptions, ScanReport, RepositoryReader, FileEntry } from '@nexus-engineering/shared'
 
 export class RepositoryScanner implements RepositoryReader {
   async scan(rootPath: string, options: ScanOptions = {}): Promise<ScanResult> {
