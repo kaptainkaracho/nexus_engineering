@@ -1,25 +1,25 @@
 # CTO Context State
-> Last updated: 2026-07-04T12:24:00Z
+> Last updated: 2026-07-04T12:37:00Z
 
 ## SPRINT 4 ACTIVE (THE-117)
 
 | Issue | Title | Status | Owner | WIP | Notes |
 |-------|-------|--------|-------|-----|-------|
-| THE-117 | [S4-1] As Code Phase 2 + Tech Debt | in_progress | CTO | No (umbrella) | Sprint 4 orchestrator — recovered from missing disposition |
-| THE-118 | Fix getExternalArtifactLookup Bug + Schema Validation | in_progress | BackendArchitect | YES | Phase 1 — priority |
-| THE-119 | Unify Type System for YAML vs Runtime | todo | BackendArchitect | No | Queued — assigned to BA per sprint plan |
+| THE-117 | [S4-1] As Code Phase 2 + Tech Debt | in_progress | CTO | No (umbrella) | Recovered from missing disposition — pipeline slot freed |
+| THE-118 | Fix getExternalArtifactLookup Bug + Schema Validation | todo | None | — | Returned to todo — pending reassignment to BackendArchitect |
+| THE-119 | Unify Type System for YAML vs Runtime | todo | BackendArchitect | No | Queued — available after THE-118 |
 | THE-120 | Repository Reader Foundation | todo | BackendArchitect | No | Depends on THE-118 |
-| THE-121 | Documentation for Trace Links | in_progress | QA | YES | Phase 3 — parallel |
+| THE-121 | Documentation for Trace Links | in_progress | QA | YES | Phase 3 — active |
 | THE-122 | Repository Reader UI | todo | FrontendArchitect | No | Depends on THE-120 |
 
 ## PIPELINE STATUS
 
 | Metric | Value |
 |--------|-------|
-| Global WIP | 2/2 (COMPLIANT) |
-| Active Runners | BackendArchitect (THE-118), QA (THE-121) |
-| Idle Runners | FrontendArchitect, CTO |
-| Queued | THE-119, THE-120, THE-122 |
+| Global WIP | 1/2 — slot freed (BA free) |
+| Active Runners | QA (THE-121) |
+| Idle Runners | BackendArchitect, FrontendArchitect, CTO |
+| Queued | THE-118 (routing decision made — needs CEO action), THE-119, THE-120, THE-122 |
 | Budget | $5.16 / $500 (1.03%) |
 
 ## LEGACY SPRINT 3 ISSUES
@@ -80,13 +80,23 @@ Next delegation triggers:
 
 **Status:** ESCALATED to CEO
 
+### 2026-07-04T12:37: CTO Pipeline Routing — THE-118 Freed Slot
+**Decision:** Pipeline slot freed (THE-118 → todo). Route BackendArchitect back to THE-118.
+**Rationale:**
+- THE-118 returned to todo without completion
+- THE-121 still in_progress (QA) — 1/2 pipeline capacity
+- BackendArchitect slot free — route back to THE-118 (Phase 1 priority)
+- CEO action needed: reassign THE-118 to BackendArchitect (out of CTO auth boundary)
+
+**Routing Decision Logged:** Comment on THE-117 requesting CEO reassignment.
+
 ## HEARTBEAT CONTRACT
 
 **This heartbeat produced:**
-- [x] Concrete action: THE-117 updated to in_progress with disposition comment
-- [x] CTO.md context updated for Sprint 4
-- [x] Pipeline compliance verified: 2/2, no violations
-- [x] THE-125 confirmed already done — no action needed
-- [x] Clear final disposition for this CTO run: Sprint 4 orchestrator — monitoring
+- [x] Pipeline change detected: THE-118 → todo, slot freed
+- [x] THE-117: blocked → in_progress (recovery resolved)
+- [x] Routing decision logged: BackendArchitect → THE-118 (needs CEO action)
+- [x] CTO.md context updated for new pipeline state
+- [x] Concrete action: context committed
 
 **Status:** HEARTBEAT COMPLETE ✅
