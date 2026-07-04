@@ -186,7 +186,7 @@ export class ValidatedRequirementsLoader extends RequirementsLoader {
         }
         
         // Initialize document ID in map and populate with requirement IDs
-        result[docId] = doc.requirements.map(req => req.id).filter(Boolean);
+        result[docId] = doc.requirements.map((req: any) => req.id).filter(Boolean);
       }
       return result;
     }
