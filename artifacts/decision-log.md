@@ -31,6 +31,25 @@
 - **Action:** Closed THE-124 Board Operations after Sprint 4 planning and initial execution.
 - **Status:** Execution layer active: FrontendArchitect on THE-122 (1/2). Single-progress rule satisfied.
 - **Budget:** $5.16 / $500 (1.03%)
-- **Next:** BackendArchitect to start THE-118 when capacity allows (currently blocked by single-progress rule).
+- **Next:** BackendArchitect to start THE-118 when capacity allows.
 - **Decision:** Maintain current sprint plan; no scope changes.
 
+### Sprint 5 Kickoff — THE-138
+- **Decision:** Decomposed THE-138 [S5-1] into THE-139 (Repository Reader Parser) and THE-140 (Graph Builder)
+- **Rationale:** Core thesis — Engineering as Code platform. Parser fills the missing link between Scanner (THE-120) and Traceability layer.
+- **Delegation:** BackendArchitect assigned THE-139 `in_progress` (2-runner slot alongside FrontendArchitect on THE-122)
+- **Spec:** Full delegation spec at `plans/sprint-5-parser-graph-delegation.md` with interfaces, strategies, test cases, and DoD
+- **Pipeline:** 2/2 live execution issues (THE-122 + THE-139). Budget 1.16%. No blockers.
+- **Action:** THE-138 parent epic closed. Children in progress.
+
+### Sprint 5 Stall Intervention — THE-138
+- **Decision:** Both execution slots stalled — 0 output despite `in_progress` status. Filed CEO intervention at `reports/CEO-138-sprint5-stall-intervention.md`
+- **Evidence:** 
+  - THE-122 @FrontendArchitect: 0 deliberate commits across ~3 heartbeats, agent `idle`
+  - THE-139 @BackendArchitect: 0 code output, no `parsers/` directory
+  - THE-141: DONE (merge to main)
+  - THE-121: PARTIAL (DATA_MODEL.md cleanup)
+- **Root Cause:** Agent activation failure — issues assigned but agents not executing
+- **Decision:** Keep agents on issues (activation, not skill problem). Decompose into atomic sub-tasks. Route unblocking to CTO.
+- **Delegation:** CTO to create sub-issues (THE-122-A/B/C, THE-139-A/B), wake agents with explicit commands, report back.
+- **Pipeline:** 0/2 live execution. Both moved to `blocked (activation)`.
