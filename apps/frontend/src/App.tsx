@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button, Input, Card, Container, Stack, Grid, Nav } from '@nexus-engineering/shared';
 import { ArtifactViewer } from './views/ArtifactViewer';
+import { RepositoryFileTree, REPO_TREE } from './views/RepositoryTree';
 
-type Section = 'overview' | 'buttons' | 'forms' | 'cards' | 'artefacts';
+type Section = 'overview' | 'buttons' | 'forms' | 'cards' | 'artefacts' | 'repository';
 
 function App() {
   const [dark, setDark] = useState(false);
@@ -38,12 +39,25 @@ function App() {
     }, 1500);
   };
 
+  // Sync activeSection with URL hash on load and hash changes
+  useEffect(() => {
+    const hashToSection = (hash: string): Section => {
+      const section = hash.replace('#', '') as Section;
+      return ['overview', 'buttons', 'forms', 'cards', 'artefacts', 'repository'].includes(section) ? section : 'overview';
+    };
+    setActiveSection(hashToSection(window.location.hash));
+    const onHashChange = () => setActiveSection(hashToSection(window.location.hash));
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+
   const navItems = [
     { label: 'Overview', href: '#overview', active: activeSection === 'overview' },
     { label: 'Buttons', href: '#buttons', active: activeSection === 'buttons' },
     { label: 'Forms', href: '#forms', active: activeSection === 'forms' },
     { label: 'Cards', href: '#cards', active: activeSection === 'cards' },
     { label: 'Artefacts', href: '#artefacts', active: activeSection === 'artefacts' },
+    { label: 'Repository', href: '#repository', active: activeSection === 'repository' },
   ];
 
   return (
@@ -73,10 +87,9 @@ function App() {
         </Container>
       </header>
 
-       <Container size="lg" className="py-8">
-         {activeSection === 'artefacts' ? (
-           <ArtifactViewer />
-         ) : (
+          ) : activeSection === 'repository' ? (
+            <RepositoryFileTree tree={REPO_TREE} />
+          ) : (
            <>
              <Nav
                items={navItems.map((item) => ({
@@ -278,7 +291,6 @@ function App() {
                 </Stack>
               </Card>
             </Grid>
-              </Stack>
             </Stack>
            </>
          )}

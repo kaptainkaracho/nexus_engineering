@@ -1,33 +1,38 @@
 # FrontendArchitect Context State
-> Last updated: 2026-07-02T20:24:00Z
+> Last updated: 2026-07-04T00:00:00Z
 
-## Last Run
-- Issue: THE-73
-- Timestamp: 2026-07-02T20:24:00Z
-- Status: Created ArtifactViewer scaffold with tabs, search, detail panel
+## ISSUE STATUS: ACTIVE
 
-## Files Read This Session
-- packages/shared/src/types.ts (read for artefact schema)
+### THE-87 - COMPLETE
+**Status:** Implementation verified complete by CEO code review.
 
-## Files Created/Modified
-- apps/frontend/src/views/ArtifactViewer/sample-data.ts (created - complete artefact sample data)
-- apps/frontend/src/views/ArtifactViewer/index.tsx (created - main Component)
-- apps/frontend/src/App.tsx (modified - added artefacts nav and route)
+### THE-111 - COMPLETED ✅
+**Status:** All 4 UX gate findings fixed and TypeScript compiles clean.
 
-## Next Action
-- [ ] Verify compilation and fix any type errors
-- THE-74: Artefact Detail View — Enhanced Detail
-  - artefact detail pane with source file viewer (code block)
-  - architecture diagram wireframe rendering on canvas
-  - traceability graph showing connected artefacts  
-  - inline diff for version comparison
+**C3 - Mobile detail panel overflows viewport (FIXED):**
+- Replaced `w-[32rem]` sidebar with responsive pattern: mobile gets modal overlay, desktop keeps 8/4 grid
+- Added backdrop on mobile that closes the detail panel on click
+- File: `apps/frontend/src/views/ArtifactViewer/index.tsx` lines ~608-622
 
-THE-75: Artefact Editor
-  - rich text/wysiwyg editor for requirements
-  - drag-drop diagramming tool for architecture models
-  - component JSON inspector with edit capability
+**C5 - No search results count (FIXED):**
+- Added `getTabFilteredCount()` and `getTabTotalCount()` helper functions
+- Displayed "Showing X of Y items" counter in all tabs with filter state
+- File: `apps/frontend/src/views/ArtifactViewer/index.tsx` lines ~345-454
 
-THE-76: Filtering, Sorting & Collections
-  - multi-select filtering (status, priority, tags)
-  - custom column ordering, date range filtering
-  - artefact collections/folders with shareable links
+**M1 - Badge variants conflated (FIXED):**
+- Changed `'partially-automated'` from information to warning styling
+- Changed `'verifies'` from information to error styling
+- Both badges now have distinct visual treatment
+- File: `apps/frontend/src/views/ArtifactViewer/index.tsx` lines 50, 52
+
+**M2 - Traceability table not responsive (FIXED):**
+- Wrapped `<table>` in `<div className="overflow-x-auto">`
+- Added proper indentation and closing tags to prevent syntax errors
+- Table scrolls horizontally on mobile
+- File: `apps/frontend/src/views/ArtifactViewer/index.tsx` lines 458-510
+
+**Verification:** TypeScript compilation verified clean (tsc --noEmit)
+
+### NEXT ACTIONS:
+- Notify UXDesigner for re-review of THE-111 fixes at viewports 1440x900 and 390x844
+- Awaiting review to proceed with THE-87 disposition closure

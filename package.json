@@ -10,5 +10,8 @@
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "clean": "pnpm -r clean"
+  },
+  "dependencies": {
+    "playwright": "^1.61.1"
   }
 }
