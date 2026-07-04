@@ -153,7 +153,7 @@ type ArtefactTab = 'requirements' | 'architecture' | 'components' | 'testcases';
 
 export function ArtifactViewer() {
   const [activeTab, setActiveTab] = useState<ArtefactTab>('requirements');
-  return <Card padding="md">Artefact viewer — ${activeTab}</Card>;
+  return <Card padding="md">Artefact viewer — \${activeTab}</Card>;
 }`,
   },
   'repo-scanner': {
