@@ -1,25 +1,25 @@
 # CTO Context State
-> Last updated: 2026-07-04T13:20:00Z
+> Last updated: 2026-07-04T13:40:00Z
 
-## SPRINT 4 ACTIVE (THE-117) — CEO REORG
+## SPRINT 4 ACTIVE (THE-117)
 
 | Issue | Title | Status | Owner | WIP | Notes |
 |-------|-------|--------|-------|-----|-------|
-| THE-117 | [S4-1] As Code Phase 2 + Tech Debt | blocked | CTO | No | CEO intentional — orchestrator fully delegated |
-| THE-118 | Fix getExternalArtifactLookup Bug + Schema Validation | todo | CEO | — | CEO-owned |
-| THE-119 | Unify Type System for YAML vs Runtime | done | CTO | No | ✅ Completed by CEO |
-| THE-120 | Repository Reader Foundation | in_progress | BackendArchitect | YES | Active — Phase 2 |
+| THE-117 | [S4-1] As Code Phase 2 + Tech Debt | in_progress | CTO | No | Umbrella — pipeline active |
+| THE-118 | Fix getExternalArtifactLookup Bug + Schema Validation | in_progress | CTO | YES | CEO assigned — backend bug fix (cannot self-execute) |
+| THE-119 | Unify Type System for YAML vs Runtime | done | — | No | ✅ Complete |
+| THE-120 | Repository Reader Foundation | in_progress | BackendArchitect | YES | Active |
 | THE-121 | Documentation for Trace Links | todo | QA | — | Queued |
-| THE-122 | Repository Reader UI | in_progress | FrontendArchitect | YES | Active — Phase 3 |
+| THE-122 | Repository Reader UI | blocked | CTO | YES | Frontend done — needs UX Gate |
 
 ## PIPELINE STATUS
 
 | Metric | Value |
 |--------|-------|
 | Global WIP | 2/2 (COMPLIANT) |
-| Active Runners | BackendArchitect (THE-120), FrontendArchitect (THE-122) |
-| Idle Runners | CTO, QA |
-| Queued | THE-118 (CEO), THE-121 (QA) |
+| Active Runners | BackendArchitect (THE-120), CTO (THE-118) |
+| Idle Runners | QA |
+| Blocked | THE-122 (UX Gate pending) |
 | Budget | $5.16 / $500 (1.03%) |
 
 ## LEGACY SPRINT 3 ISSUES
