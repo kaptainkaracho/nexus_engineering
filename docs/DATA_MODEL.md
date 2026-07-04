@@ -303,6 +303,21 @@ Trace links must satisfy the following validation constraints:
 5. **No Self-Links**: An artifact cannot trace to itself (loop prevention)
 6. **Idempotency**: Creating the same link twice should not create duplicates
 
+### Bidirectional Consistency Rules
+
+The traceability system enforces bidirectional consistency to maintain data integrity:
+
+- **Symmetrical Relationships**: When creating a link from A to B with relationship type T, the reverse relationship must also exist automatically.
+  - Example: If `req-001 satisfies comp-001`, then `comp-001 isSatifiedBy req-001` automatically exists
+- **Confidence Propagation**: Confidence levels should be consistent in both directions during validation processes
+- **Change Propagation**: When a source or target artifact changes status, related trace links are automatically flagged for review
+- **Orphan Prevention**: System prevents deletion of artifacts that would create orphaned trace links without warnings
+
+The system provides hooks to maintain consistency across distributed environments:
+- Pre-delete hooks verify link dependencies before artifact removal
+- Post-update triggers validate and update dependent trace links
+- Validation endpoints allow manual verification of bidirectional relationships
+
 ### Querying Trace Paths
 
 Complex traceability queries can be performed using combinations of:
