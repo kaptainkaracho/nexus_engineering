@@ -1,45 +1,103 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { randomUUID } from 'node:crypto'
+import crypto from 'node:crypto'
 import type { 
   RepositoryDocumentOperation, 
   Document, 
-  DocumentType, 
+  DocumentType,
+  FileMetadata,
+  ScanOptions,
+  ScanResult,
+  ScanReport,
+  RepositoryReader,
+  FileEntry
 } from '@nexus-engineering/shared'
 
-export interface ScanResult {
-  documents: Document[]
-  report: ScanReport
-}
-
-export interface ScanReport {
-  documentsFound: number
-  repositoriesScanned: number
-  errors: Array<{ repository: string; error: Error }>
-}
-
-export class RepositoryScanner {
-  async scan(repositoryPath: string): Promise<ScanResult> {
-    const report: ScanReport = { documentsFound: 0, repositoriesScanned: 1, errors: [] }
-    const documents: Document[] = []
-
-    try {
-      const scannedDocs = await this.scanDirectory(repositoryPath, ['.git', 'node_modules', '.next', 'dist', 'coverage'], report)
-      documents.push(...scannedDocs)
-      report.documentsFound = documents.length
-    } catch (error) {
-      report.errors.push({ repository: repositoryPath, error: error as Error })
+export class RepositoryScanner implements RepositoryReader {
+  async scan(rootPath: string, options: ScanOptions = {}): Promise<ScanResult> {
+    const startTime = Date.now()
+    const report: ScanReport = {
+      filesFound: 0,
+      bytesScanned: 0,
+      scanTimeMs: 0,
+      errors: []
     }
 
-    return { documents, report }
+    const fileMetadata: FileMetadata[] = []
+    const ignorePatterns = options.ignorePatterns || ['.git', 'node_modules', '.next', 'dist', 'coverage']
+    const maxFileSize = options.maxFileSize || 10 * 1024 * 1024
+    const minFileSize = options.minFileSize || 0
+    const depthLimit = options.depthLimit || null
+
+    try {
+      await this.scanDirectory(rootPath, ignorePatterns, fileMetadata, report, maxFileSize, minFileSize, depthLimit, 0)
+    } catch (error) {
+      report.errors.push({ path: rootPath, error: error as Error })
+    }
+
+    report.scanTimeMs = Date.now() - startTime
+    report.filesFound = fileMetadata.length
+
+    return { fileMetadata, report }
+  }
+
+  async getFileMetadata(filePath: string): Promise<FileMetadata | null> {
+    try {
+      const stats = await fs.promises.stat(filePath)
+      const relativePath = path.relative(process.cwd(), filePath)
+      const contentHash = await this.calculateFileHash(filePath)
+      const contentType = stats.isFile() ? 'text' : 'binary'
+
+      return {
+        filePath,
+        relativePath,
+        size: stats.size,
+        contentHash,
+        contentType
+      }
+    } catch (error) {
+      console.error(`Error getting metadata for file ${filePath}:`, error)
+      return null
+    }
+  }
+
+  async *streamFiles(patterns: string[], rootPath: string = process.cwd()): AsyncIterable<FileEntry> {
+    const glob = require('glob')
+
+    for (const pattern of patterns) {
+      const files = await glob.promise(pattern, {
+        cwd: rootPath,
+        nodir: true,
+        ignore: ['.git/**', 'node_modules/**', '.next/**', 'dist/**', 'coverage/**']
+      })
+
+      for (const file of files) {
+        const filePath = path.join(rootPath, file)
+        const stats = await fs.promises.stat(filePath)
+        const relativePath = path.relative(rootPath, filePath)
+        
+        yield {
+          filePath,
+          relativePath,
+          contentType: stats.isFile() ? 'text' : 'binary'
+        }
+      }
+    }
   }
 
   private async scanDirectory(
     directory: string,
     ignorePatterns: string[],
-    report: ScanReport
-  ): Promise<Document[]> {
-    const documents: Document[] = []
+    fileMetadata: FileMetadata[],
+    report: ScanReport,
+    maxFileSize: number,
+    minFileSize: number,
+    depthLimit: number | null,
+    currentDepth: number
+  ): Promise<void> {
+    if (depthLimit !== null && currentDepth >= depthLimit) {
+      return
+    }
 
     try {
       const entries = await fs.promises.readdir(directory, { withFileTypes: true })
@@ -48,17 +106,18 @@ export class RepositoryScanner {
         const fullPath = path.join(directory, entry.name)
 
         if (ignorePatterns.includes(entry.name)) {
-            continue
-          }
+          continue
+        }
 
         if (entry.isDirectory()) {
-          const subdirDocuments = await this.scanDirectory(fullPath, ignorePatterns, report)
-          documents.push(...subdirDocuments)
+          await this.scanDirectory(fullPath, ignorePatterns, fileMetadata, report, maxFileSize, minFileSize, depthLimit, currentDepth + 1)
         } else if (entry.isFile() && !entry.name.startsWith('.')) {
-          const document = await this.createDocumentFromFile(directory, fullPath)
-          if (document) {
-            documents.push(document)
-            report.documentsFound++
+          const metadata = await this.getFileMetadata(fullPath)
+          if (metadata) {
+            if (metadata.size >= minFileSize && metadata.size <= maxFileSize) {
+              fileMetadata.push(metadata)
+              report.bytesScanned += metadata.size
+            }
           }
         }
       }
@@ -66,93 +125,19 @@ export class RepositoryScanner {
       console.error(`Error scanning directory ${directory}:`, error)
       throw error
     }
-
-    return documents
   }
 
-  private async createDocumentFromFile(
-    basePath: string,
-    filePath: string
-  ): Promise<Document | null> {
-    const relativePath = path.relative(basePath, filePath)
-    const extension = path.extname(filePath).toLowerCase()
-    
-    let documentType: DocumentType = 'Txt'
+  private async calculateFileHash(filePath: string): Promise<string> {
+    const hash = crypto.createHash('sha256')
+    const stream = fs.createReadStream(filePath)
 
-    if (extension === '.json') {
-      documentType = 'Json'
-    } else if (extension === '.xml' || filePath.endsWith('.xsd')) {
-      documentType = 'Xml'
-    } else if (extension === '.html' || extension === '.htm') {
-      documentType = 'Html'
-    } else if (extension === '.md') {
-      documentType = 'Md'
-    }
-
-    // Try to read file content
-    let content: string | Record<string, unknown> = ''
-    try {
-      const stats = await fs.promises.stat(filePath)
-      
-      if (stats.size > 10 * 1024 * 1024) { // Limit to 10MB
-        content = `[${documentType} document too large for storage]`
-      } else {
-        const rawContent = await fs.promises.readFile(filePath, 'utf-8')
-        
-        if (documentType === 'Json') {
-          try {
-            content = JSON.parse(rawContent)
-          } catch {
-            // If not valid JSON, treat as text
-            content = rawContent
-          }
-        } else if (documentType === 'Md') {
-          content = this.parseMarkdown(rawContent)
-        } else {
-          content = rawContent
-        }
-      }
-    } catch (error) {
-      console.error(`Error reading file ${filePath}:`, error)
-      return null
-    }
-
-    return {
-      id: randomUUID(),
-      version: '1.0.0',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      source: filePath,
-      path: relativePath,
-      content,
-      type: documentType,
-    }
-  }
-
-  private parseMarkdown(rawContent: string): Record<string, unknown> {
-    const frontmatterRegex = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/
-    const match = rawContent.match(frontmatterRegex)
-
-    if (!match) {
-      return { content: rawContent, frontmatter: null }
-    }
-
-    const [, frontmatterStr, body] = match
-    const frontmatter: Record<string, unknown> = {}
-
-    // Parse YAML-like frontmatter (simple key: value pairs)
-    for (const line of frontmatterStr.split('\n')) {
-      const colonIndex = line.indexOf(':')
-      if (colonIndex > 0) {
-        const key = line.slice(0, colonIndex).trim()
-        const value = line.slice(colonIndex + 1).trim()
-        frontmatter[key] = value
-      }
-    }
-
-    return { content: body.trim(), frontmatter }
+    return new Promise((resolve, reject) => {
+      stream
+        .on('data', (chunk) => hash.update(chunk))
+        .on('end', () => resolve(hash.digest('hex')))
+        .on('error', reject)
+    })
   }
 }
 
-// Singleton instance for convenience
-export const scanner = new RepositoryScanner()
+export const repositoryScanner = new RepositoryScanner()
