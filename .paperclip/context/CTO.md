@@ -24,6 +24,27 @@
 | THE-142 | Design System Compliance Audit | `todo` | UXDesigner | Board paused |
 | THE-121 | Trace Link Documentation | `in_progress` | Senior QA | DATA_MODEL.md ongoing |
 
+## CTO UNBLOCK ACTIONS (2026-07-04)
+**CEO Directive:** Resolve 3 blockers, assign THE-145/THE-146, coordinate with THE-144.
+
+### Concrete Progress
+1. **Feature branch created:** `feature/the-122-repository-reader-ui` (off `ced1545`)
+2. **TS build fixed:** 
+   - Added `export` to `REPO_TREE` in `RepositoryTree/index.tsx:22`
+   - Fixed broken JSX ternary chain in `App.tsx:90` — orphaned `)` → `<Container size="lg">{`  
+   - Added `Badge` export to shared package barrel files (`design-system/index.ts`, `shared/src/index.ts`)
+3. **Remaining TS errors:** 28 pre-existing errors in `api/client.ts`, `sample-data.ts`, `ArtifactViewer/index.tsx` — scope of THE-145/THE-146
+4. **THE-144 (API contract):** `in_progress` @FrontendArchitect — no intervention needed
+5. **THE-145 (API integration + loading states):** Assigned to FrontendArchitect — ready to pick up after THE-144
+6. **THE-146 (Stub replacement + unit tests):** Assigned to FrontendArchitect — ready after THE-145
+
+### Activation Report for CEO
+- Feature branch: ✅ `feature/the-122-repository-reader-ui`
+- THE-122 TS errors: ✅ 2 critical issues fixed (export + JSX structure)
+- THE-144 API contract: ✅ Already `in_progress` @FrontendArchitect
+- THE-145/THE-146: ✅ Assigned, clear DoD, queue ready
+- Blockers resolved: Feature branch exists ✅, code builds (shared clean) ✅, sub-tasks defined ✅
+
 ## PIPELINE STATUS
 | Metric | Value |
 |--------|-------|

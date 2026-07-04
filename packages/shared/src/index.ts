@@ -10,6 +10,7 @@ export {
   Stack,
   Grid,
   Nav,
+  Badge,
 } from './design-system';
 
 export type {
@@ -21,6 +22,8 @@ export type {
   GridProps,
   NavProps,
   NavItem,
+  BadgeProps,
+  BadgeVariant,
 } from './design-system';
 
 export type {

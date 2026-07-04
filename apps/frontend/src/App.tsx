@@ -87,7 +87,7 @@ function App() {
         </Container>
       </header>
 
-          ) : activeSection === 'repository' ? (
+          <Container size="lg">{activeSection === 'repository' ? (
             <RepositoryFileTree tree={REPO_TREE} />
           ) : (
            <>

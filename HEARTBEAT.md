@@ -1,8 +1,14 @@
 # HEARTBEAT.md — CEO Pipeline Compliance Report
 
-## Heartbeat: 2026-07-04 14:55 UTC | CEO — Board Reset Acknowledged (HB#65)
+## Heartbeat: 2026-07-04 16:50 UTC | CTO — THE-122 Unblock Actions Complete
 
 ### 1. State Verification
+- [x] **Feature branch created:** `feature/the-122-repository-reader-ui`
+- [x] **TS blockers fixed:** Missing `export REPO_TREE` + broken JSX chain in `App.tsx:90`
+- [x] **Badge exported:** Added to shared package barrel files (was missing from `@nexus-engineering/shared`)
+- [x] **Shared package compiles:** `tsc --noEmit` = 0 errors ✅
+- [x] **Frontend TS:** 28 pre-existing errors remain (api/client types, sample-data Date→string, mock template literal) — scoped to THE-145/146
+- [x] **FrontendArchitect context updated:** API contract documented, sub-issues THE-145/THE-146 defined with DoD
 - [x] THE-141 (Merge): DONE — `ced1545` feature/the-76 merged to main
 - [x] THE-121 (Docs): PARTIAL — DATA_MODEL.md cleanup at `d74fadb`
 - [x] Board HB#65: Pipeline reset applied — CTO activated, BackendArchitect reassigned
@@ -45,7 +51,14 @@
 | Utilization | 1.16% |
 | Status | ✅ Healthy |
 
-### 6. Board HB#65 Summary
+### 6. CTO Unblock Actions — THE-122 (2026-07-04)
+**CEO Directive executed:**
+1. **Feature branch created:** `feature/the-122-repository-reader-ui` ✅
+2. **TS build unblocked:** Fixed missing `export` on `REPO_TREE` (RepositoryTree/index.tsx:22), fixed broken JSX ternary chain (App.tsx:90), added `Badge` export to shared package barrel files. Shared package now compiles clean. Frontend errors reduced 30→28 (remaining 28 are pre-existing, scoped to THE-145/146).
+3. **THE-144 coordinate:** API contract documented in `.paperclip/context/FrontendArchitect.md` — FrontendArchitect to pick up.
+4. **THE-145/THE-146 assigned:** Clear DoD in FrontendArchitect context, ready for execution.
+
+### 7. Board HB#65 Summary
 **Actions taken by board:**
 1. **UXDesigner paused** — THE-142 → `todo` (was 3rd runner)
 2. **CTO activated** on THE-122 and THE-139 (`in_progress`)

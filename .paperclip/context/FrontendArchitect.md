@@ -1,7 +1,39 @@
 # FrontendArchitect Context State
-> Last updated: 2026-07-04T00:00:00Z
+> Last updated: 2026-07-04T16:50Z
 
-## ISSUE STATUS: ACTIVE
+## ISSUE STATUS: ACTIVE — Sprint 5
+
+### THE-122 — Repository Reader UI (Parent)
+**Status:** `in_progress` — Code blockers resolved by CTO, sub-issues defined below.
+**Branch:** `feature/the-122-repository-reader-ui`
+
+### API Contract (THE-144 — in_progress)
+The RepositoryTree UI needs to communicate with the backend `/scan` API:
+
+**GET /api/scan?path=/{dir}**
+- Response: `{ files: FileEntry[], tree: TreeNode[], warnings: string[] }`
+- `FileEntry`: `{ path: string, relativePath: string, contentType: 'text'|'binary', size: number, lastModified: string }`
+- `TreeNode`: `{ id: string, name: string, type: 'folder'|'file', path: string, children?: TreeNode[] }`
+
+**GET /api/scan/file?path={filePath}**
+- Response: `{ path: string, content: string, extension: string, language?: string, fileSize?: number }`
+
+**Error format:** `{ error: string, code: string }`
+
+**Types already defined in `@nexus-engineering/shared`:**
+- `FileMetadata`, `ScanResult`, `FileEntry`, `RepositoryReader` from `packages/shared/src/types.ts`
+- Import: `import { Card, Badge, cn } from '@nexus-engineering/shared'`
+
+### Sub-Issue THE-145 — Connect RepositoryTree to backend `/scan` API
+**DoD:** Tree renders dynamic data from API, spinner shown during load, error state on failure. Use `fetchArtefacts` pattern from `ArtifactViewer`.
+
+### Sub-Issue THE-146 — Replace stub data + unit tests
+**DoD:** No hardcoded `REPO_TREE`. `RepositoryTree.test.tsx` with 3+ tests. Fix remaining TS error at `RepositoryTree/index.tsx:156` (`activeTab` variable in FILE_CONTENTS template literal).
+
+### Remaining TS errors (pre-existing — 28 total, fix is LOW priority now):
+- `apps/frontend/src/api/client.ts` — Types `ArtefactRequirement`, `ArtefactArchitecture` etc. not defined. These are backend-mirror types.
+- `apps/frontend/src/views/ArtifactViewer/sample-data.ts` — `Date` → `string` type mismatch
+- `apps/frontend/src/views/ArtifactViewer/index.tsx:77` — Dead comparison branch (pre-existing)
 
 ### THE-87 - COMPLETE
 **Status:** Implementation verified complete by CEO code review.

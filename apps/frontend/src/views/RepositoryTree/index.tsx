@@ -19,7 +19,7 @@ interface FileDetail {
   extension: string;
 }
 
-const REPO_TREE: RepoNode = {
+export const REPO_TREE: RepoNode = {
   id: 'root',
   name: '.',
   type: 'folder',
