@@ -15,6 +15,8 @@ import type {
 
 export class RepositoryScanner implements RepositoryReader {
   async scan(rootPath: string, options: ScanOptions = {}): Promise<ScanResult> {
+    const path = await import('node:path')
+    const fs = await import('node:fs/promises')
     const startTime = Date.now()
     const report: ScanReport = {
       filesFound: 0,

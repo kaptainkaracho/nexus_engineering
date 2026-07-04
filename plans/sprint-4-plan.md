@@ -2,7 +2,7 @@
 
 **Date:** 2026-07-04
 **Owner:** CEO
-**Status:** Active
+**Status:** Complete (THE-136 done, Sprint 4 delivery finalized)
 
 ---
 
@@ -12,93 +12,59 @@ Clear critical technical debt from Sprint 3 and begin Ziel 3 (Repository Reader/
 
 ---
 
-## Capacity Planning
+## Capacity Planning (Current)
 
 | Agent | Status | Available | WIP Limit |
 |-------|--------|-----------|-----------|
 | BackendArchitect | Idle | ✅ Yes | 1 |
-| FrontendArchitect | Idle | ✅ Yes | 1 |
-| CTO | Idle | ✅ Yes | Orchestration |
+| FrontendArchitect | THE-122 `in_progress` | ⚡ 1 active | 1 |
+| CTO | Idle (reset to orchestration) | ✅ Yes | Orchestration |
 | UXDesigner | Idle | ✅ Yes | 1 |
 | Senior QA | Idle | ✅ Yes | 1 |
 
-**Global Pipeline:** 0/2 Live Execution Issues
-**Budget:** $5.16 / $500 (1.03%)
+**Global Pipeline:** 1/2 Live Execution Issues (THE-122)
+**Budget:** $5.76 / $500 (1.15%)
 
 ---
 
-## Sprint 4 Scope
+## Sprint 4 Delivery Status
 
-### Priority 1 — High (Current Milestone)
+### ✅ Complete
+| Issue | Title | Delivered |
+|-------|-------|-----------|
+| THE-118 | Fix getExternalArtifactLookup Bug + Schema Validation | ✅ Both children committed |
+| THE-119 | Unify Type System | ✅ Complete |
+| THE-120 | Repository Reader Foundation | ✅ Scanner implemented |
+| THE-128 | Fix getExternalArtifactLookup logic bug | ✅ Committed 51ee8e9 |
+| THE-129 | Wire up reqDocSchema validation | ✅ Committed 4d95317 |
+| THE-136 | CTO Recovery | ✅ Context rewrite, pipeline cleaned |
 
-| Issue | Title | Estimate | Assignee | Dependencies |
-|-------|-------|----------|----------|--------------|
-| THE-118 | Fix getExternalArtifactLookup Bug + Schema Validation | 1 heartbeat | BackendArchitect | None |
-| THE-119 | Unify Type System for YAML vs Runtime | 1-2 heartbeats | CTO | None |
-| THE-120 | Repository Reader Foundation | 2-3 heartbeats | BackendArchitect | THE-118 |
+### 🔄 In Progress
+| Issue | Title | Assignee | ETA |
+|-------|-------|----------|-----|
+| THE-122 | Repository Reader UI | FrontendArchitect | 1 heartbeat |
 
-### Priority 2 — Medium (Fast-follow)
-
-| Issue | Title | Estimate | Assignee | Dependencies |
-|-------|-------|----------|----------|--------------|
-| THE-121 | Documentation for Trace Links | 1 heartbeat | Any | None |
-| THE-122 | Repository Reader UI | 1-2 heartbeats | FrontendArchitect | THE-120 |
-
----
-
-## Execution Sequence
-
-### Phase 1: Bug Fix + Type Unification (Days 1-3)
-
-1. **BackendArchitect** → THE-118 (Fix getExternalArtifactLookup bug)
-   - Single-task focus
-   - DoD: Bug fixed, schema validation wired, tests passing
-
-2. **CTO** → THE-119 (Unify Type System)
-   - Orchestration-level work
-   - DoD: Type definitions unified, imports updated, tests passing
-
-### Phase 2: Repository Reader Foundation (Days 3-5)
-
-3. **BackendArchitect** → THE-120 (Repository Reader Foundation)
-   - Depends on: THE-118 complete
-   - DoD: File system scanner implemented, metadata extraction working, tests passing
-
-### Phase 3: UI + Documentation (Days 5-7)
-
-4. **FrontendArchitect** → THE-122 (Repository Reader UI)
-   - Depends on: THE-120 complete
-   - DoD: File tree component, metadata display, responsive design
-
-5. **UXDesigner** or **QA** → THE-121 (Documentation)
-   - Can run in parallel with Phase 3
-   - DoD: Trace link documentation added to DATA_MODEL.md
+### 📋 Remaining
+| Issue | Title | Assignee | Status |
+|-------|-------|----------|--------|
+| THE-121 | Documentation for Trace Links | Senior QA | `todo` — after THE-122 |
 
 ---
 
-## Risks & Mitigations
+## Pre-Sprint 5 Blockers (Must Clear)
 
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| THE-118 takes longer than 1 heartbeat | Delays THE-120 | CTO escalation, scope reduction |
-| THE-120 blocks THE-122 | Frontend idle | Frontend can work on THE-121 instead |
-| Hardware resource constraints | Agent slowdowns | Strict 1-runner rule enforced |
+| Issue | Blocker | Owner | Action Required |
+|-------|---------|-------|-----------------|
+| THE-87 | UX Gate — awaiting UXDesigner approval | UXDesigner | Review THE-111 fixes at 1440x900 + 390x844 |
+| THE-76 | Blocked by THE-87 | CTO | Unblocks after UXDesigner approval |
 
----
+## Sprint 5 Preview
 
-## Success Criteria
-
-- [ ] All Sprint 4 issues completed
-- [ ] No WIP violations
-- [ ] All tests passing
-- [ ] Documentation updated
-- [ ] Budget within 10% of estimate
-
----
-
-## Next Sprint Preview
-
-Sprint 5 will focus on:
-- Repository Reader Parser (Ziel 3 continuation)
-- Graph Builder implementation
-- Additional UI enhancements
+| Priority | Item | Notes |
+|----------|------|-------|
+| P1 | THE-87 UX Gate Resolution | Unblock viewer integration — UXDesigner review |
+| P1 | Repository Reader Parser | Parse scanned artifacts into structured data |
+| P1 | Graph Builder | Build traceability graph from parsed artifacts |
+| P2 | Viewer integration | Connect graph to ArtifactViewer (unblocked by THE-87) |
+| P2 | THE-121 Documentation | Trace Link docs — Senior QA after runner slot available |
+| P2 | Merge feature branch to main | `feature/the-76-requirements-as-code` is 34+ commits ahead |
