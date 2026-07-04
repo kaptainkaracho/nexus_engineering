@@ -1,4 +1,4 @@
-import { repositoryScanner } from './repositoryScanner'
+import { repositoryScanner } from './repositoryScanner';
 
 async function testScanner() {
   console.log('Testing scanner...')
