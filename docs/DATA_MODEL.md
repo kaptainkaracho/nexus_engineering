@@ -436,6 +436,125 @@ async function buildTracePath(startId: string, startType: string): Promise<Trace
   const path: TraceLink[] = [];
   let currentSourceId = startId;
   let currentSourceType = startType;
+ 
+  // Follow links until no more are found
+  while (true) {
+    const links = await getTraceLinksBySource(currentSourceType, currentSourceId);
+    if (links.length === 0) break;
+ 
+    // Continue with the first linked target as the new source
+    path.push(...links);
+    const nextLink = links[0];
+    currentSourceId = nextLink.targetId; 
+    currentSourceType = nextLink.targetType;
+  }
+ 
+  return path;
+}
+```
+
+## Trace Link Usage Examples
+
+### Real-World Trace Links from Sample Requirements File
+
+The `packages/shared/requirements/sample-req-with-traces.req.yaml` file demonstrates real traceability scenarios:
+
+```yaml
+requirements:
+  - id: AUTH-001
+    type: functional
+    title: User Authentication
+    description: System must authenticate users via credentials
+    status: approved
+    traceLinks:
+      # This requirement is verified by security requirements
+      - type: verifies
+        target:
+          id: SEC-001
+          documentId: TRACE-DEMO-002
+        confidence: high
+        description: Verifies security requirements are met
+      
+      # Links to a more specific authentication requirement
+      - type: satisfies
+        target:
+          id: AUTH-REQ-001
+          documentId: TRACE-DEMO-001
+        confidence: medium
+        description: Satisfies existing authentication requirement
+      
+      # Traces to performance considerations
+      - type: tracesTo
+        target:
+          id: PERF-001
+          documentId: TRACE-DEMO-002
+        confidence: low
+        description: Traces to performance requirement
+```
+
+### Conflict Example
+
+The sample also shows conflict detection between competing requirements:
+
+```yaml
+  - id: SCALING-002
+    type: functional
+    title: Alternative Scaling Approach
+    description: Alternative method for handling concurrent users
+    tags:
+      - scaling
+      - alternative
+    traceLinks:
+      # This requirement conflicts with existing performance requirements
+      - type: conflictsWith
+        target:
+          id: PERF-001
+          documentId: TRACE-DEMO-002
+        confidence: high
+        description: Conflicts with performance requirements
+```
+
+### Bidirectional Relationships in Action
+
+When AUTH-001 `verifies` SEC-001, the system automatically recognizes the reverse:
+- `SEC-001` `isVerifiedBy` `AUTH-001` (automatic)
+- This bidirectional consistency ensures complete traceability coverage
+
+### API and Schema Integration
+
+The TraceLink model integrates fully with JSON schema validation:
+
+```typescript
+// Validates all trace links according to the schema
+const isValid = validateTraceLink(traceLink);
+
+// Query API for specific relationship types
+const requiresVerification: TraceLink[] = await fetch(
+  '/api/trace-links?relationshipType=verifies'
+);
+```
+
+### Confidence-Based Filtering
+
+API queries can filter by confidence level for focused analysis:
+
+```typescript
+// Get only high-confidence links for audit reporting
+const highConfidenceLinks = await fetch('/api/trace-links?confidence=high');
+
+// Verify implementation coverage with medium+ confidence  
+const verifiedCoverage = await filterByConfidence(['high', 'medium']);
+```
+
+### Dynamic Trace Path Building
+
+Build complete trace paths programmatically:
+
+```typescript
+async function buildTracePath(startId: string, startType: string): Promise<TraceLink[]> {
+  const path: TraceLink[] = [];
+  let currentSourceId = startId;
+  let currentSourceType = startType;
   
   // Follow links until no more are found
   while (true) {

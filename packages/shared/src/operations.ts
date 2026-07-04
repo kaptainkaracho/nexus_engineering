@@ -3,6 +3,10 @@ import { BaseEntity } from './types';
 // Engineering document types for artifact scanning
 export type DocumentType = 'Txt' | 'Json' | 'Xml' | 'Html' | 'Md';
 
+export interface ScanOperation {
+  repositoryPath: string;
+}
+
 export interface Document extends BaseEntity {
   path: string;
   content: string | Record<string, unknown>;
@@ -22,5 +26,5 @@ export interface RepositoryDocumentOperation extends DocumentOperation {
 
 export interface Operation {
   type: 'createRepository' | 'scanRepository' | 'updateRepository';
-  data?: RepositoryDocumentOperation;
+  data?: ScanOperation | RepositoryDocumentOperation;
 }

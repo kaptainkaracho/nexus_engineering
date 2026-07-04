@@ -14,60 +14,6 @@ export interface ArtefactListResponse {
   errors: Map<string, string[]>;
 }
 
-export interface ArtefactRequirement {
-  id: string;
-  version: string;
-  createdAt: string;
-  updatedAt: string;
-  source: string;
-  type: 'functional' | 'non-functional' | 'system' | 'user';
-  title: string;
-  description: string;
-  priority: 'low' | 'medium' | 'high' | 'critical';
-  status: 'proposed' | 'approved' | 'rejected' | 'implemented' | 'verified' | 'draft';
-  tags?: string[];
-}
-
-export interface ArtefactArchitecture {
-  id: string;
-  name: string;
-  type: string;
-  description: string;
-  elements?: Array<{id: string; name: string; type: string; properties?: Record<string, unknown>}>;
-}
-
-export interface ArtefactComponent {
-  id: string;
-  name: string;
-  type: 'module' | 'class' | 'interface' | 'enum' | 'service' | 'component' | 'microService' | 'library' | 'configuration';
-  description: string;
-  path?: string;
-  language?: string;
-  technologies?: string[];
-}
-
-export interface ArtefactTestCase {
-  id: string;
-  name: string;
-  type: string;
-  description: string;
-  testSteps?: Array<{stepNumber: number; action: string; expected?: string}>;
-  expectedResult?: string;
-  status: 'draft' | 'ready' | 'inProgress' | 'completed' | 'failed';
-  automationStatus: 'manual' | 'automated' | 'partially-automated';
-}
-
-export interface ArtefactTrace {
-  id: string;
-  sourceId: string;
-  sourceType: string;
-  targetId: string;
-  targetType: string;
-  relationshipType: string;
-  confidence: 'high' | 'medium' | 'low';
-  description?: string;
-}
-
 export interface ArtefactCollection {
   artefacts: ArtefactRequirement[] | ArtefactArchitecture[] | ArtefactComponent[] | ArtefactTestCase[];
   traces: ArtefactTrace[];

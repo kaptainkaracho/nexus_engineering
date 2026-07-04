@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { Card, Badge, cn } from '@nexus-engineering/shared';
 
 /** Tree nodes for repository explorer */
 interface RepoNode {
@@ -239,9 +240,9 @@ function TreeRow({ node, depth, expandedIds, selectedId, onToggle, onSelect }: T
         aria-label={`${node.type}: ${node.name}`}
       >
         {node.type === 'folder' ? (
-          <span className="shrink-0 text-xs">{isExpanded ? '▼' : '▶'}</span>
+          <span className="shrink-0 text-xs" aria-hidden="true">{isExpanded ? '▼' : '▶'}</span>
         ) : (
-          <span className="shrink-0 text-xs w-4 text-center text-text-tertiary" />
+          <span className="shrink-0 text-xs w-4 text-center text-text-tertiary" aria-hidden="true" />
         )}
         <span className={cn('shrink-0', node.type === 'file' ? 'text-base font-medium tracking-tight' : '')}>
           {node.type === 'folder' ? (isExpanded ? '📂' : '📁') : getFileIcon(node.name)}
@@ -272,7 +273,7 @@ export function RepositoryFileTree({ tree, initialExpandedIds }: RepositoryFileT
   const [selectedFile, setSelectedFile] = useState<FileDetail | null>(null);
 
   const handleToggle = useCallback((id: string) => {
-    setExpandedIds((prev) => new Set(prev).has(id) ? new Set([...prev].filter((x) => x !== id)) : new Set([...prev, id]));
+    setExpandedIds((prev) => prev.has(id) ? new Set([...prev].filter((x) => x !== id)) : new Set([...prev, id]));
   }, []);
 
   const handleSelect = useCallback((node: RepoNode) => {
@@ -284,23 +285,26 @@ export function RepositoryFileTree({ tree, initialExpandedIds }: RepositoryFileT
     }
   }, []);
 
+  const rootChildrenCount = tree.children?.length ?? 0;
+
   return (
     <div className="flex h-full flex-col gap-4">
-      {/* File tree */}
+      {/* File tree panel */}
       <div className={cn(
         'overflow-y-auto rounded-xl border border-border bg-surface-primary',
-        selectedFile ? (typeof window !== 'undefined' && window.innerWidth >= 1024 ? 'lg:w-[45%]' : '') : 'w-full',
+        selectedFile ? 'w-full' : '',
+        'lg:w-[45%]',
       )}>
         <div className="flex items-center justify-between border-b border-border px-3 py-2">
           <h3 className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">Files</h3>
-          <span className="text-xs text-text-tertiary">{REPO_TREE.children?.length ?? 0} root items</span>
+          <span className="text-xs text-text-tertiary">{rootChildrenCount} root item{rootChildrenCount !== 1 ? 's' : ''}</span>
         </div>
         <TreeRow node={tree} depth={0} expandedIds={expandedIds} selectedId={selectedFile?.node.id ?? null} onToggle={handleToggle} onSelect={handleSelect} />
       </div>
 
       {/* File detail panel */}
       {selectedFile && (
-        <Card variant="default" padding="md">
+        <Card variant="default" padding="md" className={cn('w-full', 'lg:w-[55%] lg:shrink-0')}>
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -309,7 +313,7 @@ export function RepositoryFileTree({ tree, initialExpandedIds }: RepositoryFileT
                   <Badge variant="info" className="!px-1.5 !py-0 !text-[10px]">{selectedFile.node.language}</Badge>
                 )}
               </div>
-              <button type="button" onClick={() => setSelectedFile(null)} className="shrink-0 text-xs text-text-tertiary hover:text-text-primary focus:outline-none">Dismiss</button>
+              <button type="button" onClick={() => setSelectedFile(null)} className="shrink-0 text-xs text-text-tertiary hover:text-text-primary focus:outline-none" aria-label={`Dismiss ${selectedFile.node.name}`}>Dismiss</button>
             </div>
 
             {/* Metadata row */}
