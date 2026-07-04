@@ -110,30 +110,6 @@ interface TraceLink extends BaseEntity {
 }
 ```
 
-**Field Descriptions:**
-- `type`: Categorizes the requirement (functional/safety/performance/etc.)
-- `title`: Brief descriptive title
-- `description`: Detailed requirement description
-- `priority`: Impact assessment
-- `status`: Lifecycle state
-- `tags`: Optional categorization tags
-
-**Example:**
-```typescript
-{
-  id: 'req-001',
-  version: '1.0.0',
-  createdAt: new Date('2026-07-02'),
-  updatedAt: new Date('2026-07-02'),
-  source: 'initial-design',
-  type: 'functional',
-  title: 'User Authentication',
-  description: 'System shall provide secure user authentication via OIDC',
-  priority: 'high',
-  status: 'approved'
-}
-```
-
 ### Software Component Example
 
 ```typescript
@@ -519,58 +495,6 @@ The sample also shows conflict detection between competing requirements:
 When AUTH-001 `verifies` SEC-001, the system automatically recognizes the reverse:
 - `SEC-001` `isVerifiedBy` `AUTH-001` (automatic)
 - This bidirectional consistency ensures complete traceability coverage
-
-### API and Schema Integration
-
-The TraceLink model integrates fully with JSON schema validation:
-
-```typescript
-// Validates all trace links according to the schema
-const isValid = validateTraceLink(traceLink);
-
-// Query API for specific relationship types
-const requiresVerification: TraceLink[] = await fetch(
-  '/api/trace-links?relationshipType=verifies'
-);
-```
-
-### Confidence-Based Filtering
-
-API queries can filter by confidence level for focused analysis:
-
-```typescript
-// Get only high-confidence links for audit reporting
-const highConfidenceLinks = await fetch('/api/trace-links?confidence=high');
-
-// Verify implementation coverage with medium+ confidence  
-const verifiedCoverage = await filterByConfidence(['high', 'medium']);
-```
-
-### Dynamic Trace Path Building
-
-Build complete trace paths programmatically:
-
-```typescript
-async function buildTracePath(startId: string, startType: string): Promise<TraceLink[]> {
-  const path: TraceLink[] = [];
-  let currentSourceId = startId;
-  let currentSourceType = startType;
-  
-  // Follow links until no more are found
-  while (true) {
-    const links = await getTraceLinksBySource(currentSourceType, currentSourceId);
-    if (links.length === 0) break;
-    
-    // Continue with the first linked target as the new source
-    path.push(...links);
-    const nextLink = links[0];
-    currentSourceId = nextLink.targetId;  
-    currentSourceType = nextLink.targetType;
-  }
-  
-  return path;
-}
-```
 
 ## Usage Examples
 
