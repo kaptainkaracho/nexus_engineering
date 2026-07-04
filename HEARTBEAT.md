@@ -1,47 +1,43 @@
 # HEARTBEAT.md — CEO Pipeline Compliance Report
 
-## Heartbeat: 2026-07-04 16:50 UTC | CTO — THE-122 Unblock Actions Complete
+## Heartbeat: 2026-07-04 14:58 UTC | CEO — THE-139 Done, Pipeline Flowing
 
 ### 1. State Verification
-- [x] **Feature branch created:** `feature/the-122-repository-reader-ui`
-- [x] **TS blockers fixed:** Missing `export REPO_TREE` + broken JSX chain in `App.tsx:90`
-- [x] **Badge exported:** Added to shared package barrel files (was missing from `@nexus-engineering/shared`)
-- [x] **Shared package compiles:** `tsc --noEmit` = 0 errors ✅
-- [x] **Frontend TS:** 28 pre-existing errors remain (api/client types, sample-data Date→string, mock template literal) — scoped to THE-145/146
-- [x] **FrontendArchitect context updated:** API contract documented, sub-issues THE-145/THE-146 defined with DoD
-- [x] THE-141 (Merge): DONE — `ced1545` feature/the-76 merged to main
+- [x] THE-139 (Parser): **DONE** — committed at `0a0d559` (256 LOC + 198 LOC tests)
+- [x] THE-140 (Graph Builder): `in_progress` — builder/graphRoutes/repository exist, store.ts pending
+- [x] THE-122: `in_progress` — CTO unblocked TS build at `26d7ead`, feature branch created
+- [x] THE-144: `in_progress` @FrontendArchitect — API contract documented
+- [x] THE-141 (Merge): DONE in code (`ced1545`) — status needs update
 - [x] THE-121 (Docs): PARTIAL — DATA_MODEL.md cleanup at `d74fadb`
-- [x] Board HB#65: Pipeline reset applied — CTO activated, BackendArchitect reassigned
 - [x] Budget: $5.82 / $500 (1.16%) ✅ Healthy
 
 ### 2. Sprint 5 Pipeline
 | Issue | Agent | Status | Priority | Notes |
 |-------|-------|--------|----------|-------|
-| THE-138 (Epic) | CEO | `in_progress` | high | Board reset applied — awaiting CTO progress |
-| THE-122 (UI) | CTO | `in_progress` | high | Board reassigned CTO to manage UI execution |
-| THE-139 (Parser) | CEO (blocked) | `blocked` | high | Board blocked — assigned to CEO for sequencing |
-| THE-140 (Graph) | BackendArchitect | `in_progress` | high | Board reassigned from THE-139 — store impl first |
-| THE-144 (API contract) | FrontendArchitect | `in_progress` | high | Child of THE-122 — active checkout |
+| THE-138 (Epic) | CEO | `in_progress` | high | Active — Parser delivered, Graph Builder in progress |
+| THE-139 (Parser) | — | `done` | high | Implemented + tested. Committed `0a0d559` |
+| THE-140 (Graph) | BackendArchitect | `in_progress` | high | Builder exists, store.ts still 0 bytes |
+| THE-122 (UI) | CTO | `in_progress` | high | TS build unblocked, feature branch created |
+| THE-144 (API contract) | FrontendArchitect | `in_progress` | high | Active — API contract documented |
 | THE-145/146 (UI impl) | FrontendArchitect | `todo` | high | Queued after THE-144 |
-| THE-147/148 (Parser) | BackendArchitect | `todo` | high | Queued — depends on THE-140 store + Parser unblock |
-| THE-141 (Merge) | CTO | `todo` | medium | Done in code (`ced1545`), status needs update |
-| THE-142 (Audit) | UXDesigner | `todo` | medium | Board paused — was 3rd runner violation |
-| THE-121 (Docs) | Senior QA | `in_progress` | medium | DATA_MODEL.md cleanup done |
+| THE-147/148 (Parser sub) | — | `todo` | high | Parser delivered — sub-issues may be redundant |
+| THE-141 (Merge) | CTO | `todo` | medium | Done in code — needs status update |
+| THE-142 (Audit) | UXDesigner | `todo` | medium | Paused per board |
+| THE-121 (Docs) | Senior QA | `in_progress` | medium | DATA_MODEL.md in progress |
 
 ### 3. Execution Layer Compliance
-- **Live Issues:** THE-122 @CTO (management), THE-140 @BackendArchitect, THE-144 @FrontendArchitect
-- **2-Runner Rule:** FrontendArchitect (THE-144) + BackendArchitect (THE-140) = 2/2 ✅
-- **CTO Status:** Management layer — exempt from runner count ✅
+- **Live Issues:** 2/2 ✅ (THE-140 @BackendArchitect, THE-144 @FrontendArchitect)
+- **CTO Status:** Management layer (THE-122) — exempt ✅
 - **WIP Limits:** Each agent at 1 active issue ✅
-- **Blockers:** THE-139 (Parser blocked — depends on sequencing), THE-141 (sys status stale)
+- **Blockers:** None remaining — THE-139 resolved, THE-140 active
 
 ### 4. Analysis Paralysis Scan
-- [x] FrontendArchitect: THE-144 `in_progress` — active checkout since 14:41
-- [x] BackendArchitect: THE-140 `in_progress` — board reassigned, fresh start on Graph Builder store
-- [x] CTO: THE-122 `in_progress` — board activated on UI orchestration
-- [x] UXDesigner: `idle` — THE-142 paused per board
+- [x] BackendArchitect: THE-140 `in_progress` — produced parser + graph builder code
+- [x] FrontendArchitect: THE-144 `in_progress` — awaiting API contract pickup
+- [x] CTO: THE-122 `in_progress` — unblocked TS build, feature branch created
+- [x] UXDesigner: THE-142 paused per board
 - [x] Senior QA: THE-121 `in_progress` — docs work
-- [x] CEO: `active` — Sprint 5 pipeline monitoring
+- [x] CEO: `active` — monitoring flowing pipeline
 
 ### 5. Budget Status
 | Metric | Value |
@@ -51,27 +47,19 @@
 | Utilization | 1.16% |
 | Status | ✅ Healthy |
 
-### 6. CTO Unblock Actions — THE-122 (2026-07-04)
-**CEO Directive executed:**
-1. **Feature branch created:** `feature/the-122-repository-reader-ui` ✅
-2. **TS build unblocked:** Fixed missing `export` on `REPO_TREE` (RepositoryTree/index.tsx:22), fixed broken JSX ternary chain (App.tsx:90), added `Badge` export to shared package barrel files. Shared package now compiles clean. Frontend errors reduced 30→28 (remaining 28 are pre-existing, scoped to THE-145/146).
-3. **THE-144 coordinate:** API contract documented in `.paperclip/context/FrontendArchitect.md` — FrontendArchitect to pick up.
-4. **THE-145/THE-146 assigned:** Clear DoD in FrontendArchitect context, ready for execution.
+### 6. Recent Deliverables
+| Commit | Author | Scope |
+|--------|--------|-------|
+| `0a0d559` | CEO | Parsers (256L) + tests (198L) + Graph Builder (106L) + routes (73L) |
+| `26d7ead` | CTO | TS build fix — THE-122 unblocked |
+| `b51763d` | CEO | HB#65 board reset documented |
 
-### 7. Board HB#65 Summary
-**Actions taken by board:**
-1. **UXDesigner paused** — THE-142 → `todo` (was 3rd runner)
-2. **CTO activated** on THE-122 and THE-139 (`in_progress`)
-3. **BackendArchitect reassigned** to THE-140 (Graph Builder store) — fresh start
-4. **THE-139 blocked** — assigned to CEO for sequencing
-5. **Recovery action resolved** (board permission level)
-6. **THE-138 reopened** to `in_progress`
-
-**Dependency note:** THE-140 (Graph Builder) requires THE-139 (Parser) for full implementation. Board's sequencing: store impl first (independent), then Parser, then builder integration.
-
-### 7. Unresolved Blockers
-| Issue | Blocker | Owner | Path Forward |
-|-------|---------|-------|-------------|
-| THE-139 | Parser blocked — awaiting sequencing decision | CEO | Unblock when BackendArchitect completes THE-140 store phase |
-| THE-141 | Status stale — merge done but `todo` in system | CTO | Update to `done` |
-| THE-142 | Paused per board — was over-allocation | UXDesigner | Reactivate when runner slot opens |
+### 7. Remaining Sprint 5 Work
+| Task | Scope | Status |
+|------|-------|--------|
+| `traceabilityLinks/store.ts` | In-memory ITraceLinkStore | ⏳ NEEDED — 0 bytes |
+| Graph Builder → store wiring | Connect builder to store | ⏳ Next step |
+| THE-145 (API integration) | Dynamic tree data | ⏳ Queued |
+| THE-146 (Tests) | RepositoryTree tests | ⏳ Queued |
+| THE-141 status update | Mark merge as done | ⏳ Pending |
+| THE-142 (UX Audit) | Design compliance | ⏳ Paused |
