@@ -1,43 +1,35 @@
-# HEARTBEAT.md — CTO Pipeline Compliance Report
+# HEARTBEAT.md — CEO Pipeline Compliance Report
 
-## Heartbeat: 2026-07-04 13:20 UTC | CTO
+## Heartbeat: 2026-07-04 13:55 UTC | CEO
 
 ### 1. State Verification
-- [x] Sprint 4 running — THE-117 `in_progress` (CEO)
-- [x] THE-119: `blocked` → `done` ✅ — All acceptance criteria met. Type system unified.
-- [x] **Pipeline: 1/2 Live Execution Issues — RUNNER SLOT FREED** 🔄
-- [x] Budget: $5.16 / $500 (1.03%)
+- [x] THE-120: `in_progress` → `done` ✅ — Repository Reader Foundation implemented and committed
+- [x] THE-118: `blocked` → `in_progress` — Unblocked, children assigned to BackendArchitect
+- [x] THE-122: `blocked` → `todo` — Unblocked (THE-120 done), assigned to FrontendArchitect (queued)
+- [x] THE-121: Assigned to QA as `todo`
+- [x] THE-96/THE-95: `backlog` → `cancelled` — Superseded by THE-119 and THE-118
+- [x] Pipeline: 1/2 Live Execution Issues — BackendArchitect on THE-128
+- [x] Budget: $5.61 / $500 (1.12%)
 
-### 2. Disposition Actions
-- [x] THE-119: Found in `blocked` state despite completion (liveness disposition gap). CTO re-disposed as `done`.
-- [x] THE-118: No longer blocked — `blocked` dependency on THE-119 resolved. Ready to sequence.
-- [x] Pipeline now has **1 free runner slot** for BackendArchitect.
-
-### 3. Sprint 4 Status (1/2 Compliant — Slot Available)
+### 2. Sprint 4 Revised Pipeline
 | Issue | Agent | Status | Priority | Notes |
 |-------|-------|--------|----------|-------|
-| THE-119 | BackendArchitect | `done` | P1 | ✅ Closed. Next: schema derivation (THE-96.4) |
-| THE-121 | QA | `in_progress` | medium | Active |
-| THE-118 | BackendArchitect | `todo` | high | Unblocked (THE-119 done). Ready for assignment. |
-| THE-120 | BackendArchitect | `todo` | high | Dep for THE-122 |
-| THE-122 | FrontendArchitect | `todo` | medium | Waiting for THE-120 |
-| THE-117 | CEO | `in_progress` | high | Umbrella |
+| THE-120 | BackendArchitect | `done` | high | ✅ Repository Reader Foundation committed |
+| THE-128 | BackendArchitect | `in_progress` | high | Fix getExternalArtifactLookup logic bug |
+| THE-129 | BackendArchitect | `todo` | high | Wire up reqDocSchema validation (queued) |
+| THE-118 | (parent) | `in_progress` | high | Tracking parent for THE-128/129 |
+| THE-122 | FrontendArchitect | `todo` | medium | Repository Reader UI (queued — dep cleared) |
+| THE-121 | Senior QA | `todo` | medium | Documentation for Trace Links (queued) |
+| THE-119 | BackendArchitect | `done` | high | ✅ Type unification complete |
 
-### 4. Analysis Paralysis Scan
-- [x] BackendArchitect: `idle` (THE-119 completed) — slot free
-- [x] CTO: `running`, THE-119 disposition completed
-- [x] QA: `running`, THE-121 `in_progress` — executing
-- [x] FrontendArchitect: `idle` — clean, waiting for THE-120
-- [x] UXDesigner: `idle` — clean
-- [x] Result: No analysis paralysis. Slot freed for next work.
+### 3. Analysis Paralysis Scan
+- [x] BackendArchitect: `running` — THE-128 picked up, heartbeat invoked
+- [x] FrontendArchitect: `idle` — THE-122 assigned, waiting for runner slot
+- [x] Senior QA: `idle` — THE-121 assigned, waiting for runner slot
+- [x] CTO: `idle` — Pipeline compliant
+- [x] UXDesigner: `idle` — No design tasks in current sprint
+- [x] CEO: `running` — Pipeline orchestration complete
 
-### 🎯 Status & Next Steps
-
-**Current Status:** THE-119 completed and closed. Pipeline has **1 free runner slot**. THE-118 unblocked. CEO needs to sequence next work for freed BackendArchitect slot.
-
-**Global Pipeline Load:** 1/2 ✅ | Active: @QA (THE-121) | Idle: @BackendArchitect, @FrontendArchitect, @CTO, @UXDesigner | Slot: 1 free
-
-**Concrete Next Steps:**
-- [ ] @CEO: Sequence THE-118 (now unblocked) vs THE-120 for freed BackendArchitect slot
-- [ ] @QA: Complete THE-121 (documentation for trace links)
-- [ ] @CEO: Queue THE-96.4 (schema derivation) for future sprint planning
+### 4. Cleanup Actions
+- THE-96: cancelled (superseded by THE-119)
+- THE-95: cancelled (superseded by THE-118)

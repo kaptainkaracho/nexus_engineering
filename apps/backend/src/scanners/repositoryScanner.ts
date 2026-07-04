@@ -1,16 +1,16 @@
-import fs from 'node:fs'
-import path from 'node:path'
-import crypto from 'node:crypto'
-import type { 
-  RepositoryDocumentOperation, 
-  Document, 
+// Repository Scanner Implementation
+// Implements file system scanning for engineering artifacts
+
+import { randomUUID } from 'node:crypto'
+import type {
+  Document,
   DocumentType,
   FileMetadata,
   ScanOptions,
   ScanResult,
   ScanReport,
   RepositoryReader,
-  FileEntry
+  FileEntry,
 } from '@nexus-engineering/shared'
 
 export class RepositoryScanner implements RepositoryReader {
@@ -20,17 +20,26 @@ export class RepositoryScanner implements RepositoryReader {
       filesFound: 0,
       bytesScanned: 0,
       scanTimeMs: 0,
-      errors: []
+      errors: [],
     }
 
     const fileMetadata: FileMetadata[] = []
-    const ignorePatterns = options.ignorePatterns || ['.git', 'node_modules', '.next', 'dist', 'coverage']
+    const ignorePatterns = options.ignorePatterns || this.getDefaultIgnorePatterns()
     const maxFileSize = options.maxFileSize || 10 * 1024 * 1024
     const minFileSize = options.minFileSize || 0
     const depthLimit = options.depthLimit || null
 
     try {
-      await this.scanDirectory(rootPath, ignorePatterns, fileMetadata, report, maxFileSize, minFileSize, depthLimit, 0)
+      await this.scanDirectory(
+        rootPath,
+        ignorePatterns,
+        fileMetadata,
+        report,
+        maxFileSize,
+        minFileSize,
+        depthLimit,
+        0,
+      )
     } catch (error) {
       report.errors.push({ path: rootPath, error: error as Error })
     }
@@ -43,7 +52,9 @@ export class RepositoryScanner implements RepositoryReader {
 
   async getFileMetadata(filePath: string): Promise<FileMetadata | null> {
     try {
-      const stats = await fs.promises.stat(filePath)
+      const fs = await import('node:fs/promises')
+      const path = await import('node:path')
+      const stats = await fs.stat(filePath)
       const relativePath = path.relative(process.cwd(), filePath)
       const contentHash = await this.calculateFileHash(filePath)
       const contentType = stats.isFile() ? 'text' : 'binary'
@@ -53,7 +64,7 @@ export class RepositoryScanner implements RepositoryReader {
         relativePath,
         size: stats.size,
         contentHash,
-        contentType
+        contentType,
       }
     } catch (error) {
       console.error(`Error getting metadata for file ${filePath}:`, error)
@@ -61,25 +72,28 @@ export class RepositoryScanner implements RepositoryReader {
     }
   }
 
-  async *streamFiles(patterns: string[], rootPath: string = process.cwd()): AsyncIterable<FileEntry> {
-    const glob = require('glob')
+  async *streamFiles(
+    patterns: string[],
+    rootPath: string = process.cwd(),
+  ): AsyncIterable<FileEntry> {
+    const { glob } = await import('glob')
 
     for (const pattern of patterns) {
       const files = await glob.promise(pattern, {
         cwd: rootPath,
         nodir: true,
-        ignore: ['.git/**', 'node_modules/**', '.next/**', 'dist/**', 'coverage/**']
+        ignore: ['.git/**', 'node_modules/**', '.next/**', 'dist/**', 'coverage/**'],
       })
 
       for (const file of files) {
         const filePath = path.join(rootPath, file)
         const stats = await fs.promises.stat(filePath)
         const relativePath = path.relative(rootPath, filePath)
-        
+
         yield {
           filePath,
           relativePath,
-          contentType: stats.isFile() ? 'text' : 'binary'
+          contentType: stats.isFile() ? 'text' : 'binary',
         }
       }
     }
@@ -93,14 +107,16 @@ export class RepositoryScanner implements RepositoryReader {
     maxFileSize: number,
     minFileSize: number,
     depthLimit: number | null,
-    currentDepth: number
+    currentDepth: number,
   ): Promise<void> {
     if (depthLimit !== null && currentDepth >= depthLimit) {
       return
     }
 
     try {
-      const entries = await fs.promises.readdir(directory, { withFileTypes: true })
+      const fs = await import('node:fs/promises')
+      const path = await import('node:path')
+      const entries = await fs.readdir(directory, { withFileTypes: true })
 
       for (const entry of entries) {
         const fullPath = path.join(directory, entry.name)
@@ -110,7 +126,16 @@ export class RepositoryScanner implements RepositoryReader {
         }
 
         if (entry.isDirectory()) {
-          await this.scanDirectory(fullPath, ignorePatterns, fileMetadata, report, maxFileSize, minFileSize, depthLimit, currentDepth + 1)
+          await this.scanDirectory(
+            fullPath,
+            ignorePatterns,
+            fileMetadata,
+            report,
+            maxFileSize,
+            minFileSize,
+            depthLimit,
+            currentDepth + 1,
+          )
         } else if (entry.isFile() && !entry.name.startsWith('.')) {
           const metadata = await this.getFileMetadata(fullPath)
           if (metadata) {
@@ -128,15 +153,22 @@ export class RepositoryScanner implements RepositoryReader {
   }
 
   private async calculateFileHash(filePath: string): Promise<string> {
-    const hash = crypto.createHash('sha256')
-    const stream = fs.createReadStream(filePath)
+    const crypto = await import('node:crypto')
+    const fs = await import('node:fs')
 
     return new Promise((resolve, reject) => {
+      const hash = crypto.createHash('sha256')
+      const stream = fs.createReadStream(filePath)
+
       stream
         .on('data', (chunk) => hash.update(chunk))
         .on('end', () => resolve(hash.digest('hex')))
         .on('error', reject)
     })
+  }
+
+  private getDefaultIgnorePatterns(): string[] {
+    return ['.git', 'node_modules', '.next', 'dist', 'coverage', 'build', 'target']
   }
 }
 
