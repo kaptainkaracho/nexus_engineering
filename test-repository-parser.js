@@ -1,4 +1,22 @@
-export async function runTests() {
+const fs = require('fs');
+const path = require('path');
+const yaml = require('js-yaml');
+const crypto = require('crypto');
+
+// Import the repository parser implementation
+const { RepositoryParser, repositoryParser } = require('./apps/backend/src/parsers/repositoryParser');
+
+// Mock file metadata interface
+interface MockFileMetadata {
+  filePath: string;
+  relativePath?: string;
+  size: number;
+  contentHash: string;
+  contentType: string;
+  detectedType?: string;
+}
+
+async function runTests() {
   let passed = 0;
   let failed = 0;
 
@@ -8,7 +26,7 @@ export async function runTests() {
   try {
     // Test 1: Parse .req.yaml file with trace links
     console.log('\n✓ Test 1: Parse requirement YAML file with trace links');
-    const yamlFiles = [
+    const yamlFiles: MockFileMetadata[] = [
       {
         filePath: './packages/shared/requirements/sample-req-with-traces.req.yaml',
         relativePath: './packages/shared/requirements/sample-req-with-traces.req.yaml',
@@ -47,7 +65,7 @@ export async function runTests() {
 
     // Test 2: Parse TypeScript file
     console.log('\n✓ Test 2: Parse TypeScript file to software component');
-    const tsFiles = [
+    const tsFiles: MockFileMetadata[] = [
       {
         filePath: __filename,
         relativePath: __filename,
@@ -79,7 +97,7 @@ export async function runTests() {
 
     // Test 3: Parse JSON file
     console.log('\n✓ Test 3: Parse JSON file to document');
-    const jsonFiles = [
+    const jsonFiles: MockFileMetadata[] = [
       {
         filePath: './package.json',
         relativePath: './package.json',
@@ -108,7 +126,7 @@ export async function runTests() {
 
     // Test 4: Parse with invalid file (should error gracefully)
     console.log('\n✓ Test 4: Handle invalid files gracefully');
-    const invalidFiles = [
+    const invalidFiles: MockFileMetadata[] = [
       {
         filePath: '/nonexistent/file.txt',
         relativePath: '/nonexistent/file.txt',
@@ -157,7 +175,7 @@ export async function runTests() {
 
     // Test 6: Performance check (parse should complete quickly)
     console.log('\n✓ Test 6: Performance validation');
-    const files = [
+    const files: MockFileMetadata[] = [
       {
         filePath: __filename,
         relativePath: __filename,
@@ -168,9 +186,9 @@ export async function runTests() {
       }
     ];
     
-    const start = performance.now();
+    const start = Date.now();
     await repositoryParser.parse(files, '.');
-    const elapsed = performance.now() - start;
+    const elapsed = Date.now() - start;
 
     if (elapsed > 1000) {
       console.warn(`  ⚠️  Parse took ${elapsed.toFixed(2)}ms (slow)`);

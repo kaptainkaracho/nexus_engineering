@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button, Input, Card, Container, Stack, Grid, Nav } from '@nexus-engineering/shared';
 import { ArtifactViewer } from './views/ArtifactViewer';
-import { RepositoryFileTree, REPO_TREE } from './views/RepositoryTree';
+import { RepositoryFileTree } from './views/RepositoryTree';
 
 type Section = 'overview' | 'buttons' | 'forms' | 'cards' | 'artefacts' | 'repository';
 
@@ -66,7 +66,7 @@ function App() {
         <Container size="lg">
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-500 text-sm font-bold text-white">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-500 text-sm font-bold text-text-inverse">
                 B
               </div>
               <div>
@@ -88,7 +88,7 @@ function App() {
       </header>
 
           <Container size="lg">{activeSection === 'repository' ? (
-            <RepositoryFileTree tree={REPO_TREE} />
+            <RepositoryFileTree />
           ) : (
            <>
              <Nav

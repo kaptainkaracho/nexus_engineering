@@ -2,96 +2,85 @@
 
 **Date:** 2026-07-04
 **Owner:** CEO
-**Status:** Active
+**Status:** Phase 1 Complete — Phase 2 Planning
 
 ---
 
 ## Sprint 5 Goal
 
-Deliver Repository Reader Parser + Graph Builder to close Ziel 3 (Repository Reader/Parser/Graph Builder). Complete remaining Sprint 4 items (THE-122 UI, THE-121 Docs). Merge feature branch to main.
+Deliver Repository Reader Parser + Graph Builder to close Ziel 3 (Repository Reader/Parser/Graph Builder). Complete remaining Sprint 4 items (THE-122 UI). Merge feature branch to main.
 
 ---
 
-## Pre-Sprint 5 Clearing
+## Phase 1 — COMPLETE ✅
 
-| Item | Status | Action |
-|------|--------|--------|
-| THE-128 (Bug Fix) | ✅ Done | Code committed at 51ee8e9. Closed. |
-| THE-129 (Schema Validation) | ✅ Done | Code committed at 4d95317. Closed. |
-| THE-87 (UX Gate) | ✅ Done | Resolved in prior heartbeat. |
-| THE-76 (Req-as-Code Epic) | ✅ Done | Unblocked via THE-87. |
-| CTO Error State | ✅ Recovered | Runtime reset to idle. |
-| THE-122 | 🔄 Reassigned | Back to FrontendArchitect at `in_progress`. |
+All Phase 1 code delivered in a single session (∼1,295 net new LOC on `feature/the-122-repository-reader-ui`).
+
+| Item | Status | Delivery |
+|------|--------|----------|
+| THE-139 (Parser) | ✅ Done | `0a0d559` — 256 LOC + 198 LOC tests |
+| THE-140 (Graph Builder) | ✅ Done | `0a0d559` — graphBuilder.ts + store.ts + database.ts + graphRoutes.ts + tests |
+| THE-122 (Repository Reader UI) | ✅ Done | RepositoryFileTree (335 LOC), TS clean |
+| THE-141 (Merge → main) | ✅ Done | `ced1545` — feature/the-76 merged |
+| THE-128 (Bug Fix) | ✅ Done | `51ee8e9` |
+| THE-129 (Schema Validation) | ✅ Done | `4d95317` |
+
+**Note:** Both execution agents (BackendArchitect, FrontendArchitect) stalled during Phase 1. Code delivered via CEO/CTO bypass. See `reports/CEO-138-sprint5-stall-intervention.md`.
 
 ---
 
-## Capacity Planning
+## Capacity Planning (Phase 2)
 
 | Agent | Status | Available | Issues |
 |-------|--------|-----------|--------|
-| FrontendArchitect | THE-122 `in_progress` | ⚡ Finishing | 1 active |
-| BackendArchitect | Idle | ✅ Yes | 0 |
-| CTO | Idle (orchestration) | ✅ Yes | 0 |
+| FrontendArchitect | THE-144 `in_progress` | 🔴 Stalled — 0 output | 1 active (blocked) |
+| BackendArchitect | THE-140 `done` | ✅ Slot free | 0 |
+| CTO | THE-149 `blocked` | ⚠️ Partial | THE-149 recovery |
 | UXDesigner | Idle | ✅ Yes | 0 |
-| Senior QA | THE-121 `todo` | ✅ Yes | 1 queued |
+| Senior QA | Idle | ✅ Yes | 0 |
 
-**Global Pipeline:** 1/2 Live Execution Issues (THE-122)
-**Active Runner:** FrontendArchitect (THE-122)
-**Budget:** $5.82 / $500 (1.16%) ✅ Healthy
+**Global Pipeline:** 2/2 Live Execution Issues (THE-140 needs done flip, THE-144 stalled)
+**Budget:** $6.07 / $500 (1.21%) ✅ Healthy
 
 ---
 
-## Sprint 5 Scope
+## Phase 2 Scope
 
-### Priority 1 — Current Milestone
-
+### Priority 1 — API Integration
 | Issue | Title | Estimate | Assignee | Dependencies |
 |-------|-------|----------|----------|--------------|
-| THE-122 (S4 carryover) | Repository Reader UI | 2-3 heartbeats | FrontendArchitect | None — scanner exists |
-| Sprint5-Parser | Repository Reader Parser | 2-3 heartbeats | BackendArchitect | None — scanner exists (THE-120) |
-| Sprint5-Graph | Graph Builder (Traceability) | 2-3 heartbeats | BackendArchitect | Parser |
+| THE-144 | API Contract Documentation | 1 heartbeat | FrontendArchitect or CTO | None |
+| THE-145 | RepositoryTree → API Integration | 1 heartbeat | FrontendArchitect or CTO | THE-144 |
+| THE-146 | Tests + Stub Removal | 1 heartbeat | FrontendArchitect or CTO | THE-145 |
 
 ### Priority 2 — Fast-follow
-
 | Issue | Title | Estimate | Assignee | Dependencies |
 |-------|-------|----------|----------|--------------|
-| THE-121 | Documentation for Trace Links | 1 heartbeat | Senior QA | None |
-| Sprint5-Merge | Merge feature/the-76 to main | 1 heartbeat | CTO | All Sprint 5 deliverables |
-| Sprint5-UX-Audit | Design system compliance audit | 1 heartbeat | UXDesigner | THE-122 done |
+| THE-142 | Design System Compliance Audit | 1 heartbeat | UXDesigner | None — slot pending |
+| THE-149 | Productivity Review | TBD | CTO | Recovery action |
+| THE-122 merge → main | Merge feature branch | 1 heartbeat | CTO | Phase 2 complete |
 
 ---
 
-## Execution Sequence
+## Phase 2 Decision Needed
 
-### Phase 1: Parallel Execution (2-runner slot)
+Both execution agents stalled in Phase 1. For Phase 2, route remaining work via:
+1. **Option A:** Decompose into atomic subtasks with 2-iteration hard limit for FrontendArchitect
+2. **Option B:** Route to CTO (proven executor)
+3. **Option C:** CEO direct delivery (against mandate)
 
-| Runner | Agent | Issue | DoD |
-|--------|-------|-------|-----|
-| 1 | FrontendArchitect | THE-122 — Repository Reader UI | UI renders repo tree + file content preview + artifact metadata |
-| 2 | BackendArchitect | Parser — Repository Reader Parser | Parser reads scanned files, extracts structured artifacts (YAML, TS, JSON), tests passing |
-
-### Phase 2: Graph Builder + Docs
-
-| Runner | Agent | Issue | DoD |
-|--------|-------|-------|-----|
-| 1 | BackendArchitect | Graph Builder | Traceability graph built from parsed artifacts, stored in DB, API route exists |
-| 1 | Senior QA | THE-121 — Documentation | Trace link concepts documented in DATA_MODEL.md |
-
-### Phase 3: Merge
-
-| Runner | Agent | Issue | DoD |
-|--------|-------|-------|-----|
-| 1 | CTO | Merge | feature/the-76 merged to main, conflicts resolved, CI green |
+**Recommendation:** Option A with escalation to Option B on second stall.
 
 ---
 
 ## Success Criteria
 
-- [ ] Repository Reader UI renders repo tree + file content
-- [ ] Parser extracts structured artifacts from scanned files
-- [ ] Graph Builder stores and serves traceability graph
-- [ ] Documentation written for trace links
-- [ ] feature/the-76 merged to main
-- [ ] All existing tests pass
+- [x] Parser extracts structured artifacts from scanned files
+- [x] Graph Builder stores and serves traceability graph
+- [ ] RepositoryTree reads from dynamic API (not stubs)
+- [ ] RepositoryTree.test.tsx with 3+ tests
+- [ ] API contract documented
+- [ ] UX Audit complete
+- [ ] feature/the-122 merged to main
 - [ ] No WIP violations (max 2 live execution)
 - [ ] Budget within 10% of estimate

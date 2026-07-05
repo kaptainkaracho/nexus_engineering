@@ -177,14 +177,20 @@ export class RepositoryParser {
 
     if (typeof content === 'object' && content !== null) {
       if ('title' in content) metadata.title = String(content.title);
-      if ('description' in content) metadata.title = String(content.description);
+      if ('description' in content) metadata.description = String(content.description);
       if ('language' in content) metadata.language = String(content.language);
       if ('technologies' in content) metadata.technologies = Array.isArray(content.technologies) ? content.technologies : [];
       if ('dependencies' in content) metadata.dependencies = Array.isArray(content.dependencies) ? content.dependencies : [];
       if ('tags' in content) metadata.tags = Array.isArray(content.tags) ? content.tags : [];
       if ('nexus' in content) {
-        metadata.title = String(content.nexus.metadata.title || '');
-        metadata.language = String(content.nexus.metadata.domain || '');
+        const nexusMeta = content.nexus as Record<string, unknown>;
+        if (typeof nexusMeta === 'object' && nexusMeta !== null) {
+          if ('metadata' in nexusMeta && typeof nexusMeta.metadata === 'object') {
+            const metadataObj = nexusMeta.metadata as Record<string, unknown>;
+            if ('title' in metadataObj) metadata.title = String(metadataObj.title);
+            if ('domain' in metadataObj) metadata.language = String(metadataObj.domain);
+          }
+        }
       }
     }
 
@@ -231,14 +237,30 @@ export class RepositoryParser {
 
         for (const req of requirements) {
           if ('traceLinks' in req && Array.isArray(req.traceLinks)) {
+            const sourceId = (req as any).id || (req as any)._id || (req as any).sourceId;
             for (const link of req.traceLinks) {
               if (link.target && link.target.id && link.type) {
+                const targetId = link.target.id;
+                let confidence: 'high' | 'medium' | 'low' = 'high';
+                
+                // Handle both string and object confidence formats
+                if ('confidence' in link) {
+                  if (typeof link.confidence === 'string') {
+                    confidence = link.confidence as 'high' | 'medium' | 'low';
+                  } else if (typeof link.confidence === 'number') {
+                    confidence = link.confidence >= 7 ? 'high' : (link.confidence >= 4 ? 'medium' : 'low');
+                  }
+                }
+                
+                // Handle string or object relationshipType
+                const relationshipType = typeof link.type === 'string' ? link.type : link.type?.value || 'tracesTo';
+                
                 traceLinks.push({
-                  sourceId: req.id,
-                  targetId: link.target.id,
+                  sourceId,
+                  targetId,
                   targetDocumentId: link.target.documentId,
-                  relationshipType: link.type,
-                  confidence: link.confidence || 'high'
+                  relationshipType: relationshipType as ParsedTraceLink['relationshipType'],
+                  confidence
                 });
               }
             }
@@ -247,6 +269,49 @@ export class RepositoryParser {
 
         return traceLinks;
       }
+    }
+
+    if ((ext === '.ts' || ext === '.tsx' || ext === '.js' || ext === '.jsx') && detectedType === 'softwareComponent') {
+      const contentStr = String(content);
+      const traceLinkMatches = contentStr.match(/@(trace)\s*\n\s*sourceId:\s*(\w+),\s*targetId:\s*(\w+)/gi) || [];
+      const traceLinks: ParsedTraceLink[] = [];
+
+      for (const match of traceLinkMatches) {
+        const lines = match.split('\n');
+        const sourceMatch = match.match(/sourceId:\s*(\w+)/);
+        const targetMatch = match.match(/targetId:\s*(\w+)/);
+        const relationshipMatch = match.match(/relationshipType:\s*(\w+)/);
+        const confidenceMatch = match.match(/confidence:\s*(\w+)/);
+
+        if (sourceMatch && targetMatch) {
+          traceLinks.push({
+            sourceId: sourceMatch[1],
+            targetId: targetMatch[1],
+            relationshipType: (relationshipMatch?.[1] as any) || 'tracesTo',
+            confidence: (confidenceMatch?.[1] as any) || 'high'
+          });
+        }
+      }
+
+      return traceLinks;
+    }
+
+    if (ext === '.md' || ext === '.txt') {
+      const contentStr = String(content);
+      const refMatches = contentStr.match(/(REF|REQ)-\d+/gi) || [];
+      const reqMatches = contentStr.match(/reqId:\s*(\w+)/gi) || [];
+      const traceLinks: ParsedTraceLink[] = [];
+
+      for (let i = 0; i < refMatches.length && i < reqMatches.length; i++) {
+        traceLinks.push({
+          sourceId: refMatches[i],
+          targetId: reqMatches[i].split(':')[1].trim(),
+          relationshipType: 'tracesTo',
+          confidence: 'medium'
+        });
+      }
+
+      return traceLinks;
     }
 
     return [];
