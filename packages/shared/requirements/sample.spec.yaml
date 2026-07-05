@@ -1,0 +1,8 @@
+
+# infra/sample.spec.yaml — Skeleton sample for BackendArchitect
+# Do NOT modify this file. Use plans/THE-161-spec-yaml-parser-delegation.md for full spec format.
+# This is a minimal skeleton to validate parser can load YAML without erroring on missing optional fields.
+
+title: "Skeleton Specification"
+version: "0.0.1"
+status: draft
