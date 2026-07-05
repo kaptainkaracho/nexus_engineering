@@ -1,0 +1,188 @@
+openapi: 3.0.0
+info:
+  title: Repository Reader API
+  version: 1.0.0
+  description: API endpoints for scanning and accessing repository file metadata
+servers:
+  - url: http://localhost:3000/api
+    description: Local development server
+paths:
+  /scan:
+    get:
+      tags:
+        - Repository Scanner
+      summary: Scan a repository directory
+      description: Scan a repository directory and return file metadata with tree structure
+      parameters:
+        - name: repositoryPath
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Path to the repository to scan
+      responses:
+        '200':
+          description: Successful scan completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanResult'
+        '400':
+          description: Invalid request parameters
+        '500':
+          description: Internal server error
+  /scan/tree:
+    get:
+      tags:
+        - Repository Scanner
+      summary: Get lightweight tree structure
+      description: Returns only the hierarchical tree structure for initial UI mount
+      parameters:
+        - name: repositoryPath
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Path to the repository to scan
+      responses:
+        '200':
+          description: Repository tree structure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepoTree'
+        '400':
+          description: Invalid request parameters
+        '500':
+          description: Internal server error
+  /scan/stream:
+    post:
+      tags:
+        - Repository Scanner
+      summary: Stream files matching patterns
+      description: Stream file content for files matching search patterns (lazy loading)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                patterns:
+                  type: array
+                  items:
+                    type: string
+                  description: Glob patterns to match files
+                rootPath:
+                  type: string
+                  description: Root path for file search
+      responses:
+        '200':
+          description: File stream (chunked JSON)
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Newline-delimited JSON stream of file entries
+        '400':
+          description: Invalid request parameters
+        '500':
+          description: Internal server error
+components:
+  schemas:
+    ScanResult:
+      type: object
+      properties:
+        fileMetadata:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileMetadata'
+        scanReport:
+          $ref: '#/components/schemas/ScanReport'
+        tree:
+          $ref: '#/components/schemas/RepoTree'
+      required:
+        - fileMetadata
+        - scanReport
+    RepoTree:
+      type: object
+      properties:
+        root:
+          $ref: '#/components/schemas/RepoNode'
+        nodesByPath:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/RepoNode'
+    RepoNode:
+      type: object
+      properties:
+        id:
+          type: string
+        path:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum: [file, directory]
+        size:
+          type: integer
+          format: int64
+        extension:
+          type: string
+        isBinary:
+          type: boolean
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/RepoNode'
+    FileMetadata:
+      type: object
+      properties:
+        filePath:
+          type: string
+        relativePath:
+          type: string
+        size:
+          type: integer
+          format: int64
+        contentHash:
+          type: string
+        contentType:
+          type: string
+          enum: [text, binary]
+        detectedType:
+          type: string
+          enum: [requirement, architectureModel, softwareComponent, testCase, traceLink]
+      required:
+        - filePath
+        - relativePath
+        - size
+        - contentHash
+        - contentType
+    ScanReport:
+      type: object
+      properties:
+        filesFound:
+          type: integer
+          format: int32
+        bytesScanned:
+          type: integer
+          format: int64
+        scanTimeMs:
+          type: integer
+          format: int32
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScanError'
+    ScanError:
+      type: object
+      properties:
+        path:
+          type: string
+        error:
+          type: string
+      required:
+        - path
+        - error
