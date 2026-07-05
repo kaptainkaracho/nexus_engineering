@@ -62,9 +62,9 @@ describe('folder expansion', () => {
     const folderBtn = treeContainer?.querySelector('button[aria-label="folder: Folder 1"]');
 
     expect(folderBtn).toBeInTheDocument();
-    expect(folderBtn).toHaveAttribute('aria-expanded', 'true');
-    fireEvent.click(folderBtn!);
     expect(folderBtn).toHaveAttribute('aria-expanded', 'false');
+    fireEvent.click(folderBtn!);
+    expect(folderBtn).toHaveAttribute('aria-expanded', 'true');
   });
 });
 
