@@ -64,6 +64,9 @@ export type {
   FileMetadata,
   ScanOptions,
   ScanResult,
+  ScanReport,
   RepositoryReader,
-  FileEntry
+  FileEntry,
+  DetectedArtifact,
+  ScanSession,
 } from './types';

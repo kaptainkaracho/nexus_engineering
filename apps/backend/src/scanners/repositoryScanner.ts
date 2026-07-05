@@ -1,15 +1,14 @@
 // Repository Scanner Implementation
 // Implements file system scanning for engineering artifacts
 
-import { randomUUID } from 'node:crypto'
-import { Document, DocumentType, FileMetadata, ScanOptions, ScanReport, RepositoryReader, FileEntry } from '@nexus-engineering/shared'
+import { FileMetadata, ScanOptions, ScanReport, ScanResult, RepositoryReader, FileEntry } from '@nexus-engineering/shared'
+import { artifactDetector } from './artifactDetector'
+import { scanMetadataStore } from './scanMetadata'
 
 export class RepositoryScanner implements RepositoryReader {
   async scan(rootPath: string, options: ScanOptions = {}): Promise<ScanResult> {
-    const path = await import('node:path')
-    const fs = await import('node:fs/promises')
     const startTime = Date.now()
-    const report: ScanReport = {
+    const scanReport: ScanReport = {
       filesFound: 0,
       bytesScanned: 0,
       scanTimeMs: 0,
@@ -22,25 +21,40 @@ export class RepositoryScanner implements RepositoryReader {
     const minFileSize = options.minFileSize || 0
     const depthLimit = options.depthLimit || null
 
+    const scanId = scanMetadataStore.createSession(rootPath)
+
     try {
       await this.scanDirectory(
         rootPath,
         ignorePatterns,
         fileMetadata,
-        report,
+        scanReport,
         maxFileSize,
         minFileSize,
         depthLimit,
         0,
       )
     } catch (error) {
-      report.errors.push({ path: rootPath, error: error as Error })
+      scanReport.errors.push({ path: rootPath, error: error as Error })
+      scanMetadataStore.failSession(scanId, (error as Error).message)
+      scanReport.scanTimeMs = Date.now() - startTime
+      return { scanId, fileMetadata, scanReport, artifacts: [] }
     }
 
-    report.scanTimeMs = Date.now() - startTime
-    report.filesFound = fileMetadata.length
+    scanReport.scanTimeMs = Date.now() - startTime
+    scanReport.filesFound = fileMetadata.length
 
-    return { fileMetadata, report }
+    const artifacts = artifactDetector.detect(fileMetadata)
+
+    scanMetadataStore.completeSession(
+      scanId,
+      fileMetadata.length,
+      0,
+      artifacts,
+      scanReport.errors.map((e) => ({ path: e.path, message: e.error.message })),
+    )
+
+    return { scanId, fileMetadata, scanReport, artifacts }
   }
 
   async getFileMetadata(filePath: string): Promise<FileMetadata | null> {
@@ -70,6 +84,8 @@ export class RepositoryScanner implements RepositoryReader {
     rootPath: string = process.cwd(),
   ): AsyncIterable<FileEntry> {
     const { glob } = await import('glob')
+    const path = await import('node:path')
+    const fs = await import('node:fs/promises')
 
     for (const pattern of patterns) {
       const files = await glob.promise(pattern, {
@@ -80,7 +96,7 @@ export class RepositoryScanner implements RepositoryReader {
 
       for (const file of files) {
         const filePath = path.join(rootPath, file)
-        const stats = await fs.promises.stat(filePath)
+        const stats = await fs.stat(filePath)
         const relativePath = path.relative(rootPath, filePath)
 
         yield {
@@ -96,7 +112,7 @@ export class RepositoryScanner implements RepositoryReader {
     directory: string,
     ignorePatterns: string[],
     fileMetadata: FileMetadata[],
-    report: ScanReport,
+    scanReport: ScanReport,
     maxFileSize: number,
     minFileSize: number,
     depthLimit: number | null,
@@ -123,7 +139,7 @@ export class RepositoryScanner implements RepositoryReader {
             fullPath,
             ignorePatterns,
             fileMetadata,
-            report,
+            scanReport,
             maxFileSize,
             minFileSize,
             depthLimit,
@@ -134,7 +150,7 @@ export class RepositoryScanner implements RepositoryReader {
           if (metadata) {
             if (metadata.size >= minFileSize && metadata.size <= maxFileSize) {
               fileMetadata.push(metadata)
-              report.bytesScanned += metadata.size
+              scanReport.bytesScanned += metadata.size
             }
           }
         }

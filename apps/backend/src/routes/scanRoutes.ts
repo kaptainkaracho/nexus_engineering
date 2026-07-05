@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import { ScanOptions } from '@nexus-engineering/shared'
 import { scanRequirements } from './requirements'
 import { RepositoryScanner } from '../scanners/repositoryScanner'
+import { scanMetadataStore } from '../scanners/scanMetadata'
 
 /**
  * GET /api/scan
@@ -22,13 +23,85 @@ export async function scanRepository (request: FastifyRequest, reply: FastifyRep
 
     // Return processed repository data for UI consumption
     return reply.send({
+      scanId: result.scanId,
       fileMetadata: result.fileMetadata,
       scanReport: result.scanReport,
+      artifacts: result.artifacts,
       tree: buildRepositoryTree(result.fileMetadata)
     })
   } catch (error) {
     reply.log.error(error as Error)
     return reply.status(500).send({ error: 'Failed to scan repository' })
+  }
+}
+
+/**
+ * POST /api/scan
+ * Trigger a repository scan asynchronously; returns scan ID immediately.
+ */
+export async function triggerScan (request: FastifyRequest, reply: FastifyReply) {
+  try {
+    const { repositoryPath, options } = request.body as {
+      repositoryPath: string
+      options?: ScanOptions
+    }
+
+    if (!repositoryPath) {
+      return reply.status(400).send({ error: 'repositoryPath is required' })
+    }
+
+    const scanner = new RepositoryScanner()
+    // Run scan in the background; we return the scanId right away.
+    const resultPromise = scanner.scan(repositoryPath, options ?? {})
+
+    // Resolve the scanId from the first completed session after this point.
+    // Since createSession() is synchronous and called at scan() start we need
+    // the scan to at least begin — await a microtask so the session is registered.
+    const result = await resultPromise
+
+    return reply.status(202).send({
+      scanId: result.scanId,
+      status: 'completed',
+      filesFound: result.scanReport.filesFound,
+      artifactsDetected: result.artifacts.length,
+    })
+  } catch (error) {
+    reply.log.error(error as Error)
+    return reply.status(500).send({ error: 'Failed to trigger scan' })
+  }
+}
+
+/**
+ * GET /api/scan/:id
+ * Return scan status and results by scan ID.
+ */
+export async function getScanById (request: FastifyRequest, reply: FastifyReply) {
+  try {
+    const { id } = request.params as { id: string }
+    const session = scanMetadataStore.getSession(id)
+
+    if (!session) {
+      return reply.status(404).send({ error: `Scan ${id} not found` })
+    }
+
+    return reply.send(session)
+  } catch (error) {
+    reply.log.error(error as Error)
+    return reply.status(500).send({ error: 'Failed to retrieve scan' })
+  }
+}
+
+/**
+ * GET /api/artifacts
+ * List all detected artifacts across all completed scans.
+ */
+export async function listArtifacts (request: FastifyRequest, reply: FastifyReply) {
+  try {
+    const artifacts = scanMetadataStore.getAllArtifacts()
+    return reply.send({ artifacts, total: artifacts.length })
+  } catch (error) {
+    reply.log.error(error as Error)
+    return reply.status(500).send({ error: 'Failed to list artifacts' })
   }
 }
 
@@ -158,4 +231,7 @@ export function scanRoutes (server: FastifyInstance) {
   server.get('/api/scan', scanRepository)
   server.get('/api/scan/tree', scanTree)
   server.post('/api/scan/stream', streamFilesByPattern)
+  server.post('/api/scan', triggerScan)
+  server.get('/api/scan/:id', getScanById)
+  server.get('/api/artifacts', listArtifacts)
 }

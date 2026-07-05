@@ -1,5 +1,8 @@
 import type { TraceLink } from '@nexus-engineering/shared'
+import type { ParsedDocument } from '../parsers/repositoryParser'
 import { GraphBuilder, type TraceabilityGraph } from './graphBuilder.js'
+import type { GraphNodeRow, GraphEdgeRow } from './graphDatabase'
+import { getGraphDatabase } from './graphDatabase'
 
 export interface TraceLinkRow {
   id: string
@@ -12,125 +15,96 @@ export interface TraceLinkRow {
   description?: string
 }
 
-/**
- * In-memory persistence for traceability graph nodes and edges.
- * No database driver is wired yet — the GraphRepository stores everything in memory
- * so the API can return meaningful data once parsed artifacts are fed in via upsertNodes/upsertEdges.
- */
-export class GraphDatabase {
-  private traceLinks: TraceLinkRow[] = []
-
-  upsertNodes(nodes: Array<{ id: string; type: string; title?: string, name?: string }>): void {
-    // Nodes are implicit from edges in the current model.
-  }
-
-  upsertEdges(edges: Array<{ sourceId: string; targetId: string; relationshipType: string; confidence: 'high' | 'medium' | 'low' }>): void {
-    for (const edge of edges) {
-      const existing = this.traceLinks.find(l => l.sourceId === edge.sourceId && l.targetId === edge.targetId)
-      if (existing) {
-        Object.assign(existing, edge)
-      } else {
-        this.traceLinks.push({
-          id: `${edge.sourceId}→${edge.targetId}`,
-          sourceId: edge.sourceId,
-          sourceType: 'unknown',
-          targetId: edge.targetId,
-          targetType: 'unknown',
-          relationshipType: edge.relationshipType,
-          confidence: edge.confidence
-        })
-      }
-    }
-  }
-
-  getTraceLinks(): TraceLinkRow[] {
-    return this.traceLinks
-  }
-}
-
-export const db = new GraphDatabase()
+const db = getGraphDatabase()
 
 export class GraphRepository {
-  
   async getTraceabilityGraph(): Promise<TraceabilityGraph> {
     try {
-      const traceLinks: TraceLink[] = this._rowsToTraceLinks(db.getTraceLinks())
-      return new GraphBuilder(traceLinks).buildGraph()
+      const rows = db.buildGraph()
+      return this._rowsToGraph(rows)
     } catch (error) {
       throw error
     }
   }
-  
+
   async getFilteredTraceabilityGraph(
     sourceTypes?: string[],
     targetTypes?: string[],
     relationships?: string[]
   ): Promise<TraceabilityGraph> {
     try {
-      const traceLinks = this._filterLinks(db.getTraceLinks(), sourceTypes, targetTypes, relationships)
-      let builder = new GraphBuilder(traceLinks)
-      
-      if (sourceTypes && sourceTypes.length > 0) {
-        builder = builder.filterBySourceType(sourceTypes)
-      }
-      
-      if (targetTypes && targetTypes.length > 0) {
-        builder = builder.filterByTargetType(targetTypes)
-      }
-        
-      if (relationships && relationships.length > 0) {
-        builder = builder.filterByRelationship(relationships)
-      }
-  
-      return builder.buildGraph()
+      const rows = db.buildGraph(sourceTypes, targetTypes, relationships)
+      return this._rowsToGraph(rows)
     } catch (error) {
       throw error
     }
   }
-  
+
   async getConfidenceSortedTraceabilityGraph(
     descending: boolean = true
   ): Promise<TraceabilityGraph> {
     try {
-      const traceLinks = this._rowsToTraceLinks(db.getTraceLinks())
+      const traceLinks: TraceLink[] = this._rowsToTraceLinks(db.getGraphEdges())
       return new GraphBuilder(traceLinks).sortByConfidence(descending)
     } catch (error) {
       throw error
     }
   }
-  
-  async upsertNodes(nodes: Array<{ id: string; type: string; title?: string, name?: string }>): Promise<void> {
-    db.upsertNodes(nodes)
-  }
-  
-  async upsertEdges(edges: Array<{ sourceId: string; targetId: string; relationshipType: string; confidence: 'high' | 'medium' | 'low' }>): Promise<void> {
-    db.upsertEdges(edges)
+
+  async upsertNodes(nodes: Array<{ id: string; type: string; title?: string; name?: string }>): Promise<void> {
+    try {
+      db.upsertNodes(nodes)
+    } catch (error) {
+      throw error
+    }
   }
 
-  private _rowsToTraceLinks(rows: TraceLinkRow[]): TraceLink[] {
-    return rows.map(r => ({
-      sourceId: r.sourceId,
-      sourceType: r.sourceType,
-      targetId: r.targetId,
-      targetType: r.targetType,
-      relationshipType: r.relationshipType as TraceLink['relationshipType'],
+  async upsertEdges(edge: { sourceId: string; targetId: string; relationshipType: string; confidence: 'high' | 'medium' | 'low'; description?: string }): Promise<void> {
+    try {
+      db.upsertEdge(edge)
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async buildFromParsed(parsedDocs: ParsedDocument[]): Promise<{ nodes: GraphNodeRow[]; edges: GraphEdgeRow[] }> {
+    db.buildGraphFromParsed(parsedDocs)
+    const rows = db.buildGraph()
+    return { nodes: rows.nodes, edges: rows.edges }
+  }
+
+  private _rowsToGraph(rows: { nodes: GraphNodeRow[]; edges: GraphEdgeRow[] }): TraceabilityGraph {
+    const nodes: Array<{ id: string; type: string; title?: string; name?: string }> = rows.nodes.map((n) => ({
+      id: n.id,
+      type: n.type,
+      title: n.title,
+      name: n.name,
+    }))
+    const edges: Array<{ sourceId: string; targetId: string; relationshipType: string; confidence: 'high' | 'medium' | 'low'; description?: string }> = rows.edges.map((e) => ({
+      sourceId: e.source_id,
+      targetId: e.target_id,
+      relationshipType: e.relationship_type,
+      confidence: e.confidence,
+      description: e.description || undefined,
+    }))
+    return { nodes, edges, totalNodes: rows.totalNodes, totalEdges: rows.totalEdges }
+  }
+
+  private _rowsToTraceLinks(rows: GraphEdgeRow[]): TraceLink[] {
+    return rows.map((r) => ({
+      id: '',
+      version: '',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      source: '',
+      sourceId: r.source_id,
+      sourceType: '' as any,
+      targetId: r.target_id,
+      targetType: '' as any,
+      relationshipType: r.relationship_type as TraceLink['relationshipType'],
       confidence: r.confidence,
-      description: r.description
-    } satisfies TraceLink))
-  }
-
-  private _filterLinks(
-    links: TraceLinkRow[],
-    sourceTypes?: string[],
-    targetTypes?: string[],
-    relationships?: string[]
-  ): TraceLink[] {
-    return links.filter(link => {
-      if (sourceTypes?.length && !sourceTypes.includes(link.sourceType)) return false
-      if (targetTypes?.length && !targetTypes.includes(link.targetType)) return false
-      if (relationships?.length && !relationships.includes(link.relationshipType)) return false
-      return true
-    })
+      description: r.description || undefined,
+    }))
   }
 }
 

@@ -119,9 +119,31 @@ export interface ScanOptions {
   includePatterns?: string[];
 }
 
+export interface DetectedArtifact {
+  artifactType: 'requirement' | 'architecture' | 'adr' | 'spec';
+  filePath: string;
+  relativePath: string;
+  fileName: string;
+  detectedAt: IsoDateString;
+}
+
+export interface ScanSession {
+  id: string;
+  startedAt: IsoDateString;
+  completedAt?: IsoDateString;
+  repositoryPath: string;
+  filesFound: number;
+  filesSkipped: number;
+  artifactsDetected: DetectedArtifact[];
+  errors: Array<{ path: string; message: string }>;
+  status: 'running' | 'completed' | 'failed';
+}
+
 export interface ScanResult {
+  scanId: string;
   fileMetadata: FileMetadata[];
   scanReport: ScanReport;
+  artifacts: DetectedArtifact[];
 }
 
 export interface ScanReport {

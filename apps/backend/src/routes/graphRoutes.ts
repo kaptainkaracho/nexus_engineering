@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
-import type { TraceabilityGraph } from '../graphBuilder/graphBuilder'
+import type { GraphNode, GraphEdge, TraceabilityGraph } from '../graphBuilder/graphBuilder'
 import { graphRepository } from '../graphBuilder/repository'
 
 export async function getTraceabilityGraph (_: FastifyRequest, reply: FastifyReply) {
@@ -66,8 +66,24 @@ export async function getConfidenceSortedTraceabilityGraph (
   }
 }
 
+export async function getTraceGraph(_: FastifyRequest, reply: FastifyReply) {
+  try {
+    const graph = await graphRepository.getTraceabilityGraph()
+    return reply.send({
+      nodes: graph.nodes as GraphNode[],
+      edges: graph.edges as GraphEdge[],
+      totalNodes: graph.totalNodes,
+      totalEdges: graph.totalEdges
+    })
+  } catch (error) {
+    reply.log.error(error as Error)
+    return reply.status(500).send({ error: 'Failed to generate traceability graph' })
+  }
+}
+
 export function graphBuilderRoutes (server: FastifyInstance) {
   server.get('/api/graph/traceability', getTraceabilityGraph)
   server.get('/api/graph/traceability/filtered', getFilteredTraceabilityGraph)
   server.get('/api/graph/traceability/sorted', getConfidenceSortedTraceabilityGraph)
+  server.get('/api/trace-graph', getTraceGraph)
 }

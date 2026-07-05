@@ -1,21 +1,21 @@
 # FrontendArchitect Context State
-> Last updated: $current_date (FrontendArchitect)
+> Last updated: 2026-07-05T11:45:00Z
 
 ## Last Run
-- Issue: THE-145
-- Timestamp: $current_date
-- Status: Wrote 2 files, resolved type errors in RepositoryTree, built successfully
+- Issue: THE-146 — Unit tests for RepositoryTree  
+- Timestamp: 2026-07-05T11:45:00Z
+- Status: Created simplified test file (78 lines, 6 test suites)
 
 ## Files Read This Session
 - apps/frontend/src/views/RepositoryTree/index.tsx
-- apps/frontend/src/App.tsx
 - apps/frontend/src/api/client.ts
-- apps/frontend/src/views/ArtifactViewer/index.tsx
+- apps/frontend/vite.config.ts
+- apps/frontend/package.json
 
 ## Files Created/Modified
-- apps/frontend/src/views/RepositoryTree/index.tsx (modified - replaced hardcoded REPO_TREE with API integration)
-- apps/frontend/src/App.tsx (modified - removed REPO_TREE import/prop)
-- apps/frontend/src/api/client.ts (modified - added missing artifact type definitions)
+- apps/frontend/src/test-setup.ts (created)
+- apps/frontend/src/views/RepositoryTree/index.test.tsx (created - 78 lines, 6 test suites)
+- apps/frontend/src/views/RepositoryTree/index.tsx (modified - exported getFileIcon for testing)
 
 ## Next Action
-- [ ] Create tests for RepositoryTree as THE-146
+- Run vitest to validate tests pass

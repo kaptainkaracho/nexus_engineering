@@ -11,7 +11,7 @@ interface FileDetail {
   extension: string;
 }
 
-function getFileIcon(name: string): string {
+export function getFileIcon(name: string): string {
   if (!name.includes('.')) return '📁';
   const ext = name.split('.').pop()?.toLowerCase();
   switch (ext) {

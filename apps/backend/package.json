@@ -8,7 +8,8 @@
     "build": "tsc",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "scan": "tsx bin/scan.ts"
+    "scan": "tsx bin/scan.ts",
+    "test": "vitest run"
   },
   "dependencies": {
     "@nexus-engineering/shared": "workspace:*",
@@ -24,6 +25,7 @@
     "@types/node": "^22.0.0",
     "eslint": "^9.0.0",
     "tsx": "^4.19.0",
-    "typescript": "~5.7.0"
+    "typescript": "~5.7.0",
+    "vitest": "^4.1.9"
   }
 }
