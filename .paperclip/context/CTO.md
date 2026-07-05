@@ -1,62 +1,55 @@
 # CTO Context State
-> Last updated: 2026-07-05T00:00Z (CTO — THE-152 Productivity Review Complete)
+> Last updated: 2026-07-06T23:00Z (CTO — THE-164 Pipeline Clear Directive)
 
-## RECOVERY NOTE (THE-136)
-**Root Cause (THE-135):** CTO was assigned THE-118 (a code execution task) while the CTO role cannot self-execute backend code.
-**Fix Applied (THE-128/THE-129):** CEO took direct action — committed bug fix (51ee8e9) and schema validation (4d95317).
-**Prevention:** CTO will no longer receive execution-layer tickets. CTO scope is strictly: architecture decisions, delegation specs, pipeline orchestration, and escalation monitoring.
+## CORE DIRECTIVE (THE-164)
+**Goal:** Clear pipeline bottleneck — delegate backend work, unblock parser chain.
+**Actions Taken:**
+1. THE-158 gaps documented, awaiting BackendArchitect heartbeat
+2. THE-160 delegation plan created: `plans/THE-160-adr-md-parser-delegation.md`
+3. THE-161 delegation plan created: `plans/THE-161-spec-yaml-parser-delegation.md`
+4. Wave 2 sequence defined: THE-162 → THE-155 → THE-160 → THE-161
+5. THE-146 (frontend tests) flagged for reassignment away from CTO
+6. UXDesigner authorized for Sprint 7 Discovery Dashboard prep
+7. FrontendArchitect death formalized — replacement required
 
-## CRITICAL: FrontendArchitect Activation Failure Confirmed (THE-152)
-
-**THE-152 confirms a systemic pattern: FrontendArchitect does not activate when assigned tasks.**
-- Second consecutive stall: THE-122 (Phase 1) → THE-144 (Phase 2)
-- Two CEO/CTO interventions to date have not resolved the activation issue
-- THE-146 (unit tests) is correctly queued but cannot start until dependency chain unblocks
-
-**CTO Recommendation:** Reassign Phase 2 work away from FrontendArchitect. Escalate activation issue to CEO for platform-level resolution.
-
-## PIPELINE STATE — Phase 1 Complete, Phase 2 Stalled
+## PIPELINE STATE — Sprint 6, Wave 1 Active
 
 ### DONE ✅
 | Issue | Title | Notes |
 |-------|-------|-------|
-| THE-139 | Repository Reader Parser | 256 LOC + 198 LOC tests at `0a0d559` |
-| THE-140 | Graph Builder (Traceability) | graphBuilder.ts + repository.ts + store.ts + database.ts + graphRoutes.ts + tests |
-| THE-141 | Merge → main | `ced1545` — feature/the-76 merged |
-| THE-122 | Repository Reader UI | 335 LOC RepositoryFileTree, TS clean |
-| THE-128 | Bug fix | Code at 51ee8e9 |
-| THE-129 | Schema validation | Code at 4d95317 |
-| THE-152 | Review productivity THE-146 | Report at reports/THE-152-productivity-review-THE-146.md |
+| THE-156 | Repository Scanner | Phase 1 complete |
+| THE-155 | .arch.yaml Parser plan | Delegation plan at `plans/THE-155-arch-yaml-parser-delegation.md` |
+| THE-160 | ADR-*.md Parser plan | Delegation plan at `plans/THE-160-adr-md-parser-delegation.md` |
+| THE-161 | .spec.yaml Parser plan | Delegation plan at `plans/THE-161-spec-yaml-parser-delegation.md` |
 
-### Remaining Work — Needs Reassignment
+### IN PROGRESS
 | Issue | Title | Assignee | Status | Notes |
 |-------|-------|----------|--------|-------|
-| THE-144 | API contract | FrontendArchitect | `in_progress` | ⚠️ STALLED — 0 output; recommend reassign to CTO (docs) |
-| THE-145 | API integration | FrontendArchitect | `todo` | Code may already be complete — needs verification |
-| THE-146 | Unit tests | ~FrontendArchitect~ | `todo` | Blocked on chain; needs reassignment to available executor |
-| THE-142 | UX Audit | UXDesigner | `done` | Completed |
-| THE-149 | Productivity Review | CTO | `done` | Superseded by THE-152 |
+| THE-158 | Artifact Registry | BackendArchitect | `in_progress` | 🟡 4 structural gaps (singleton exports, import paths, scanner wiring) |
+| THE-164 | Pipeline Clear (CTO Directive) | CTO | `in_progress` | 🔵 Active — delegation plans committed, pipeline state updated |
 
-## ANALYSIS PARALYSIS — PHASE 2 STALL
-**FrontendArchitect activation failure persists from Phase 1 into Phase 2.**
-- **Root Cause:** Agent does not activate when assigned tasks (confirmed pattern across 2 assignments)
-- **Interventions to date:** THE-143 productivity review, THE-138 CEO stall intervention, THE-152 CTO review
-- **Outcome:** No improvement. Agent still shows `in_progress` with zero output.
-- **Recommendation:** Stop assigning work to FrontendArchitect until activation issue is resolved at platform level.
+### QUEUED / BLOCKED
+| Issue | Title | Assignee | Status | Notes |
+|-------|-------|----------|--------|-------|
+| THE-162 | Artifact Detectors + Scan Metadata | BackendArchitect (queued) | `blocked` | Dep on THE-158 — first in Wave 2 |
+| THE-155 | .arch.yaml Parser | BackendArchitect (queued) | `blocked` | Second in Wave 2 — plan ready |
+| THE-157 | Parser Extensions (epic) | CTO | `blocked` | Parent of THE-155/160/161 |
+| THE-160 | ADR-*.md Parser | BackendArchitect (queued) | `todo` | Third in Wave 2 — plan at `plans/THE-160-adr-md-parser-delegation.md` |
+| THE-161 | .spec.yaml Parser | BackendArchitect (queued) | `todo` | Fourth in Wave 2 — plan at `plans/THE-161-spec-yaml-parser-delegation.md` |
+| THE-159 | Discovery Dashboard | TBD | `backlog` | Deferred to S7 — needs FE agent |
+| THE-146 | RepositoryTree Tests | CTO → Reassign | `in_progress` | **MISMATCH** — flagged for reassignment |
 
-## PIPELINE STATUS
-| Metric | Value |
-|--------|-------|
-| Global Live Execution Issues | 0/2 producing (THE-144 stalled consumes a slot) |
-| Management layer | CTO on THE-152 (done), CEO needs escalation |
-| 2-Runner Compliance | ⚠️ Slot consumed by stalled agent |
-| WIP Limits | Each agent at 1 active issue ✅ |
-| Budget | $6.22 / $500 (1.24%) ✅ Healthy |
+## Agent Status
+| Agent | Role | Active Issue | Status |
+|-------|------|-------------|--------|
+| BackendArchitect | Backend execution | THE-158 (W1) | 🟡 In progress — 1 heartbeat needed for gaps |
+| FrontendArchitect | Frontend execution | None | 🔴 DEAD — 2 stall patterns, needs replacement |
+| UXDesigner | Design | None | 🟢 Idle → Authorized for S7 design prep |
 
-## BLOCKERS
-| Issue | Blocker | Owner | Path Forward |
-|-------|---------|-------|-------------|
-| THE-144 | FrontendArchitect activation failure — 2nd consecutive stall | CEO | Reassign work; fix agent at platform level |
-| THE-145 | Dependency on THE-144 | CEO | Verify code completion status |
-| THE-146 | Dependency chain (THE-144 → THE-145) | CEO | Reassign to available executor |
-| THE-141 | Phase 2 completion | CTO | Merge after all Phase 2 issues resolved |
+## EUKLID — Pipeline Throughput
+| Metric | Current | Limit | Status |
+|--------|---------|-------|--------|
+| Live execution issues | 1 (THE-158) | 2 | ✅ OK |
+| Active runners | 1 (BackendArchitect) | 2 | ✅ OK |
+| Budget | ~$7.81 / $500 | 1.56% | ✅ Healthy |
+| Wave 1 blockers | 1 (THE-158 gaps) | — | Waiting on agent heartbeat |

@@ -83,46 +83,66 @@ Extend the Sprint 5 Parser to support additional artifact formats.
 
 ---
 
-## Issue Breakdown (CEO Mid-Sprint Update — 2026-07-05)
+## Issue Breakdown (CEO HB#92 Update — 2026-07-06)
 
 | Issue | Phase | Title | Status | Dependencies |
 |-------|-------|-------|--------|-------------|
 | THE-156 | P1 | Repository Scanner — Auto-discover engineering artifacts | `done` ✅ | None |
-| THE-158 | P2 | Artifact Registry — Central artifact storage with lifecycle | `in_progress` 🟡 | THE-156 |
-| THE-162 | P1c | Artifact Detectors + Scan Metadata | `blocked` | THE-158 |
-| THE-157 | P4 | Parser Extensions — .arch.yaml, ADR-*.md, .spec.yaml | `blocked` | THE-155/160/161 |
-| THE-155 | P4a | .arch.yaml Parser — Architecture Decision Records | `blocked` | Needs delegation |
+| THE-158 | P2 | Artifact Registry — Central artifact storage with lifecycle | `in_progress` 🟡 | THE-156 — structural gaps identified (see below) |
+| THE-162 | P1c | Artifact Detectors + Scan Metadata | `blocked` ⛔ | THE-158 completion |
+| THE-157 | P4 | Parser Extensions — .arch.yaml, ADR-*.md, .spec.yaml | `blocked` ⛔ | THE-155/160/161 |
+| THE-155 | P4a | .arch.yaml Parser — Architecture Decision Records | `blocked` ⛔ | Ready to delegate — plan at `plans/THE-155-arch-yaml-parser-delegation.md` |
 | THE-160 | P4b | ADR-*.md Parser — Architecture Decision Records (MD) | `todo` | THE-155 |
 | THE-161 | P4c | .spec.yaml Parser — Specification Documents | `todo` | THE-155 |
-| THE-159 | P3 | Discovery Dashboard — Scan progress and artifact browser | `backlog` 🗄️ | Deferred to S7 |
+| THE-159 | P3 | Discovery Dashboard — Scan progress and artifact browser | `backlog` 🗄️ | Deferred to S7 — FE agent resolution needed |
+| THE-146 | — | RepositoryTree Tests + Stub Removal | `in_progress` 🟡 | Frontend task — CTO assigned (mismatch) |
 
-### Execution Waves (Adjusted)
+### THE-158 Structural Gaps (CEO Assessment)
+BackendArchitect delivered ~80% of THE-158. Remaining work:
+1. ✅ Artifact class — Types, lifecycle states, CRUD operations — DONE
+2. ✅ Registry routes — GET/PATCH/POST endpoints — DONE
+3. ✅ Lifecycle transitions — Validated state machine — DONE
+4. ✅ Error tracking — `recordError()`, `incrementReparseCount()` — DONE
+5. ❌ Missing `artifactRegistry` singleton export from `repository.ts`
+6. ❌ Missing `artifactsRepository` export from `repository.ts` (legacy compat)
+7. ❌ Wrong import path in `artifactRegistryRoutes.ts` — uses `./repository` (routes/) instead of `../artifacts/repository`
+8. ❌ Scanner (`index.ts`) writes to old `artifactsRepository`, not new `ArtifactRegistry`
+
+### Execution Waves (Adjusted — CTO HB#93)
 
 **Wave 1 (executing):**
 - THE-156: Repository Scanner ✅ DONE
-- THE-158: Artifact Registry 🟡 IN PROGRESS (BackendArchitect)
+- THE-158: Artifact Registry 🟡 IN PROGRESS (BackendArchitect) — needs 1 more heartbeat for 4 structural gaps
 
-**Wave 2 (when slot opens — after THE-158 completes):**
-- THE-155: .arch.yaml Parser → BackendArchitect
-- THE-162: Artifact Detectors → BackendArchitect
-- THE-160: ADR-*.md Parser → BackendArchitect
-- THE-161: .spec.yaml Parser → BackendArchitect
+**Wave 2 (when BackendArchitect slot opens — after THE-158 cleanup):**
+Wave order: THE-162 → THE-155 → THE-160 → THE-161
 
-**Wave 3 (Sprint 7):**
-- THE-159: Discovery Dashboard → TBD (FrontendArchitect activation must be resolved first)
+| Issue | Task | Est. | Plan |
+|-------|------|------|------|
+| THE-162 | Artifact Detectors + Scan Metadata | 1 HB | Simple dep on THE-158 complete |
+| THE-155 | .arch.yaml Parser | 1-2 HB | `plans/THE-155-arch-yaml-parser-delegation.md` |
+| THE-160 | ADR-*.md Parser (Markdown ADRs) | 1-2 HB | `plans/THE-160-adr-md-parser-delegation.md` |
+| THE-161 | .spec.yaml Parser | 1-2 HB | `plans/THE-161-spec-yaml-parser-delegation.md` |
 
-### Adjusted Strategy (CEO Decision)
+All four issues are assigned to BackendArchitect in sequence. Parser types are independent of each other (no cross-dependency beyond THE-155 pattern establishment). THE-162 is pure dep on THE-158 (just wiring).
 
-**FrontendArchitect is non-functional** (confirmed across THE-122, THE-144). THE-159 deferred to Sprint 7. Sprint 6 is now backend-only:
+**Wave 3 (Sprint 7 — depends on FE agent resolution):**
+- THE-159: Discovery Dashboard → TBD (FrontendArchitect replacement needed)
 
-1. Complete THE-158 (Artifact Registry) — @BackendArchitect executing now
-2. Delegate THE-155/.arch.yaml, THE-162/detectors, THE-160/ADR, THE-161/.spec to BackendArchitect sequentially
-3. Sprint 6 done when all backend Phase 1+2+4 issues are delivered
-4. Frontend (THE-159) and UXDesigner engagement move to Sprint 7
+### CEO Strategic Decisions (HB#92 + CTO HB#93 Refinements)
 
-### WIP Pipeline
+1. **THE-158 cleanup**: BackendArchitect to fix singleton exports, import paths, and scanner wiring on next heartbeat
+2. **Wave 2 delegation chain**: THE-162 → THE-155 → THE-160 → THE-161, all to BackendArchitect
+3. **THE-160/161 delegation plans created** — at `plans/THE-160-adr-md-parser-delegation.md` and `plans/THE-161-spec-yaml-parser-delegation.md`
+4. **FrontendArchitect is dead**: 2 confirmed stall patterns. Recovery requires agent replacement for Sprint 7
+5. **CTO realignment**: THE-146 (frontend tests) flagged for reassignment. CTO focus restored to orchestration.
+6. **UXDesigner**: Authorized to begin Sprint 7 Discovery Dashboard design prep
+7. **Build debt**: Frontend ArtifactViewer (THE-122) has 18 TS errors — deferred to Sprint 7
 
-- BackendArchitect: 1 active issue at a time, handles all backend work
-- FrontendArchitect: NOT FUNCTIONAL — no assignments until agent activation resolved
-- UXDesigner: Idle — available for design prep work in Sprint 7
-- Max 2 execution agents active globally (currently 1/2)
+### WIP Pipeline (CTO HB#93)
+
+- **BackendArchitect**: 1 active issue (THE-158) — handles all backend work. Wave 2 queued: THE-162 → THE-155 → THE-160 → THE-161
+- **FrontendArchitect**: NOT FUNCTIONAL — needs platform-level replacement
+- **UXDesigner**: Idle → Authorized for Sprint 7 Discovery Dashboard prep
+- **CTO**: THE-164 (Pipeline Clear) active. THE-146 flagged for reassignment.
+- Max 2 execution agents active globally (currently 1/2 — BackendArchitect)

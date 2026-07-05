@@ -81,3 +81,16 @@
 - **UXDesigner:** Can begin Phase 3 design asset preparation (wireframes, tokens, component specs) while frontend path is unresolved — no execution slot needed for design-only work.
 - **Pipeline:** 1/2 live execution issues (THE-158). Budget 1.56% ✅.
 - **Next:** Complete backend Sprint 6 scope, defer frontend to Sprint 7 with agent resolution.
+
+### HB#92 — THE-158 Structural Assessment & Pipeline Reset
+- **Decision:** THE-158 is ~80% complete with known structural gaps.
+- **Gap 1 (blocking runtime):** Missing `artifactRegistry` singleton export from `repository.ts`. `artifactRegistryRoutes.ts` imports this but it doesn't exist.
+- **Gap 2 (blocking runtime):** Missing `artifactsRepository` export from `repository.ts`. `index.ts` and `api.ts` import this but it doesn't exist.
+- **Gap 3 (wrong import path):** `artifactRegistryRoutes.ts` imports `./repository` (resolves to `routes/repository` which doesn't exist) instead of `../artifacts/repository`.
+- **Gap 4 (wiring):** Scanner in `index.ts` still writes to old `artifactsRepository`, not new `ArtifactRegistry`.
+- **Decision — Next delegation:** When THE-158 completes, delegate THE-155 (.arch.yaml Parser) to BackendArchitect as Wave 2. Delegation plan at `plans/THE-155-arch-yaml-parser-delegation.md` is ready.
+- **Decision — CTO realignment:** CTO should not be doing frontend test work (THE-146). Unblock CTO by delegating THE-155 to BackendArchitect. CTO should focus on THE-157 epic orchestration and THE-162 detector spec.
+- **Decision — FrontendArchitect is dead:** 2 confirmed stall patterns. No recovery path. THE-159 requires a new execution strategy for Sprint 7 — either a different FE agent or route through CTO.
+- **Decision — UXDesigner activation:** Authorize UXDesigner to begin Sprint 7 Discovery Dashboard prep: wireframes, design tokens, component specs. No execution slot needed — design-only work.
+- **Decision — Pre-existing build errors:** Frontend ArtifactViewer (THE-122 legacy) has 18 TS errors. Not Sprint 6 scope. Defer to Sprint 7 technical debt cleanup.
+- **Pipeline:** 1/2 live execution issues (THE-158). Budget 1.56% ✅.

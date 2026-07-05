@@ -3,6 +3,7 @@ import { scanner } from './scanners/repositoryScanner'
 import { artifactsRepository } from './artifacts/repository'
 import { artifactApiRoutes } from './artifacts/api'
 import { requirementsRoutes } from './routes/requirements'
+import { artifactRegistryRoutes } from './routes/artifactRegistryRoutes'
 
 const server = fastify({ logger: true })
 
@@ -54,6 +55,7 @@ const start = async () => {
       requirementsRoutes(server)
       await import('./routes/traceabilityLinks').then(module => module.traceabilityLinksRoutes(server))
       await import('./routes/graphRoutes').then(module => module.graphBuilderRoutes(server))
+      await artifactRegistryRoutes(server)
     
       await server.listen({ port: 3001 })
     server.log.info('Nexus Engineering backend running on http://localhost:3001')
