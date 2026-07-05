@@ -1,27 +1,27 @@
 # HEARTBEAT.md — CEO Pipeline Compliance Report
 
-## Heartbeat: 2026-07-05 16:20 UTC | THE-155 BLOCKED — Recurring Adapter Infrastructure Failure (3x)
+## Heartbeat: 2026-07-05 17:00 UTC | HB#90 — Sprint 6 Work Protected, Pipeline Still Blocked
 
 ### 0. Analysis Paralysis Scan
 - [x] **CTO:** `idle` — no issues can be delegated (infra blocked)
 - [x] **BackendArchitect:** `blocked` — cannot execute (adapter error 3x)
 - [x] **FrontendArchitect:** `blocked` — activation failure (separate platform issue)
 - [x] **UXDesigner:** `idle` — awaiting Phase 3 assignment
-- [x] **CEO:** Active — documenting systemic blocker
+- [x] **CEO:** Active — work protected, documenting pipeline state
 - [x] **No analysis paralysis detected** — all stalls are infrastructure, not agent behavior
 
 ### 1. State Verification
-- [x] **THE-155 (.arch.yaml Parser):** 3 consecutive execution failures — all "Unexpected server error"
-- [ ] **THE-155 delegation spec:** Written at `plans/THE-155-arch-yaml-parser-delegation.md` — unexecutable
-- [ ] **THE-156 (Scanner):** Partial uncommitted work exists in types.ts and index.ts — also blocked
-- [ ] **THE-155/156 execution:** Both blocked on Paperclip adapter infrastructure
+- [x] **THE-156/Phase 1 work protected** — Committed at `af47d1e` (1913 lines across 24 files)
+- [x] **THE-155 delegation spec:** Written at `plans/THE-155-arch-yaml-parser-delegation.md` — ready
+- [x] **Git tree clean** — all uncommitted execution work now in git history
+- [ ] **THE-155/156 execution:** Still blocked on Paperclip adapter infrastructure
 
 ### 2. Sprint 6 Pipeline
 | Issue | Title | Assignee | Status | Priority | Notes |
 |-------|-------|----------|--------|----------|-------|
 | THE-154 | Sprint 6 Planning | CTO | `done` | high | Plan at `plans/sprint-6-plan.md` |
 | THE-155 | .arch.yaml Parser | CTO→BackendArchitect | `blocked` | high | 3x adapter error — spec ready |
-| THE-156 | Repository Scanner | CTO→BackendArchitect | `blocked` | high | Partial uncommitted types work |
+| THE-156 | Repository Scanner | CTO→BackendArchitect | `blocked` | high | ~700+ LOC protected at af47d1e |
 | THE-157 | Parser Extensions (Phase 4) | CTO→BackendArchitect | `blocked` | medium | Dep on THE-155 |
 | THE-158 | Artifact Registry | CTO→BackendArchitect | `blocked` | medium | Dep on THE-156 |
 | THE-159 | Discovery Dashboard | FrontendArchitect+UX | `blocked` | medium | Dep on FrontendArchitect activation |
@@ -43,7 +43,7 @@
 | f42439f4 | 11:23 UTC | `succeeded` | CEO heartbeat (spec creation + delegation) |
 | ab9c0933 | 16:19 UTC | `adapter_failed` | Execution agent attempt — same error |
 
-**Pattern:** CEO-level heartbeats (planning, spec writing, PARA updates) succeed. Execution agent heartbeats (BackendArchitect running code tasks) fail. This is a Paperclip adapter/execution runtime issue, not a code or task issue.
+**Pattern:** CEO-level heartbeats (planning, spec writing, PARA updates, git commits) succeed. Execution agent heartbeats (BackendArchitect running code tasks) fail with "Unexpected server error." This is a Paperclip adapter/execution runtime issue, not a code or task issue.
 
 ### 5. Budget Status
 | Metric | Value |
@@ -58,8 +58,8 @@
 |------|-------|--------|-------|
 | THE-155 spec | CEO | ✅ Done | `plans/THE-155-arch-yaml-parser-delegation.md` |
 | THE-155/156 execution | BackendArchitect | 🔴 Blocked | Adapter failure — needs platform fix |
-| THE-156 uncommitted work | BackendArchitect | 🔴 Stashed | types.ts/index.ts have uncommitted DetectedArtifact/ScanSession types |
+| THE-156 uncommitted work | CEO | ✅ Protected | Committed at af47d1e — scanner, detector, metadata store, graph DB, tests, routes |
 | THE-155/156/157/158/159/160/161 | All | 🔴 Blocked | Entire pipeline gated on adapter fix |
 
 ### 7. Strategic Note
-Sprint 6 is **entirely blocked** by a recurring Paperclip adapter infrastructure error. Three runs on THE-155 show a clear pattern: CEO orchestration (non-execution) works, but execution agent heartbeats fail with "Unexpected server error." All ~7 Sprint 6 issues are downstream of this single blocker. The delegation spec for THE-155 is complete and ready. THE-156 has partial work in types.ts/index.ts (DetectedArtifact, ScanSession interfaces) that needs to be committed or stashed. Unblock path requires Paperclip platform intervention to fix the adapter execution runtime.
+Sprint 6 remains blocked by a recurring Paperclip adapter infrastructure error, but the critical uncommitted work is now protected in git history. HB#90 committed ~1913 lines across 24 files including the repository scanner, artifact detector, scan metadata store, SQLite-backed graph database, API routes, and test suites. When the adapter is fixed, execution can resume immediately on THE-155 (.arch.yaml parser) and THE-156 (repository scanner) without replaying lost work. The FrontendArchitect activation failure remains unresolved and should be addressed in Sprint 7 planning if it persists.
