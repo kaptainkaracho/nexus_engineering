@@ -113,7 +113,7 @@ export class RepositoryParser {
       case '.yaml':
       case '.yml':
         try {
-          return yaml.load(content);
+          return yaml.load(content) as string | Record<string, unknown>;
         } catch (error) {
           throw new Error(`YAML parse failed: ${(error as Error).message}`);
         }

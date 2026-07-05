@@ -21,8 +21,8 @@ export async function runTests() {
         relativePath: 'packages/shared/requirements/sample-req-with-traces.req.yaml',
         size: 1000,
         contentHash: 'hash',
-        contentType: 'text',
-        detectedType: 'requirement'
+        contentType: 'text' as const,
+        detectedType: 'requirement' as const
       }
     ];
     
@@ -60,8 +60,8 @@ export async function runTests() {
         relativePath: __filename,
         size: 1000,
         contentHash: 'hash',
-        contentType: 'text',
-        detectedType: 'softwareComponent'
+        contentType: 'text' as const,
+        detectedType: 'softwareComponent' as const
       }
     ];
     
@@ -92,7 +92,7 @@ export async function runTests() {
         relativePath: './package.json',
         size: 1000,
         contentHash: 'hash',
-        contentType: 'text',
+        contentType: 'text' as const,
         detectedType: undefined
       }
     ];
@@ -121,7 +121,7 @@ export async function runTests() {
         relativePath: '/nonexistent/file.txt',
         size: 0,
         contentHash: 'hash',
-        contentType: 'text',
+        contentType: 'text' as const,
         detectedType: undefined
       }
     ];
@@ -170,8 +170,8 @@ export async function runTests() {
         relativePath: __filename,
         size: 1000,
         contentHash: 'hash',
-        contentType: 'text',
-        detectedType: 'softwareComponent'
+        contentType: 'text' as const,
+        detectedType: 'softwareComponent' as const
       }
     ];
     
@@ -188,7 +188,7 @@ export async function runTests() {
 
   } catch (error) {
     console.error('\n✗ Test failed:', error);
-    console.error(error.stack);
+    console.error(error instanceof Error ? error.stack : String(error));
     failed++;
   }
 
