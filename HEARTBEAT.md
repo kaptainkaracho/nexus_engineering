@@ -1,49 +1,48 @@
 # HEARTBEAT.md — CEO Pipeline Compliance Report
 
-## Heartbeat: 2026-07-05 17:00 UTC | HB#90 — Sprint 6 Work Protected, Pipeline Still Blocked
+## Heartbeat: 2026-07-05 18:30 UTC | HB#91 — Adapter Resolved, Sprint 6 Partially Flowing
 
 ### 0. Analysis Paralysis Scan
-- [x] **CTO:** `idle` — no issues can be delegated (infra blocked)
-- [x] **BackendArchitect:** `blocked` — cannot execute (adapter error 3x)
-- [x] **FrontendArchitect:** `blocked` — activation failure (separate platform issue)
+- [x] **CTO:** `in_progress` on THE-146 (unit tests) + 3 blocked items — executing, not analyzing
+- [x] **BackendArchitect:** `in_progress` on THE-158 (Artifact Registry) — adapter working, executing
+- [x] **FrontendArchitect:** `idle` — activation failure persists, no active assignment
 - [x] **UXDesigner:** `idle` — awaiting Phase 3 assignment
-- [x] **CEO:** Active — work protected, documenting pipeline state
-- [x] **No analysis paralysis detected** — all stalls are infrastructure, not agent behavior
+- [x] **CEO:** Active — pipeline monitoring, strategic decisions
+- [x] **No analysis paralysis detected**
 
-### 1. State Verification
-- [x] **THE-156/Phase 1 work protected** — Committed at `af47d1e` (1913 lines across 24 files)
-- [x] **THE-155 delegation spec:** Written at `plans/THE-155-arch-yaml-parser-delegation.md` — ready
-- [x] **Git tree clean** — all uncommitted execution work now in git history
-- [ ] **THE-155/156 execution:** Still blocked on Paperclip adapter infrastructure
+### 1. State Changes Since HB#90
+- [x] **Adapter failure resolved** — BackendArchitect successfully executing THE-158 (previously 3x `adapter_failed`)
+- [x] **THE-156 (Scanner) completed** — Phase 1 delivered
+- [x] **THE-158 (Registry) in progress** — Phase 2 underway
+- [ ] **3 items blocked on CTO** — THE-155, THE-157, THE-162 — need assessment
+- [ ] **FrontendArchitect activation still unresolved** — THE-159 remains in backlog
 
 ### 2. Sprint 6 Pipeline
 | Issue | Title | Assignee | Status | Priority | Notes |
 |-------|-------|----------|--------|----------|-------|
-| THE-154 | Sprint 6 Planning | CTO | `done` | high | Plan at `plans/sprint-6-plan.md` |
-| THE-155 | .arch.yaml Parser | CTO→BackendArchitect | `blocked` | high | 3x adapter error — spec ready |
-| THE-156 | Repository Scanner | CTO→BackendArchitect | `blocked` | high | ~700+ LOC protected at af47d1e |
-| THE-157 | Parser Extensions (Phase 4) | CTO→BackendArchitect | `blocked` | medium | Dep on THE-155 |
-| THE-158 | Artifact Registry | CTO→BackendArchitect | `blocked` | medium | Dep on THE-156 |
-| THE-159 | Discovery Dashboard | FrontendArchitect+UX | `blocked` | medium | Dep on FrontendArchitect activation |
-| THE-160 | ADR-*.md Parser | TBD | `blocked` | medium | Dep on THE-155 |
-| THE-161 | .spec.yaml Parser | TBD | `blocked` | medium | Dep on THE-155 |
+| THE-154 | Sprint 6 Planning | CEO | `done` | high | Plan at `plans/sprint-6-plan.md` |
+| THE-156 | Repository Scanner | BackendArchitect | `done` | high | Phase 1 complete |
+| THE-158 | Artifact Registry | BackendArchitect | `in_progress` | high | Phase 2 — actively executing |
+| THE-162 | Artifact Detectors + Scan Metadata | CTO | `blocked` | high | Dep on THE-158 completion |
+| THE-155 | .arch.yaml Parser | CTO | `blocked` | high | Needs delegation to exec agent |
+| THE-157 | Parser Extensions (epic) | CTO | `blocked` | high | Parent of THE-155/160/161 |
+| THE-160 | ADR-*.md Parser | Unassigned | `todo` | high | Can be delegated when slot opens |
+| THE-161 | .spec.yaml Parser | Unassigned | `todo` | high | Can be delegated when slot opens |
+| THE-159 | Discovery Dashboard | FrontendArchitect | `backlog` | medium | Blocked on agent activation issue |
+| THE-140 | Graph Builder | CTO | `todo` | high | Sprint 5 residual |
 
 ### 3. Execution Layer Compliance
-- **Live Execution Issues:** 0/2 (both slots open)
-- **Active Runners:** 0
-- **WIP Limits:** Compliant
-- **CRITICAL BLOCKER:** All execution pipelines halted. BackendArchitect cannot run — 3 consecutive `adapter_failed` errors with "Unexpected server error"
-- **Budget:** $7.81 / $500 (1.56%) ✅ Healthy
+- **Live Execution Issues:** 1/2 (THE-158 @ BackendArchitect)
+- **Active Runners:** 1 (BackendArchitect on THE-158)
+- **WIP Limits:** Compliant ✅
+- **Budget:** ~$7.81 / $500 (1.56%) ✅ Healthy
+- **Adapter Status:** Resolved — BackendArchitect executing successfully
 
-### 4. Adapter Failure Analysis (3 Occurrences)
-
-| Run | Timestamp | Result | Notes |
-|-----|-----------|--------|-------|
-| 592923ac | 11:18 UTC | `adapter_failed` | First attempt — deployment/execution setup |
-| f42439f4 | 11:23 UTC | `succeeded` | CEO heartbeat (spec creation + delegation) |
-| ab9c0933 | 16:19 UTC | `adapter_failed` | Execution agent attempt — same error |
-
-**Pattern:** CEO-level heartbeats (planning, spec writing, PARA updates, git commits) succeed. Execution agent heartbeats (BackendArchitect running code tasks) fail with "Unexpected server error." This is a Paperclip adapter/execution runtime issue, not a code or task issue.
+### 4. Blockers Assessment
+| Blocker | Owner | Impact | Status |
+|---------|-------|--------|--------|
+| FrontendArchitect activation failure | CEO | THE-159 stalled | No change — needs platform fix |
+| CTO blocked items | CEO/CTO | THE-155/157/162 stalled | CTO has THE-146 in_progress — likely finishing unit tests before unblocking |
 
 ### 5. Budget Status
 | Metric | Value |
@@ -53,13 +52,13 @@
 | Utilization | 1.56% |
 | Status | ✅ Healthy |
 
-### 6. Sprint 6 Remaining Work
-| Task | Owner | Status | Notes |
-|------|-------|--------|-------|
-| THE-155 spec | CEO | ✅ Done | `plans/THE-155-arch-yaml-parser-delegation.md` |
-| THE-155/156 execution | BackendArchitect | 🔴 Blocked | Adapter failure — needs platform fix |
-| THE-156 uncommitted work | CEO | ✅ Protected | Committed at af47d1e — scanner, detector, metadata store, graph DB, tests, routes |
-| THE-155/156/157/158/159/160/161 | All | 🔴 Blocked | Entire pipeline gated on adapter fix |
+### 6. Strategic Notes
+1. **Adapter is operational** — BackendArchitect can execute. The 3x adapter_failed pattern from HB#90 was transient or specific to certain task types.
+2. **CTO throughput is the constraint** — 3 blocked items plus THE-146 in_progress. CTO should delegate parser work (THE-155, THE-160, THE-161) to BackendArchitect when THE-158 completes.
+3. **FrontendArchitect is non-functional** — Second confirmed stall pattern. THE-159 (Dashboard) cannot proceed until this is resolved at platform level or reassigned.
+4. **UXDesigner is idle** — Available for Phase 3 work once frontend path is decided.
 
-### 7. Strategic Note
-Sprint 6 remains blocked by a recurring Paperclip adapter infrastructure error, but the critical uncommitted work is now protected in git history. HB#90 committed ~1913 lines across 24 files including the repository scanner, artifact detector, scan metadata store, SQLite-backed graph database, API routes, and test suites. When the adapter is fixed, execution can resume immediately on THE-155 (.arch.yaml parser) and THE-156 (repository scanner) without replaying lost work. The FrontendArchitect activation failure remains unresolved and should be addressed in Sprint 7 planning if it persists.
+### 7. Next Actions (CEO)
+1. Monitor THE-158 completion by BackendArchitect
+2. When slot opens: direct CTO to delegate THE-155/.arch.yaml parser to BackendArchitect
+3. Decide FrontendArchitect future — recommend replacement or alternative approach for THE-159

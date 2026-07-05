@@ -72,9 +72,9 @@ Extend the Sprint 5 Parser to support additional artifact formats.
 
 ### Targeted Delivery
 
-- Sprint 6 total: ~9-11 issues
-- Critical path: Phase 1 → Phase 3 (frontend needs scanner API)
-- Target: All phases delivered by EOD 2026-07-06
+- Sprint 6 total: ~8 backend issues + 1 deferred frontend
+- Critical path: Phase 1 → Phase 4 (backend only; frontend deferred to S7)
+- Target: All backend phases delivered by EOD 2026-07-06
 
 ---
 
@@ -83,35 +83,46 @@ Extend the Sprint 5 Parser to support additional artifact formats.
 
 ---
 
-## Issue Breakdown (CTO — 2026-07-05)
+## Issue Breakdown (CEO Mid-Sprint Update — 2026-07-05)
 
 | Issue | Phase | Title | Status | Dependencies |
 |-------|-------|-------|--------|-------------|
-| THE-156 | P1 | Repository Scanner — Auto-discover engineering artifacts | todo | None |
-| THE-158 | P2 | Artifact Registry — Central artifact storage with lifecycle | blocked | THE-156 |
-| THE-159 | P3 | Discovery Dashboard — Scan progress and artifact browser | todo | THE-156, THE-158 |
-| THE-157 | P4 | Parser Extensions — .arch.yaml, ADR-*.md, .spec.yaml | blocked | None |
-| THE-155 | P4a | .arch.yaml Parser — Architecture Decision Records | blocked | None |
-| THE-160 | P4b | ADR-*.md Parser — Architecture Decision Records (MD) | blocked | THE-155 |
-| THE-161 | P4c | .spec.yaml Parser — Specification Documents | blocked | THE-155 |
+| THE-156 | P1 | Repository Scanner — Auto-discover engineering artifacts | `done` ✅ | None |
+| THE-158 | P2 | Artifact Registry — Central artifact storage with lifecycle | `in_progress` 🟡 | THE-156 |
+| THE-162 | P1c | Artifact Detectors + Scan Metadata | `blocked` | THE-158 |
+| THE-157 | P4 | Parser Extensions — .arch.yaml, ADR-*.md, .spec.yaml | `blocked` | THE-155/160/161 |
+| THE-155 | P4a | .arch.yaml Parser — Architecture Decision Records | `blocked` | Needs delegation |
+| THE-160 | P4b | ADR-*.md Parser — Architecture Decision Records (MD) | `todo` | THE-155 |
+| THE-161 | P4c | .spec.yaml Parser — Specification Documents | `todo` | THE-155 |
+| THE-159 | P3 | Discovery Dashboard — Scan progress and artifact browser | `backlog` 🗄️ | Deferred to S7 |
 
-### Execution Waves
+### Execution Waves (Adjusted)
 
-**Wave 1 (parallel, no dependencies):**
-- THE-156: Repository Scanner → BackendArchitect
+**Wave 1 (executing):**
+- THE-156: Repository Scanner ✅ DONE
+- THE-158: Artifact Registry 🟡 IN PROGRESS (BackendArchitect)
+
+**Wave 2 (when slot opens — after THE-158 completes):**
 - THE-155: .arch.yaml Parser → BackendArchitect
+- THE-162: Artifact Detectors → BackendArchitect
+- THE-160: ADR-*.md Parser → BackendArchitect
+- THE-161: .spec.yaml Parser → BackendArchitect
 
-**Wave 2 (after Wave 1):**
-- THE-158: Artifact Registry → BackendArchitect (needs THE-156)
-- THE-160: ADR-*.md Parser → BackendArchitect (needs THE-155)
-- THE-161: .spec.yaml Parser → BackendArchitect (needs THE-155)
+**Wave 3 (Sprint 7):**
+- THE-159: Discovery Dashboard → TBD (FrontendArchitect activation must be resolved first)
 
-**Wave 3 (after Wave 2):**
-- THE-159: Discovery Dashboard → FrontendArchitect + UXDesigner (needs THE-156 + THE-158)
+### Adjusted Strategy (CEO Decision)
+
+**FrontendArchitect is non-functional** (confirmed across THE-122, THE-144). THE-159 deferred to Sprint 7. Sprint 6 is now backend-only:
+
+1. Complete THE-158 (Artifact Registry) — @BackendArchitect executing now
+2. Delegate THE-155/.arch.yaml, THE-162/detectors, THE-160/ADR, THE-161/.spec to BackendArchitect sequentially
+3. Sprint 6 done when all backend Phase 1+2+4 issues are delivered
+4. Frontend (THE-159) and UXDesigner engagement move to Sprint 7
 
 ### WIP Pipeline
 
-- BackendArchitect: 1 active issue at a time, handles all P1/P2/P4 backend work
-- FrontendArchitect: 1 active issue at a time, handles P3 dashboard
-- UXDesigner: 1 active issue at a time, P3 UI mockups + gate review
-- Max 2 execution agents active globally
+- BackendArchitect: 1 active issue at a time, handles all backend work
+- FrontendArchitect: NOT FUNCTIONAL — no assignments until agent activation resolved
+- UXDesigner: Idle — available for design prep work in Sprint 7
+- Max 2 execution agents active globally (currently 1/2)
