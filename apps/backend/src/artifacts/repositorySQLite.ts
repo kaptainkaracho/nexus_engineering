@@ -2,6 +2,14 @@
 // Persists artifacts to disk so data survives restarts.
 // Designed as a drop-in replacement for the in-memory Map store.
 
+// Persisted SQLite location. Defaults to a Railway persistent-volume mount so
+// data survives deploys/restarts. Falls back to an in-memory DB for local dev.
+export const DEFAULT_ARTIFACT_DB_PATH = process.env.DATABASE_PATH
+  ? `${process.env.DATABASE_PATH}.artifacts`
+  : ':memory:'
+
+import { mkdirSync } from 'node:fs'
+import { dirname } from 'node:path'
 import Database from 'better-sqlite3'
 import type { Artifact, ArtifactType, LifecycleState } from './repository'
 
@@ -48,7 +56,8 @@ class ArtifactStorage {
     CREATE INDEX IF NOT EXISTS idx_artifacts_created_at ON artifacts (created_at DESC);
   `
 
-  constructor(databasePath: string = ':memory:') {
+  constructor(databasePath: string = DEFAULT_ARTIFACT_DB_PATH) {
+    if (databasePath !== ':memory:') mkdirSync(dirname(databasePath), { recursive: true })
     this.db = new Database(databasePath)
   }
 

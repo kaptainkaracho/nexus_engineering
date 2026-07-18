@@ -1,11 +1,20 @@
+import { mkdirSync } from 'node:fs'
+import { dirname } from 'node:path'
 import { TraceLink } from '@nexus-engineering/shared'
 import Database from 'better-sqlite3'
+
+// Persisted SQLite location. Defaults to a Railway persistent-volume mount so
+// data survives deploys/restarts. Falls back to an in-memory DB for local dev.
+export const DEFAULT_TRACE_DB_PATH = process.env.DATABASE_PATH
+  ? `${process.env.DATABASE_PATH}.trace`
+  : ':memory:'
 
 class TraceLinkDatabase {
   private db: Database.Database
   private initialized = false
 
-  constructor(databasePath: string = ':memory:') {
+  constructor(databasePath: string = DEFAULT_TRACE_DB_PATH) {
+    if (databasePath !== ':memory:') mkdirSync(dirname(databasePath), { recursive: true })
     this.db = new Database(databasePath)
   }
 

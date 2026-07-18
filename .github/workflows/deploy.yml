@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy to Railway
 
 on:
   push:
@@ -19,8 +19,8 @@ env:
   PNPM_VERSION: '9'
 
 jobs:
-  build-and-deploy:
-    name: Build & Deploy
+  deploy:
+    name: Deploy (single service)
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment || 'preview' }}
     steps:
@@ -41,14 +41,18 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build
-        run: pnpm build
-
+      # Railway builds via Nixpacks (see railway.toml) and serves the SPA from
+      # the same origin as the Fastify backend. Only one service is deployed.
       - name: Setup Railway CLI
         run: curl -fsSL https://railway.app/install.sh | sh
 
       - name: Deploy to Railway
         run: |
-          railway login --token ${{ secrets.RAILWAY_TOKEN }}
-          railway up --service backend --environment ${{ github.event.inputs.environment || 'preview' }}
-          railway up --service frontend --environment ${{ github.event.inputs.environment || 'preview' }}
+          railway up \
+            --detach \
+            --project "$RAILWAY_PROJECT_ID" \
+            --environment "$RAILWAY_ENVIRONMENT"
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+          RAILWAY_ENVIRONMENT: ${{ github.event.inputs.environment || 'preview' }}
