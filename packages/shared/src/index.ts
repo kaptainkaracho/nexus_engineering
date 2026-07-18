@@ -104,6 +104,9 @@ export type {
   AuditLog,
   AuditLogFilter,
   AuditAction,
+  MultiScanSession,
+  MultiRepoScanResult,
+  MultiRepoScanOptions,
 } from './types';
 
 export type {
@@ -118,3 +121,25 @@ export type {
   LLMCompletionResponse,
   TraceabilityQuery,
 } from './ai-types';
+
+export {
+  testDocSchema,
+  TestLoader,
+  ValidatedTestLoader,
+  testLoader,
+  validatedTestLoader,
+  validateTestTraceLinks,
+  validateTestDocument,
+} from './tests';
+
+export type {
+  TestCaseNexusMetadata,
+  GherkinScenario,
+  TestCaseType,
+  TestCasePriority,
+  TestCase,
+  TestSuite,
+  TestDocument,
+  TestLoadResult,
+  TestDocumentValidationResult,
+} from './tests';

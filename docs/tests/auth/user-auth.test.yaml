@@ -1,0 +1,135 @@
+nexus:
+  schema: test-doc/v1
+  metadata:
+    domain: auth
+    version: "1.0.0"
+    source: sprint-9-auth-rbac
+
+suites:
+  - id: auth-user-registration
+    name: User Registration
+    description: Test cases for the user registration flow
+    cases:
+      - id: REG-001
+        title: Register with valid email and password
+        type: e2e
+        priority: critical
+        traceLinks:
+          - type: verifies
+            target:
+              id: REQ-AUTH-001
+              documentId: docs/requirements/auth/authentication.req.yaml
+            confidence: high
+            description: Verifies new user can create account
+        scenario:
+          given: User is on the registration page
+          when: They enter a valid email, password, and display name and submit
+          then: Account is created, email verification is sent, and user is redirected to login
+        acceptanceCriteria:
+          - Account created with provided email
+          - Password is hashed and stored securely
+          - Verification email is dispatched
+          - User sees success confirmation
+        tags:
+          - registration
+          - happy-path
+        automated: true
+
+      - id: REG-002
+        title: Register with existing email address
+        type: e2e
+        priority: high
+        traceLinks:
+          - type: verifies
+            target:
+              id: REQ-AUTH-002
+              documentId: docs/requirements/auth/authentication.req.yaml
+            confidence: high
+        scenario:
+          given: A user already exists with email "existing@test.com"
+          when: A new user attempts to register with "existing@test.com"
+          then: Registration is rejected with "Email already registered" error
+        acceptanceCriteria:
+          - Error message is displayed to user
+          - No duplicate account is created
+          - Existing account is not modified
+        tags:
+          - registration
+          - duplicate
+        automated: true
+
+      - id: REG-003
+        title: Register with invalid email format
+        type: unit
+        priority: medium
+        scenario:
+          given: User is on the registration page
+          when: They enter "not-an-email" in the email field
+          then: Client-side validation shows "Invalid email format"
+        acceptanceCriteria:
+          - Form does not submit
+          - Validation error is shown on email field
+        tags:
+          - registration
+          - validation
+        automated: true
+
+  - id: auth-user-login
+    name: User Login
+    description: Test cases for the login flow
+    cases:
+      - id: LOG-001
+        title: Login with valid credentials
+        type: e2e
+        priority: critical
+        traceLinks:
+          - type: verifies
+            target:
+              id: REQ-AUTH-003
+              documentId: docs/requirements/auth/authentication.req.yaml
+            confidence: high
+        scenario:
+          given: A verified user exists with email "user@test.com" and password "Test123!"
+          when: They enter correct credentials and submit
+          then: JWT access token and refresh token are issued, and user is redirected to dashboard
+        acceptanceCriteria:
+          - Access token is returned in response
+          - Refresh token is stored securely
+          - User session is created
+        tags:
+          - login
+          - happy-path
+        automated: true
+
+      - id: LOG-002
+        title: Login with incorrect password
+        type: e2e
+        priority: high
+        scenario:
+          given: A verified user exists with email "user@test.com"
+          when: They enter "user@test.com" with wrong password
+          then: Login is rejected with "Invalid credentials" error
+        acceptanceCriteria:
+          - Error message is displayed
+          - No tokens are issued
+          - Failed attempt is logged for audit
+        tags:
+          - login
+          - error
+        automated: true
+
+      - id: LOG-003
+        title: Login with unverified email
+        type: integration
+        priority: high
+        scenario:
+          given: A user exists with email "unverified@test.com" but email is not verified
+          when: They attempt to log in
+          then: Login is rejected with "Email not verified" message
+        acceptanceCriteria:
+          - User is prompted to verify email
+          - No access token is issued
+        tags:
+          - login
+          - email-verification
+        automated: true
