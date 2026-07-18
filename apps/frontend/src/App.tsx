@@ -11,6 +11,7 @@ import { ProtectedLayout, isAdmin } from './views/Auth/ProtectedRoute';
 import { AdminDashboard } from './views/AdminDashboard';
 import { RoleManagement } from './views/RoleManagement';
 import { AuditLogViewer } from './views/AuditLogViewer';
+import { PrivateRegistries } from './views/PrivateRegistries';
 import {
   getCurrentSession,
   clearSession,
@@ -31,7 +32,8 @@ type Section =
   | 'templates'
   | 'admin'
   | 'roles'
-  | 'audit-log';
+  | 'audit-log'
+  | 'registries';
 
 const VALID_SECTIONS: Section[] = [
   'overview',
@@ -47,6 +49,7 @@ const VALID_SECTIONS: Section[] = [
   'admin',
   'roles',
   'audit-log',
+  'registries',
 ];
 
 interface RouteState {
@@ -166,6 +169,7 @@ function App() {
       ? [
           { label: 'Organizations', href: '#admin', active: activeSection === 'admin' },
           { label: 'Roles', href: '#roles', active: activeSection === 'roles' },
+          { label: 'Registries', href: '#registries', active: activeSection === 'registries' },
         ]
       : []),
   ];
@@ -237,6 +241,10 @@ function App() {
           ) : activeSection === 'roles' ? (
             <ProtectedLayout allowedRoles={['admin']}>
               <RoleManagement />
+            </ProtectedLayout>
+          ) : activeSection === 'registries' ? (
+            <ProtectedLayout allowedRoles={['admin']}>
+              <PrivateRegistries />
             </ProtectedLayout>
           ) : (
            <>

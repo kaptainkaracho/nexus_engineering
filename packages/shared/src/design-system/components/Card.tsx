@@ -8,6 +8,8 @@ export interface CardProps {
   padding?: CardPadding;
   children: React.ReactNode;
   className?: string;
+  role?: string;
+  'aria-label'?: string;
 }
 
 const variantStyles: Record<CardVariant, string> = {
@@ -28,6 +30,8 @@ export function Card({
   padding = 'md',
   children,
   className,
+  role,
+  'aria-label': ariaLabel,
 }: CardProps) {
   return (
     <div
@@ -37,6 +41,8 @@ export function Card({
         paddingStyles[padding],
         className,
       )}
+      role={role}
+      aria-label={ariaLabel}
     >
       {children}
     </div>

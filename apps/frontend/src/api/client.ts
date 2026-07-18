@@ -2,6 +2,13 @@
  * API client for the Nexus Engineering backend
  */
 
+import type {
+  ArtifactRegistry,
+  RegistryProviderType,
+  RegistryCredentials,
+  RegistryArtifact,
+} from '@nexus-engineering/shared';
+
 const BASE = import.meta.env.VITE_API_URL || '';
 
 // Define the missing artefact types

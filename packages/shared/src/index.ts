@@ -98,4 +98,7 @@ export type {
   RegistryArtifact,
   RegistryCredentials,
   RegistryProviderType,
+  AuditLog,
+  AuditLogFilter,
+  AuditAction,
 } from './types';
