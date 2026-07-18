@@ -11,6 +11,7 @@ import { authRoutes } from './routes/auth'
 import { registerAuthHooks } from './auth/middleware'
 import { racRoutes } from './routes/racRoutes'
 import { aacRoutes } from './routes/aacRoutes'
+import { organizationsRoutes } from './routes/organizations'
 
 const server = fastify({ logger: true })
 
@@ -55,6 +56,7 @@ const start = async () => {
     scanRoutes(server)
     await racRoutes(server)
     await aacRoutes(server)
+    organizationsRoutes(server)
 
     // SPA fallback: serve index.html for any non-API GET route in production.
     if (process.env.NODE_ENV === 'production' && existsSync(frontendDist)) {
