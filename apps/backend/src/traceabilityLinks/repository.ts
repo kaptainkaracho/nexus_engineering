@@ -28,8 +28,8 @@ export class TraceLinkRepository {
       ...traceLink,
       id: nanoid() + '-trace',
       version: '1.0',
-      createdAt: traceLink.createdAt instanceof Date ? traceLink.createdAt : new Date(traceLink.createdAt),
-      updatedAt: traceLink.updatedAt instanceof Date ? traceLink.updatedAt : new Date(traceLink.updatedAt),
+      createdAt: new Date(traceLink.createdAt).toISOString(),
+      updatedAt: new Date(traceLink.updatedAt).toISOString(),
       source: traceLink.source || 'API'
     }
     
@@ -40,7 +40,7 @@ export class TraceLinkRepository {
   async updateTraceLink(id: string, updates: Partial<TraceLink>): Promise<TraceLink | undefined> {
     const updated = this.store.update(id, updates)
     if (!updated) return undefined
-    ;(updated as any).updatedAt = new Date()
+    ;(updated as any).updatedAt = new Date().toISOString()
     return updated
   }
     

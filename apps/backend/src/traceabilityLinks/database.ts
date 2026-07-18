@@ -72,8 +72,8 @@ class TraceLinkDatabase {
     stmt.run(
       id,
       version,
-      createdAt.toISOString(),
-      updatedAt.toISOString(),
+      new Date(createdAt).toISOString(),
+      new Date(updatedAt).toISOString(),
       source,
       sourceId,
       sourceType,
@@ -147,7 +147,7 @@ class TraceLinkDatabase {
       ...existing,
       ...updates,
       version: '1.1',
-      updatedAt: new Date(), // Always update timestamp
+      updatedAt: new Date().toISOString(), // Always update timestamp
     }
 
     const stmt = this.db.prepare(`
@@ -167,7 +167,7 @@ class TraceLinkDatabase {
 
     const result = stmt.run(
       version,
-      updatedAt.toISOString(),
+      updatedAt,
       source,
       sourceId,
       sourceType,
@@ -195,12 +195,16 @@ class TraceLinkDatabase {
     return result.changes > 0
   }
 
+  clear() {
+    this.db.exec('DELETE FROM trace_links')
+  }
+
   private mapRowToTraceLink(row: any): TraceLink {
     return {
       id: row.id,
       version: row.version,
-      createdAt: new Date(row.created_at),
-      updatedAt: new Date(row.updated_at),
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
       source: row.source,
       sourceId: row.source_id,
       sourceType: row.source_type,

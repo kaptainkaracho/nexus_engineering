@@ -3,5 +3,10 @@ packages:
   - "packages/*"
   - "packages/eslint-config"
 allowBuilds:
-  better-sqlite3: false
-  esbuild: true
+  esbuild: set this to true or false
+pnpm:
+  # Allowlist of dependencies permitted to run install/build scripts (native modules).
+  # better-sqlite3 needs its native binding compiled; esbuild ships a native binary.
+  onlyBuiltDependencies:
+    - better-sqlite3
+    - esbuild

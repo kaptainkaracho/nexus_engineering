@@ -48,8 +48,8 @@ export async function createTraceLink (request: FastifyRequest, reply: FastifyRe
       ...traceLink,
       id: '', // Will be generated
       version: '1.0',
-      createdAt: new Date(),
-      updatedAt: new Date()
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     })
 
     return reply.status(201).send(createdTraceLink)

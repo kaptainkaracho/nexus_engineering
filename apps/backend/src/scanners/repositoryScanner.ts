@@ -21,6 +21,9 @@ export class RepositoryScanner implements RepositoryReader {
     const maxFileSize = options.maxFileSize || 10 * 1024 * 1024
     const minFileSize = options.minFileSize || 0
     const depthLimit = options.depthLimit || null
+    // Hashing every file reads its full contents — expensive for large repos.
+    // Only compute when the caller explicitly opts in.
+    const computeHashes = options.computeHashes ?? false
 
     const scanId = scanMetadataStore.createSession(rootPath)
 
@@ -33,6 +36,7 @@ export class RepositoryScanner implements RepositoryReader {
         maxFileSize,
         minFileSize,
         depthLimit,
+        computeHashes,
         0,
       )
     } catch (error) {
@@ -100,7 +104,7 @@ export class RepositoryScanner implements RepositoryReader {
     const fs = await import('node:fs/promises')
 
     for (const pattern of patterns) {
-      const files = await glob.promise(pattern, {
+      const files = await glob(pattern, {
         cwd: rootPath,
         nodir: true,
         ignore: ['.git/**', 'node_modules/**', '.next/**', 'dist/**', 'coverage/**'],
@@ -128,6 +132,7 @@ export class RepositoryScanner implements RepositoryReader {
     maxFileSize: number,
     minFileSize: number,
     depthLimit: number | null,
+    computeHashes: boolean,
     currentDepth: number,
   ): Promise<void> {
     if (depthLimit !== null && currentDepth >= depthLimit) {
@@ -155,10 +160,11 @@ export class RepositoryScanner implements RepositoryReader {
             maxFileSize,
             minFileSize,
             depthLimit,
+            computeHashes,
             currentDepth + 1,
           )
         } else if (entry.isFile() && !entry.name.startsWith('.')) {
-          const metadata = await this.getFileMetadata(fullPath)
+          const metadata = await this.collectFileMetadata(fullPath, computeHashes)
           if (metadata) {
             if (metadata.size >= minFileSize && metadata.size <= maxFileSize) {
               fileMetadata.push(metadata)
@@ -170,6 +176,35 @@ export class RepositoryScanner implements RepositoryReader {
     } catch (error) {
       console.error(`Error scanning directory ${directory}:`, error)
       throw error
+    }
+  }
+
+  /**
+   * Collect metadata for a single file. Delegates hash computation to
+   * `calculateFileHash` only when `computeHashes` is true; otherwise the
+   * hash is left empty to keep large scans cheap.
+   */
+  private async collectFileMetadata(
+    filePath: string,
+    computeHashes: boolean,
+  ): Promise<FileMetadata | null> {
+    try {
+      const fs = await import('node:fs/promises')
+      const path = await import('node:path')
+      const stats = await fs.stat(filePath)
+      const relativePath = path.relative(process.cwd(), filePath)
+      const contentHash = computeHashes ? await this.calculateFileHash(filePath) : ''
+
+      return {
+        filePath,
+        relativePath,
+        size: stats.size,
+        contentHash,
+        contentType: stats.isFile() ? 'text' : 'binary',
+      }
+    } catch (error) {
+      console.error(`Error getting metadata for file ${filePath}:`, error)
+      return null
     }
   }
 

@@ -50,8 +50,7 @@ class SQLiteTraceLinkStore implements TraceLinkStore {
   }
 
   clear(): void {
-    const db = getTraceLinkDatabase()
-    db.db.exec('DELETE FROM trace_links')
+    getTraceLinkDatabase().clear()
   }
 }
 
