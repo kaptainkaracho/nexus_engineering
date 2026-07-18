@@ -1,0 +1,4 @@
+# Native build toolchain for better-sqlite3 (node-gyp needs python3 + a compiler).
+# Extends the Node provider defaults via "...".
+[phases.setup]
+nixPkgs = ["...", "python3", "gcc", "gnumake"]

@@ -18,4 +18,5 @@ requiredMountPath = "/data"
 
 [variables]
 NODE_ENV = "production"
+NODE_VERSION = "20"
 DATABASE_PATH = "/data/nexus.db"
