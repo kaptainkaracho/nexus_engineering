@@ -55,9 +55,21 @@ Both environments share the same `railway.toml`; only `RAILWAY_ENVIRONMENT` diff
 3. Push to `main` (or run the workflow manually) → service builds and goes healthy
    once `/health` returns 200.
 
+## Live status (THE-175)
+
+- **Production** — deployed & verified:
+  - URL: `https://nexus-engineering-production.up.railway.app`
+  - `/health` → 200, SPA `/` → 200, `/api/requirements` & `/api/artifacts/registry` → 200
+  - Persistent volume `nexus-engineering-volume` mounted at `/data` (SQLite at
+    `/data/nexus.db.trace` + `/data/nexus.db.artifacts`).
+- **Staging environment** — created (`staging`). Instantiate its service (Railway
+  dashboard → New Service → existing repo, or `railway up` once the CLI creates the
+  service in that env) and `railway up --environment staging`. It reuses this same
+  `railway.toml` (no per-env config needed).
+
 ## Verify
 
 ```bash
-curl https://<railway-url>/health      # { "status": "ok" }
-curl https://<railway-url>/api/requirements
+curl https://nexus-engineering-production.up.railway.app/health   # { "status": "ok" }
+curl https://nexus-engineering-production.up.railway.app/api/requirements
 ```
