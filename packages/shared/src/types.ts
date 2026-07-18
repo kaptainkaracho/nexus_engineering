@@ -107,8 +107,8 @@ export interface FileMetadata {
   size: number;
   contentHash: string;
   contentType: 'text' | 'binary';
-  detectedType?: 'requirement' | 'architectureModel' |
-    'softwareComponent' | 'testCase' | 'traceLink';
+  detectedType?: 'requirement' | 'architectureModel' | 'softwareComponent' |
+    'testCase' | 'traceLink' | 'spec' | 'adr';
 }
 
 export interface ScanOptions {

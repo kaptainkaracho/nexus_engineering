@@ -148,6 +148,29 @@ export class RepositoryParser {
       };
     }
 
+    // Architecture Decision Records (ADR-*.md) use Markdown with YAML
+    // frontmatter. Body sections (Context/Decision/Consequences) are parsed
+    // from the Markdown; malformed frontmatter degrades gracefully.
+    if (this.isAdrMarkdownFile(filePath)) {
+      const decision = this.buildAdrMarkdownDecision(filePath, content);
+      const traceLinks = this.buildAdrTraceLinks(decision, filePath);
+
+      return {
+        id: randomUUID(),
+        filePath,
+        relativePath: fileMetadata.relativePath || path.relative(rootPath, filePath),
+        type: 'Md',
+        detectedType: 'adr',
+        content: decision,
+        metadata: {
+          title: decision.title,
+          status: decision.status,
+          decisionCount: 1,
+        },
+        traceLinks,
+      };
+    }
+
     const parsedContent = this.parseContent(filePath, content);
     const extractedType = this.detectContentType(filePath, detectedType, parsedContent);
     const metadata = this.extractMetadata(filePath, parsedContent, extractedType);
@@ -171,6 +194,10 @@ export class RepositoryParser {
 
   private isArchitectureDecisionFile(filePath: string): boolean {
     return filePath.toLowerCase().endsWith('.arch.yaml');
+  }
+
+  private isAdrMarkdownFile(filePath: string): boolean {
+    return /^ADR-.*\.md$/i.test(path.basename(filePath));
   }
 
   private async readFileContent(filePath: string): Promise<string> {
@@ -694,6 +721,142 @@ export class RepositoryParser {
         confidence: 'high',
       },
     ];
+  }
+
+  // --- Architecture Decision Records (ADR-*.md) ---------------------------------
+
+  private buildAdrMarkdownDecision(
+    filePath: string,
+    content: string
+  ): ArchitectureDecision {
+    const { frontmatter, body } = this.splitAdrMarkdown(content, filePath);
+    const sections = this.parseAdrMarkdownBody(body);
+
+    const title =
+      (typeof frontmatter.title === 'string' && frontmatter.title.trim()) ||
+      sections.title ||
+      '';
+    if (!title) {
+      console.warn(`[ADR-*.md] ${filePath}: missing title (frontmatter or # heading)`);
+    }
+
+    const status = this.coerceArchitectureDecisionStatus(frontmatter.status, filePath);
+
+    const dateRaw = frontmatter.date;
+    const date =
+      dateRaw instanceof Date
+        ? dateRaw.toISOString().slice(0, 10)
+        : typeof dateRaw === 'string'
+          ? dateRaw
+          : dateRaw != null
+            ? String(dateRaw)
+            : '';
+
+    const deciders = Array.isArray(frontmatter.deciders)
+      ? (frontmatter.deciders as unknown[])
+          .map((d) => (typeof d === 'string' ? d : String(d)))
+          .filter(Boolean)
+      : [];
+
+    const supersededBy =
+      (typeof frontmatter.superseded_by === 'string' && frontmatter.superseded_by.trim()) ||
+      (typeof frontmatter.supersededBy === 'string' && frontmatter.supersededBy.trim()) ||
+      undefined;
+
+    const id = path.basename(filePath, '.md');
+
+    return {
+      id,
+      title,
+      date,
+      status,
+      deciders,
+      context: sections.context,
+      decision: sections.decision,
+      consequences: this.splitAdrConsequences(sections.consequences),
+      ...(supersededBy ? { supersededBy } : {}),
+    };
+  }
+
+  /**
+   * Split an ADR markdown document into its YAML frontmatter object and the
+   * remaining Markdown body. Malformed frontmatter is logged and degraded to an
+   * empty object so the body can still be parsed.
+   */
+  private splitAdrMarkdown(
+    content: string,
+    filePath: string
+  ): { frontmatter: Record<string, unknown>; body: string } {
+    const match = content.match(/^---\s*\n([\s\S]*?)\n---\s*\n?([\s\S]*)$/);
+    if (!match) {
+      return { frontmatter: {}, body: content };
+    }
+
+    const frontmatterRaw = match[1];
+    const body = match[2] ?? '';
+
+    try {
+      const parsed = yaml.load(frontmatterRaw);
+      if (parsed && typeof parsed === 'object') {
+        return { frontmatter: parsed as Record<string, unknown>, body };
+      }
+      console.warn(`[ADR-*.md] ${filePath}: frontmatter is not a mapping — ignoring`);
+      return { frontmatter: {}, body };
+    } catch (error) {
+      console.warn(
+        `[ADR-*.md] ${filePath}: malformed YAML frontmatter — ${(error as Error).message}`
+      );
+      return { frontmatter: {}, body };
+    }
+  }
+
+  /**
+   * Parse the Markdown body of an ADR into its titled sections. Captures an
+   * optional leading `# Title` and the `## Context` / `## Decision` /
+   * `## Consequences` sections, tolerating case and extra whitespace.
+   */
+  private parseAdrMarkdownBody(body: string): {
+    title?: string;
+    context: string;
+    decision: string;
+    consequences: string;
+  } {
+    let title: string | undefined;
+    let remaining = body;
+
+    const h1Match = remaining.match(/^\s*#\s+(.+?)\s*$/m);
+    if (h1Match) {
+      title = h1Match[1].trim();
+      remaining = remaining.replace(h1Match[0], '');
+    }
+
+    const parts = remaining.split(/^##\s+(.+?)\s*$/m);
+    const sections: Record<string, string> = {};
+
+    for (let i = 1; i < parts.length; i += 2) {
+      const heading = (parts[i] ?? '').trim().toLowerCase();
+      const sectionBody = (parts[i + 1] ?? '').trim();
+      if (heading.includes('context')) sections.context = sectionBody;
+      else if (heading.includes('decision')) sections.decision = sectionBody;
+      else if (heading.includes('consequences')) sections.consequences = sectionBody;
+    }
+
+    return {
+      title,
+      context: sections.context ?? '',
+      decision: sections.decision ?? '',
+      consequences: sections.consequences ?? '',
+    };
+  }
+
+  /**
+   * Split the Consequences section text into an array of non-empty paragraphs.
+   */
+  private splitAdrConsequences(text: string): string[] {
+    return text
+      .split(/\n\s*\n/)
+      .map((p) => p.trim())
+      .filter(Boolean);
   }
 }
 
