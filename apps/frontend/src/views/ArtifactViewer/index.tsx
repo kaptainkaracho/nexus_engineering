@@ -74,7 +74,7 @@ function Badge({ variant, children, category }: { variant: string; children: Rea
   let extraClasses = '';
   if (category === 'automation-status') {
     // Automation badges use primary tint so they don't visually collide with trace relation badges
-    extraClasses = '!bg-primary-500/10 !text-primary-700 dark:!bg-primary-950 dark:!text-primary-300' + (variant === 'partially-automated' && variant !== 'automated' ? ' !border-l-2 !border-l-warning-500 !pl-1.5' : '');
+    extraClasses = '!bg-primary-500/10 !text-primary-700 dark:!bg-primary-950 dark:!text-primary-300' + (variant === 'partially-automated' ? ' !border-l-2 !border-l-warning-500 !pl-1.5' : '');
   } else if (category === 'trace-relation') {
     // Trace relation badges get secondary tint for visual separation from status badges
     extraClasses = '!bg-secondary-500/10 !text-secondary-700 dark:!bg-secondary-950 dark:!text-secondary-300';
