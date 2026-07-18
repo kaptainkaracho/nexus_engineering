@@ -1,9 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button, Input, Card, Container, Stack, Grid, Nav } from '@nexus-engineering/shared';
 import { ArtifactViewer } from './views/ArtifactViewer';
 import { RepositoryFileTree } from './views/RepositoryTree';
 import { DiscoveryDashboard } from './views/DiscoveryDashboard';
 import { GraphBuilder } from './views/GraphBuilder';
+import { AuthPage } from './views/Auth';
+import {
+  getCurrentSession,
+  clearSession,
+  logout as apiLogout,
+  type AuthUser,
+} from './api/auth';
 
 type Section =
   | 'overview'
@@ -45,6 +52,8 @@ function App() {
   const [dark, setDark] = useState(false);
   const [activeSection, setActiveSection] = useState<Section>('overview');
   const [deepLinkArtifact, setDeepLinkArtifact] = useState<string | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [authReady, setAuthReady] = useState(false);
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -76,6 +85,15 @@ function App() {
     }, 1500);
   };
 
+  // Restore session on mount
+  useEffect(() => {
+    const session = getCurrentSession();
+    if (session) {
+      setUser(session.user);
+    }
+    setAuthReady(true);
+  }, []);
+
   // Sync activeSection with URL hash on load and hash changes
   useEffect(() => {
     const onHashChange = () => {
@@ -88,6 +106,20 @@ function App() {
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
+  const handleLogout = useCallback(async () => {
+    await apiLogout();
+    setUser(null);
+    window.location.hash = '';
+  }, []);
+
+  const handleAuthenticated = useCallback(() => {
+    const session = getCurrentSession();
+    if (session) {
+      setUser(session.user);
+    }
+    window.location.hash = 'overview';
+  }, []);
+
   const navItems = [
     { label: 'Overview', href: '#overview', active: activeSection === 'overview' },
     { label: 'Buttons', href: '#buttons', active: activeSection === 'buttons' },
@@ -98,6 +130,14 @@ function App() {
     { label: 'Discovery', href: '#discovery', active: activeSection === 'discovery' },
     { label: 'Graph Builder', href: '#graph', active: activeSection === 'graph' },
   ];
+
+  if (!authReady) {
+    return null;
+  }
+
+  if (!user) {
+    return <AuthPage onAuthenticated={handleAuthenticated} />;
+  }
 
   return (
     <div className="min-h-screen bg-surface-secondary">
@@ -113,15 +153,28 @@ function App() {
                 <p className="text-sm text-text-tertiary">Design System v0.1</p>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              icon={dark ? <SunIcon /> : <MoonIcon />}
-              onClick={toggleDark}
-              aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
-            >
-              {dark ? 'Light' : 'Dark'}
-            </Button>
+            <div className="flex items-center gap-3">
+              <span className="hidden text-sm text-text-tertiary sm:inline">
+                {user.name}
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                icon={dark ? <SunIcon /> : <MoonIcon />}
+                onClick={toggleDark}
+                aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+              >
+                {dark ? 'Light' : 'Dark'}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                aria-label="Sign out"
+              >
+                Sign Out
+              </Button>
+            </div>
           </div>
         </Container>
       </header>
