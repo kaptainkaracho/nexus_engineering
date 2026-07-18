@@ -159,11 +159,13 @@ export interface RepositoryReader {
   streamFiles(patterns: string[], rootPath?: string): AsyncIterable<FileEntry>;
 }
 
+export type ArchitectureDecisionStatus = 'proposed' | 'accepted' | 'deprecated' | 'superseded';
+
 export interface ArchitectureDecision {
   id: string;
   title: string;
   date: IsoDateString;
-  status: 'proposed' | 'accepted' | 'deprecated' | 'superseded';
+  status: ArchitectureDecisionStatus;
   deciders: string[];
   context: string;
   decision: string;

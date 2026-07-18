@@ -19,6 +19,8 @@ import type {
   SpecPriority,
   SpecRequirementStatus,
   SpecReferenceType,
+  ArchitectureDecision,
+  ArchitectureDecisionStatus,
 } from '@nexus-engineering/shared';
 
 export interface ParseResult {
@@ -33,7 +35,7 @@ export interface ParsedDocument {
   relativePath: string;
   type: DocumentType;
   detectedType?: 'requirement' | 'architectureModel' | 'softwareComponent' | 'testCase' | 'traceLink' | 'spec' | 'adr';
-  content: string | Record<string, unknown>;
+  content: unknown;
   metadata: {
     title?: string;
     language?: string;
@@ -115,6 +117,37 @@ export class RepositoryParser {
       };
     }
 
+    // Architecture Decision Records (.arch.yaml) get a structured
+    // ArchitectureDecision object with graceful degradation on bad data.
+    if (this.isArchitectureDecisionFile(filePath)) {
+      let parsedContent: string | Record<string, unknown>;
+      try {
+        parsedContent = this.parseContent(filePath, content);
+      } catch (error) {
+        console.warn(
+          `[arch.yaml] ${filePath}: malformed YAML — ${(error as Error).message}`
+        );
+        throw error;
+      }
+      const decision = this.buildArchitectureDecision(filePath, parsedContent);
+      const traceLinks = this.buildAdrTraceLinks(decision, filePath);
+
+      return {
+        id: randomUUID(),
+        filePath,
+        relativePath: fileMetadata.relativePath || path.relative(rootPath, filePath),
+        type: 'Md',
+        detectedType: 'adr',
+        content: decision,
+        metadata: {
+          title: decision.title,
+          status: decision.status,
+          decisionCount: 1,
+        },
+        traceLinks,
+      };
+    }
+
     const parsedContent = this.parseContent(filePath, content);
     const extractedType = this.detectContentType(filePath, detectedType, parsedContent);
     const metadata = this.extractMetadata(filePath, parsedContent, extractedType);
@@ -134,6 +167,10 @@ export class RepositoryParser {
 
   private isSpecificationFile(filePath: string): boolean {
     return filePath.toLowerCase().endsWith('.spec.yaml');
+  }
+
+  private isArchitectureDecisionFile(filePath: string): boolean {
+    return filePath.toLowerCase().endsWith('.arch.yaml');
   }
 
   private async readFileContent(filePath: string): Promise<string> {
@@ -532,6 +569,131 @@ export class RepositoryParser {
     }
 
     return traceLinks;
+  }
+
+  // --- Architecture Decision Records (.arch.yaml) -------------------------------
+
+  private buildArchitectureDecision(
+    filePath: string,
+    parsedContent: string | Record<string, unknown>
+  ): ArchitectureDecision {
+    if (!parsedContent || typeof parsedContent !== 'object') {
+      console.warn(
+        `[arch.yaml] ${filePath}: empty or non-object content — returning empty decision`
+      );
+      return this.emptyArchitectureDecision();
+    }
+
+    const raw = parsedContent as Record<string, unknown>;
+
+    const title = typeof raw.title === 'string' ? raw.title : '';
+    if (!title) {
+      console.warn(`[arch.yaml] ${filePath}: missing required field "title"`);
+    }
+
+    const status = this.coerceArchitectureDecisionStatus(raw.status, filePath);
+    const context = typeof raw.context === 'string' ? raw.context : '';
+    const decision = typeof raw.decision === 'string' ? raw.decision : '';
+    const consequences = this.buildConsequences(raw.consequences, filePath);
+
+    // Optional fields not in the base spec but allowed for forward-compat.
+    const date = typeof raw.date === 'string' ? raw.date : '';
+    const deciders = Array.isArray(raw.deciders)
+      ? (raw.deciders as unknown[])
+          .map((d) => (typeof d === 'string' ? d : String(d)))
+          .filter(Boolean)
+      : [];
+    const supersededBy =
+      typeof raw.superseded_by === 'string' && raw.superseded_by.trim()
+        ? raw.superseded_by.trim()
+        : undefined;
+
+    return {
+      id: title ? title : path.basename(filePath, '.arch.yaml'),
+      title,
+      date,
+      status,
+      deciders,
+      context,
+      decision,
+      consequences,
+      ...(supersededBy ? { supersededBy } : {}),
+    };
+  }
+
+  private emptyArchitectureDecision(): ArchitectureDecision {
+    return {
+      id: '',
+      title: '',
+      date: '',
+      status: 'proposed',
+      deciders: [],
+      context: '',
+      decision: '',
+      consequences: [],
+    };
+  }
+
+  private coerceArchitectureDecisionStatus(
+    value: unknown,
+    filePath: string
+  ): ArchitectureDecisionStatus {
+    const allowed: ArchitectureDecisionStatus[] = [
+      'proposed',
+      'accepted',
+      'deprecated',
+      'superseded',
+    ];
+    if (typeof value === 'string' && (allowed as string[]).includes(value)) {
+      return value as ArchitectureDecisionStatus;
+    }
+    if (value !== undefined && value !== null) {
+      console.warn(
+        `[arch.yaml] ${filePath}: invalid status "${String(value)}" — defaulting to "proposed"`
+      );
+    }
+    return 'proposed';
+  }
+
+  private buildConsequences(value: unknown, filePath: string): string[] {
+    if (!Array.isArray(value)) {
+      if (value !== undefined && value !== null) {
+        console.warn(
+          `[arch.yaml] ${filePath}: "consequences" is not an array — ignoring`
+        );
+      }
+      return [];
+    }
+
+    const consequences: string[] = [];
+    for (const [idx, item] of value.entries()) {
+      if (typeof item !== 'string') {
+        console.warn(
+          `[arch.yaml] ${filePath}: consequence #${idx} is not a string — skipping`
+        );
+        continue;
+      }
+      if (item.trim()) {
+        consequences.push(item);
+      }
+    }
+    return consequences;
+  }
+
+  private buildAdrTraceLinks(
+    decision: ArchitectureDecision,
+    filePath: string
+  ): ParsedTraceLink[] {
+    if (!decision.supersededBy) return [];
+
+    return [
+      {
+        sourceId: decision.id || path.basename(filePath, '.arch.yaml'),
+        targetId: decision.supersededBy,
+        relationshipType: 'tracesTo',
+        confidence: 'high',
+      },
+    ];
   }
 }
 

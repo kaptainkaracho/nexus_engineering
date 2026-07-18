@@ -62,6 +62,7 @@ export type {
 
 export type {
   ArchitectureDecision,
+  ArchitectureDecisionStatus,
   FileMetadata,
   ScanOptions,
   ScanResult,
