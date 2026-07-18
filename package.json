@@ -9,6 +9,7 @@
     "lint:fix": "pnpm -r lint -- --fix",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
+    "validate:requirements": "tsx scripts/validate-requirements.mts",
     "clean": "pnpm -r clean"
   },
   "dependencies": {
