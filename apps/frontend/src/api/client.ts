@@ -513,6 +513,28 @@ export async function fetchAuditLogs(filter?: AuditLogFilter): Promise<AuditLogR
   }
 }
 
+/** Export audit logs as CSV or JSON */
+export async function exportAuditLogs(format: 'csv' | 'json', filter?: AuditLogFilter): Promise<Blob | null> {
+  const params = new URLSearchParams();
+  params.set('format', format);
+  if (filter) {
+    if (filter.action) params.set('action', filter.action);
+    if (filter.resourceType) params.set('resourceType', filter.resourceType);
+    if (filter.userId) params.set('userId', filter.userId);
+    if (filter.startDate) params.set('startDate', filter.startDate);
+    if (filter.endDate) params.set('endDate', filter.endDate);
+    if (filter.search) params.set('search', filter.search);
+  }
+  const qs = params.toString();
+  try {
+    const res = await fetch(`${BASE}/api/audit-logs/export?${qs}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.blob();
+  } catch {
+    return null;
+  }
+}
+
 /** Fetch a single audit log entry by ID */
 export async function fetchAuditLog(id: string): Promise<AuditLogEntry | null> {
   try {
@@ -530,4 +552,118 @@ function emptySummary(): RegistrySummary {
     byType: { requirement: 0, architecture: 0, adr: 0, spec: 0, unknown: 0 },
     byLifecycle: { discovered: 0, parsed: 0, indexed: 0, related: 0, error: 0 },
   };
+}
+
+// =========================================================
+// Private Registry Management API
+// =========================================================
+
+export interface RegistryListResponse {
+  data: ArtifactRegistry[]
+  total: number
+}
+
+export interface RegistryCreateRequest {
+  name: string
+  description?: string
+  registryType: RegistryProviderType
+  url?: string
+  visibility: 'private' | 'team' | 'organization'
+  allowedRoles?: string[]
+}
+
+export interface RegistryUpdateRequest {
+  name?: string
+  description?: string
+  url?: string
+  visibility?: 'private' | 'team' | 'organization'
+  allowedRoles?: string[]
+  enabled?: boolean
+}
+
+export async function fetchRegistries(): Promise<RegistryListResponse> {
+  try {
+    const res = await fetch(`${BASE}/api/registries`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    const json = await res.json();
+    return { data: json.data ?? [], total: json.total ?? json.data?.length ?? 0 };
+  } catch (err) {
+    if (err instanceof Error && err.message.startsWith('HTTP')) throw err;
+    return { data: [], total: 0 };
+  }
+}
+
+export async function fetchRegistryById(id: string): Promise<ArtifactRegistry | null> {
+  try {
+    const res = await fetch(`${BASE}/api/registries/${encodeURIComponent(id)}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+export async function createRegistry(data: RegistryCreateRequest): Promise<ArtifactRegistry | null> {
+  try {
+    const res = await fetch(`${BASE}/api/registries`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+export async function updateRegistry(id: string, data: RegistryUpdateRequest): Promise<ArtifactRegistry | null> {
+  try {
+    const res = await fetch(`${BASE}/api/registries/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+export async function deleteRegistry(id: string): Promise<boolean> {
+  try {
+    const res = await fetch(`${BASE}/api/registries/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function toggleRegistry(id: string, enabled: boolean): Promise<ArtifactRegistry | null> {
+  return updateRegistry(id, { enabled });
+}
+
+export async function fetchRegistryCredentials(registryId: string): Promise<RegistryCredentials | null> {
+  try {
+    const res = await fetch(`${BASE}/api/registries/${encodeURIComponent(registryId)}/credentials`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchRegistryArtifacts(registryId: string): Promise<RegistryArtifact[]> {
+  try {
+    const res = await fetch(`${BASE}/api/registries/${encodeURIComponent(registryId)}/artifacts`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    const json = await res.json();
+    return json.data ?? [];
+  } catch {
+    return [];
+  }
 }

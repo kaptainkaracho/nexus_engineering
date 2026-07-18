@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { AuditLogViewer } from './index';
 import * as api from '../../api/client';
-import type { AuditLogEntry } from '../../api/client';
+import type { AuditLogEntry, AuditLogFilter } from '../../api/client';
 
 function makeEntry(overrides: Partial<AuditLogEntry> = {}): AuditLogEntry {
   return {
@@ -165,6 +165,75 @@ describe('AuditLogViewer', () => {
     await waitFor(() => {
       const lastCall = fetchSpy.mock.calls[fetchSpy.mock.calls.length - 1][0];
       expect(lastCall?.search).toBe('search-term');
+    });
+  });
+
+  it('renders date range filter inputs', async () => {
+    vi.spyOn(api, 'fetchAuditLogs').mockResolvedValue(auditLogResponse([makeEntry()]));
+    render(<AuditLogViewer />);
+
+    await waitFor(() => expect(screen.queryByText(/Loading audit logs/i)).not.toBeInTheDocument());
+
+    expect(screen.getByLabelText(/From Date/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/To Date/i)).toBeInTheDocument();
+  });
+
+  it('includes date range in filter when Apply is clicked', async () => {
+    const fetchSpy = vi.spyOn(api, 'fetchAuditLogs').mockResolvedValue(auditLogResponse([makeEntry()]));
+    render(<AuditLogViewer />);
+
+    await waitFor(() => expect(screen.queryByText(/Loading audit logs/i)).not.toBeInTheDocument());
+
+    const fromDate = screen.getByLabelText(/From Date/i);
+    const toDate = screen.getByLabelText(/To Date/i);
+    fireEvent.change(fromDate, { target: { value: '2026-07-01' } });
+    fireEvent.change(toDate, { target: { value: '2026-07-31' } });
+    fireEvent.click(screen.getByRole('button', { name: /Apply/i }));
+
+    await waitFor(() => {
+      const lastCall = fetchSpy.mock.calls[fetchSpy.mock.calls.length - 1][0];
+      expect(lastCall?.startDate).toBe('2026-07-01');
+      expect(lastCall?.endDate).toBe('2026-07-31');
+    });
+  });
+
+  it('renders export buttons when entries are loaded', async () => {
+    vi.spyOn(api, 'fetchAuditLogs').mockResolvedValue(auditLogResponse([makeEntry()]));
+    render(<AuditLogViewer />);
+
+    await waitFor(() => expect(screen.queryByText(/Loading audit logs/i)).not.toBeInTheDocument());
+
+    expect(screen.getByRole('button', { name: /Export as CSV/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Export as JSON/i })).toBeInTheDocument();
+  });
+
+  it('calls exportAuditLogs with CSV format on CSV button click', async () => {
+    const exportSpy = vi.spyOn(api, 'exportAuditLogs').mockResolvedValue(new Blob());
+    vi.spyOn(api, 'fetchAuditLogs').mockResolvedValue(auditLogResponse([makeEntry()]));
+    render(<AuditLogViewer />);
+
+    await waitFor(() => expect(screen.queryByText(/Loading audit logs/i)).not.toBeInTheDocument());
+
+    const csvBtn = screen.getByRole('button', { name: /Export as CSV/i });
+    fireEvent.click(csvBtn);
+
+    await waitFor(() => {
+      expect(exportSpy).toHaveBeenCalledWith('csv', expect.any(Object));
+    });
+  });
+
+  it('calls exportAuditLogs with JSON format on JSON button click', async () => {
+    const exportSpy = vi.spyOn(api, 'exportAuditLogs').mockResolvedValue(new Blob());
+    vi.spyOn(api, 'fetchAuditLogs').mockResolvedValue(auditLogResponse([makeEntry()]));
+    render(<AuditLogViewer />);
+
+    await waitFor(() => expect(screen.queryByText(/Loading audit logs/i)).not.toBeInTheDocument());
+
+    const jsonBtn = screen.getByRole('button', { name: /Export as JSON/i });
+    fireEvent.click(jsonBtn);
+
+    await waitFor(() => {
+      expect(exportSpy).toHaveBeenCalledWith('json', expect.any(Object));
     });
   });
 });

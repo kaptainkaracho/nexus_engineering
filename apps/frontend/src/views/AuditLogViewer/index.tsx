@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Button, Card, Container, Stack } from '@nexus-engineering/shared';
-import { fetchAuditLogs, type AuditLogEntry, type AuditLogFilter } from '../../api/client';
+import { fetchAuditLogs, exportAuditLogs, type AuditLogEntry, type AuditLogFilter } from '../../api/client';
 
 const ACTIONS = [
   { value: '', label: 'All Actions' },
@@ -68,6 +68,9 @@ export function AuditLogViewer() {
   const [actionFilter, setActionFilter] = useState('');
   const [resourceTypeFilter, setResourceTypeFilter] = useState('');
   const [searchText, setSearchText] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [exporting, setExporting] = useState<'csv' | 'json' | null>(null);
 
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
 
@@ -103,14 +106,18 @@ export function AuditLogViewer() {
       action: actionFilter || undefined,
       resourceType: resourceTypeFilter || undefined,
       search: searchText || undefined,
+      startDate: startDate || undefined,
+      endDate: endDate || undefined,
     });
     setExpandedRow(null);
-  }, [actionFilter, resourceTypeFilter, searchText]);
+  }, [actionFilter, resourceTypeFilter, searchText, startDate, endDate]);
 
   const handleResetFilters = useCallback(() => {
     setActionFilter('');
     setResourceTypeFilter('');
     setSearchText('');
+    setStartDate('');
+    setEndDate('');
     setFilter(emptyFilter());
     setExpandedRow(null);
   }, []);
@@ -124,6 +131,32 @@ export function AuditLogViewer() {
     [limit],
   );
 
+  const handleExport = useCallback(
+    async (format: 'csv' | 'json') => {
+      setExporting(format);
+      try {
+        const blob = await exportAuditLogs(format, {
+          action: actionFilter || undefined,
+          resourceType: resourceTypeFilter || undefined,
+          search: searchText || undefined,
+          startDate: startDate || undefined,
+          endDate: endDate || undefined,
+        });
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `audit-logs.${format}`;
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+      } finally {
+        setExporting(null);
+      }
+    },
+    [actionFilter, resourceTypeFilter, searchText, startDate, endDate],
+  );
+
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === 'Enter') handleApplyFilters();
@@ -131,7 +164,7 @@ export function AuditLogViewer() {
     [handleApplyFilters],
   );
 
-  const isDefaultFilter = !actionFilter && !resourceTypeFilter && !searchText;
+  const isDefaultFilter = !actionFilter && !resourceTypeFilter && !searchText && !startDate && !endDate;
 
   return (
     <Container size="lg">
@@ -180,6 +213,35 @@ export function AuditLogViewer() {
                 </select>
               </div>
 
+              <div className="flex-1">
+                <label htmlFor="audit-start-date" className="mb-1 block text-xs font-medium text-text-tertiary uppercase tracking-wide">
+                  From Date
+                </label>
+                <input
+                  id="audit-start-date"
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="w-full rounded-lg border border-border bg-surface-primary px-3 py-2 text-sm text-text-primary transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                />
+              </div>
+
+              <div className="flex-1">
+                <label htmlFor="audit-end-date" className="mb-1 block text-xs font-medium text-text-tertiary uppercase tracking-wide">
+                  To Date
+                </label>
+                <input
+                  id="audit-end-date"
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  min={startDate || undefined}
+                  className="w-full rounded-lg border border-border bg-surface-primary px-3 py-2 text-sm text-text-primary transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:gap-4">
               <div className="flex-[2]">
                 <label htmlFor="audit-search" className="mb-1 block text-xs font-medium text-text-tertiary uppercase tracking-wide">
                   Search
@@ -195,7 +257,7 @@ export function AuditLogViewer() {
                 />
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 shrink-0">
                 <Button variant="primary" size="sm" onClick={handleApplyFilters}>
                   Apply
                 </Button>
@@ -262,11 +324,34 @@ export function AuditLogViewer() {
           <>
             <Card padding="lg">
               <Stack gap={3}>
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-medium uppercase tracking-wide text-text-tertiary">
-                    {total} {total === 1 ? 'Entry' : 'Entries'}
-                  </h3>
-                  <span className="text-xs text-text-tertiary">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <h3 className="text-sm font-medium uppercase tracking-wide text-text-tertiary">
+                      {total} {total === 1 ? 'Entry' : 'Entries'}
+                    </h3>
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs text-text-tertiary">Export</span>
+                      <button
+                        type="button"
+                        disabled={exporting === 'csv'}
+                        onClick={() => handleExport('csv')}
+                        className="inline-flex items-center rounded-md border border-border px-2 py-1 text-xs font-medium text-text-secondary hover:bg-surface-tertiary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        aria-label="Export as CSV"
+                      >
+                        {exporting === 'csv' ? 'Exporting…' : 'CSV'}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={exporting === 'json'}
+                        onClick={() => handleExport('json')}
+                        className="inline-flex items-center rounded-md border border-border px-2 py-1 text-xs font-medium text-text-secondary hover:bg-surface-tertiary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        aria-label="Export as JSON"
+                      >
+                        {exporting === 'json' ? 'Exporting…' : 'JSON'}
+                      </button>
+                    </div>
+                  </div>
+                  <span className="text-xs text-text-tertiary shrink-0">
                     Page {currentPage} of {totalPages}
                   </span>
                 </div>
