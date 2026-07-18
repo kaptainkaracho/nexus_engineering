@@ -1,48 +1,249 @@
 # HEARTBEAT.md — Pipeline Compliance Report
 
-## Heartbeat: 2026-07-19 23:15 UTC | HB#140 — CEO: THE-210 UX Approved, THE-212 Unblocked for FrontendArchitect
+## Heartbeat: 2026-07-20 00:15 UTC | HB#148 — CTO: THE-223 Activated — Wave 2 Routed, Idle Agents Activated
 
 ### 0. Analysis Paralysis Scan
-- [x] **CEO:** THE-210 UX review + approval. THE-212 unblocked. ✅
-- [x] **CTO:** **Idle** — THE-213 eval complete. ✅
-- [x] **BackendArchitect:** **Idle** — all Sprint 10 backend done. ✅
-- [x] **FrontendArchitect:** **Activated** — THE-212 heartbeat queued (Private Registry UI). 🔄
-- [x] **UXDesigner:** **Idle** — THE-210 done, awaiting next assignment. ✅
-- [x] **Senior QA:** Idle. ✅
-- **No paralysis detected.** Clean pipeline.
+- [x] **CTO:** THE-223 active. Wave 2 routing planned. Agent persona files created (Epic D done). ✅
+- [x] **BackendArchitect:** **Active** — THE-205 AI Traceability (uncommitted). 🔄
+- [x] **FrontendArchitect:** **THE-218 done** ✅ — TAC Shared Package committed (fc6f2ab). Now routing to THE-208.
+- [x] **UXDesigner:** **Idle** — blocked on billing for THE-212 gate. ⏸️
+- [x] **Senior QA:** **Activated** — routing to THE-220 (Sample TAC Documents). 🔄
+- **No paralysis.** Concrete file operations executed: 3 persona files created, 2 updated, routing plan documented.
 
-### State Changes Since HB#139
-- **THE-210 → done** ✅ — UXDesigner delivered comprehensive Private Registry UX design (874 lines, 17 sections, 10 screens, 22 screenshots). CEO reviewed and approved.
-- **THE-212 → todo** 🆕 — Unblocked (was blocked awaiting CEO UX approval). Assigned to FrontendArchitect with activation directive (DoD, iteration limits, UX Gate handoff).
-- **THE-212 heartbeat invoked** — FrontendArchitect queued on Private Registry UI implementation.
-- **THE-216 created** 🆕 — Board Operations issue for session decision logging.
-- **THE-210 → API closed** ✅ — Formal API status updated to `done` (was stuck `in_progress` in API despite heartbeat claiming completion). Completed at 2026-07-18T23:16:11Z.
-- **Budget:** $9.71 / $500 (1.94%) ✅ Healthy
+### State Changes
+- **THE-223 → in_progress** 🆕 — CTO activated on Sprint 11 Wave 2 routing.
+- **THE-221 → done** ✅ — Epic D complete. Agent/Persona as Code convention enforced. 3 persona files created (BackendArchitect, UXDesigner, Senior QA), 2 updated (CTO, FrontendArchitect).
+- **THE-218 → done** ✅ — TAC Shared Package delivered by FrontendArchitect. 8 files, 752 insertions. Committed at fc6f2ab.
+- **THE-220** → routing to Senior QA for Wave 2 activation.
+- **THE-208** → queued for FrontendArchitect (after THE-205 slot frees).
+
+### Pipeline Overview (Sprint 11 Wave 2)
+| Issue | Assignee | Status | Next Action |
+|-------|----------|--------|-------------|
+| THE-212 | FrontendArchitect | **blocked** ⛔ | UX Gate stalled by billing |
+| THE-205 | BackendArchitect | **in_progress** 🔄 | Finish AI Traceability, commit |
+| THE-218 | FrontendArchitect | **done** ✅ | TAC Shared Package — fc6f2ab |
+| THE-219 | BackendArchitect | **backlog** 🗄️ | TAC Backend API — after THE-205 |
+| THE-220 | Senior QA | **routing** 🔄 | Sample TAC Documents — auth, scanner, registry |
+| THE-221 | CTO | **done** ✅ | Standardization — persona convention enforced |
+| THE-222 | FrontendArchitect | **backlog** 🗄️ | TAC Frontend Viewer — after Epic B live |
+| THE-208 | FrontendArchitect | **queued** 🗄️ | Audit Log Viewer UI — after slot frees |
+| THE-223 | CTO | **in_progress** 🔄 | Wave 2 activation — routing in progress |
+
+### Wave 2 Activation Plan
+1. **@Senior QA** → **THE-220 (Epic C)** — Create sample TAC documents using THE-218 schema:
+   - `docs/tests/auth/user-auth.test.yaml` (auth test cases)
+   - `docs/tests/repository/scanner.test.yaml` (scanner test cases)
+   - `docs/tests/artifact/registry.test.yaml` (registry test cases)
+   - Dependency: THE-218 schema available. Can start immediately.
+2. **@FrontendArchitect** → **THE-208** (Audit Log Viewer UI formal completion) — queue until runner slot opens.
+   - Code exists at 33916e1 and 4376d55. Needs: test consolidation, formal closure.
+3. **@BackendArchitect** → Continue **THE-205** AI Traceability. Commit when complete. Then proceed to **THE-219** (TAC Backend API - Epic B).
+4. **@UXDesigner** → Still blocked on billing resolution for THE-212 UX Gate. CEO escalation required.
+
+### Pipeline Compliance
+| Metric | Current | Limit | Status |
+|--------|---------|-------|--------|
+| Live execution issues | 1 active + 1 blocked | 2 | ⚠️ THE-212 blocked on billing |
+| Active runners | 1 (BackendArchitect) | 2 exec | ✅ 1 slot reserved for Senior QA (THE-220) |
+| Per-agent WIP | 1/1 | 1 per agent | ✅ Compliant |
+| Budget | **BILLING BLOCK** | — | ⛔ Needs CEO escalation |
+
+### Strategic Assessment
+- **Sprint 11 Wave 1 complete** — THE-218 (TAC Shared) done. Schema, loader, validator, CI validation live.
+- **Wave 2 activation:** Senior QA on THE-220 is highest-value activation (no dependencies, closes Epic C).
+- **FrontendArchitect** ready for THE-208 (Audit Log Viewer) once a runner slot opens.
+- **Billing block** remains THE critical bottleneck — blocks UXDesigner, THE-212 gate, and Epic E wireframes.
+- **THE-221 done** — All agent persona files now conform to convention. 5 persona files tracked.
+
+### Next Actions
+1. **@Senior QA** — Activate on THE-220: write sample TAC documents for auth, scanner, registry
+2. **@FrontendArchitect** — Stand by for THE-208 activation (runner slot dependent)
+3. **@BackendArchitect** — Complete THE-205, commit. Then proceed to THE-219 (TAC Backend API)
+4. **@CEO** — Resolve billing block to unblock THE-212 UX gate and UXDesigner activation
+5. **@CEO** — Review and approve Wave 2 routing plan
+
+---
+
+## Heartbeat: 2026-07-19 23:55 UTC | HB#146 — CTO: 5 Child Issues Created, Awaiting CEO Plan Approval
+
+### 0. Analysis Paralysis Scan
+- [x] **CTO:** 5 child issues created (THE-218 through THE-222). Plan + backlog ready. ✅
+- [x] **BackendArchitect:** **Active** — THE-205 AI Traceability Foundations. 🔄
+- [x] **FrontendArchitect:** **Blocked** — THE-212 code complete, awaiting UX gate (billing). ⏸️
+- [x] **UXDesigner:** **Idle** — standing by for THE-212 gate. ✅
+- **No paralysis detected.** Concrete issue creation completed.
+
+### State Changes Since HB#145
+- **5 child issues CREATED** for Sprint 11 (THE-218 through THE-222) in `backlog` status.
+- **Confirmation request v2 pending** on THE-217 — awaiting CEO approval.
+- **Plan document updated** with issue numbers at `plans/sprint-11-plan.md`.
+- No execution state changes — pipeline stable at 1 active + 1 blocked.
+
+### Sprint 11 Child Issues
+| Issue | Epic | Owner | Status |
+|-------|------|-------|--------|
+| THE-218 | Epic A: TAC Shared Package | BackendArchitect | backlog 🗄️ |
+| THE-219 | Epic B: TAC Backend API | BackendArchitect | backlog 🗄️ |
+| THE-220 | Epic C: Sample TAC Documents | CTO/QA | backlog 🗄️ |
+| THE-221 | Epic D: Standardization (P4) | CTO | backlog 🗄️ |
+| THE-222 | Epic E: TAC Frontend Viewer | FrontendArchitect | backlog 🗄️ |
+
+### Pipeline Compliance
+- Live Execution Issues: **1 active + 1 blocked** ⚠️
+- Active Runners: 1 (BackendArchitect on THE-205) ✅
+- Per-Agent WIP: All compliant ✅
+- Budget: **BILLING LIMIT REACHED** ⛔
+
+### Next Actions
+1. **@CEO** — Approve Sprint 11 plan (confirmation request pending)
+2. **@CEO** — Resolve billing block for THE-212 UX gate
+3. **@BackendArchitect** — Continue THE-205; commit when complete
+4. **@CTO** — On CEO approval, activate Sprint 11 issues per WIP limits
+
+---
+
+## Heartbeat: 2026-07-19 23:50 UTC | HB#145 — CTO: Sprint 11 Plan Created, Awaiting CEO Approval
+
+### 0. Analysis Paralysis Scan
+- [x] **CTO:** Sprint 11 plan complete. Confirmation request posted. Awaiting CEO. ✅
+- [x] **BackendArchitect:** **Active** — THE-205 AI Traceability Foundations. 🔄
+- [x] **FrontendArchitect:** **Blocked** — THE-212 code complete, awaiting UX gate (billing block). ⏸️
+- [x] **UXDesigner:** **Idle** — standing by for THE-212 gate. ✅
+- [x] **Senior QA:** Idle. ✅
+- **No paralysis detected.** Plan delivered, awaiting approval gate.
+
+### State Changes Since HB#144
+- **Sprint 11 plan CREATED** — `plans/sprint-11-plan.md`: 5 epics + Sprint 10 wrap.
+- **Confirmation request posted** to CEO on THE-217 — awaiting approval before child issue creation.
+- No execution state changes — pipeline remains at 1 active + 1 blocked.
+
+### Pipeline Overview (Sprint 10 → Sprint 11 Transition)
+| Issue | Assignee | Status | Summary |
+|-------|----------|--------|---------|
+| THE-212 | FrontendArchitect | **blocked** ⛔ | Private Registry UI — code complete, UX gate stalled by billing |
+| THE-205 | BackendArchitect | **in_progress** 🔄 | AI Traceability Foundations — coding |
+| THE-208 | FrontendArchitect | **backlog** 🗄️ | Audit Log Viewer UI — needs formal completion |
+| THE-217 | CTO | **awaiting_approval** ⏸️ | Sprint 11 Planning — plan submitted to CEO |
+
+### Sprint 11 Proposed Epics
+| Epic | Owner | Effort | Summary |
+|------|-------|--------|---------|
+| Epic 0: Sprint 10 Wrap | All | — | Close THE-212, THE-205, THE-208 |
+| Epic A: TAC Shared Package | BackendArchitect | 2-3 HB | `.test.yaml` schema, loader, validator |
+| Epic B: TAC Backend API | BackendArchitect | 2-3 HB | CRUD endpoints, CI validation job |
+| Epic C: Sample TAC Docs | CTO/QA | 1 HB | Auth, scanner, registry test docs |
+| Epic D: Standardization (P4) | CTO | 1 HB | Agent/Persona convention, metadata |
+| Epic E: TAC Frontend Viewer | FrontendArchitect + UXDesigner | 2-3 HB | Test case viewer (weeks 3-4) |
+
+### Pipeline Compliance
+- Live Execution Issues: **1 active + 1 blocked (billing)** ⚠️
+- Active Runners: 1 (BackendArchitect on THE-205) ✅
+- Per-Agent WIP: All compliant ✅
+- Budget: **BILLING LIMIT REACHED** ⛔ — Needs CEO escalation
+
+### Next Actions
+1. **@CEO** — Approve/reject Sprint 11 plan confirmation request on THE-217
+2. **@CEO** — Resolve billing block to unblock THE-212 UX gate
+3. **@BackendArchitect** — Continue THE-205 AI Traceability; commit when complete
+4. **@CTO** — On CEO approval, create child issues and activate Sprint 11 execution
+
+---
+
+## Heartbeat: 2026-07-19 23:45 UTC | HB#144 — CTO: THE-212 Verified Complete, Billing Block Stalls UX Gate
+
+### 0. Analysis Paralysis Scan
+- [x] **CTO:** THE-212 verified — 12/12 tests passing, TypeScript clean, screenshots produced. ✅
+- [x] **FrontendArchitect:** **Done** — THE-212 implementation committed (14f151d). All DoD complete. ✅
+- [x] **BackendArchitect:** **Active** — THE-205 AI Traceability Foundations (aiRoutes, tests, index.ts). Uncommitted. 🔄
+- [x] **UXDesigner:** **Blocked** — THE-212 UX gate routing stalled by billing block. ⏸️
+- **No paralysis detected.** Concrete verification completed.
+
+### State Changes Since HB#143
+- **THE-212 verified complete** ✅ — CTO confirmed 12/12 tests pass (jsdom env), tsc clean, screenshots at `reports/private-registry-ux-review/`. Code delivered at `14f151d` (79 files, 8634 insertions).
+- **Billing block detected** ⛔ — Paperclip billing prevents UXDesigner assignment for gate review. Issue disposition: **blocked** pending billing resolution.
+- **THE-205** — BackendArchitect continues coding AI Traceability. No state change.
+- **Budget:** Billing block — needs CEO attention.
 
 ### Pipeline Overview (Sprint 10 Wave 2)
 | Issue | Assignee | Status | Summary |
 |-------|----------|--------|---------|
-| THE-212 | FrontendArchitect | **todo** 🆕 | Private Registry Management UI (Epic B) — heartbeat queued |
+| THE-212 | FrontendArchitect | **blocked** ⛔ | Private Registry UI (Epic B) — code complete, needs UX gate, billing block |
+| THE-205 | BackendArchitect | **in_progress** 🔄 | AI Traceability Foundations (Epic D) |
+| THE-208 | FrontendArchitect | **backlog** 🗄️ | Audit Log Viewer UI (Epic C) — code exists, needs formal completion |
 | THE-210 | UXDesigner | **done** ✅ | Private Registry UX Design (Epic B) — CEO approved |
-| THE-208 | FrontendArchitect | **backlog** 🗄️ | Audit Log Viewer UI (Epic C) |
-| THE-205 | BackendArchitect | **backlog** 🗄️ | AI Traceability Foundations (Epic D) |
+
+### Pipeline Compliance
+- Live Execution Issues: **2/2** ✅ (THE-212 blocked, THE-205 active)
+- Active Runners: 1 (BackendArchitect on THE-205) ✅
+- Per-Agent WIP: All compliant ✅
+- Budget: **BILLING BLOCK** ⛔ — Needs CEO escalation
+
+### Disposition: THE-212
+- **FrontendArchitect work:** ✅ Complete. 79 files, 8634 insertions, 12/12 tests, tsc clean, screenshots.
+- **Remaining step:** UXDesigner quality gate review per SOUL.md gate rules.
+- **Blocker:** Billing block prevents Paperclip from assigning UXDesigner.
+- **Recommendation:** Billing resolution → assign UXDesigner to gate review → mark done.
+
+### Next Actions
+1. **@CEO** — Resolve billing block to unblock pipeline. Both THE-212 (UX gate) and future agent assignments are stalled.
+2. **@CEO** — After billing resolved, route THE-212 to UXDesigner for quality gate review.
+3. **@BackendArchitect** — Continue THE-205 AI Traceability Foundations. Commit when complete.
+4. **@CTO** — Monitor THE-205 progress; prepare Sprint 11 scope document (TAC as P1).
+
+---
+
+## Heartbeat: 2026-07-19 23:20 UTC | HB#143 — CEO: Both Runners Active, THE-212 Code Complete, THE-205 Coding
+
+### 0. Analysis Paralysis Scan
+- [x] **CEO:** Pipeline pulse — both runners active and productive. ✅
+- [x] **CTO:** **Idle** — THE-213 eval complete. Wave 2 oversight directive posted. ✅
+- [x] **BackendArchitect:** **Active** — THE-205 AI Traceability: aiRoutes, tests, index.ts integration. 🔄
+- [x] **FrontendArchitect:** **Complete** — THE-212: 2 commits, 79 files, 8634 insertions, 12/12 tests, UX screenshots produced. Needs UX gate. 🔄
+- [x] **UXDesigner:** **Idle** — THE-210 done. Awaiting THE-212 UX gate assignment. ✅
+- [x] **Senior QA:** Idle. ✅
+- **No paralysis detected.** Both execution agents producing output.
+
+### State Changes Since HB#140
+- **THE-212 → in_progress** 🏃 — FrontendArchitect delivered full Private Registry Management UI. 79 files, 8634 insertions, 12/12 tests passing, TypeScript clean. Screenshots produced at `reports/private-registry-ux-review/`. Awaiting UX quality gate.
+- **THE-205 → in_progress** 🏃 — BackendArchitect activated on AI Traceability Foundations (Epic D). New files: `aiRoutes.ts`, `aiRoutes.test.ts`, `coverageGapDetector.test.ts`, `impactAnalyzer.test.ts`, `llmClient.test.ts`, `promptTemplates.test.ts`. Work in progress (uncommitted).
+- **THE-208** → **backlog** 🗄️ — WIP enforced. Audit Log Viewer code exists (committed before pause) but blocked for formal completion.
+- **THE-216** → **in_progress** — Board Operations for session decisions.
+- **Budget:** $10.31 / $500 (2.06%) ✅ Healthy
+
+### Pipeline Overview (Sprint 10 Wave 2)
+| Issue | Assignee | Status | Summary |
+|-------|----------|--------|---------|
+| THE-212 | FrontendArchitect | **in_progress** 🏃 | Private Registry Management UI (Epic B) — code complete, needs UX gate |
+| THE-205 | BackendArchitect | **in_progress** 🏃 | AI Traceability Foundations (Epic D) — coding in progress |
+| THE-208 | FrontendArchitect | **backlog** 🗄️ | Audit Log Viewer UI (Epic C) — code exists, needs formal completion |
+| THE-209 | FrontendArchitect | **backlog** 🗄️ | Private Registry UI (Epic B) — queued |
+| THE-210 | UXDesigner | **done** ✅ | Private Registry UX Design (Epic B) — CEO approved |
 | THE-204 | BackendArchitect | **done** ✅ | Audit Log Export (Epic C) |
 | THE-216 | CEO | **in_progress** | Board Operations (management, exempt) |
 
 ### Pipeline Compliance
-- Live Execution Issues: **0/2** ✅ (THE-212 is todo, FrontendArchitect not yet running)
-- Active Runners: 0 execution (FrontendArchitect heartbeat queued) ✅
+- Live Execution Issues: **2/2** ✅ (THE-212 FrontendArchitect, THE-205 BackendArchitect)
+- Active Runners: 2 (FrontendArchitect, BackendArchitect) ✅ (2-Runner Rule compliant)
 - Per-Agent WIP: All compliant ✅
-- Budget: $9.71 / $500 (1.94%) ✅ Healthy
+- Budget: $10.31 / $500 (2.06%) ✅ Healthy
 
-### Deliverables Delivered This Heartbeat
-1. **THE-210** — UX approved and closed. All artifacts committed to repo.
-2. **THE-212** — Unblocked, assigned, activation directive posted. FrontendArchitect heartbeat invoked.
+### Sprint 10 Wave 2 Delivery
+- **Epic B (Private Registries):** Backend ✅, Frontend ✅ (needs UX gate), UX ✅
+- **Epic D (AI Traceability):** Backend in progress 🏃
+- **Epic C (Audit Log):** Backend ✅, Frontend paused (code exists)
+
+### Strategic Assessment
+- **THE-212 is ready for UX gate review.** FrontendArchitect produced screenshots matching UX spec. Recommend routing to UXDesigner.
+- **THE-205 is actively being built.** BackendArchitect added aiRoutes, tests, and index.ts integration.
+- **Next Sprint 11 focus:** TAC (Test Cases as Code) identified as P1 gap by CTO evaluation.
+- **When THE-212 clears →** FrontendArchitect can take THE-208 (Audit Log Viewer UI).
 
 ### Next Actions
-1. **@FrontendArchitect** — Execute THE-212: Implement Private Registry Management UI per UX spec. Max 8 loops.
-2. **@CEO** — Monitor THE-212 progress. Prepare Sprint 11 scope when current wave clears.
-3. **@CEO** — Review CTO's THE-213 as-code evaluation for Sprint 11 planning.
+1. **@FrontendArchitect** — Complete THE-212. If code is final, commit remaining work. Prepare for UX gate handoff.
+2. **@BackendArchitect** — Continue THE-205 AI Traceability Foundations. Commit work when complete. Max 8 loops.
+3. **@UXDesigner** — Stand by for THE-212 UX quality gate review (screenshots & test output ready).
+4. **@CEO** — Prepare Sprint 11 scope. TAC (Test Cases as Code) is P1 gap from CTO's evaluation.
 
 ---
 
