@@ -141,8 +141,8 @@ class ArtifactStorage {
     return mapRowToArtifact(row)
   }
 
-  /** Find all artifacts, optionally filtered by type. */
-  findAll(filters?: { type?: ArtifactType; lifecycle?: LifecycleState }): Artifact[] {
+  /** Find all artifacts, optionally filtered by type, lifecycle, or repository. */
+  findAll(filters?: { type?: ArtifactType; lifecycle?: LifecycleState; repositoryPath?: string }): Artifact[] {
     let sql = 'SELECT * FROM artifacts'
     const conditions: string[] = []
     const params: unknown[] = []
@@ -156,6 +156,10 @@ class ArtifactStorage {
         conditions.push('lifecycle = ?')
         params.push(filters.lifecycle)
       }
+      if (filters.repositoryPath) {
+        conditions.push('repository_path = ?')
+        params.push(filters.repositoryPath)
+      }
     }
 
     if (conditions.length > 0) sql += ' WHERE ' + conditions.join(' AND ')
@@ -167,6 +171,11 @@ class ArtifactStorage {
       : stmt.all() as ArtifactRow[]
 
     return rows.map(mapRowToArtifact)
+  }
+
+  /** Find artifacts by repository path. */
+  findByRepository(repositoryPath: string): Artifact[] {
+    return this.findAll({ repositoryPath })
   }
 
   /** Increment reparse count by one. */

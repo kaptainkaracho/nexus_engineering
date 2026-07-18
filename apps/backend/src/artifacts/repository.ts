@@ -116,6 +116,11 @@ export class ArtifactRegistry {
     return artifacts.filter((a) => a.type === type)
   }
 
+  getByRepository(repositoryPath: string): Artifact[] {
+    this.ensureStorageLoaded()
+    return Array.from(this.store.values()).filter((a) => a.repositoryPath === repositoryPath)
+  }
+
   getAll(): Artifact[] {
     this.ensureStorageLoaded()
     return Array.from(this.store.values())

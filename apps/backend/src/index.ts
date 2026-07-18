@@ -7,6 +7,7 @@ import { dirname, resolve } from 'node:path'
 import { requirementsRoutes } from './routes/requirements'
 import { artifactRegistryRoutes } from './routes/artifactRegistryRoutes'
 import { scanRoutes } from './routes/scanRoutes'
+import { multiRepoRoutes } from './routes/multiRepoRoutes'
 import { authRoutes } from './routes/auth'
 import { registerAuthHooks } from './auth/middleware'
 import { racRoutes } from './routes/racRoutes'
@@ -57,6 +58,7 @@ const start = async () => {
     await racRoutes(server)
     await aacRoutes(server)
     organizationsRoutes(server)
+    multiRepoRoutes(server)
 
     // SPA fallback: serve index.html for any non-API GET route in production.
     if (process.env.NODE_ENV === 'production' && existsSync(frontendDist)) {

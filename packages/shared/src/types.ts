@@ -215,6 +215,52 @@ export interface RepositoryReader {
   streamFiles(patterns: string[], rootPath?: string): AsyncIterable<FileEntry>;
 }
 
+// Multi-Repo Support
+export interface MultiScanSession {
+  id: string;
+  startedAt: IsoDateString;
+  completedAt?: IsoDateString;
+  repositoryPaths: string[];
+  scanIds: string[];
+  filesFound: number;
+  filesSkipped: number;
+  artifactsDetected: number;
+  perRepoResults: Array<{
+    repositoryPath: string;
+    scanId: string;
+    status: 'running' | 'completed' | 'failed';
+    filesFound: number;
+    artifactsDetected: number;
+    error?: string;
+  }>;
+  errors: Array<{ path: string; message: string }>;
+  status: 'running' | 'completed' | 'failed';
+  scanMode: 'parallel' | 'sequential';
+}
+
+export interface MultiRepoScanResult {
+  sessionId: string;
+  scans: Array<{
+    repositoryPath: string;
+    scanId: string;
+    status: 'completed' | 'failed';
+    filesFound: number;
+    artifactsDetected: number;
+    scanReport: ScanReport;
+    error?: string;
+  }>;
+  totalFilesFound: number;
+  totalArtifactsDetected: number;
+  scanTimeMs: number;
+  errors: Array<{ path: string; message: string }>;
+}
+
+export interface MultiRepoScanOptions {
+  repositoryPaths: string[];
+  scanMode?: 'parallel' | 'sequential';
+  scanOptions?: ScanOptions;
+}
+
 export type ArchitectureDecisionStatus = 'proposed' | 'accepted' | 'deprecated' | 'superseded';
 
 export interface ArchitectureDecision {
