@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Discovery Dashboard — Artifact Browser</title>
+<style>
+  :root {
+    --surface-primary: #0F172A;
+    --surface-secondary: #1E293B;
+    --surface-tertiary: #334155;
+    --text-primary: #F8FAFC;
+    --text-secondary: #CBD5E1;
+    --text-tertiary: #64748B;
+    --text-inverse: #0F172A;
+    --border-default: #334155;
+    --border-hover: #475569;
+    --color-primary-500: #3B82F6;
+    --color-success-500: #22C55E;
+    --color-error-500: #EF4444;
+    --radius-xl: 1rem;
+    --radius-lg: 0.75rem;
+    --radius-md: 0.625rem;
+    --radius-full: 9999px;
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: var(--font-sans); background: var(--surface-secondary); color: var(--text-primary); min-height: 100vh; }
+
+  .header { background: var(--surface-primary); border-bottom: 1px solid var(--border-default); padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; }
+  .header-brand { display: flex; align-items: center; gap: 0.75rem; }
+  .header-logo { width: 2.5rem; height: 2.5rem; background: var(--color-primary-500); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 0.875rem; }
+  .header-title { font-size: 1.125rem; font-weight: 700; }
+  .header-subtitle { font-size: 0.75rem; color: var(--text-tertiary); }
+
+  .nav { background: var(--surface-primary); border-bottom: 1px solid var(--border-default); padding: 0 2rem; display: flex; }
+  .nav-tab { padding: 0.75rem 1.25rem; font-size: 0.875rem; color: var(--text-tertiary); text-decoration: none; border-bottom: 2px solid transparent; cursor: pointer; }
+  .nav-tab:hover { color: var(--text-secondary); }
+  .nav-tab.active { color: var(--color-primary-500); border-bottom-color: var(--color-primary-500); font-weight: 500; }
+
+  .page { padding: 2rem; max-width: 80rem; margin: 0 auto; }
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+  .page-title { font-size: 1.5rem; font-weight: 700; }
+  .page-count { font-size: 0.875rem; color: var(--text-tertiary); margin-left: 0.5rem; }
+
+  .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.625rem 1.25rem; border-radius: var(--radius-lg); font-size: 0.875rem; font-weight: 500; cursor: pointer; border: none; transition: background 100ms; }
+  .btn-primary { background: var(--color-primary-500); color: white; }
+  .btn-primary:hover { background: #2563EB; }
+  .btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-default); }
+  .btn-ghost:hover { background: var(--surface-tertiary); }
+  .btn-sm { padding: 0.375rem 0.75rem; font-size: 0.8125rem; }
+
+  /* Filter Bar */
+  .filter-bar { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .filter-group { display: flex; align-items: center; gap: 0.375rem; }
+  .filter-label { font-size: 0.75rem; color: var(--text-tertiary); margin-right: 0.25rem; white-space: nowrap; }
+  .filter-chip {
+    display: inline-flex; align-items: center; gap: 0.375rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem; font-weight: 500;
+    background: var(--surface-tertiary);
+    color: var(--text-secondary);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 100ms;
+  }
+  .filter-chip:hover { background: var(--border-default); }
+  .filter-chip.active { background: rgba(59,130,246,0.15); color: #60A5FA; border-color: rgba(59,130,246,0.3); }
+  .filter-chip .count { background: rgba(255,255,255,0.1); padding: 0.0625rem 0.375rem; border-radius: var(--radius-full); font-size: 0.6875rem; }
+
+  .search-input {
+    flex: 1;
+    min-width: 200px;
+    padding: 0.5rem 0.75rem 0.5rem 2.25rem;
+    background: var(--surface-primary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 100ms;
+  }
+  .search-input::placeholder { color: var(--text-tertiary); }
+  .search-input:focus { border-color: var(--color-primary-500); }
+  .search-wrapper { position: relative; flex: 1; min-width: 200px; }
+  .search-icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); }
+
+  /* Artifact List */
+  .artifact-layout { display: grid; grid-template-columns: 1fr 380px; gap: 1.5rem; }
+  .artifact-list {
+    background: var(--surface-primary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+  }
+  .artifact-list-header {
+    display: grid;
+    grid-template-columns: 1fr 100px 100px 120px 40px;
+    gap: 1rem;
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid var(--border-default);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary);
+  }
+  .artifact-row {
+    display: grid;
+    grid-template-columns: 1fr 100px 100px 120px 40px;
+    gap: 1rem;
+    padding: 0.875rem 1.5rem;
+    border-bottom: 1px solid var(--border-default);
+    align-items: center;
+    cursor: pointer;
+    transition: background 100ms;
+  }
+  .artifact-row:hover { background: var(--surface-secondary); }
+  .artifact-row:last-child { border-bottom: none; }
+  .artifact-row.selected { background: rgba(59,130,246,0.08); }
+
+  .artifact-name { font-size: 0.875rem; font-weight: 500; }
+  .artifact-path { font-size: 0.75rem; color: var(--text-tertiary); font-family: var(--font-mono); margin-top: 0.125rem; }
+
+  .badge {
+    display: inline-flex; align-items: center;
+    padding: 0.125rem 0.5rem;
+    border-radius: var(--radius-full);
+    font-size: 0.6875rem; font-weight: 500;
+  }
+  .badge-lifecycle { background: rgba(255,255,255,0.05); color: var(--text-secondary); }
+  .badge-lifecycle.discovered { background: rgba(59,130,246,0.1); color: #60A5FA; }
+  .badge-lifecycle.parsed { background: rgba(34,197,94,0.1); color: #22C55E; }
+  .badge-lifecycle.indexed { background: rgba(139,92,246,0.1); color: #A78BFA; }
+  .badge-lifecycle.related { background: rgba(249,115,22,0.1); color: #FB923C; }
+  .badge-lifecycle.error { background: rgba(239,68,68,0.1); color: #EF4444; }
+  .badge-type { background: rgba(255,255,255,0.05); color: var(--text-tertiary); }
+  .badge-type.requirement { background: rgba(14,165,233,0.1); color: #38BDF8; }
+  .badge-type.architecture { background: rgba(245,158,11,0.1); color: #FBBF24; }
+  .badge-type.adr { background: rgba(99,102,241,0.1); color: #818CF8; }
+  .badge-type.spec { background: rgba(20,184,166,0.1); color: #2DD4BF; }
+
+  .artifact-date { font-size: 0.75rem; color: var(--text-tertiary); }
+  .row-chevron { color: var(--text-tertiary); }
+
+  /* Detail Panel */
+  .detail-panel {
+    background: var(--surface-primary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-xl);
+    position: sticky;
+    top: 2rem;
+    max-height: calc(100vh - 8rem);
+    overflow-y: auto;
+  }
+  .detail-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-default);
+  }
+  .detail-title { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+  .detail-badges { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+  .detail-meta { display: flex; flex-direction: column; gap: 0.5rem; }
+  .detail-meta-row { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; }
+  .detail-meta-label { color: var(--text-tertiary); min-width: 5rem; }
+  .detail-meta-value { color: var(--text-secondary); font-family: var(--font-mono); font-size: 0.75rem; word-break: break-all; }
+
+  .detail-section { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-default); }
+  .detail-section:last-child { border-bottom: none; }
+  .detail-section-title { font-size: 0.6875rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); margin-bottom: 0.75rem; }
+  .detail-section-content { font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.6; }
+
+  .detail-actions { padding: 1.25rem 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; }
+  .detail-action-link {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: background 100ms;
+    cursor: pointer;
+    border: none; background: none; width: 100%; text-align: left;
+  }
+  .detail-action-link:hover { background: var(--surface-tertiary); }
+  .detail-action-link svg { width: 1rem; height: 1rem; color: var(--text-tertiary); flex-shrink: 0; }
+
+  /* Lifecycle Timeline */
+  .lifecycle-timeline { display: flex; flex-direction: column; gap: 0; }
+  .lifecycle-step { display: flex; align-items: flex-start; gap: 0.75rem; position: relative; padding-bottom: 1rem; }
+  .lifecycle-step:last-child { padding-bottom: 0; }
+  .lifecycle-step::before {
+    content: '';
+    position: absolute;
+    left: 0.375rem;
+    top: 0.875rem;
+    bottom: 0;
+    width: 1px;
+    background: var(--border-default);
+  }
+  .lifecycle-step:last-child::before { display: none; }
+  .lifecycle-dot {
+    width: 0.75rem; height: 0.75rem;
+    border-radius: 50%;
+    background: var(--surface-tertiary);
+    border: 2px solid var(--border-default);
+    flex-shrink: 0;
+    z-index: 1;
+  }
+  .lifecycle-dot.active { background: var(--color-primary-500); border-color: var(--color-primary-500); }
+  .lifecycle-dot.done { background: var(--color-success-500); border-color: var(--color-success-500); }
+  .lifecycle-dot.error { background: var(--color-error-500); border-color: var(--color-error-500); }
+  .lifecycle-text { font-size: 0.8125rem; color: var(--text-secondary); }
+  .lifecycle-text small { display: block; font-size: 0.6875rem; color: var(--text-tertiary); margin-top: 0.125rem; }
+
+  @media (max-width: 1024px) {
+    .artifact-layout { grid-template-columns: 1fr; }
+    .detail-panel { position: static; max-height: none; }
+    .artifact-list-header { display: none; }
+    .artifact-row { grid-template-columns: 1fr auto; }
+    .artifact-row .badge-type,
+    .artifact-row .artifact-date,
+    .artifact-row .row-chevron { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-brand">
+    <div class="header-logo">N</div>
+    <div>
+      <div class="header-title">Nexus Engineering</div>
+      <div class="header-subtitle">Engineering as Code Viewer</div>
+    </div>
+  </div>
+</header>
+
+<nav class="nav">
+  <a class="nav-tab" href="#">Overview</a>
+  <a class="nav-tab" href="#">Repository</a>
+  <a class="nav-tab" href="#">Artefacts</a>
+  <a class="nav-tab active" href="#">Discovery</a>
+  <a class="nav-tab" href="#">Graph</a>
+</nav>
+
+<main class="page">
+  <div class="page-header">
+    <div style="display:flex; align-items:baseline;">
+      <h1 class="page-title">Artifact Browser</h1>
+      <span class="page-count">47 artifacts</span>
+    </div>
+    <button class="btn btn-primary">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      Run Scan
+    </button>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <div class="search-wrapper">
+      <svg class="search-icon" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      <input class="search-input" type="text" placeholder="Search artifacts by name or path..." />
+    </div>
+
+    <div class="filter-group">
+      <span class="filter-label">Type:</span>
+      <button class="filter-chip active">All <span class="count">47</span></button>
+      <button class="filter-chip">requirement <span class="count">23</span></button>
+      <button class="filter-chip">architecture <span class="count">12</span></button>
+      <button class="filter-chip">adr <span class="count">8</span></button>
+      <button class="filter-chip">spec <span class="count">4</span></button>
+    </div>
+
+    <div class="filter-group">
+      <span class="filter-label">Status:</span>
+      <button class="filter-chip active">All</button>
+      <button class="filter-chip">discovered</button>
+      <button class="filter-chip">parsed</button>
+      <button class="filter-chip">indexed</button>
+      <button class="filter-chip">related</button>
+      <button class="filter-chip">error</button>
+    </div>
+  </div>
+
+  <!-- Main Layout -->
+  <div class="artifact-layout">
+    <!-- Artifact List -->
+    <div class="artifact-list">
+      <div class="artifact-list-header">
+        <span>Name</span>
+        <span>Type</span>
+        <span>Status</span>
+        <span>Updated</span>
+        <span></span>
+      </div>
+
+      <div class="artifact-row selected" tabindex="0" role="row">
+        <div>
+          <div class="artifact-name">sys-01-requirements.req.yaml</div>
+          <div class="artifact-path">auth/requirements/sys-01.req.yaml</div>
+        </div>
+        <span class="badge badge-type requirement">requirement</span>
+        <span class="badge badge-lifecycle related">related</span>
+        <span class="artifact-date">2 min ago</span>
+        <svg class="row-chevron" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      </div>
+
+      <div class="artifact-row" tabindex="0" role="row">
+        <div>
+          <div class="artifact-name">sys-02-authentication.req.yaml</div>
+          <div class="artifact-path">auth/requirements/sys-02.req.yaml</div>
+        </div>
+        <span class="badge badge-type requirement">requirement</span>
+        <span class="badge badge-lifecycle indexed">indexed</span>
+        <span class="artifact-date">2 min ago</span>
+        <svg class="row-chevron" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      </div>
+
+      <div class="artifact-row" tabindex="0" role="row">
+        <div>
+          <div class="artifact-name">adr-001-tech-stack.adr.md</div>
+          <div class="artifact-path">docs/decisions/adr-001-tech-stack.adr.md</div>
+        </div>
+        <span class="badge badge-type adr">adr</span>
+        <span class="badge badge-lifecycle parsed">parsed</span>
+        <span class="artifact-date">5 min ago</span>
+        <svg class="row-chevron" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      </div>
+
+      <div class="artifact-row" tabindex="0" role="row">
+        <div>
+          <div class="artifact-name">auth-module.arch.yaml</div>
+          <div class="artifact-path">src/architecture/auth-module.arch.yaml</div>
+        </div>
+        <span class="badge badge-type architecture">architecture</span>
+        <span class="badge badge-lifecycle related">related</span>
+        <span class="artifact-date">5 min ago</span>
+        <svg class="row-chevron" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      </div>
+
+      <div class="artifact-row" tabindex="0" role="row">
+        <div>
+          <div class="artifact-name">login-flow.spec.yaml</div>
+          <div class="artifact-path">specs/login-flow.spec.yaml</div>
+        </div>
+        <span class="badge badge-type spec">spec</span>
+        <span class="badge badge-lifecycle parsed">parsed</span>
+        <span class="artifact-date">12 min ago</span>
+        <svg class="row-chevron" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      </div>
+
+      <div class="artifact-row" tabindex="0" role="row" style="opacity:0.6;">
+        <div>
+          <div class="artifact-name">sys-04-authorization.req.yaml</div>
+          <div class="artifact-path">auth/requirements/sys-04.req.yaml</div>
+        </div>
+        <span class="badge badge-type requirement">requirement</span>
+        <span class="badge badge-lifecycle error">error</span>
+        <span class="artifact-date">12 min ago</span>
+        <svg class="row-chevron" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      </div>
+
+      <div class="artifact-row" tabindex="0" role="row">
+        <div>
+          <div class="artifact-name">adr-002-auth-strategy.adr.md</div>
+          <div class="artifact-path">docs/decisions/adr-002-auth-strategy.adr.md</div>
+        </div>
+        <span class="badge badge-type adr">adr</span>
+        <span class="badge badge-lifecycle discovered">discovered</span>
+        <span class="artifact-date">1 hour ago</span>
+        <svg class="row-chevron" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      </div>
+
+      <div class="artifact-row" tabindex="0" role="row">
+        <div>
+          <div class="artifact-name">session-management.arch.yaml</div>
+          <div class="artifact-path">src/architecture/session-management.arch.yaml</div>
+        </div>
+        <span class="badge badge-type architecture">architecture</span>
+        <span class="badge badge-lifecycle indexed">indexed</span>
+        <span class="artifact-date">1 hour ago</span>
+        <svg class="row-chevron" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      </div>
+    </div>
+
+    <!-- Detail Panel -->
+    <div class="detail-panel">
+      <div class="detail-header">
+        <div class="detail-title">sys-01-requirements.req.yaml</div>
+        <div class="detail-badges">
+          <span class="badge badge-type requirement">requirement</span>
+          <span class="badge badge-lifecycle related">related</span>
+        </div>
+        <div class="detail-meta">
+          <div class="detail-meta-row">
+            <span class="detail-meta-label">Path</span>
+            <span class="detail-meta-value">auth/requirements/sys-01.req.yaml</span>
+          </div>
+          <div class="detail-meta-row">
+            <span class="detail-meta-label">Created</span>
+            <span class="detail-meta-value">2026-07-18 14:32</span>
+          </div>
+          <div class="detail-meta-row">
+            <span class="detail-meta-label">Parsed</span>
+            <span class="detail-meta-value">2026-07-18 14:32</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lifecycle Timeline -->
+      <div class="detail-section">
+        <div class="detail-section-title">Lifecycle Progress</div>
+        <div class="lifecycle-timeline">
+          <div class="lifecycle-step">
+            <div class="lifecycle-dot done"></div>
+            <div class="lifecycle-text">
+              Discovered
+              <small>Scanner found file — 14:32:01</small>
+            </div>
+          </div>
+          <div class="lifecycle-step">
+            <div class="lifecycle-dot done"></div>
+            <div class="lifecycle-text">
+              Parsed
+              <small>YAML parsed successfully — 14:32:02</small>
+            </div>
+          </div>
+          <div class="lifecycle-step">
+            <div class="lifecycle-dot done"></div>
+            <div class="lifecycle-text">
+              Indexed
+              <small>Added to search index — 14:32:03</small>
+            </div>
+          </div>
+          <div class="lifecycle-step">
+            <div class="lifecycle-dot active"></div>
+            <div class="lifecycle-text">
+              Related
+              <small>Traceability links established — 14:32:04</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Metadata -->
+      <div class="detail-section">
+        <div class="detail-section-title">Metadata</div>
+        <div class="detail-section-content" style="font-family:var(--font-mono); font-size:0.75rem; background:var(--surface-secondary); padding:0.75rem; border-radius:var(--radius-md); line-height:1.8;">
+          <div><span style="color:var(--text-tertiary);">id:</span> req-sys-01</div>
+          <div><span style="color:var(--text-tertiary);">title:</span> System Authentication</div>
+          <div><span style="color:var(--text-tertiary);">priority:</span> high</div>
+          <div><span style="color:var(--text-tertiary);">status:</span> approved</div>
+          <div><span style="color:var(--text-tertiary);">relations:</span> 3 links</div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="detail-section">
+        <div class="detail-section-title">Actions</div>
+        <div class="detail-actions">
+          <button class="detail-action-link">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+            Open in Repository Tree
+          </button>
+          <button class="detail-action-link">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+            View Traceability Graph
+          </button>
+          <button class="detail-action-link">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            Reparse Artifact
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

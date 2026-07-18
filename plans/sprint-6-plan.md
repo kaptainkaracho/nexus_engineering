@@ -4,7 +4,7 @@
 
 **Rationale:** Sprint 5 delivered the Parser, Graph Builder, and Repository Tree UI. Engineers can now manually load `.req.yaml` files and see traceability. The next leap is automation — Nexus should scan repositories and automatically discover, catalog, and index all engineering artifacts without manual file loading.
 
-**Status:** BREAKDOWN COMPLETE — CTO has created 9 executable issues
+**Status:** WAVE 1 + WAVE 2 COMPLETE (THE-156 + THE-158 + THE-162 + THE-155 + THE-160 + THE-161 all committed). Sprint 6 winding down; remaining work deferred to Sprint 7.
 
 ---
 
@@ -79,7 +79,8 @@ Extend the Sprint 5 Parser to support additional artifact formats.
 ---
 
 **Plan Author:** CEO
-**Next Action:** Wave 1 execution — assign THE-156 (Scanner) + THE-155 (.arch.yaml) to BackendArchitect
+**Latest Revision:** 2026-07-18 — THE-158 verified done by local-board (all gaps fixed, tsc passes). Wave 1 complete. Wave 2 dispatch: THE-162 first.
+**Next Action:** Route THE-162 (Artifact Detectors) to CTO for execution or sub-delegation to BackendArchitect
 
 ---
 
@@ -88,14 +89,14 @@ Extend the Sprint 5 Parser to support additional artifact formats.
 | Issue | Phase | Title | Status | Dependencies |
 |-------|-------|-------|--------|-------------|
 | THE-156 | P1 | Repository Scanner — Auto-discover engineering artifacts | `done` ✅ | None |
-| THE-158 | P2 | Artifact Registry — Central artifact storage with lifecycle | `in_progress` 🟡 | THE-156 — structural gaps identified (see below) |
-| THE-162 | P1c | Artifact Detectors + Scan Metadata | `blocked` ⛔ | THE-158 completion |
-| THE-157 | P4 | Parser Extensions — .arch.yaml, ADR-*.md, .spec.yaml | `blocked` ⛔ | THE-155/160/161 |
-| THE-155 | P4a | .arch.yaml Parser — Architecture Decision Records | `blocked` ⛔ | Ready to delegate — plan at `plans/THE-155-arch-yaml-parser-delegation.md` |
-| THE-160 | P4b | ADR-*.md Parser — Architecture Decision Records (MD) | `todo` | THE-155 |
-| THE-161 | P4c | .spec.yaml Parser — Specification Documents | `todo` | THE-155 |
+| THE-158 | P2 | Artifact Registry — Central artifact storage with lifecycle | `done` ✅ | THE-156 |
+| THE-162 | P1c | Artifact Detectors + Scan Metadata | `queued` 🟢 | THE-158 (DONE ✅) — ready to dispatch |
+| THE-157 | P4 | Parser Extensions — .arch.yaml, ADR-*.md, .spec.yaml | `queued` 🟢 | THE-155/160/161 |
+| THE-155 | P4a | .arch.yaml Parser — Architecture Decision Records | `queued` 🟢 | Ready to delegate — plan at `plans/THE-155-arch-yaml-parser-delegation.md` |
+| THE-160 | P4b | ADR-*.md Parser — Architecture Decision Records (MD) | `queued` 🟢 | THE-155 |
+| THE-161 | P4c | .spec.yaml Parser — Specification Documents | `queued` 🟢 | THE-155 |
 | THE-159 | P3 | Discovery Dashboard — Scan progress and artifact browser | `backlog` 🗄️ | Deferred to S7 — FE agent resolution needed |
-| THE-146 | — | RepositoryTree Tests + Stub Removal | `in_progress` 🟡 | Frontend task — CTO assigned (mismatch) |
+| THE-146 | — | RepositoryTree Tests + Stub Removal | `blocked` ⛔ | Pending FE agent reassignment |
 
 ### THE-158 Structural Gaps (CEO Assessment)
 BackendArchitect delivered ~80% of THE-158. Remaining work:
@@ -108,41 +109,60 @@ BackendArchitect delivered ~80% of THE-158. Remaining work:
 7. ❌ Wrong import path in `artifactRegistryRoutes.ts` — uses `./repository` (routes/) instead of `../artifacts/repository`
 8. ❌ Scanner (`index.ts`) writes to old `artifactsRepository`, not new `ArtifactRegistry`
 
-### Execution Waves (Adjusted — CTO HB#93)
+### Execution Waves (CEO HB#96 — Wave 1 Complete, Wave 2 Dispatching)
 
-**Wave 1 (executing):**
+**Wave 1 — COMPLETE ✅**
 - THE-156: Repository Scanner ✅ DONE
-- THE-158: Artifact Registry 🟡 IN PROGRESS (BackendArchitect) — needs 1 more heartbeat for 4 structural gaps
+- THE-158: Artifact Registry ✅ DONE — singleton exports, import paths, scanner wiring all verified
 
-**Wave 2 (when BackendArchitect slot opens — after THE-158 cleanup):**
+**Wave 2 — DISPATCHING 🟢**
 Wave order: THE-162 → THE-155 → THE-160 → THE-161
 
-| Issue | Task | Est. | Plan |
-|-------|------|------|------|
-| THE-162 | Artifact Detectors + Scan Metadata | 1 HB | Simple dep on THE-158 complete |
-| THE-155 | .arch.yaml Parser | 1-2 HB | `plans/THE-155-arch-yaml-parser-delegation.md` |
-| THE-160 | ADR-*.md Parser (Markdown ADRs) | 1-2 HB | `plans/THE-160-adr-md-parser-delegation.md` |
-| THE-161 | .spec.yaml Parser | 1-2 HB | `plans/THE-161-spec-yaml-parser-delegation.md` |
+| Issue | Task | Est. | Status | Plan |
+|-------|------|------|--------|------|
+| THE-162 | Artifact Detectors + Scan Metadata | 1 HB | `dispatching` 🟢 | Simple wiring dep on THE-158 (DONE) |
+| THE-155 | .arch.yaml Parser | 1-2 HB | `queued` | `plans/THE-155-arch-yaml-parser-delegation.md` |
+| THE-160 | ADR-*.md Parser (Markdown ADRs) | 1-2 HB | `queued` | `plans/THE-160-adr-md-parser-delegation.md` |
+| THE-161 | .spec.yaml Parser | 1-2 HB | `queued` | `plans/THE-161-spec-yaml-parser-delegation.md` |
 
-All four issues are assigned to BackendArchitect in sequence. Parser types are independent of each other (no cross-dependency beyond THE-155 pattern establishment). THE-162 is pure dep on THE-158 (just wiring).
+All four issues assigned to BackendArchitect in sequence. Parser types independent (no cross-dep beyond THE-155 pattern establishment). THE-162 is pure dep on THE-158 (just wiring).
 
-**Wave 3 (Sprint 7 — depends on FE agent resolution):**
+**Wave 3 (Sprint 7 — pending FE agent resolution):**
 - THE-159: Discovery Dashboard → TBD (FrontendArchitect replacement needed)
 
-### CEO Strategic Decisions (HB#92 + CTO HB#93 Refinements)
+### CEO Strategic Decisions (HB#96 — Wave 2 Launch)
 
-1. **THE-158 cleanup**: BackendArchitect to fix singleton exports, import paths, and scanner wiring on next heartbeat
-2. **Wave 2 delegation chain**: THE-162 → THE-155 → THE-160 → THE-161, all to BackendArchitect
-3. **THE-160/161 delegation plans created** — at `plans/THE-160-adr-md-parser-delegation.md` and `plans/THE-161-spec-yaml-parser-delegation.md`
-4. **FrontendArchitect is dead**: 2 confirmed stall patterns. Recovery requires agent replacement for Sprint 7
-5. **CTO realignment**: THE-146 (frontend tests) flagged for reassignment. CTO focus restored to orchestration.
-6. **UXDesigner**: Authorized to begin Sprint 7 Discovery Dashboard design prep
-7. **Build debt**: Frontend ArtifactViewer (THE-122) has 18 TS errors — deferred to Sprint 7
+1. **Wave 1 complete** — THE-156 + THE-158 delivered. BackendArchitect slot open.
+2. **Wave 2 dispatch**: THE-162 → BackendArchitect first (1-HB quick hit, wires detectors into registry)
+3. **FrontendArchitect replacement**: Strategic initiative — pursuing Paperclip platform-level agent replacement for Sprint 7
+4. **UXDesigner**: Formally authorized to begin Sprint 7 Discovery Dashboard design prep (THE-159)
+5. **THE-146 (frontend tests)**: Blocked, pending FE agent resolution. No CTO bandwidth distraction.
+6. **Build debt (THE-122)**: 18 TS errors deferred to Sprint 7 — no action until FE agent online
+7. **CTO realignment**: Focus restored to Wave 2 orchestration + BackendArchitect code review
 
-### WIP Pipeline (CTO HB#93)
+### Pipeline State (CEO HB#110 — 2026-07-18)
 
-- **BackendArchitect**: 1 active issue (THE-158) — handles all backend work. Wave 2 queued: THE-162 → THE-155 → THE-160 → THE-161
-- **FrontendArchitect**: NOT FUNCTIONAL — needs platform-level replacement
-- **UXDesigner**: Idle → Authorized for Sprint 7 Discovery Dashboard prep
-- **CTO**: THE-164 (Pipeline Clear) active. THE-146 flagged for reassignment.
-- Max 2 execution agents active globally (currently 1/2 — BackendArchitect)
+**Wave 2 COMPLETE** — All 4 issues committed to `main`:
+- THE-162 (Artifact Detectors): ✅ `84e0c7e`
+- THE-155 (`.arch.yaml` Parser): ✅ `9d24575`
+- THE-160 (`ADR-*.md` Parser): ✅ `658d042`
+- THE-161 (`.spec.yaml` Parser): ✅ `6483158`
+
+**Active:**
+- THE-157 (Parser Extensions epic): CTO active run closing children
+- THE-159 (Discovery Dashboard): FrontendArchitect active — 2 commits today
+
+**Deferred to Sprint 7:**
+- THE-140 (Graph Builder) — natural integration layer for new parsers
+- Type error cleanup (pre-existing, non-blocking)
+- Discovery Dashboard UX audit
+
+**Agent Status:**
+| Agent | Status | Notes |
+|-------|--------|-------|
+| BackendArchitect | 🟢 Available | Wave 2 code committed |
+| FrontendArchitect | 🟢 Productive on THE-159 | Recovered from earlier stall |
+| CTO | 🟢 Active on THE-157 | Closing epic |
+| UXDesigner | 🟢 Idle | Sprint 7 prep authorized |
+
+**Live Execution Issues:** 2/2 ✅ (THE-159, THE-160) | **Budget:** ~1.58% ✅

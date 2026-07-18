@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Discovery Dashboard — Edge States</title>
+<style>
+  :root {
+    --surface-primary: #0F172A;
+    --surface-secondary: #1E293B;
+    --surface-tertiary: #334155;
+    --text-primary: #F8FAFC;
+    --text-secondary: #CBD5E1;
+    --text-tertiary: #64748B;
+    --border-default: #334155;
+    --border-hover: #475569;
+    --color-primary-500: #3B82F6;
+    --color-success-500: #22C55E;
+    --color-error-500: #EF4444;
+    --color-warning-500: #F59E0B;
+    --radius-xl: 1rem;
+    --radius-lg: 0.75rem;
+    --radius-full: 9999px;
+    --font-sans: 'Inter', system-ui, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: var(--font-sans); background: var(--surface-secondary); color: var(--text-primary); }
+
+  .header { background: var(--surface-primary); border-bottom: 1px solid var(--border-default); padding: 1rem 2rem; display: flex; align-items: center; gap: 0.75rem; }
+  .header-logo { width: 2.5rem; height: 2.5rem; background: var(--color-primary-500); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 0.875rem; }
+  .header-title { font-size: 1.125rem; font-weight: 700; }
+
+  .page { padding: 2rem; max-width: 80rem; margin: 0 auto; }
+  .page-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 2rem; }
+
+  .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: var(--radius-lg); font-size: 0.875rem; font-weight: 500; cursor: pointer; border: none; transition: all 100ms; }
+  .btn-primary { background: var(--color-primary-500); color: white; }
+  .btn-primary:hover { background: #2563EB; }
+  .btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-default); }
+  .btn-ghost:hover { background: var(--surface-tertiary); }
+
+  /* State sections */
+  .state-section {
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: var(--surface-primary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-xl);
+  }
+  .state-label {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-default);
+  }
+
+  /* Empty State */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+  }
+  .empty-icon {
+    width: 6rem; height: 6rem;
+    border-radius: 50%;
+    background: var(--surface-tertiary);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+  .empty-icon svg { width: 3rem; height: 3rem; color: var(--text-tertiary); }
+  .empty-title { font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem; }
+  .empty-body { font-size: 0.875rem; color: var(--text-tertiary); max-width: 24rem; margin-bottom: 1.5rem; line-height: 1.6; }
+
+  /* Scanning State */
+  .scanning-banner {
+    background: rgba(59,130,246,0.08);
+    border: 1px solid rgba(59,130,246,0.2);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .scanning-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  .scanning-info { display: flex; align-items: center; gap: 0.75rem; }
+  .scanning-pulse {
+    width: 0.75rem; height: 0.75rem;
+    border-radius: 50%;
+    background: var(--color-primary-500);
+    animation: scanPulse 2s ease-in-out infinite;
+  }
+  @keyframes scanPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(59,130,246,0); }
+  }
+  .scanning-title { font-size: 0.9375rem; font-weight: 600; color: #60A5FA; }
+  .scanning-meta { font-size: 0.8125rem; color: var(--text-tertiary); }
+  .scanning-progress-track {
+    height: 0.375rem;
+    background: rgba(59,130,246,0.15);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+  }
+  .scanning-progress-fill {
+    height: 100%;
+    background: var(--color-primary-500);
+    border-radius: var(--radius-full);
+    animation: scanProgress 3s ease-in-out infinite;
+  }
+  @keyframes scanProgress {
+    0% { width: 0%; }
+    100% { width: 100%; }
+  }
+  .scanning-stats {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1rem;
+  }
+  .scanning-stat { font-size: 0.8125rem; color: var(--text-secondary); }
+  .scanning-stat strong { color: var(--text-primary); }
+
+  /* Skeleton Cards */
+  .skeleton-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 1.5rem; }
+  .skeleton-card {
+    background: var(--surface-secondary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem;
+  }
+  .skeleton-row {
+    height: 0.875rem;
+    background: var(--surface-tertiary);
+    border-radius: var(--radius-md);
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+  @keyframes shimmer {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+  .skeleton-icon { width: 2.5rem; height: 2.5rem; border-radius: var(--radius-lg); background: var(--surface-tertiary); margin-bottom: 0.75rem; animation: shimmer 1.5s ease-in-out infinite; }
+  .skeleton-number { width: 3rem; height: 1.875rem; background: var(--surface-tertiary); border-radius: var(--radius-md); margin-bottom: 0.375rem; animation: shimmer 1.5s ease-in-out infinite 0.1s; }
+  .skeleton-label { width: 5rem; height: 0.75rem; background: var(--surface-tertiary); border-radius: var(--radius-md); animation: shimmer 1.5s ease-in-out infinite 0.2s; }
+
+  /* Error Banner */
+  .error-banner {
+    background: rgba(239,68,68,0.06);
+    border: 1px solid rgba(239,68,68,0.2);
+    border-radius: var(--radius-xl);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .error-banner-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+  .error-banner-icon { color: var(--color-error-500); }
+  .error-banner-title { font-size: 0.9375rem; font-weight: 600; color: var(--color-error-500); }
+  .error-banner-body { font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 1rem; }
+  .error-list { display: flex; flex-direction: column; gap: 0.5rem; }
+  .error-item {
+    display: flex; align-items: flex-start; gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--surface-primary);
+    border-radius: var(--radius-md);
+    font-size: 0.8125rem;
+  }
+  .error-item-icon { color: var(--color-error-500); flex-shrink: 0; margin-top: 0.125rem; }
+  .error-item-path { font-family: monospace; font-size: 0.75rem; color: var(--text-tertiary); }
+  .error-item-msg { color: var(--text-secondary); margin-top: 0.25rem; }
+
+  /* Reduced Motion */
+  @media (prefers-reduced-motion: reduce) {
+    .scanning-pulse { animation: none; }
+    .scanning-progress-fill { animation: none; width: 50%; }
+    .skeleton-row, .skeleton-icon, .skeleton-number, .skeleton-label { animation: none; opacity: 0.6; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-logo">N</div>
+  <div class="header-title">Nexus Engineering</div>
+</header>
+
+<main class="page">
+  <h1 class="page-title">Edge States & Loading Patterns</h1>
+
+  <!-- State 1: Empty -->
+  <div class="state-section">
+    <div class="state-label">State: Empty — No scans performed yet</div>
+    <div class="empty-state">
+      <div class="empty-icon">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+        </svg>
+      </div>
+      <div class="empty-title">No artifacts discovered</div>
+      <div class="empty-body">
+        Run a scan to discover engineering artifacts in your repository. 
+        The scanner will detect requirements, architecture documents, ADRs, and specifications.
+      </div>
+      <button class="btn btn-primary">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        Run First Scan
+      </button>
+    </div>
+  </div>
+
+  <!-- State 2: Scanning -->
+  <div class="state-section">
+    <div class="state-label">State: Scanning — Active scan in progress</div>
+    <div class="scanning-banner">
+      <div class="scanning-header">
+        <div class="scanning-info">
+          <div class="scanning-pulse"></div>
+          <div>
+            <div class="scanning-title">Scan in progress...</div>
+            <div class="scanning-meta">Scanning nexus_engineering repository</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost" style="padding:0.375rem 0.75rem; font-size:0.8125rem;">Cancel</button>
+      </div>
+      <div class="scanning-progress-track">
+        <div class="scanning-progress-fill"></div>
+      </div>
+      <div class="scanning-stats">
+        <div class="scanning-stat"><strong>142</strong> files scanned</div>
+        <div class="scanning-stat"><strong>12</strong> artifacts detected</div>
+        <div class="scanning-stat"><strong>0</strong> errors</div>
+      </div>
+    </div>
+
+    <!-- Skeleton Loading -->
+    <div class="skeleton-grid">
+      <div class="skeleton-card">
+        <div class="skeleton-icon"></div>
+        <div class="skeleton-number"></div>
+        <div class="skeleton-label"></div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-icon"></div>
+        <div class="skeleton-number"></div>
+        <div class="skeleton-label"></div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-icon"></div>
+        <div class="skeleton-number"></div>
+        <div class="skeleton-label"></div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-icon"></div>
+        <div class="skeleton-number"></div>
+        <div class="skeleton-label"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- State 3: Errors -->
+  <div class="state-section">
+    <div class="state-label">State: Errors — Scan completed with parse errors</div>
+    <div class="error-banner">
+      <div class="error-banner-header">
+        <svg class="error-banner-icon" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+        <span class="error-banner-title">6 artifacts failed to parse</span>
+      </div>
+      <div class="error-banner-body">
+        These artifacts were discovered but could not be parsed. They may contain invalid YAML or missing required fields.
+      </div>
+      <div class="error-list">
+        <div class="error-item">
+          <svg class="error-item-icon" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+          <div>
+            <div class="error-item-path">auth/requirements/sys-04.req.yaml</div>
+            <div class="error-item-msg">YAML Error: unexpected token at line 14, column 5. Expected indentation of 4 spaces, got 2.</div>
+          </div>
+        </div>
+        <div class="error-item">
+          <svg class="error-item-icon" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+          <div>
+            <div class="error-item-path">docs/decisions/adr-003.adr.md</div>
+            <div class="error-item-msg">Missing required field: "status". ADR must have a status of accepted, deprecated, or superseded.</div>
+          </div>
+        </div>
+        <div class="error-item">
+          <svg class="error-item-icon" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+          <div>
+            <div class="error-item-path">specs/payment.spec.yaml</div>
+            <div class="error-item-msg">File exceeds maximum size limit (50KB). Consider splitting into smaller spec files.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

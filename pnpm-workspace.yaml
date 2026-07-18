@@ -3,6 +3,7 @@ packages:
   - "packages/*"
   - "packages/eslint-config"
 allowBuilds:
+  bcrypt: true
   esbuild: set this to true or false
 pnpm:
   # Allowlist of dependencies permitted to run install/build scripts (native modules).

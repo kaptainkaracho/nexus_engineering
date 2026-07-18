@@ -147,6 +147,27 @@ Accessibility: `aria-invalid`, `aria-describedby` for error/helper, `htmlFor` li
 
 Horizontal variant includes mobile hamburger menu with dropdown.
 
+### Alert `<Alert />` (New — Added in THE-193)
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `variant` | `'success' \| 'error' \| 'warning' \| 'info'` | — | Visual style |
+| `title` | `string` | — | Optional bold title |
+| `children` | `ReactNode` | — | Alert body content |
+| `icon` | `ReactNode` | — | Icon element (matched to variant color) |
+| `dismissible` | `boolean` | `false` | Shows close button |
+| `onDismiss` | `() => void` | — | Callback on dismiss |
+
+**Styling:**
+| Variant | Background | Border | Text |
+|---------|-----------|--------|------|
+| success | `bg-success-50` | `border-success-200` | `text-success-700` |
+| error | `bg-error-50` | `border-error-200` | `text-error-700` |
+| warning | `bg-warning-50` | `border-warning-200` | `text-warning-700` |
+| info | `bg-info-50` | `border-info-200` | `text-info-700` |
+
+Uses `role="alert"` for accessibility.
+
 ## Utility
 
 ```ts
@@ -169,6 +190,8 @@ packages/shared/src/design-system/
 │   └── spacing.ts
 └── components/
     ├── index.ts
+    ├── Alert.tsx
+    ├── Badge.tsx
     ├── Button.tsx
     ├── Input.tsx
     ├── Card.tsx
@@ -185,6 +208,13 @@ packages/shared/src/design-system/
 - Color contrast meets WCAG AA across all token scales
 - Dark mode respects `prefers-color-scheme` when used with system detection
 - Reduced motion: animations use Tailwind's `motion-reduce:` as needed
+
+## Design Documents
+
+| Document | Location | Covers |
+|----------|----------|--------|
+| **Auth Flow Wireframes** | `docs/ux/auth-flow-wireframes.md` | Login, Registration, Password Reset, Email Verification, Auth Guard |
+| **Admin UI Mockups** | `docs/ux/admin-ui-mockups.md` | Admin Dashboard, Members, Roles & Permissions, Settings, Audit Log |
 
 ## Design Lenses Applied
 

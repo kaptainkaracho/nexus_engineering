@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Discovery Dashboard — Overview</title>
+<style>
+  /* Nexus Design System Tokens (dark mode) */
+  :root {
+    --surface-primary: #0F172A;
+    --surface-secondary: #1E293B;
+    --surface-tertiary: #334155;
+    --text-primary: #F8FAFC;
+    --text-secondary: #CBD5E1;
+    --text-tertiary: #64748B;
+    --text-inverse: #0F172A;
+    --border-default: #334155;
+    --border-hover: #475569;
+    --color-primary-500: #3B82F6;
+    --color-primary-600: #60A5FA;
+    --color-success-500: #22C55E;
+    --color-error-500: #EF4444;
+    --color-warning-500: #F59E0B;
+    --radius-xl: 1rem;
+    --radius-lg: 0.75rem;
+    --radius-md: 0.625rem;
+    --radius-full: 9999px;
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--surface-secondary);
+    color: var(--text-primary);
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .header {
+    background: var(--surface-primary);
+    border-bottom: 1px solid var(--border-default);
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .header-logo {
+    width: 2.5rem; height: 2.5rem;
+    background: var(--color-primary-500);
+    border-radius: var(--radius-lg);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 700; font-size: 0.875rem;
+  }
+  .header-title { font-size: 1.125rem; font-weight: 700; }
+  .header-subtitle { font-size: 0.75rem; color: var(--text-tertiary); }
+
+  /* Nav Tabs */
+  .nav {
+    background: var(--surface-primary);
+    border-bottom: 1px solid var(--border-default);
+    padding: 0 2rem;
+    display: flex;
+    gap: 0;
+  }
+  .nav-tab {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.875rem;
+    color: var(--text-tertiary);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: color 100ms, border-color 100ms;
+    cursor: pointer;
+  }
+  .nav-tab:hover { color: var(--text-secondary); }
+  .nav-tab.active {
+    color: var(--color-primary-500);
+    border-bottom-color: var(--color-primary-500);
+    font-weight: 500;
+  }
+
+  /* Page Container */
+  .page { padding: 2rem; max-width: 80rem; margin: 0 auto; }
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+  .page-title { font-size: 1.5rem; font-weight: 700; }
+  .page-subtitle { font-size: 0.875rem; color: var(--text-tertiary); margin-top: 0.25rem; }
+
+  /* Button */
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    border-radius: var(--radius-lg);
+    font-size: 0.875rem; font-weight: 500;
+    cursor: pointer; border: none;
+    transition: background 100ms, transform 100ms;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary {
+    background: var(--color-primary-500);
+    color: white;
+  }
+  .btn-primary:hover { background: #2563EB; }
+  .btn-primary:disabled {
+    background: var(--surface-tertiary);
+    color: var(--text-tertiary);
+    cursor: not-allowed;
+    transform: none;
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-default);
+  }
+  .btn-ghost:hover { background: var(--surface-tertiary); }
+
+  /* Stat Cards Grid */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .stat-card {
+    background: var(--surface-primary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    transition: border-color 100ms;
+  }
+  .stat-card:hover { border-color: var(--border-hover); }
+  .stat-icon {
+    width: 2.5rem; height: 2.5rem;
+    border-radius: var(--radius-lg);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .stat-icon svg { width: 1.25rem; height: 1.25rem; }
+  .stat-icon.blue { background: rgba(59,130,246,0.1); color: #60A5FA; }
+  .stat-icon.green { background: rgba(34,197,94,0.1); color: #22C55E; }
+  .stat-icon.amber { background: rgba(245,158,11,0.1); color: #F59E0B; }
+  .stat-icon.red { background: rgba(239,68,68,0.1); color: #EF4444; }
+  .stat-value { font-size: 1.875rem; font-weight: 700; line-height: 1.2; }
+  .stat-label { font-size: 0.875rem; color: var(--text-tertiary); margin-top: 0.125rem; }
+
+  /* Scan Status Banner */
+  .scan-banner {
+    background: var(--surface-primary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-xl);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+  .scan-info { display: flex; align-items: center; gap: 1rem; }
+  .scan-dot {
+    width: 0.5rem; height: 0.5rem;
+    border-radius: 50%;
+    background: var(--color-success-500);
+    flex-shrink: 0;
+  }
+  .scan-dot.active {
+    background: var(--color-primary-500);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(59,130,246,0.4); }
+    50% { opacity: 0.8; box-shadow: 0 0 0 6px rgba(59,130,246,0); }
+  }
+  .scan-label { font-size: 0.875rem; color: var(--text-secondary); }
+  .scan-time { font-size: 0.875rem; font-weight: 500; }
+  .scan-actions { display: flex; gap: 0.75rem; }
+
+  /* Section */
+  .section { margin-bottom: 2rem; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary);
+  }
+
+  /* Type Breakdown */
+  .type-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+  .type-card {
+    background: var(--surface-primary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: border-color 100ms, background 100ms;
+  }
+  .type-card:hover {
+    border-color: var(--border-hover);
+    background: var(--surface-secondary);
+  }
+  .type-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+  .type-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.5rem;
+    border-radius: var(--radius-full);
+    font-size: 0.6875rem;
+    font-weight: 500;
+  }
+  .type-badge.requirement { background: rgba(14,165,233,0.1); color: #38BDF8; }
+  .type-badge.architecture { background: rgba(245,158,11,0.1); color: #FBBF24; }
+  .type-badge.adr { background: rgba(99,102,241,0.1); color: #818CF8; }
+  .type-badge.spec { background: rgba(20,184,166,0.1); color: #2DD4BF; }
+  .type-count { font-size: 1.5rem; font-weight: 700; }
+  .type-name { font-size: 0.8125rem; color: var(--text-tertiary); margin-top: 0.25rem; }
+  .type-bar {
+    height: 0.25rem;
+    border-radius: var(--radius-full);
+    background: var(--surface-tertiary);
+    margin-top: 0.75rem;
+    overflow: hidden;
+  }
+  .type-bar-fill { height: 100%; border-radius: var(--radius-full); transition: width 300ms ease-out; }
+  .type-bar-fill.requirement { background: #0EA5E9; }
+  .type-bar-fill.architecture { background: #F59E0B; }
+  .type-bar-fill.adr { background: #6366F1; }
+  .type-bar-fill.spec { background: #14B8A6; }
+
+  /* Recent Activity */
+  .activity-list {
+    background: var(--surface-primary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+  }
+  .activity-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.875rem 1.5rem;
+    border-bottom: 1px solid var(--border-default);
+    font-size: 0.875rem;
+  }
+  .activity-row:last-child { border-bottom: none; }
+  .activity-dot {
+    width: 0.375rem; height: 0.375rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .activity-dot.success { background: var(--color-success-500); }
+  .activity-dot.info { background: var(--color-primary-500); }
+  .activity-dot.error { background: var(--color-error-500); }
+  .activity-text { flex: 1; color: var(--text-secondary); }
+  .activity-text strong { color: var(--text-primary); font-weight: 500; }
+  .activity-time { color: var(--text-tertiary); font-size: 0.75rem; white-space: nowrap; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .page { padding: 1rem; }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    .type-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+    .page-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    .scan-banner { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    .scan-actions { width: 100%; }
+    .scan-actions .btn { flex: 1; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-brand">
+    <div class="header-logo">N</div>
+    <div>
+      <div class="header-title">Nexus Engineering</div>
+      <div class="header-subtitle">Engineering as Code Viewer</div>
+    </div>
+  </div>
+</header>
+
+<!-- Navigation -->
+<nav class="nav">
+  <a class="nav-tab" href="#">Overview</a>
+  <a class="nav-tab" href="#">Repository</a>
+  <a class="nav-tab" href="#">Artefacts</a>
+  <a class="nav-tab active" href="#">Discovery</a>
+  <a class="nav-tab" href="#">Graph</a>
+</nav>
+
+<!-- Page Content -->
+<main class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Discovery Dashboard</h1>
+      <p class="page-subtitle">Monitor repository scans and discovered engineering artifacts</p>
+    </div>
+    <div style="display:flex; gap:0.75rem;">
+      <button class="btn btn-ghost">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        Refresh
+      </button>
+      <button class="btn btn-primary">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        Run Scan
+      </button>
+    </div>
+  </div>
+
+  <!-- Scan Status Banner -->
+  <div class="scan-banner">
+    <div class="scan-info">
+      <div class="scan-dot"></div>
+      <div>
+        <div class="scan-label">Last scan completed</div>
+        <div class="scan-time">Today at 14:32 — 47 artifacts found in 2.3s</div>
+      </div>
+    </div>
+    <div class="scan-actions">
+      <button class="btn btn-ghost" style="font-size:0.8125rem;">View Scan History</button>
+    </div>
+  </div>
+
+  <!-- Stat Cards -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-icon blue">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+      </div>
+      <div>
+        <div class="stat-value">47</div>
+        <div class="stat-label">Total Artifacts</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      </div>
+      <div>
+        <div class="stat-value">41</div>
+        <div class="stat-label">Parsed Successfully</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon amber">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+      </div>
+      <div>
+        <div class="stat-value">6</div>
+        <div class="stat-label">Errors</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon blue">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      </div>
+      <div>
+        <div class="stat-value">12</div>
+        <div class="stat-label">Scans Today</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Artifact Type Breakdown -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Artifacts by Type</span>
+    </div>
+    <div class="type-grid">
+      <div class="type-card" tabindex="0" role="button" aria-label="View 23 requirements">
+        <div class="type-card-header">
+          <span class="type-badge requirement">requirement</span>
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--text-tertiary)" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        </div>
+        <div class="type-count">23</div>
+        <div class="type-name">Requirements</div>
+        <div class="type-bar"><div class="type-bar-fill requirement" style="width:49%"></div></div>
+      </div>
+      <div class="type-card" tabindex="0" role="button" aria-label="View 12 architecture artifacts">
+        <div class="type-card-header">
+          <span class="type-badge architecture">architecture</span>
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--text-tertiary)" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        </div>
+        <div class="type-count">12</div>
+        <div class="type-name">Architecture</div>
+        <div class="type-bar"><div class="type-bar-fill architecture" style="width:26%"></div></div>
+      </div>
+      <div class="type-card" tabindex="0" role="button" aria-label="View 8 architecture decision records">
+        <div class="type-card-header">
+          <span class="type-badge adr">adr</span>
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--text-tertiary)" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        </div>
+        <div class="type-count">8</div>
+        <div class="type-name">ADRs</div>
+        <div class="type-bar"><div class="type-bar-fill adr" style="width:17%"></div></div>
+      </div>
+      <div class="type-card" tabindex="0" role="button" aria-label="View 4 specifications">
+        <div class="type-card-header">
+          <span class="type-badge spec">spec</span>
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--text-tertiary)" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        </div>
+        <div class="type-count">4</div>
+        <div class="type-name">Specifications</div>
+        <div class="type-bar"><div class="type-bar-fill spec" style="width:9%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Recent Activity</span>
+      <button class="btn btn-ghost" style="font-size:0.8125rem; padding:0.375rem 0.75rem;">View All</button>
+    </div>
+    <div class="activity-list">
+      <div class="activity-row">
+        <div class="activity-dot success"></div>
+        <div class="activity-text"><strong>Scan completed</strong> — 47 artifacts discovered, 0 errors</div>
+        <div class="activity-time">2 min ago</div>
+      </div>
+      <div class="activity-row">
+        <div class="activity-dot info"></div>
+        <div class="activity-text"><strong>Requirements parsed</strong> — 23 files indexed and related</div>
+        <div class="activity-time">5 min ago</div>
+      </div>
+      <div class="activity-row">
+        <div class="activity-dot error"></div>
+        <div class="activity-text"><strong>Parse error</strong> — invalid YAML in <code style="font-family:var(--font-mono);font-size:0.75rem;background:var(--surface-tertiary);padding:0.125rem 0.375rem;border-radius:4px;">auth/requirements/sys-04.req.yaml</code></div>
+        <div class="activity-time">12 min ago</div>
+      </div>
+      <div class="activity-row">
+        <div class="activity-dot success"></div>
+        <div class="activity-text"><strong>Scan completed</strong> — 45 artifacts discovered, 2 errors</div>
+        <div class="activity-time">1 hour ago</div>
+      </div>
+      <div class="activity-row">
+        <div class="activity-dot info"></div>
+        <div class="activity-text"><strong>Repository indexed</strong> — nexus_engineering at HEAD (a3f2c1d)</div>
+        <div class="activity-time">1 hour ago</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

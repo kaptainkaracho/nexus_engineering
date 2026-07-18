@@ -260,3 +260,72 @@ export interface Specification {
   status: SpecStatus;
   requirements: SpecRequirement[];
 }
+
+// --- Auth & RBAC Types ---
+
+export interface User {
+  id: string
+  email: string
+  displayName: string | null
+  roleId: string
+  isActive: boolean
+  emailVerified: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface UserWithPassword extends User {
+  passwordHash: string
+}
+
+export interface Role {
+  id: string
+  name: string
+  description: string | null
+  createdAt: string
+}
+
+export interface Permission {
+  id: string
+  name: string
+  description: string | null
+  resource: string
+  action: string
+}
+
+export interface RefreshToken {
+  id: string
+  userId: string
+  tokenHash: string
+  expiresAt: string
+  createdAt: string
+  revoked: boolean
+}
+
+export interface JwtPayload {
+  sub: string
+  email: string
+  role: string
+  permissions: string[]
+}
+
+export interface LoginRequest {
+  email: string
+  password: string
+}
+
+export interface RegisterRequest {
+  email: string
+  password: string
+  displayName?: string
+}
+
+export interface AuthResponse {
+  user: Omit<User, 'passwordHash'>
+  accessToken: string
+  refreshToken: string
+}
+
+export interface RefreshRequest {
+  refreshToken: string
+}

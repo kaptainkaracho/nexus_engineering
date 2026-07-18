@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Discovery Dashboard — Design Mockups Index</title>
+<style>
+  :root {
+    --surface-primary: #0F172A;
+    --surface-secondary: #1E293B;
+    --surface-tertiary: #334155;
+    --text-primary: #F8FAFC;
+    --text-secondary: #CBD5E1;
+    --text-tertiary: #64748B;
+    --border-default: #334155;
+    --color-primary-500: #3B82F6;
+    --radius-xl: 1rem;
+    --radius-lg: 0.75rem;
+    --font-sans: 'Inter', system-ui, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: var(--font-sans); background: var(--surface-secondary); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 3rem 1.5rem; }
+  .container { max-width: 48rem; width: 100%; }
+  h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .subtitle { font-size: 0.9375rem; color: var(--text-tertiary); margin-bottom: 2.5rem; line-height: 1.6; }
+  .section { margin-bottom: 2rem; }
+  .section-title { font-size: 0.6875rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-default); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .card {
+    background: var(--surface-primary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 100ms, transform 100ms;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .card:hover { border-color: var(--color-primary-500); transform: translateY(-1px); }
+  .card-full { grid-column: 1 / -1; }
+  .card-title { font-size: 1rem; font-weight: 600; }
+  .card-desc { font-size: 0.8125rem; color: var(--text-tertiary); line-height: 1.5; }
+  .card-tag {
+    display: inline-flex; align-self: flex-start;
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.6875rem; font-weight: 500;
+    background: rgba(59,130,246,0.1); color: #60A5FA;
+  }
+  .doc-list { display: flex; flex-direction: column; gap: 0.75rem; }
+  .doc-link {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    background: var(--surface-primary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: border-color 100ms;
+  }
+  .doc-link:hover { border-color: var(--color-primary-500); }
+  .doc-icon { width: 2rem; height: 2rem; border-radius: var(--radius-md); background: var(--surface-tertiary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .doc-icon svg { width: 1rem; height: 1rem; color: var(--text-tertiary); }
+  .doc-name { font-size: 0.875rem; font-weight: 500; }
+  .doc-desc { font-size: 0.75rem; color: var(--text-tertiary); }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Discovery Dashboard — Design Artifacts</h1>
+  <p class="subtitle">
+    UX mockups, design tokens, and user flow for the Discovery Dashboard feature (THE-171). 
+    All mockups use the existing Nexus design system tokens. Open each HTML file in a browser at 1440×900 (desktop) or 390×844 (mobile).
+  </p>
+
+  <div class="section">
+    <div class="section-title">Mockup Screens</div>
+    <div class="grid">
+      <a class="card" href="mockup-overview.html">
+        <span class="card-tag">Primary</span>
+        <div class="card-title">Scan Overview</div>
+        <div class="card-desc">Stat cards, scan status banner, type breakdown with progress bars, recent activity timeline.</div>
+      </a>
+      <a class="card" href="mockup-browser.html">
+        <span class="card-tag">Primary</span>
+        <div class="card-title">Artifact Browser</div>
+        <div class="card-desc">Filterable list with search, type/status filter chips, inline detail panel with lifecycle timeline.</div>
+      </a>
+      <a class="card" href="mockup-detail.html">
+        <span class="card-tag">Primary</span>
+        <div class="card-title">Artifact Detail</div>
+        <div class="card-desc">Full-page detail view with metadata, source preview, lifecycle progress, traceability relations.</div>
+      </a>
+      <a class="card" href="mockup-mobile.html">
+        <span class="card-tag">Mobile</span>
+        <div class="card-title">Mobile (390×844)</div>
+        <div class="card-desc">Responsive mobile layout with bottom tab navigation, compact stat cards, scrollable artifact list.</div>
+      </a>
+      <a class="card card-full" href="mockup-edge-states.html">
+        <span class="card-tag">States</span>
+        <div class="card-title">Edge States & Loading</div>
+        <div class="card-desc">Empty state (no scans), scanning state (progress bar + skeleton), error state (parse failures with file paths). Includes prefers-reduced-motion support.</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Design Documentation</div>
+    <div class="doc-list">
+      <a class="doc-link" href="user-flow.md">
+        <div class="doc-icon">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+        </div>
+        <div>
+          <div class="doc-name">User Flow Diagram</div>
+          <div class="doc-desc">Mermaid diagrams for primary navigation, first-time use, daily use, and integration touchpoints.</div>
+        </div>
+      </a>
+      <a class="doc-link" href="design-tokens.md">
+        <div class="doc-icon">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+        </div>
+        <div>
+          <div class="doc-name">Design Tokens</div>
+          <div class="doc-desc">Lifecycle state colors, artifact type colors, spacing, typography, component tokens, accessibility notes.</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

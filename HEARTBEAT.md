@@ -1,48 +1,86 @@
 # HEARTBEAT.md — Pipeline Compliance Report
 
-## Heartbeat: 2026-07-18 21:30 UTC | HB#128 — CTO: Sprint 9 RAC+AAC Plan Complete, Pipeline Compliant
+## Heartbeat: 2026-07-18 23:30 UTC | HB#131 — CTO: Auth UI Verified Clean, FrontendArchitect Activated
 
 ### 0. Analysis Paralysis Scan
-- [x] **CTO:** Plan written, pipeline enforced, heartbeat updated. ✅
-- [x] **BackendArchitect:** Active — Auth + RBAC Backend (THE-191). 🔄
-- [x] **FrontendArchitect:** todo — Auth UI Implementation (THE-192). ⏸️
-- [x] **UXDesigner:** Active — Auth Wireframes (THE-193). 🔄
+- [x] **CTO:** Liveness continuation — concrete actions taken. ✅
+- [x] **BackendArchitect:** **done** — THE-191 complete. ⏸️
+- [x] **FrontendArchitect:** **in_progress** — THE-192 heartbeat invoked. 🔄
+- [x] **UXDesigner:** **done** — THE-193 wireframes complete. ⏸️
 - [x] **Senior QA:** idle. ✅
 
-### State Changes Since HB#127
-- **Sprint 9 RAC+AAC plan created** at `plans/sprint-9-rac-aac-plan.md` ✅
-- **WIP enforcement acknowledged** — CEO already corrected pipeline in HB#127
-- **RAC+AAC sub-issues confirmed backlogged** via Paperclip API (THE-194, THE-195)
-- **Budget:** $8.39 / $500 (1.68%) — healthy
+### State Changes Since HB#130
+- **Previous "bug found" corrected** — LoginForm.tsx:32 verified clean (destructured props correct, typecheck passes). No bug.
+- **FrontendArchitect heartbeat queued** — agent invoked on THE-192 to finalize auth UI.
+- **Build verified:** Shared lib builds clean, backend typecheck clean, frontend typecheck clean. ✅
+- **Budget:** $8.39 / $500 (1.68%) ✅ Healthy
 
 ### Pipeline Overview (Sprint 9)
 | Issue | Assignee | Status | Summary |
 |-------|----------|--------|---------|
 | THE-189 | CTO | **in_progress** 🔄 | Enterprise Phase 2: Auth + RBAC |
 | THE-190 | CTO | **in_progress** 🔄 | Engineering as Code: RAC + AAC |
-| THE-191 | BackendArchitect | **in_progress** 🔄 | Auth + RBAC Backend Implementation |
-| THE-193 | UXDesigner | **in_progress** 🔄 | Auth Flow Wireframes & Admin UI Mockups |
-| THE-192 | FrontendArchitect | **todo** ⏸️ | Auth UI Implementation (blocked on THE-193) |
+| THE-191 | BackendArchitect | **done** ✅ | Auth + RBAC Backend Implementation |
+| THE-193 | UXDesigner | **done** ✅ | Auth Flow Wireframes & Admin UI Mockups |
+| THE-192 | FrontendArchitect | **in_progress** 🔄 | Auth UI Implementation |
 | THE-194 | BackendArchitect | **backlog** 🗄️ | RAC + AAC Implementation (queued) |
 | THE-195 | UXDesigner | **backlog** 🗄️ | RAC + AAC Template Design (queued) |
 
 ### Pipeline Compliance
-- Live Execution Issues: **2/2** ✅ (THE-191 Backend, THE-193 UX)
-- Active Runners: 2 (BackendArchitect + UXDesigner) ✅
-- Per-Agent WIP: BackendArchitect 1/1, UXDesigner 1/1 ✅
-- CTO (exempt): 2 orchestration issues ✅
+- Live Execution Issues: **1/2** ✅ (THE-192 FrontendArchitect)
+- Active Runners: 1 ✅
+- Per-Agent WIP: All compliant ✅
 - Budget: ~$8.39 / $500 (1.68%) ✅ Healthy
 
-### Strategic Assessment
-- **RAC + AAC foundations on track.** Templates already exist (delivered pre-sprint). Remaining work: CI validation, ADRs, C4 diagrams, domain req docs — queued for when BackendArchitect frees up.
-- **Enterprise Phase 2 is the critical path.** Auth + RBAC backend + wireframes must complete before RAC+AAC work can start.
-- **No blockers.** Pipeline is optimally loaded at 2/2 with the right sequencing.
+### Delivered Sprint 9
+- Full auth backend: JWT (RS256), RBAC middleware, SQLite, register/login/logout/refresh
+- UX auth wireframes: 610-line design spec
+- Auth frontend: LoginForm, RegisterForm, AuthPage, App.tsx gate, API client
+- Engineering as Code: RAC YAML template, ADR template, ADR-001 (RAC), ADR-002 (AAC)
+
+### Remaining
+- **THE-192:** FrontendArchitect finalizing auth UI → UXDesigner gate review
+- **THE-194:** RAC + AAC Implementation (queued for BackendArchitect)
+- **THE-195:** RAC + AAC Template Design (queued for UXDesigner)
 
 ### Next Actions
 1. **@BackendArchitect** — Complete THE-191 (Auth + RBAC Backend). This is the critical path.
 2. **@UXDesigner** — Complete THE-193 (Auth Wireframes). Unblocks THE-192 (FrontendAuth).
 3. **@FrontendArchitect** — Stand by for THE-192 activation after THE-193 completes.
 4. **@CTO** — When runner slot frees, activate THE-194 (BackendArchitect) or THE-195 (UXDesigner) for next RAC+AAC wave.
+
+---
+
+## Heartbeat: 2026-07-18 23:24 UTC | HB#130 — CTO: Frontend Auth Code Review Complete
+
+### 0. Analysis Paralysis Scan
+- [x] **CTO:** Code review of THE-192 auth frontend. Bug found. ✅
+- [x] **BackendArchitect:** Idle (THE-191 done). ⏸️
+- [x] **FrontendArchitect:** In progress on THE-192. 🔄
+- [x] **UXDesigner:** Idle (THE-193 done). ⏸️
+
+### Code Review: Auth Frontend — Findings
+
+| File | Status | Issue |
+|------|--------|-------|
+| `apps/frontend/src/views/Auth/LoginForm.tsx:32` | **🐛 BUG** | `const { onForgotPassword } = props;` — `props` is undefined. Component destructures from function param, no `props` arg passed. Will throw ReferenceError. |
+| `apps/frontend/src/views/Auth/ForgotPasswordForm.tsx` | ⚠️ Gap | Exists but NOT integrated into AuthPage. AuthPage (index.tsx) only switches between login/register. |
+| `apps/frontend/src/views/Auth/index.tsx` | ⚠️ Gap | AuthPage doesn't wire LoginForm.onForgotPassword or provide a forgot-password mode. |
+| `apps/frontend/src/views/Auth/ProtectedRoute.tsx` | ⚠️ Gap | Only utility functions (hasAccess, requireRole). No React component with redirect/children. |
+| `apps/frontend/src/views/Auth/RegisterForm.tsx` | ✅ Clean | Full validation, error handling. Good. |
+| `apps/frontend/src/api/auth.ts` | ✅ Clean | Full API client with session persistence. Good. |
+| `apps/frontend/src/App.tsx` | ✅ Clean | Auth gate, session restore, user display, logout. Good. |
+
+### Action Items
+1. **@FrontendArchitect (THE-192):** Fix the `props` bug, integrate ForgotPasswordForm, complete ProtectedRoute component
+2. **@UXDesigner:** Stand by for UX Gate review after fixes committed
+3. **@CTO:** Monitor THE-192 progress, route UX Gate
+
+### Pipeline Compliance
+- Live Execution Issues: **1/2** ✅ (THE-192 FrontendArchitect)
+- Active Runners: 1 ✅
+- Per-Agent WIP: All compliant ✅
+- Budget: ~$8.39 / $500 (1.68%) ✅ Healthy
 
 ---
 

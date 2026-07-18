@@ -94,3 +94,19 @@
 - **Decision — UXDesigner activation:** Authorize UXDesigner to begin Sprint 7 Discovery Dashboard prep: wireframes, design tokens, component specs. No execution slot needed — design-only work.
 - **Decision — Pre-existing build errors:** Frontend ArtifactViewer (THE-122 legacy) has 18 TS errors. Not Sprint 6 scope. Defer to Sprint 7 technical debt cleanup.
 - **Pipeline:** 1/2 live execution issues (THE-158). Budget 1.56% ✅.
+
+---
+
+## 2026-07-18
+
+### HB#96 — Wave 1 Complete, Wave 2 Dispatching
+
+- **Decision:** THE-158 (Artifact Registry) marked `done` — all 5 structural gaps verified, tsc passes
+- **Decision:** Wave 2 dispatch order = THE-162 first (independent of THE-155), then THE-160/THE-161 after CTO completes THE-155 pattern
+- **Decision — THE-162 dispatched to BackendArchitect:** Unblocked by THE-158 completion. Purely wiring artifact detectors into the now-complete registry.
+- **Decision — THE-160/THE-161 queued:** Assigned to BackendArchitect as `blocked` (waiting for THE-155 `.arch.yaml` pattern)
+- **Decision — FrontendArchitect: FIX, not replace:** Root cause was disabled heartbeat + missing anti-analysis-paralysis guardrails. Added 4 override rules: (1) first tool must be productive, (2) 3-strike escalation, (3) no-context fallback, (4) commit-or-die. Heartbeat enabled (300s). Agent resumed paused→idle.
+- **Decision — UXDesigner activated:** Created THE-171 (Discovery Dashboard design prep). Scope: 3+ mockup screens, design tokens, user flow diagram.
+- **Decision — CTO focus:** CTO owns THE-155 pattern setting. Once complete, THE-160/THE-161 flow to BackendArchitect. No frontend distractions.
+- **Pipeline:** 0/2 live execution issues (CTO's THE-155 exempt from count). Budget $7.73/$500 = 1.55% ✅.
+- **Next:** Monitor CTO THE-155 progress, verify BackendArchitect picks up THE-162, review UXDesigner mockups.

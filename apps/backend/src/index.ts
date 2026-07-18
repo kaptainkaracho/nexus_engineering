@@ -7,6 +7,10 @@ import { dirname, resolve } from 'node:path'
 import { requirementsRoutes } from './routes/requirements'
 import { artifactRegistryRoutes } from './routes/artifactRegistryRoutes'
 import { scanRoutes } from './routes/scanRoutes'
+import { authRoutes } from './routes/auth'
+import { registerAuthHooks } from './auth/middleware'
+import { racRoutes } from './routes/racRoutes'
+import { aacRoutes } from './routes/aacRoutes'
 
 const server = fastify({ logger: true })
 
@@ -39,12 +43,18 @@ server.get('/health', async () => {
 
 const start = async () => {
   try {
+    // Register auth hooks
+    registerAuthHooks(server)
+
     // Register API routes
+    authRoutes(server)
     requirementsRoutes(server)
     await import('./routes/traceabilityLinks').then(module => module.traceabilityLinksRoutes(server))
     await import('./routes/graphRoutes').then(module => module.graphBuilderRoutes(server))
     await artifactRegistryRoutes(server)
     scanRoutes(server)
+    await racRoutes(server)
+    await aacRoutes(server)
 
     // SPA fallback: serve index.html for any non-API GET route in production.
     if (process.env.NODE_ENV === 'production' && existsSync(frontendDist)) {

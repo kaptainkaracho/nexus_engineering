@@ -5,3 +5,10 @@ dist/
 .DS_Store
 .turbo
 *.tsbuildinfo
+
+# Playwright E2E artifacts
+playwright-report/
+test-results/
+**/playwright-report/
+**/test-results/
+.playwright/

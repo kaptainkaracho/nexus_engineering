@@ -8,6 +8,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./requirements/loader": "./src/requirements/loader.ts",
+    "./requirements/schema": "./src/requirements/schema.ts",
     "./src/design-system/*": "./src/design-system/*"
   },
   "scripts": {

@@ -78,4 +78,13 @@ export type {
   SpecReference,
   SpecRequirement,
   Specification,
+  User,
+  Role,
+  Permission,
+  RefreshToken,
+  JwtPayload,
+  LoginRequest,
+  RegisterRequest,
+  AuthResponse,
+  RefreshRequest,
 } from './types';
