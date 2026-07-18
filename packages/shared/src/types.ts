@@ -117,6 +117,62 @@ export interface ScanOptions {
   minFileSize?: number;
   depthLimit?: number | null;
   includePatterns?: string[];
+  /**
+   * Compute a SHA-256 content hash for every scanned file.
+   * Expensive for large repositories (reads every byte) — defaults to false.
+   * Required only by callers doing change detection / dedupe.
+   */
+  computeHashes?: boolean;
+  /**
+   * Build the full hierarchical repository tree in the scan output.
+   * The tree is O(files) and heavy to serialize for large repos — defaults to false.
+   * Request it explicitly when the UI needs the tree in a single response.
+   */
+  includeTree?: boolean;
+}
+
+/** Standard pagination envelope returned by list endpoints. */
+export interface PaginationMeta {
+  limit: number;
+  offset: number;
+  total: number;
+  hasMore: boolean;
+}
+
+/** Generic paginated payload. */
+export interface Paginated<T> {
+  items: T[];
+  pagination: PaginationMeta;
+}
+
+/** Node in the hierarchical repository tree produced by a scan. */
+export interface RepositoryTreeNode {
+  id: string;
+  path: string;
+  name: string;
+  type: 'directory' | 'file';
+  size?: number;
+  extension?: string;
+  isBinary?: boolean;
+  children?: RepositoryTreeNode[];
+}
+
+/** Hierarchical representation of a repository, used for UI tree views. */
+export interface RepositoryTree {
+  root: RepositoryTreeNode;
+  nodesByPath: Record<string, RepositoryTreeNode>;
+}
+
+/** Paginated scan output returned by GET /api/scan. */
+export interface ScanOutput {
+  scanId: string;
+  fileMetadata: FileMetadata[];
+  totalFiles: number;
+  artifacts: DetectedArtifact[];
+  totalArtifacts: number;
+  scanReport: ScanReport;
+  tree?: RepositoryTree;
+  pagination: PaginationMeta;
 }
 
 export interface DetectedArtifact {
