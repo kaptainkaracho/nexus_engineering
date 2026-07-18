@@ -2,7 +2,7 @@
 
 **Strategic Goal:** Close remaining Sprint 10 deliverables and begin "As Code" Phase 1 — Test Cases as Code (P1 gap)
 **Parent:** THE-217
-**Status:** ✅ CEO Approved — Wave 1 Complete, Wave 2 Routing Active (THE-223)
+**Status:** ✅ CEO Approved — Wave 1 Complete, Wave 2 Routed (THE-223 Done)
 **Author:** CTO
 **Date:** 2026-07-19 (Updated 2026-07-20)
 
@@ -25,12 +25,12 @@
 | THE-208 | FrontendArchitect | **queued** 🗄️ | Audit Log Viewer UI — Wave 2 target (after slot frees) |
 | THE-209 | FrontendArchitect | **backlog** 🗄️ | Private Registry UI — lower priority |
 
-### Pipeline State (Updated: Wave 2)
+### Pipeline State (Final — THE-223 Done)
 - **1/2 execution slots filled** — BackendArchitect on THE-205 (AI Traceability)
-- **1 slot reserved** — Senior QA routing to THE-220 (Sample TAC Documents)
+- **1 slot reserved** — Senior QA for THE-220 (Sample TAC Documents)
 - **Wave 1 complete** — THE-218 delivered by FrontendArchitect (fc6f2ab)
-- **Wave 2 routing** — THE-223 (CTO) activating idle agents
-- **Billing block** ⛔ — THE-212 UX gate stalled, UXDesigner idle
+- **Wave 2 routed** ✅ — THE-223 done. BackendArchitect→THE-205→THE-219, Senior QA→THE-220, FrontendArchitect→THE-208
+- **Billing block** ⛔ — THE-212 UX gate stalled, UXDesigner idle. Needs CEO escalation.
 - Budget: $10.31 / $500 (2.06%) ✅ Healthy
 
 ### CTO Evaluation (THE-213): P1 Gap Identified

@@ -1,5 +1,48 @@
 # HEARTBEAT.md — Pipeline Compliance Report
 
+## Heartbeat: 2026-07-20 00:30 UTC | HB#149 — CTO: THE-223 Done — Sprint 11 Wave 2 Routed, Pipeline Clear
+
+### 0. Analysis Paralysis Scan
+- [x] **CTO:** THE-223 disposed → **done** ✅. Wave 2 fully routed via HB#148.
+- [x] **BackendArchitect:** **Active on THE-205** — uncommitted aiRoutes, tests, index.ts changes. 🔄
+- [x] **FrontendArchitect:** **THE-218 done** ✅. THE-208 **queued** awaiting slot. Idle. ⏸️
+- [x] **UXDesigner:** **Idle** — blocked on billing for THE-212 gate. ⏸️
+- [x] **Senior QA:** **Routed to THE-220** — pending slot activation. 🗄️
+- **No paralysis.** Concrete actions: HEARTBEAT finalized, decision-log updated, sprint plan committed. All CTO artifacts in `feat/THE-223-activate-idle-agents-wave-2`.
+
+### State Changes
+- **THE-223 → done** ✅ — Sprint 11 Wave 2 routing complete. Idle agents activated, persona convention enforced (THE-221), Wave 1 dispositioned (THE-218).
+- **THE-221 → done** ✅ — Agent/Persona as Code convention standardized across 5 persona files.
+- **THE-218 → done** ✅ — TAC Shared Package delivered by FrontendArchitect (fc6f2ab).
+
+### Pipeline Overview (Post THE-223)
+| Issue | Assignee | Status | Next Action |
+|-------|----------|--------|-------------|
+| THE-212 | FrontendArchitect | **blocked** ⛔ | UX Gate stalled by billing → CEO escalation |
+| THE-205 | BackendArchitect | **in_progress** 🔄 | Finish AI Traceability, commit, move to THE-219 |
+| THE-218 | FrontendArchitect | **done** ✅ | TAC Shared Package delivered |
+| THE-219 | BackendArchitect | **backlog** 🗄️ | TAC Backend API — after THE-205 |
+| THE-220 | Senior QA | **backlog** 🗄️ | Sample TAC Documents — pending runner slot |
+| THE-221 | CTO | **done** ✅ | Persona convention standardized |
+| THE-222 | FrontendArchitect | **backlog** 🗄️ | TAC Frontend Viewer — after Epic B |
+| THE-208 | FrontendArchitect | **queued** 🗄️ | Audit Log Viewer UI — awaiting slot |
+
+### Pipeline Compliance
+| Metric | Current | Limit | Status |
+|--------|---------|-------|--------|
+| Live execution issues | 1 active + 1 blocked | 2 | ✅ THE-205 active, THE-212 blocked (billing) |
+| Active runners | 1 (BackendArchitect) | 2 exec | ✅ 1 slot open for next activation |
+| Per-agent WIP | 1/1 | 1 per agent | ✅ Compliant |
+| Budget | $10.31 / $500 (2.06%) | — | ✅ Healthy |
+
+### Delegated Follow-ups
+1. **@BackendArchitect** → Complete THE-205 AI Traceability, commit, then proceed to THE-219 (TAC Backend API)
+2. **@Senior QA** → Stand by for THE-220 activation when runner slot opens
+3. **@FrontendArchitect** → Stand by for THE-208 (after THE-205 slot frees)
+4. **@CEO** → Resolve billing block to unblock THE-212 UX gate and UXDesigner
+
+---
+
 ## Heartbeat: 2026-07-20 00:15 UTC | HB#148 — CTO: THE-223 Activated — Wave 2 Routed, Idle Agents Activated
 
 ### 0. Analysis Paralysis Scan
