@@ -166,3 +166,114 @@ describe('RepositoryParser .arch.yaml support', () => {
     expect(result.documents[0].traceLinks!.length).toBeGreaterThan(0);
   });
 });
+
+describe('RepositoryParser ADR-*.md support', () => {
+  const MD_HAPPY = `---
+title: "Use Markdown ADRs with YAML Frontmatter for Architecture Decision Records"
+status: accepted
+date: 2026-07-01
+superseded_by: ADR-099
+---
+
+# Context
+
+The team needs a lightweight, version-controllable format for recording decisions.
+
+# Decision
+
+We adopt ADR-*.md files with YAML frontmatter.
+
+# Consequences
+
+- Decisions are co-located with code and reviewable in PRs.
+- No new tooling is required.
+`;
+
+  const MD_H2 = `---
+title: Second ADR
+status: proposed
+---
+
+## Context
+
+Background using H2 headings.
+
+## Decision
+
+Choose the H2 variant.
+
+## Consequences
+
+- One consequence.
+`;
+
+  beforeAll(async () => {
+    await fs.mkdir(TMP, { recursive: true });
+    await fs.writeFile(path.join(TMP, 'ADR-001-test.md'), MD_HAPPY, 'utf-8');
+    await fs.writeFile(path.join(TMP, 'ADR-002-test.md'), MD_H2, 'utf-8');
+  });
+
+  it('parses ADR-*.md frontmatter + H1 body sections into ArchitectureDecision', async () => {
+    const result = await repositoryParser.parse([fixture('ADR-001-test.md', MD_HAPPY)], TMP);
+    expect(result.errors).toHaveLength(0);
+    expect(result.documents).toHaveLength(1);
+
+    const doc = result.documents[0];
+    expect(doc.detectedType).toBe('adr');
+    expect(doc.metadata.title).toBe(
+      'Use Markdown ADRs with YAML Frontmatter for Architecture Decision Records'
+    );
+
+    const adr = doc.content as any;
+    expect(adr.title).toBe(
+      'Use Markdown ADRs with YAML Frontmatter for Architecture Decision Records'
+    );
+    expect(adr.status).toBe('accepted');
+    expect(adr.date).toBe('2026-07-01');
+    expect(adr.context).toContain('lightweight');
+    expect(adr.decision).toContain('YAML frontmatter');
+    expect(adr.consequences).toHaveLength(2);
+    expect(adr.consequences[0]).toContain('co-located with code');
+    expect(adr.supersededBy).toBe('ADR-099');
+
+    // superseded_by produces a trace link (source id is the ADR file name,
+    // which matches ADR-chain naming such as `superseded_by: ADR-099`).
+    expect(doc.traceLinks).toHaveLength(1);
+    expect(doc.traceLinks![0]).toMatchObject({
+      sourceId: 'ADR-001-test',
+      targetId: 'ADR-099',
+      relationshipType: 'tracesTo',
+    });
+  });
+
+  it('tolerates H2 section headings', async () => {
+    const result = await repositoryParser.parse([fixture('ADR-002-test.md', MD_H2)], TMP);
+    expect(result.errors).toHaveLength(0);
+    const adr = result.documents[0].content as any;
+    expect(adr.context).toContain('H2 headings');
+    expect(adr.decision).toContain('H2 variant');
+    expect(adr.consequences).toEqual(['One consequence.']);
+  });
+
+  it('parses the shipped ADR-001 sample (H1 sections)', async () => {
+    const adrPath = path.resolve(
+      __dirname,
+      '../../../../packages/shared/requirements/decisions/ADR-001-use-markdown-adrs.md'
+    );
+    const adrFile: SharedFileMetadata = {
+      filePath: adrPath,
+      relativePath: 'ADR-001-use-markdown-adrs.md',
+      size: 1000,
+      contentHash: 'hash',
+      contentType: 'text',
+      detectedType: 'adr',
+    };
+    const result = await repositoryParser.parse([adrFile], '.');
+    expect(result.errors).toHaveLength(0);
+    const adr = result.documents[0].content as any;
+    expect(adr.title).toContain('Markdown ADRs');
+    expect(adr.context).toContain('version-controllable');
+    expect(adr.decision).toContain('ADR-*.md files with YAML frontmatter');
+    expect(adr.consequences.length).toBeGreaterThan(0);
+  });
+});

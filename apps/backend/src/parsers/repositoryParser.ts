@@ -730,7 +730,10 @@ export class RepositoryParser {
     content: string
   ): ArchitectureDecision {
     const { frontmatter, body } = this.splitAdrMarkdown(content, filePath);
-    const sections = this.parseAdrMarkdownBody(body);
+    const hasFrontmatterTitle = Boolean(
+      typeof frontmatter.title === 'string' && frontmatter.title.trim()
+    );
+    const sections = this.parseAdrMarkdownBody(body, hasFrontmatterTitle);
 
     const title =
       (typeof frontmatter.title === 'string' && frontmatter.title.trim()) ||
@@ -811,34 +814,51 @@ export class RepositoryParser {
   }
 
   /**
-   * Parse the Markdown body of an ADR into its titled sections. Captures an
-   * optional leading `# Title` and the `## Context` / `## Decision` /
-   * `## Consequences` sections, tolerating case and extra whitespace.
+   * Parse the Markdown body of an ADR into its titled sections. Captures the
+   * `## Context` / `## Decision` / `## Consequences` sections (tolerating H1 or
+   * H2 markers and case). When the document has no frontmatter title, the first
+   * heading doubles as the document title (buildAdrMarkdownDecision prefers the
+   * frontmatter title when present, so section extraction is unaffected).
    */
-  private parseAdrMarkdownBody(body: string): {
+  private parseAdrMarkdownBody(
+    body: string,
+    hasFrontmatterTitle: boolean
+  ): {
     title?: string;
     context: string;
     decision: string;
     consequences: string;
   } {
+    const parts = body.split(/^#{1,2}\s+(.+?)\s*$/m);
     let title: string | undefined;
-    let remaining = body;
-
-    const h1Match = remaining.match(/^\s*#\s+(.+?)\s*$/m);
-    if (h1Match) {
-      title = h1Match[1].trim();
-      remaining = remaining.replace(h1Match[0], '');
-    }
-
-    const parts = remaining.split(/^##\s+(.+?)\s*$/m);
+    let titleAssigned = false;
     const sections: Record<string, string> = {};
 
     for (let i = 1; i < parts.length; i += 2) {
-      const heading = (parts[i] ?? '').trim().toLowerCase();
+      const heading = (parts[i] ?? '').trim();
       const sectionBody = (parts[i + 1] ?? '').trim();
-      if (heading.includes('context')) sections.context = sectionBody;
-      else if (heading.includes('decision')) sections.decision = sectionBody;
-      else if (heading.includes('consequences')) sections.consequences = sectionBody;
+      const lower = heading.toLowerCase();
+
+      // Without a frontmatter title, the first heading is the document title.
+      if (!hasFrontmatterTitle && !titleAssigned) {
+        title = heading;
+        titleAssigned = true;
+        continue;
+      }
+
+      if (lower.includes('context')) sections.context = sectionBody;
+      else if (lower.includes('decision')) sections.decision = sectionBody;
+      else if (lower.includes('consequences')) sections.consequences = sectionBody;
+      else if (!titleAssigned) {
+        title = heading;
+        titleAssigned = true;
+      }
+    }
+
+    // Prose before the first heading becomes the title when no heading exists.
+    const before = (parts[0] ?? '').trim();
+    if (before && !titleAssigned) {
+      title = before.split('\n')[0];
     }
 
     return {
@@ -850,13 +870,33 @@ export class RepositoryParser {
   }
 
   /**
-   * Split the Consequences section text into an array of non-empty paragraphs.
+   * Split the Consequences section text into an array of items. Markdown
+   * bullet lists (`-`/`*` items) become individual entries with their markers
+   * stripped; prose blocks are kept intact. Mirrors the list-array semantics
+   * of the `.arch.yaml` decision parser.
    */
   private splitAdrConsequences(text: string): string[] {
-    return text
+    const blocks = text
       .split(/\n\s*\n/)
-      .map((p) => p.trim())
+      .map((b) => b.trim())
       .filter(Boolean);
+
+    const out: string[] = [];
+    for (const block of blocks) {
+      const lines = block.split('\n');
+      const isList = lines.length > 0 && lines.every((l) => /^[-*]\s+/.test(l.trim()));
+
+      if (isList) {
+        for (const line of lines) {
+          const item = line.trim().replace(/^[-*]\s+/, '').trim();
+          if (item) out.push(item);
+        }
+      } else {
+        out.push(block);
+      }
+    }
+
+    return out;
   }
 }
 
