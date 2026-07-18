@@ -9,7 +9,7 @@
     "lint:fix": "pnpm -r lint -- --fix",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
-    "validate:requirements": "tsx scripts/validate-requirements.mts",
+    "validate:requirements": "node scripts/validate-requirements.js",
     "clean": "pnpm -r clean"
   },
   "dependencies": {
@@ -18,6 +18,8 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
+    "glob": "^10.4.0",
+    "js-yaml": "^4.1.0",
     "jsdom": "^29.1.1",
     "vitest": "^4.1.9"
   }
