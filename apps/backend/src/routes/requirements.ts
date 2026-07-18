@@ -1,7 +1,12 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import * as path from 'path'
 import * as fs from 'fs'
+import { fileURLToPath } from 'node:url'
+import { dirname } from 'node:path'
 import { validatedRequirementsLoader, type LoadResult } from '@nexus-engineering/shared/requirements/loader'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 /**
  * Map backend RequirementDocument to frontend artefact types
@@ -85,17 +90,19 @@ function mapArtefacts(documents: LoadResult[]): {
     }
 
     // Extract test cases from requirements that have verification criteria
-    for (const tv of ((req as any).testVerification || [])) {
-      testCases.push({
-        id: `tc-${result.document?.nexus?.metadata?.documentId}-${tv.id}`,
-        name: tv.name,
-        type: 'system',
-        description: tv.description,
-        testSteps: (tv.steps || []).map((s: any) => ({ stepNumber: s.number, action: s.action, expected: s.expected })),
-        expectedResult: tv.expectedResult || '',
-        status: 'ready',
-        automationStatus: (tv.automated ? 'automated' : 'manual'),
-      })
+    for (const req of (result.document?.requirements || [])) {
+      for (const tv of ((req as any).testVerification || [])) {
+        testCases.push({
+          id: `tc-${result.document?.nexus?.metadata?.documentId}-${tv.id}`,
+          name: tv.name,
+          type: 'system',
+          description: tv.description,
+          testSteps: (tv.steps || []).map((s: any) => ({ stepNumber: s.number, action: s.action, expected: s.expected })),
+          expectedResult: tv.expectedResult || '',
+          status: 'ready',
+          automationStatus: (tv.automated ? 'automated' : 'manual'),
+        })
+      }
     }
   }
 
@@ -122,7 +129,7 @@ export async function listRequirements (_: FastifyRequest, reply: FastifyReply) 
     for (const fp of filePaths) {
       try {
         const doc = await validatedRequirementsLoader.loadRequirementFile(fp)
-        if (doc?.requirements) allDocs.push(doc)
+        if ((doc as any)?.requirements) allDocs.push(doc)
       } catch { /* skip bad files */ }
     }
 
@@ -153,8 +160,8 @@ export async function getRequirement (request: FastifyRequest, reply: FastifyRep
     const filePaths = await validatedRequirementsLoader.findRequirementFiles(reqDir)
     for (const fp of filePaths) {
       const doc = await validatedRequirementsLoader.loadRequirementFile(fp)
-      if (doc?.requirements?.some((r: any) => r.id === id)) {
-        return reply.send({ requirement: { ...doc, id } })
+      if ((doc as any)?.requirements?.some((r: any) => r.id === id)) {
+        return reply.send({ requirement: { ...(doc as any), id } })
       }
     }
 
@@ -183,7 +190,7 @@ export async function getRequirementsByDomain (request: FastifyRequest, reply: F
 
     for (const fp of filePaths) {
       const doc = await validatedRequirementsLoader.loadRequirementFile(fp)
-      if (doc?.nexus?.metadata?.domain === domain || doc?.nexus?.metadata?.documentId?.toLowerCase().includes(domain.toLowerCase())) {
+      if ((doc as any)?.nexus?.metadata?.domain === domain || (doc as any)?.nexus?.metadata?.documentId?.toLowerCase().includes(domain.toLowerCase())) {
         matchingDocs.push({ document: doc, errors: new Map() })
       }
     }
