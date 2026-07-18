@@ -3,6 +3,7 @@ import { Button, Input, Card, Container, Stack, Grid, Nav } from '@nexus-enginee
 import { ArtifactViewer } from './views/ArtifactViewer';
 import { RepositoryFileTree } from './views/RepositoryTree';
 import { DiscoveryDashboard } from './views/DiscoveryDashboard';
+import { MultiRepoDashboard } from './views/MultiRepoDashboard';
 import { GraphBuilder } from './views/GraphBuilder';
 import { Templates } from './views/Templates';
 import { AuthPage } from './views/Auth';
@@ -24,6 +25,7 @@ type Section =
   | 'artefacts'
   | 'repository'
   | 'discovery'
+  | 'multi-repo'
   | 'graph'
   | 'templates'
   | 'admin'
@@ -37,6 +39,7 @@ const VALID_SECTIONS: Section[] = [
   'artefacts',
   'repository',
   'discovery',
+  'multi-repo',
   'graph',
   'templates',
   'admin',
@@ -152,6 +155,7 @@ function App() {
     { label: 'Artefacts', href: '#artefacts', active: activeSection === 'artefacts' },
     { label: 'Repository', href: '#repository', active: activeSection === 'repository' },
     { label: 'Discovery', href: '#discovery', active: activeSection === 'discovery' },
+    { label: 'Multi-Repo', href: '#multi-repo', active: activeSection === 'multi-repo' },
     { label: 'Graph Builder', href: '#graph', active: activeSection === 'graph' },
     { label: 'Templates', href: '#templates', active: activeSection === 'templates' },
     ...(isUserAdmin
@@ -212,6 +216,8 @@ function App() {
 
           <Container size="lg">{activeSection === 'discovery' ? (
             <DiscoveryDashboard />
+          ) : activeSection === 'multi-repo' ? (
+            <MultiRepoDashboard />
           ) : activeSection === 'repository' ? (
             <RepositoryFileTree />
           ) : activeSection === 'graph' ? (

@@ -378,6 +378,82 @@ export async function fetchTraceabilityGraph(): Promise<TraceabilityGraph> {
   }
 }
 
+// =========================================================
+// Multi-Repo Scanner — Trigger + Status + Per-Repo Artifacts
+// =========================================================
+
+export interface MultiRepoScanRequest {
+  repositoryPaths: string[]
+  scanMode?: 'parallel' | 'sequential'
+}
+
+export interface MultiRepoScanEntry {
+  repositoryPath: string
+  scanId: string
+  status: 'running' | 'completed' | 'failed'
+  filesFound?: number
+  artifactsDetected?: number
+  error?: string
+}
+
+export interface MultiRepoScanResponse {
+  sessionId: string
+  scans: MultiRepoScanEntry[]
+  totalFilesFound: number
+  totalArtifactsDetected: number
+  scanTimeMs: number
+  errors: Array<{ repositoryPath: string; message: string }>
+}
+
+export interface MultiRepoSession {
+  id: string
+  startedAt: string
+  completedAt?: string
+  scans: MultiRepoScanEntry[]
+  totalFilesFound: number
+  totalArtifactsDetected: number
+  scanTimeMs?: number
+  errors: Array<{ repositoryPath: string; message: string }>
+  status: 'running' | 'completed' | 'failed'
+}
+
+/** Trigger a multi-repository scan */
+export async function triggerMultiScan(
+  request: MultiRepoScanRequest,
+): Promise<MultiRepoScanResponse> {
+  const res = await fetch(`${BASE}/api/scan/multi`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(request),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  return res.json();
+}
+
+/** Poll the status of a multi-repo scan session */
+export async function fetchMultiScanStatus(sessionId: string): Promise<MultiRepoSession> {
+  const res = await fetch(`${BASE}/api/scan/multi/${encodeURIComponent(sessionId)}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  return res.json();
+}
+
+export interface ByRepositoryResponse {
+  data: DiscoveryArtifact[]
+  total: number
+  repositoryPath: string
+}
+
+/** Get artifacts filtered by repository path */
+export async function fetchArtifactsByRepository(
+  repositoryPath: string,
+): Promise<ByRepositoryResponse> {
+  const res = await fetch(
+    `${BASE}/api/artifacts/by-repository?path=${encodeURIComponent(repositoryPath)}`,
+  );
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  return res.json();
+}
+
 function emptySummary(): RegistrySummary {
   return {
     total: 0,

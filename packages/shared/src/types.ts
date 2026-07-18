@@ -413,3 +413,71 @@ export interface TeamMember {
   role: 'lead' | 'member'
   joinedAt: string
 }
+
+// --- Private Artifact Registries ---
+
+export type RegistryProviderType = 'npm' | 'pypi' | 'maven' | 'generic'
+
+export interface RegistryCredentials {
+  id: string
+  registryId: string
+  authType: 'none' | 'basic' | 'token' | 'env'
+  username: string | null
+  /** Encrypted at rest; decrypted in-memory only during scan */
+  secretValue: string | null
+  /** Environment variable name when authType is 'env' */
+  envVar: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ArtifactRegistry {
+  id: string
+  name: string
+  description: string | null
+  organizationId: string
+  visibility: 'private' | 'team' | 'organization'
+  allowedRoles: string[] | null
+  registryType: RegistryProviderType
+  url: string | null
+  enabled: boolean
+  createdBy: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface RegistryArtifact {
+  id: string
+  registryId: string
+  artifactId: string
+  addedBy: string
+  addedAt: string
+  metadata?: Record<string, unknown>
+}
+
+// --- Audit Log Types ---
+
+export type AuditAction = 'CREATE' | 'UPDATE' | 'DELETE' | 'LOGIN' | 'LOGOUT' | 'EXPORT' | 'READ' | 'ARCHIVE' | 'RESTORE'
+
+export interface AuditLog {
+  id: string
+  timestamp: string
+  userId: string
+  userEmail: string
+  action: AuditAction
+  resourceType: string
+  resourceId: string
+  details: string | null
+  ipAddress: string | null
+}
+
+export interface AuditLogFilter {
+  startDate?: string
+  endDate?: string
+  userId?: string
+  action?: AuditAction
+  resourceType?: string
+  search?: string
+  limit?: number
+  offset?: number
+}

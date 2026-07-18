@@ -1,6 +1,6 @@
 export { colors, typography, spacing } from './tokens';
 export { cn } from './utils';
-export { Button, Input, Card, Container, Stack, Grid, Nav, Badge } from './components';
+export { Button, Input, Card, Container, Stack, Grid, Nav, Badge, Alert } from './components';
 export type {
   ButtonProps,
   InputProps,
@@ -12,4 +12,6 @@ export type {
   NavItem,
   BadgeProps,
   BadgeVariant,
+  AlertProps,
+  AlertVariant,
 } from './components';

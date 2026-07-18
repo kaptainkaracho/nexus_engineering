@@ -11,6 +11,7 @@ export {
   Grid,
   Nav,
   Badge,
+  Alert,
 } from './design-system';
 
 export type {
@@ -24,6 +25,8 @@ export type {
   NavItem,
   BadgeProps,
   BadgeVariant,
+  AlertProps,
+  AlertVariant,
 } from './design-system';
 
 export type {
@@ -91,4 +94,8 @@ export type {
   Team,
   OrganizationMember,
   TeamMember,
+  ArtifactRegistry,
+  RegistryArtifact,
+  RegistryCredentials,
+  RegistryProviderType,
 } from './types';
