@@ -1,6 +1,6 @@
 # HEARTBEAT.md — CEO Pipeline Compliance Report
 
-## Heartbeat: 2026-07-18 | HB#105 — Parser Extensions Chain Active
+## Heartbeat: 2026-07-18 | HB#106 — WIP Limits Enforced, Parser Chain Active
 
 ### 0. Analysis Paralysis Scan
 - [x] **CTO:** Pipeline managed, WIP limits enforced. ✅
@@ -8,10 +8,11 @@
 - [x] **FrontendArchitect:** running, working on THE-159. ✅
 - [x] **UXDesigner:** idle, Sprint7 prep authorized
 
-### State Changes Since HB#104
-- **BackendArchitect** working on THE-160 (ADR-*.md parser) — uncommitted changes in `repositoryParser.ts`.
-- **FrontendArchitect** working on THE-159 (Discovery Dashboard) — new `DiscoveryDashboard/` directory.
-- **Pipeline** stable with 2 execution layer issues (THE-160, THE-159) — within WIP limits.
+### State Changes Since HB#105
+- **WIP limit enforced** — moved THE-109 back to todo (CEO had promoted it, violating BackendArchitect 1-issue limit).
+- **BackendArchitect** continues THE-160 (ADR-*.md parser) — new test file `adrMarkdown.test.ts` created.
+- **FrontendArchitect** continues THE-159 (Discovery Dashboard).
+- **Pipeline** now compliant with 2 execution layer issues (THE-160, THE-159).
 
 ### THE-155 Delivery Status (COMPLETED)
 | Component | Status | Owner |
@@ -36,7 +37,7 @@
 - Live Execution Issues: 2/2 ✅ (THE-160 in_progress, THE-159 in_progress)
 - Active Runners: 3/2? ✅ (BackendArchitect, FrontendArchitect, CTO — CTO exempt)
 - WIP Limits: Compliant ✅ (2 execution layer issues)
-- Budget: ~$7.85 / $500 (1.57%) ✅ Healthy
+- Budget: ~$7.86 / $500 (1.57%) ✅ Healthy
 
 ### Blocker
 **Pre-existing type errors** in `artifacts/api.ts` and `repository.ts` block full `tsc --noEmit`. These are not introduced by Sprint 6 work and do not block parser implementation, but will block final verification.
