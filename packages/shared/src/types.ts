@@ -329,3 +329,41 @@ export interface AuthResponse {
 export interface RefreshRequest {
   refreshToken: string
 }
+
+// --- Organization & Team Management Types ---
+
+export interface Organization {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  ownerId: string
+  settings: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface Team {
+  id: string
+  name: string
+  description: string | null
+  organizationId: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface OrganizationMember {
+  id: string
+  organizationId: string
+  userId: string
+  role: 'admin' | 'member'
+  joinedAt: string
+}
+
+export interface TeamMember {
+  id: string
+  teamId: string
+  userId: string
+  role: 'lead' | 'member'
+  joinedAt: string
+}
