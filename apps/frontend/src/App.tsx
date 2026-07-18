@@ -6,6 +6,9 @@ import { DiscoveryDashboard } from './views/DiscoveryDashboard';
 import { GraphBuilder } from './views/GraphBuilder';
 import { Templates } from './views/Templates';
 import { AuthPage } from './views/Auth';
+import { ProtectedLayout, isAdmin } from './views/Auth/ProtectedRoute';
+import { AdminDashboard } from './views/AdminDashboard';
+import { RoleManagement } from './views/RoleManagement';
 import {
   getCurrentSession,
   clearSession,
@@ -22,7 +25,9 @@ type Section =
   | 'repository'
   | 'discovery'
   | 'graph'
-  | 'templates';
+  | 'templates'
+  | 'admin'
+  | 'roles';
 
 const VALID_SECTIONS: Section[] = [
   'overview',
@@ -34,6 +39,8 @@ const VALID_SECTIONS: Section[] = [
   'discovery',
   'graph',
   'templates',
+  'admin',
+  'roles',
 ];
 
 interface RouteState {
@@ -135,6 +142,8 @@ function App() {
     window.location.hash = 'overview';
   }, []);
 
+  const isUserAdmin = isAdmin();
+
   const navItems = [
     { label: 'Overview', href: '#overview', active: activeSection === 'overview' },
     { label: 'Buttons', href: '#buttons', active: activeSection === 'buttons' },
@@ -145,6 +154,12 @@ function App() {
     { label: 'Discovery', href: '#discovery', active: activeSection === 'discovery' },
     { label: 'Graph Builder', href: '#graph', active: activeSection === 'graph' },
     { label: 'Templates', href: '#templates', active: activeSection === 'templates' },
+    ...(isUserAdmin
+      ? [
+          { label: 'Organizations', href: '#admin', active: activeSection === 'admin' },
+          { label: 'Roles', href: '#roles', active: activeSection === 'roles' },
+        ]
+      : []),
   ];
 
   if (!authReady) {
@@ -203,6 +218,14 @@ function App() {
             <GraphBuilder selectedId={deepLinkArtifact} />
           ) : activeSection === 'templates' ? (
             <Templates />
+          ) : activeSection === 'admin' ? (
+            <ProtectedLayout allowedRoles={['admin']}>
+              <AdminDashboard />
+            </ProtectedLayout>
+          ) : activeSection === 'roles' ? (
+            <ProtectedLayout allowedRoles={['admin']}>
+              <RoleManagement />
+            </ProtectedLayout>
           ) : (
            <>
              <Nav
