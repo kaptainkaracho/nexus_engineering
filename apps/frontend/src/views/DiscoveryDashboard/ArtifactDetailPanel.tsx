@@ -105,6 +105,14 @@ export function ArtifactDetailPanel({
               View in Repository Tree &rarr;
             </a>
 
+            <a
+              href={`#graph?artifact=${encodeURIComponent(artifact.id)}`}
+              className="inline-flex items-center gap-1 text-sm font-medium text-primary-600 transition-colors hover:text-primary-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+              aria-label={`Open ${artifactName(artifact)} in Graph Builder`}
+            >
+              View in Graph Builder &rarr;
+            </a>
+
             {artifact.errors.length > 0 && (
               <MetaGroup title={`Error history (${artifact.errors.length})`}>
                 <ul className="flex flex-col gap-2">

@@ -316,6 +316,68 @@ export async function reparseArtifact(id: string): Promise<DiscoveryArtifact> {
   return json.data;
 }
 
+// =========================================================
+// Graph Builder — Traceability Graph API
+// =========================================================
+
+export type GraphNodeType =
+  | 'requirement'
+  | 'architectureModel'
+  | 'softwareComponent'
+  | 'testCase';
+
+export type TraceConfidence = 'high' | 'medium' | 'low';
+
+export interface GraphNode {
+  id: string;
+  type: GraphNodeType;
+  title?: string;
+  name?: string;
+}
+
+export interface GraphEdge {
+  sourceId: string;
+  targetId: string;
+  relationshipType: string;
+  confidence: TraceConfidence;
+  description?: string;
+}
+
+export interface TraceabilityGraph {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+  totalNodes: number;
+  totalEdges: number;
+}
+
+export interface TraceabilityGraphResponse {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+  totalNodes: number;
+  totalEdges: number;
+}
+
+function emptyGraph(): TraceabilityGraph {
+  return { nodes: [], edges: [], totalNodes: 0, totalEdges: 0 };
+}
+
+/** Fetch the full traceability graph (nodes = artifacts, edges = trace links) */
+export async function fetchTraceabilityGraph(): Promise<TraceabilityGraph> {
+  try {
+    const res = await fetch(`${BASE}/api/graph/traceability`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    const json = (await res.json()) as TraceabilityGraphResponse;
+    return {
+      nodes: json.nodes ?? [],
+      edges: json.edges ?? [],
+      totalNodes: json.totalNodes ?? json.nodes?.length ?? 0,
+      totalEdges: json.totalEdges ?? json.edges?.length ?? 0,
+    };
+  } catch {
+    return emptyGraph();
+  }
+}
+
 function emptySummary(): RegistrySummary {
   return {
     total: 0,

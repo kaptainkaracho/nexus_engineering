@@ -3,12 +3,48 @@ import { Button, Input, Card, Container, Stack, Grid, Nav } from '@nexus-enginee
 import { ArtifactViewer } from './views/ArtifactViewer';
 import { RepositoryFileTree } from './views/RepositoryTree';
 import { DiscoveryDashboard } from './views/DiscoveryDashboard';
+import { GraphBuilder } from './views/GraphBuilder';
 
-type Section = 'overview' | 'buttons' | 'forms' | 'cards' | 'artefacts' | 'repository' | 'discovery';
+type Section =
+  | 'overview'
+  | 'buttons'
+  | 'forms'
+  | 'cards'
+  | 'artefacts'
+  | 'repository'
+  | 'discovery'
+  | 'graph';
+
+const VALID_SECTIONS: Section[] = [
+  'overview',
+  'buttons',
+  'forms',
+  'cards',
+  'artefacts',
+  'repository',
+  'discovery',
+  'graph',
+];
+
+interface RouteState {
+  section: Section;
+  artifact: string | null;
+}
+
+function parseHash(hash: string): RouteState {
+  const raw = hash.replace(/^#/, '');
+  const [sectionPart, queryPart] = raw.split('?');
+  const section = (VALID_SECTIONS.includes(sectionPart as Section)
+    ? sectionPart
+    : 'overview') as Section;
+  const artifact = queryPart ? new URLSearchParams(queryPart).get('artifact') : null;
+  return { section, artifact };
+}
 
 function App() {
   const [dark, setDark] = useState(false);
   const [activeSection, setActiveSection] = useState<Section>('overview');
+  const [deepLinkArtifact, setDeepLinkArtifact] = useState<string | null>(null);
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -42,12 +78,12 @@ function App() {
 
   // Sync activeSection with URL hash on load and hash changes
   useEffect(() => {
-    const hashToSection = (hash: string): Section => {
-      const section = hash.replace('#', '') as Section;
-      return ['overview', 'buttons', 'forms', 'cards', 'artefacts', 'repository', 'discovery'].includes(section) ? section : 'overview';
+    const onHashChange = () => {
+      const route = parseHash(window.location.hash);
+      setActiveSection(route.section);
+      setDeepLinkArtifact(route.artifact);
     };
-    setActiveSection(hashToSection(window.location.hash));
-    const onHashChange = () => setActiveSection(hashToSection(window.location.hash));
+    onHashChange();
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
@@ -60,6 +96,7 @@ function App() {
     { label: 'Artefacts', href: '#artefacts', active: activeSection === 'artefacts' },
     { label: 'Repository', href: '#repository', active: activeSection === 'repository' },
     { label: 'Discovery', href: '#discovery', active: activeSection === 'discovery' },
+    { label: 'Graph Builder', href: '#graph', active: activeSection === 'graph' },
   ];
 
   return (
@@ -93,6 +130,8 @@ function App() {
             <DiscoveryDashboard />
           ) : activeSection === 'repository' ? (
             <RepositoryFileTree />
+          ) : activeSection === 'graph' ? (
+            <GraphBuilder selectedId={deepLinkArtifact} />
           ) : (
            <>
              <Nav

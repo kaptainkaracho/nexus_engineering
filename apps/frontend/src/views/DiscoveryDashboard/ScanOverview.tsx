@@ -194,6 +194,26 @@ export function ScanOverview({
           </ul>
         </Stack>
       </Card>
+
+      <Card padding="lg" className="mt-6">
+        <Stack gap={3}>
+          <h3 className="text-sm font-medium text-text-tertiary">Explore</h3>
+          <div className="flex flex-wrap gap-3">
+            <a
+              href="#repository"
+              className="inline-flex items-center gap-1 text-sm font-medium text-primary-600 transition-colors hover:text-primary-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+            >
+              Repository Tree &rarr;
+            </a>
+            <a
+              href="#graph"
+              className="inline-flex items-center gap-1 text-sm font-medium text-primary-600 transition-colors hover:text-primary-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+            >
+              Graph Builder &rarr;
+            </a>
+          </div>
+        </Stack>
+      </Card>
     </section>
   );
 }
