@@ -4,6 +4,95 @@
 
 Nexus Engineering is a modern web application for visualizing and navigating engineering artifacts managed as code in Git repositories. The system automatically discovers, analyzes, and links engineering artifacts to provide comprehensive traceability.
 
+## System Context Diagram
+
+```mermaid
+graph TB
+    User[Engineer] --> Frontend[Frontend App]
+    Frontend --> Backend[Backend API]
+    Backend --> Scanner[Repository Scanner]
+    Backend --> Parser[Artifact Parser]
+    Backend --> GraphBuilder[Graph Builder]
+    Scanner --> Repository[(Git Repository)]
+    Parser --> Artifacts[(Artifact Registry)]
+    GraphBuilder --> TraceLinks[(Trace Links)]
+    GraphBuilder --> Artifacts
+    Frontend --> |React + Vite| User
+    Backend --> |Fastify 5| Frontend
+```
+
+## Container Diagram
+
+```mermaid
+graph TB
+    subgraph Frontend["Frontend (React 19 + Vite 6)"]
+        Dashboard[Discovery Dashboard]
+        Tree[Repository Tree]
+        Viewer[Artifact Viewer]
+        GraphViz[Graph Builder]
+    end
+    
+    subgraph Backend["Backend (Fastify 5 + TypeScript)"]
+        Routes[API Routes]
+        Services[Business Logic]
+        Scanners[Scanners]
+        Parsers[Parsers]
+    end
+    
+    subgraph Shared["Shared Package"]
+        Types[TypeScript Types]
+        Validation[Schema Validation]
+        DesignSystem[Design System]
+    end
+    
+    subgraph Storage["Storage"]
+        SQLite[(SQLite)]
+        FileSystem[(File System)]
+    end
+    
+    Dashboard --> Routes
+    Tree --> Routes
+    Viewer --> Routes
+    GraphViz --> Routes
+    Routes --> Services
+    Services --> Scanners
+    Services --> Parsers
+    Scanners --> FileSystem
+    Parsers --> SQLite
+    Services --> SQLite
+    Frontend --> Shared
+    Backend --> Shared
+```
+
+## Data Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant FE as Frontend
+    participant BE as Backend
+    participant S as Scanner
+    participant P as Parser
+    participant DB as Database
+    
+    U->>FE: Trigger Scan
+    FE->>BE: POST /api/scan
+    BE->>S: Scan Repository
+    S-->>BE: FileMetadata[]
+    BE->>P: Parse Artifacts
+    P-->>BE: Artifacts + TraceLinks
+    BE->>DB: Store Results
+    BE-->>FE: ScanOutput
+    FE-->>U: Display Dashboard
+    
+    U->>FE: View Graph
+    FE->>BE: GET /api/graph/traceability
+    BE->>DB: Query TraceLinks
+    DB-->>BE: Graph Data
+    BE-->>FE: Nodes + Edges
+    FE-->>U: Render Graph
+```
+
 ## System Components
 
 ### 1. Repository Scanner Foundation
@@ -71,16 +160,105 @@ The scanner implements a recursive directory walker with:
 - Depth limit: configurable (default: unlimited)
 - Pattern matching: glob-style include/exclude patterns
 
+## Component Diagram
+
+```mermaid
+graph LR
+    subgraph Frontend Components
+        DD[Discovery Dashboard]
+        RT[Repository Tree]
+        AV[Artifact Viewer]
+        GB[Graph Builder]
+    end
+    
+    subgraph Backend Components
+        SR[Scan Routes]
+        AR[Artifact Routes]
+        TR[TraceLink Routes]
+        RR[Requirements Routes]
+        GR[Graph Routes]
+    end
+    
+    subgraph Core Services
+        Scanner[Repository Scanner]
+        Parser[Artifact Parser]
+        Registry[Artifact Registry]
+        TraceStore[TraceLink Store]
+        GraphRepo[Graph Repository]
+    end
+    
+    DD --> SR
+    RT --> SR
+    AV --> AR
+    GB --> GR
+    SR --> Scanner
+    AR --> Registry
+    TR --> TraceStore
+    GR --> GraphRepo
+    Scanner --> Parser
+    Parser --> Registry
+    Parser --> TraceStore
+```
+
+## Deployment Architecture
+
+```mermaid
+graph TB
+    subgraph GitHub
+        Repo[GitHub Repository]
+        Actions[GitHub Actions]
+    end
+    
+    subgraph Railway
+        Preview[Preview Environment]
+        Production[Production Environment]
+    end
+    
+    subgraph Services
+        FE[Frontend Service]
+        BE[Backend Service]
+    end
+    
+    Repo --> Actions
+    Actions --> |PR| Preview
+    Actions --> |Main Push| Production
+    Preview --> FE
+    Preview --> BE
+    Production --> FE
+    Production --> BE
+```
+
 ## Code Structure
 
 ```
-apps/backend/src/scanners/
-├── repositoryScanner.ts   # Main scanner implementation
-├── repositoryScanner.test.ts  # Unit tests
-└── index.ts               # Module exports
-
-packages/shared/src/types.ts
-└── interfaces for Document, ScanResult, FileMetadata, etc.
+nexus/
+├── apps/
+│   ├── backend/
+│   │   └── src/
+│   │       ├── routes/           # API route handlers
+│   │       ├── scanners/         # Repository scanning
+│   │       ├── parsers/          # Artifact parsing
+│   │       ├── graphBuilder/     # Graph construction
+│   │       ├── artifacts/        # Artifact registry
+│   │       └── traceabilityLinks/ # Trace link management
+│   └── frontend/
+│       └── src/
+│           ├── views/            # Page components
+│           │   ├── DiscoveryDashboard/
+│           │   ├── RepositoryTree/
+│           │   ├── ArtifactViewer/
+│           │   └── GraphBuilder/
+│           ├── components/       # Shared UI components
+│           └── api/              # API client
+├── packages/
+│   ├── shared/                   # Shared types and utilities
+│   │   └── src/
+│   │       ├── types.ts          # Core data models
+│   │       ├── requirements/     # Requirements loader
+│   │       ├── validation/       # Schema validation
+│   │       └── design-system/    # UI components
+│   └── eslint-config/            # Shared ESLint config
+└── docs/                         # Documentation
 ```
 
 ## Usage Examples
