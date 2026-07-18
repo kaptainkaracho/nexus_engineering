@@ -3,6 +3,7 @@ import type { Organization, Team } from '@nexus-engineering/shared'
 import { orgRepository } from '../organizations/repository'
 import { authenticate, requirePermission } from '../auth/middleware'
 import { getOrgDatabase } from '../organizations/database'
+import { logAuditAction } from '../auditLog/middleware'
 
 // --- Organization Handlers ---
 
@@ -60,6 +61,7 @@ export async function createOrganization(request: FastifyRequest, reply: Fastify
 
     await orgRepository.addOrganizationMember(organization.id, request.user!.sub, 'admin')
 
+    logAuditAction(request, 'CREATE', 'organization', organization.id)
     return reply.status(201).send(organization)
   } catch (error) {
     reply.log.error(error as Error)
@@ -92,6 +94,7 @@ export async function updateOrganization(request: FastifyRequest, reply: Fastify
       return reply.status(404).send({ error: 'Organization not found' })
     }
 
+    logAuditAction(request, 'UPDATE', 'organization', id, JSON.stringify(Object.keys(updates)))
     return reply.send(updated)
   } catch (error) {
     reply.log.error(error as Error)
@@ -112,6 +115,7 @@ export async function deleteOrganization(request: FastifyRequest, reply: Fastify
       return reply.status(404).send({ error: 'Organization not found' })
     }
 
+    logAuditAction(request, 'DELETE', 'organization', id)
     return reply.send({ message: `Organization ${id} deleted successfully` })
   } catch (error) {
     reply.log.error(error as Error)
@@ -162,6 +166,7 @@ export async function addOrganizationMember(request: FastifyRequest, reply: Fast
     }
 
     const member = await orgRepository.addOrganizationMember(id, body.userId, body.role || 'member')
+    logAuditAction(request, 'CREATE', 'organizationMember', `${id}:${body.userId}`)
     return reply.status(201).send(member)
   } catch (error) {
     reply.log.error(error as Error)
@@ -187,6 +192,7 @@ export async function updateOrganizationMember(request: FastifyRequest, reply: F
       return reply.status(404).send({ error: 'Organization member not found' })
     }
 
+    logAuditAction(request, 'UPDATE', 'organizationMember', `${id}:${userId}`, `role=${body.role}`)
     return reply.send(updated)
   } catch (error) {
     reply.log.error(error as Error)
@@ -207,6 +213,7 @@ export async function removeOrganizationMember(request: FastifyRequest, reply: F
       return reply.status(404).send({ error: 'Organization member not found' })
     }
 
+    logAuditAction(request, 'DELETE', 'organizationMember', `${id}:${userId}`)
     return reply.send({ message: 'Member removed from organization successfully' })
   } catch (error) {
     reply.log.error(error as Error)
@@ -272,6 +279,7 @@ export async function createTeam(request: FastifyRequest, reply: FastifyReply) {
     }
 
     const team = await orgRepository.createTeam(orgId, body)
+    logAuditAction(request, 'CREATE', 'team', team.id, `orgId=${orgId}`)
     return reply.status(201).send(team)
   } catch (error) {
     reply.log.error(error as Error)
@@ -293,6 +301,7 @@ export async function updateTeam(request: FastifyRequest, reply: FastifyReply) {
       return reply.status(404).send({ error: 'Team not found' })
     }
 
+    logAuditAction(request, 'UPDATE', 'team', id, JSON.stringify(Object.keys(updates)))
     return reply.send(updated)
   } catch (error) {
     reply.log.error(error as Error)
@@ -313,6 +322,7 @@ export async function deleteTeam(request: FastifyRequest, reply: FastifyReply) {
       return reply.status(404).send({ error: 'Team not found' })
     }
 
+    logAuditAction(request, 'DELETE', 'team', id)
     return reply.send({ message: `Team ${id} deleted successfully` })
   } catch (error) {
     reply.log.error(error as Error)
@@ -363,6 +373,7 @@ export async function addTeamMember(request: FastifyRequest, reply: FastifyReply
     }
 
     const member = await orgRepository.addTeamMember(id, body.userId, body.role || 'member')
+    logAuditAction(request, 'CREATE', 'teamMember', `${id}:${body.userId}`)
     return reply.status(201).send(member)
   } catch (error) {
     reply.log.error(error as Error)
@@ -388,6 +399,7 @@ export async function updateTeamMember(request: FastifyRequest, reply: FastifyRe
       return reply.status(404).send({ error: 'Team member not found' })
     }
 
+    logAuditAction(request, 'UPDATE', 'teamMember', `${id}:${userId}`, `role=${body.role}`)
     return reply.send(updated)
   } catch (error) {
     reply.log.error(error as Error)
@@ -408,6 +420,7 @@ export async function removeTeamMember(request: FastifyRequest, reply: FastifyRe
       return reply.status(404).send({ error: 'Team member not found' })
     }
 
+    logAuditAction(request, 'DELETE', 'teamMember', `${id}:${userId}`)
     return reply.send({ message: 'Member removed from team successfully' })
   } catch (error) {
     reply.log.error(error as Error)

@@ -1,4 +1,4 @@
-import type { Organization, Team, OrganizationMember, TeamMember } from '@nexus-engineering/shared'
+import type { Organization, Team, OrganizationMember, TeamMember, ArtifactRegistry, RegistryArtifact, RegistryCredentials } from '@nexus-engineering/shared'
 import { getOrgDatabase } from './database'
 
 let storeInstance: OrgStore | null = null
@@ -33,6 +33,24 @@ export interface OrgStore {
   listTeamMembers(teamId: string): TeamMember[]
   updateTeamMember(teamId: string, userId: string, role: string): TeamMember | undefined
   deleteTeamMember(teamId: string, userId: string): boolean
+
+  // Registries
+  insertRegistry(registry: ArtifactRegistry): ArtifactRegistry
+  findRegistryById(id: string): ArtifactRegistry | undefined
+  listRegistriesByOrganization(organizationId: string): ArtifactRegistry[]
+  updateRegistry(id: string, updates: Partial<ArtifactRegistry>): ArtifactRegistry | undefined
+  deleteRegistry(id: string): boolean
+
+  // Registry Artifacts
+  insertRegistryArtifact(ra: RegistryArtifact): RegistryArtifact
+  findRegistryArtifact(registryId: string, artifactId: string): RegistryArtifact | undefined
+  listRegistryArtifacts(registryId: string): RegistryArtifact[]
+  deleteRegistryArtifact(registryId: string, artifactId: string): boolean
+
+  // Registry Credentials
+  upsertRegistryCredentials(creds: RegistryCredentials): RegistryCredentials
+  findRegistryCredentials(registryId: string): RegistryCredentials | undefined
+  deleteRegistryCredentials(registryId: string): boolean
 }
 
 class SQLiteOrgStore implements OrgStore {
@@ -129,6 +147,57 @@ class SQLiteOrgStore implements OrgStore {
   deleteTeamMember(teamId: string, userId: string): boolean {
     return this.database.deleteTeamMember(teamId, userId)
   }
+
+  // Registries
+  insertRegistry(registry: ArtifactRegistry): ArtifactRegistry {
+    return this.database.insertRegistry(registry)
+  }
+
+  findRegistryById(id: string): ArtifactRegistry | undefined {
+    return this.database.findRegistryById(id)
+  }
+
+  listRegistriesByOrganization(organizationId: string): ArtifactRegistry[] {
+    return this.database.listRegistriesByOrganization(organizationId)
+  }
+
+  updateRegistry(id: string, updates: Partial<ArtifactRegistry>): ArtifactRegistry | undefined {
+    return this.database.updateRegistry(id, updates)
+  }
+
+  deleteRegistry(id: string): boolean {
+    return this.database.deleteRegistry(id)
+  }
+
+  // Registry Artifacts
+  insertRegistryArtifact(ra: RegistryArtifact): RegistryArtifact {
+    return this.database.insertRegistryArtifact(ra)
+  }
+
+  findRegistryArtifact(registryId: string, artifactId: string): RegistryArtifact | undefined {
+    return this.database.findRegistryArtifact(registryId, artifactId)
+  }
+
+  listRegistryArtifacts(registryId: string): RegistryArtifact[] {
+    return this.database.listRegistryArtifacts(registryId)
+  }
+
+  deleteRegistryArtifact(registryId: string, artifactId: string): boolean {
+    return this.database.deleteRegistryArtifact(registryId, artifactId)
+  }
+
+  // Registry Credentials
+  upsertRegistryCredentials(creds: RegistryCredentials): RegistryCredentials {
+    return this.database.upsertRegistryCredentials(creds)
+  }
+
+  findRegistryCredentials(registryId: string): RegistryCredentials | undefined {
+    return this.database.findRegistryCredentials(registryId)
+  }
+
+  deleteRegistryCredentials(registryId: string): boolean {
+    return this.database.deleteRegistryCredentials(registryId)
+  }
 }
 
 export function getOrgStore(): OrgStore {
@@ -136,4 +205,8 @@ export function getOrgStore(): OrgStore {
     storeInstance = new SQLiteOrgStore()
   }
   return storeInstance
+}
+
+export function resetOrgStore(): void {
+  storeInstance = null
 }

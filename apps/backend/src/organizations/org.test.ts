@@ -1,6 +1,13 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { artifactRegistry } from '../artifacts/repository'
 import { OrgDatabase, getOrgDatabase, resetOrgDatabase } from './database'
+import { resetOrgStore } from './store'
 import { orgRepository } from './repository'
+
+function resetAll() {
+  resetOrgDatabase()
+  resetOrgStore()
+}
 
 function freshDb(): OrgDatabase {
   const db = new OrgDatabase(':memory:')
@@ -10,7 +17,7 @@ function freshDb(): OrgDatabase {
 
 describe('OrgDatabase', () => {
   afterEach(() => {
-    resetOrgDatabase()
+    resetAll()
   })
 
   it('creates and finds an organization', () => {
@@ -165,12 +172,12 @@ describe('OrgDatabase', () => {
 
 describe('OrgRepository', () => {
   beforeEach(() => {
-    resetOrgDatabase()
+    resetAll()
     getOrgDatabase(':memory:')
   })
 
   afterEach(() => {
-    resetOrgDatabase()
+    resetAll()
   })
 
   it('creates and retrieves an organization', async () => {
@@ -272,5 +279,455 @@ describe('OrgRepository', () => {
 
     expect(await orgRepository.removeTeamMember(team.id, 'user-2')).toBe(true)
     expect(await orgRepository.listTeamMembers(team.id)).toHaveLength(0)
+  })
+})
+
+describe('Registry Database', () => {
+  afterEach(() => {
+    resetAll()
+  })
+
+  it('creates and finds a registry with extended fields', () => {
+    const db = freshDb()
+    const org = db.insertOrganization({
+      id: 'org-1', name: 'Org', slug: 'org',
+      description: null, ownerId: 'user-1', settings: null,
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    })
+
+    const reg = db.insertRegistry({
+      id: 'reg-1',
+      name: 'npm Registry',
+      description: 'Private npm packages',
+      organizationId: org.id,
+      visibility: 'private',
+      allowedRoles: null,
+      registryType: 'npm',
+      url: 'https://npm.mycompany.com',
+      enabled: true,
+      createdBy: 'user-1',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    })
+    expect(reg.name).toBe('npm Registry')
+    expect(reg.visibility).toBe('private')
+    expect(reg.registryType).toBe('npm')
+    expect(reg.url).toBe('https://npm.mycompany.com')
+    expect(reg.enabled).toBe(true)
+
+    const found = db.findRegistryById('reg-1')
+    expect(found?.name).toBe('npm Registry')
+    expect(found?.organizationId).toBe('org-1')
+    expect(found?.registryType).toBe('npm')
+    expect(found?.url).toBe('https://npm.mycompany.com')
+    expect(found?.enabled).toBe(true)
+    db.close()
+  })
+
+  it('lists registries by organization with registry type', () => {
+    const db = freshDb()
+    db.insertOrganization({
+      id: 'org-1', name: 'Org', slug: 'org',
+      description: null, ownerId: 'user-1', settings: null,
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    })
+
+    db.insertRegistry({
+      id: 'reg-1', name: 'npm Registry', description: null,
+      organizationId: 'org-1', visibility: 'private', allowedRoles: null,
+      registryType: 'npm', url: 'https://npm.example.com', enabled: true,
+      createdBy: 'user-1', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    })
+    db.insertRegistry({
+      id: 'reg-2', name: 'PyPI Registry', description: null,
+      organizationId: 'org-1', visibility: 'team', allowedRoles: ['admin'],
+      registryType: 'pypi', url: 'https://pypi.mycompany.com', enabled: false,
+      createdBy: 'user-1', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    })
+
+    const registries = db.listRegistriesByOrganization('org-1')
+    expect(registries.length).toBe(2)
+    const npm = registries.find(r => r.registryType === 'npm')
+    const pypi = registries.find(r => r.registryType === 'pypi')
+    expect(npm?.enabled).toBe(true)
+    expect(pypi?.enabled).toBe(false)
+    expect(pypi?.allowedRoles).toEqual(['admin'])
+    db.close()
+  })
+
+  it('updates a registry including type and URL', () => {
+    const db = freshDb()
+    db.insertOrganization({
+      id: 'org-1', name: 'Org', slug: 'org',
+      description: null, ownerId: 'user-1', settings: null,
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    })
+    db.insertRegistry({
+      id: 'reg-1', name: 'Old Name', description: 'Old desc',
+      organizationId: 'org-1', visibility: 'private', allowedRoles: null,
+      registryType: 'generic', url: null, enabled: true,
+      createdBy: 'user-1', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    })
+
+    const updated = db.updateRegistry('reg-1', {
+      name: 'New Name',
+      visibility: 'organization',
+      registryType: 'maven',
+      url: 'https://maven.mycompany.com',
+      enabled: false,
+    })
+    expect(updated?.name).toBe('New Name')
+    expect(updated?.visibility).toBe('organization')
+    expect(updated?.registryType).toBe('maven')
+    expect(updated?.url).toBe('https://maven.mycompany.com')
+    expect(updated?.enabled).toBe(false)
+
+    const found = db.findRegistryById('reg-1')
+    expect(found?.registryType).toBe('maven')
+    expect(found?.url).toBe('https://maven.mycompany.com')
+    expect(found?.enabled).toBe(false)
+    db.close()
+  })
+
+  it('deletes a registry', () => {
+    const db = freshDb()
+    db.insertOrganization({
+      id: 'org-1', name: 'Org', slug: 'org',
+      description: null, ownerId: 'user-1', settings: null,
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    })
+    db.insertRegistry({
+      id: 'reg-1', name: 'To Delete', description: null,
+      organizationId: 'org-1', visibility: 'private', allowedRoles: null,
+      registryType: 'generic', url: null, enabled: true,
+      createdBy: 'user-1', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    })
+
+    expect(db.deleteRegistry('reg-1')).toBe(true)
+    expect(db.findRegistryById('reg-1')).toBeUndefined()
+    expect(db.deleteRegistry('nonexistent')).toBe(false)
+    db.close()
+  })
+
+  it('cascades delete from organization to registries', () => {
+    const db = freshDb()
+    db.insertOrganization({
+      id: 'org-1', name: 'Org', slug: 'org',
+      description: null, ownerId: 'user-1', settings: null,
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    })
+    db.insertRegistry({
+      id: 'reg-1', name: 'Registry', description: null,
+      organizationId: 'org-1', visibility: 'private', allowedRoles: null,
+      registryType: 'generic', url: null, enabled: true,
+      createdBy: 'user-1', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    })
+
+    db.deleteOrganization('org-1')
+    expect(db.findRegistryById('reg-1')).toBeUndefined()
+    db.close()
+  })
+
+  it('manages registry artifacts', () => {
+    const db = freshDb()
+    db.insertOrganization({
+      id: 'org-1', name: 'Org', slug: 'org',
+      description: null, ownerId: 'user-1', settings: null,
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    })
+    db.insertRegistry({
+      id: 'reg-1', name: 'Registry', description: null,
+      organizationId: 'org-1', visibility: 'private', allowedRoles: null,
+      registryType: 'generic', url: null, enabled: true,
+      createdBy: 'user-1', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    })
+
+    const ra = db.insertRegistryArtifact({
+      id: 'ra-1',
+      registryId: 'reg-1',
+      artifactId: 'art-1',
+      addedBy: 'user-1',
+      addedAt: new Date().toISOString(),
+    })
+    expect(ra.registryId).toBe('reg-1')
+    expect(ra.artifactId).toBe('art-1')
+
+    const artifacts = db.listRegistryArtifacts('reg-1')
+    expect(artifacts.length).toBe(1)
+
+    const found = db.findRegistryArtifact('reg-1', 'art-1')
+    expect(found?.id).toBe('ra-1')
+
+    expect(db.deleteRegistryArtifact('reg-1', 'art-1')).toBe(true)
+    expect(db.listRegistryArtifacts('reg-1')).toHaveLength(0)
+    db.close()
+  })
+
+  it('enforces unique registry artifacts constraint', () => {
+    const db = freshDb()
+    db.insertOrganization({
+      id: 'org-1', name: 'Org', slug: 'org',
+      description: null, ownerId: 'user-1', settings: null,
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    })
+    db.insertRegistry({
+      id: 'reg-1', name: 'Registry', description: null,
+      organizationId: 'org-1', visibility: 'private', allowedRoles: null,
+      registryType: 'generic', url: null, enabled: true,
+      createdBy: 'user-1', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    })
+
+    db.insertRegistryArtifact({
+      id: 'ra-1', registryId: 'reg-1', artifactId: 'art-1',
+      addedBy: 'user-1', addedAt: new Date().toISOString(),
+    })
+
+    expect(() => {
+      db.insertRegistryArtifact({
+        id: 'ra-2', registryId: 'reg-1', artifactId: 'art-1',
+        addedBy: 'user-1', addedAt: new Date().toISOString(),
+      })
+    }).toThrow()
+    db.close()
+  })
+
+  it('manages registry credentials', () => {
+    const db = freshDb()
+    db.insertOrganization({
+      id: 'org-1', name: 'Org', slug: 'org',
+      description: null, ownerId: 'user-1', settings: null,
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    })
+    db.insertRegistry({
+      id: 'reg-1', name: 'npm Registry', description: null,
+      organizationId: 'org-1', visibility: 'private', allowedRoles: null,
+      registryType: 'npm', url: 'https://npm.example.com', enabled: true,
+      createdBy: 'user-1', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    })
+
+    const creds = db.upsertRegistryCredentials({
+      id: 'cred-1',
+      registryId: 'reg-1',
+      authType: 'token',
+      username: null,
+      secretValue: 'encrypted-token-value',
+      envVar: null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    })
+    expect(creds.authType).toBe('token')
+    expect(creds.secretValue).toBe('encrypted-token-value')
+
+    const found = db.findRegistryCredentials('reg-1')
+    expect(found?.id).toBe('cred-1')
+    expect(found?.authType).toBe('token')
+
+    // Upsert again (same registry_id) should update
+    db.upsertRegistryCredentials({
+      id: 'cred-1',
+      registryId: 'reg-1',
+      authType: 'basic',
+      username: 'admin',
+      secretValue: 'new-password',
+      envVar: null,
+      createdAt: found!.createdAt,
+      updatedAt: new Date().toISOString(),
+    })
+    const updated = db.findRegistryCredentials('reg-1')
+    expect(updated?.authType).toBe('basic')
+    expect(updated?.username).toBe('admin')
+
+    expect(db.deleteRegistryCredentials('reg-1')).toBe(true)
+    expect(db.findRegistryCredentials('reg-1')).toBeUndefined()
+    db.close()
+  })
+
+  it('cascades credentials delete with registry', () => {
+    const db = freshDb()
+    db.insertOrganization({
+      id: 'org-1', name: 'Org', slug: 'org',
+      description: null, ownerId: 'user-1', settings: null,
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    })
+    db.insertRegistry({
+      id: 'reg-1', name: 'Registry', description: null,
+      organizationId: 'org-1', visibility: 'private', allowedRoles: null,
+      registryType: 'npm', url: 'https://npm.example.com', enabled: true,
+      createdBy: 'user-1', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    })
+    db.upsertRegistryCredentials({
+      id: 'cred-1', registryId: 'reg-1', authType: 'none',
+      username: null, secretValue: null, envVar: null,
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    })
+
+    db.deleteRegistry('reg-1')
+    expect(db.findRegistryCredentials('reg-1')).toBeUndefined()
+    db.close()
+  })
+
+  it('defaults to generic registry type', () => {
+    const db = freshDb()
+    db.insertOrganization({
+      id: 'org-1', name: 'Org', slug: 'org',
+      description: null, ownerId: 'user-1', settings: null,
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    })
+    const reg = db.insertRegistry({
+      id: 'reg-1', name: 'Generic', description: null,
+      organizationId: 'org-1', visibility: 'private', allowedRoles: null,
+      registryType: 'generic', url: null, enabled: true,
+      createdBy: 'user-1', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    })
+    expect(reg.registryType).toBe('generic')
+    db.close()
+  })
+})
+
+describe('Registry Repository', () => {
+  beforeEach(() => {
+    resetAll()
+    getOrgDatabase(':memory:')
+  })
+
+  afterEach(() => {
+    resetAll()
+  })
+
+  it('creates and retrieves a registry with type and URL', async () => {
+    const org = await orgRepository.createOrganization({ name: 'Org', slug: 'org', ownerId: 'user-1' })
+    const reg = await orgRepository.createRegistry(org.id, {
+      name: 'npm Registry',
+      description: 'Private npm packages',
+      registryType: 'npm',
+      url: 'https://npm.mycompany.com',
+      createdBy: 'user-1',
+    })
+    expect(reg.name).toBe('npm Registry')
+    expect(reg.organizationId).toBe(org.id)
+    expect(reg.visibility).toBe('private')
+    expect(reg.registryType).toBe('npm')
+    expect(reg.url).toBe('https://npm.mycompany.com')
+    expect(reg.enabled).toBe(true)
+    expect(reg.id).toMatch(/^reg_/)
+
+    const found = await orgRepository.getRegistry(reg.id)
+    expect(found?.name).toBe('npm Registry')
+    expect(found?.registryType).toBe('npm')
+    expect(found?.url).toBe('https://npm.mycompany.com')
+    expect(found?.enabled).toBe(true)
+  })
+
+  it('lists registries by organization with types', async () => {
+    const org = await orgRepository.createOrganization({ name: 'Org', slug: 'org', ownerId: 'user-1' })
+    await orgRepository.createRegistry(org.id, { name: 'npm Registry', createdBy: 'user-1', registryType: 'npm', url: 'https://npm.example.com' })
+    await orgRepository.createRegistry(org.id, { name: 'PyPI Registry', createdBy: 'user-1', visibility: 'team', registryType: 'pypi', url: 'https://pypi.example.com' })
+
+    const registries = await orgRepository.listRegistriesByOrganization(org.id)
+    expect(registries.length).toBe(2)
+    expect(registries.map(r => r.registryType)).toContain('npm')
+    expect(registries.map(r => r.registryType)).toContain('pypi')
+  })
+
+  it('updates a registry including type and URL', async () => {
+    const org = await orgRepository.createOrganization({ name: 'Org', slug: 'org', ownerId: 'user-1' })
+    const reg = await orgRepository.createRegistry(org.id, { name: 'Old', createdBy: 'user-1', registryType: 'generic' })
+
+    const updated = await orgRepository.updateRegistry(reg.id, {
+      name: 'Updated',
+      visibility: 'organization',
+      registryType: 'maven',
+      url: 'https://maven.mycompany.com',
+      enabled: false,
+    })
+    expect(updated?.name).toBe('Updated')
+    expect(updated?.visibility).toBe('organization')
+    expect(updated?.registryType).toBe('maven')
+    expect(updated?.url).toBe('https://maven.mycompany.com')
+    expect(updated?.enabled).toBe(false)
+
+    const found = await orgRepository.getRegistry(reg.id)
+    expect(found?.registryType).toBe('maven')
+    expect(found?.url).toBe('https://maven.mycompany.com')
+    expect(found?.enabled).toBe(false)
+  })
+
+  it('deletes a registry', async () => {
+    const org = await orgRepository.createOrganization({ name: 'Org', slug: 'org', ownerId: 'user-1' })
+    const reg = await orgRepository.createRegistry(org.id, { name: 'Delete Me', createdBy: 'user-1' })
+
+    expect(await orgRepository.deleteRegistry(reg.id)).toBe(true)
+    expect(await orgRepository.getRegistry(reg.id)).toBeUndefined()
+    expect(await orgRepository.deleteRegistry('nonexistent')).toBe(false)
+  })
+
+  it('manages registry artifacts', async () => {
+    const org = await orgRepository.createOrganization({ name: 'Org', slug: 'org', ownerId: 'user-1' })
+    const reg = await orgRepository.createRegistry(org.id, { name: 'My Registry', createdBy: 'user-1' })
+
+    const ra = await orgRepository.addArtifactToRegistry(reg.id, 'art-1', 'user-1')
+    expect(ra.registryId).toBe(reg.id)
+    expect(ra.artifactId).toBe('art-1')
+    expect(ra.id).toMatch(/^ra_/)
+
+    const artifacts = await orgRepository.listRegistryArtifacts(reg.id)
+    expect(artifacts.length).toBe(1)
+
+    const found = await orgRepository.getRegistryArtifact(reg.id, 'art-1')
+    expect(found?.id).toBe(ra.id)
+
+    expect(await orgRepository.removeArtifactFromRegistry(reg.id, 'art-1')).toBe(true)
+    expect(await orgRepository.listRegistryArtifacts(reg.id)).toHaveLength(0)
+  })
+
+  it('prevents duplicate artifact in registry', async () => {
+    const org = await orgRepository.createOrganization({ name: 'Org', slug: 'org', ownerId: 'user-1' })
+    const reg = await orgRepository.createRegistry(org.id, { name: 'Registry', createdBy: 'user-1' })
+
+    await orgRepository.addArtifactToRegistry(reg.id, 'art-1', 'user-1')
+
+    await expect(
+      orgRepository.addArtifactToRegistry(reg.id, 'art-1', 'user-1')
+    ).rejects.toThrow()
+  })
+
+  it('manages registry credentials', async () => {
+    const org = await orgRepository.createOrganization({ name: 'Org', slug: 'org', ownerId: 'user-1' })
+    const reg = await orgRepository.createRegistry(org.id, { name: 'npm Registry', createdBy: 'user-1', registryType: 'npm', url: 'https://npm.example.com' })
+
+    const creds = await orgRepository.upsertRegistryCredentials(reg.id, {
+      authType: 'token',
+      secretValue: 'npm-token-123',
+    })
+    expect(creds.authType).toBe('token')
+    expect(creds.secretValue).toBe('npm-token-123')
+    expect(creds.registryId).toBe(reg.id)
+
+    const found = await orgRepository.getRegistryCredentials(reg.id)
+    expect(found?.authType).toBe('token')
+
+    // Upsert with basic auth
+    const updated = await orgRepository.upsertRegistryCredentials(reg.id, {
+      authType: 'basic',
+      username: 'deploy',
+      secretValue: 'new-password',
+    })
+    expect(updated?.authType).toBe('basic')
+    expect(updated?.username).toBe('deploy')
+
+    expect(await orgRepository.deleteRegistryCredentials(reg.id)).toBe(true)
+    expect(await orgRepository.getRegistryCredentials(reg.id)).toBeUndefined()
+  })
+
+  it('uses env var for credentials when authType is env', async () => {
+    const org = await orgRepository.createOrganization({ name: 'Org', slug: 'org', ownerId: 'user-1' })
+    const reg = await orgRepository.createRegistry(org.id, { name: 'Env Registry', createdBy: 'user-1', registryType: 'npm', url: 'https://npm.example.com' })
+
+    const creds = await orgRepository.upsertRegistryCredentials(reg.id, {
+      authType: 'env',
+      envVar: 'NPM_REGISTRY_TOKEN',
+    })
+    expect(creds.authType).toBe('env')
+    expect(creds.envVar).toBe('NPM_REGISTRY_TOKEN')
   })
 })

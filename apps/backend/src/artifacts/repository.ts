@@ -29,6 +29,10 @@ export interface Artifact {
   createdAt: string
   updatedAt: string
   lastParsedAt?: string
+  /** Origin registry provider type for externally-scanned artifacts (npm, pypi, maven) */
+  registryType?: string
+  /** The registry ID this artifact was scanned from */
+  registryId?: string
 }
 
 export type PatchArtifactInput = Pick<Artifact, 'lifecycle'> & {

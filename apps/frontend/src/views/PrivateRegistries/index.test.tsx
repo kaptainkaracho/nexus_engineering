@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { PrivateRegistries } from './index';
 import * as api from '../../api/client';
 import type { ArtifactRegistry } from '@nexus-engineering/shared';
@@ -31,51 +31,47 @@ describe('PrivateRegistries', () => {
     vi.restoreAllMocks();
   });
 
-  it('shows loading state initially', () => {
+  it('shows loading skeleton initially', () => {
     vi.spyOn(api, 'fetchRegistries').mockReturnValue(new Promise(() => {}));
     render(<PrivateRegistries />);
-    expect(screen.getByText(/Loading registries/i)).toBeInTheDocument();
+    expect(document.querySelector('.animate-pulse')).toBeInTheDocument();
   });
 
-  it('renders table with registries after load', async () => {
+  it('renders registry cards after load', async () => {
     vi.spyOn(api, 'fetchRegistries').mockResolvedValue(listResponse([makeRegistry()]));
     render(<PrivateRegistries />);
 
-    await waitFor(() => expect(screen.queryByText(/Loading registries/i)).not.toBeInTheDocument());
-    expect(screen.getByText('1 Registry')).toBeInTheDocument();
-    expect(screen.getByText('acme-packages')).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText(/acme-packages/i)).toBeInTheDocument());
     expect(screen.getByText('NPM')).toBeInTheDocument();
-    expect(screen.getByText('Enabled')).toBeInTheDocument();
   });
 
   it('shows empty state when no registries exist', async () => {
     vi.spyOn(api, 'fetchRegistries').mockResolvedValue(listResponse([]));
     render(<PrivateRegistries />);
 
-    await waitFor(() => expect(screen.getByText(/No Registries Yet/i)).toBeInTheDocument());
-    const addButtons = screen.getAllByRole('button', { name: /Add Registry/i });
-    expect(addButtons.length).toBeGreaterThanOrEqual(1);
+    await waitFor(() => expect(screen.getByText(/No registries configured/i)).toBeInTheDocument());
+    const createBtn = screen.getByRole('button', { name: /Create your first registry/i });
+    expect(createBtn).toBeInTheDocument();
   });
 
-  it('shows error state with alert when fetch fails', async () => {
+  it('shows error state with retry when fetch fails', async () => {
     vi.spyOn(api, 'fetchRegistries').mockRejectedValue(new Error('Network error'));
     render(<PrivateRegistries />);
 
     await waitFor(() => expect(screen.getByText('Network error')).toBeInTheDocument());
-    expect(screen.getByRole('alert')).toBeInTheDocument();
+    expect(screen.getByText('Retry')).toBeInTheDocument();
   });
 
-  it('opens create modal when Add Registry is clicked', async () => {
+  it('opens create modal when Create button is clicked', async () => {
     vi.spyOn(api, 'fetchRegistries').mockResolvedValue(listResponse([]));
     render(<PrivateRegistries />);
 
-    await waitFor(() => expect(screen.queryByText(/Loading registries/i)).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText(/No registries configured/i)).toBeInTheDocument());
 
-    const addBtns = screen.getAllByRole('button', { name: /Add Registry/i });
-    fireEvent.click(addBtns[0]);
+    const createBtns = screen.getAllByText(/Create/i);
+    fireEvent.click(createBtns[0]);
 
-    expect(screen.getByRole('dialog', { name: /Add registry/i })).toBeInTheDocument();
-    expect(screen.getByText(/Create/i)).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: /Create Registry/i })).toBeInTheDocument();
   });
 
   it('calls createRegistry when create form is submitted', async () => {
@@ -83,82 +79,56 @@ describe('PrivateRegistries', () => {
     vi.spyOn(api, 'fetchRegistries').mockResolvedValue(listResponse([]));
     render(<PrivateRegistries />);
 
-    await waitFor(() => expect(screen.queryByText(/Loading registries/i)).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText(/No registries configured/i)).toBeInTheDocument());
 
-    const addBtns = screen.getAllByRole('button', { name: /Add Registry/i });
-    fireEvent.click(addBtns[0]);
+    const createBtns = screen.getAllByText(/Create/i);
+    fireEvent.click(createBtns[0]);
+    await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument());
 
-    const nameInput = screen.getByLabelText(/Name/i);
+    const nameInput = screen.getByLabelText(/Registry name/i);
     fireEvent.change(nameInput, { target: { value: 'my-registry' } });
 
-    fireEvent.click(screen.getByRole('button', { name: /Create/i }));
+    const submitBtn = screen.getByRole('button', { name: /Create registry/i });
+    fireEvent.click(submitBtn);
 
     await waitFor(() => {
       expect(createSpy).toHaveBeenCalledWith(
-        expect.objectContaining({ name: 'my-registry', registryType: 'npm' }),
+        expect.objectContaining({ name: 'my-registry', registryType: 'generic' }),
       );
     });
   });
 
-  it('opens edit modal when Edit button is clicked', async () => {
+  it('calls scanRegistry when Scan button is clicked', async () => {
+    const scanSpy = vi.spyOn(api, 'scanRegistry').mockResolvedValue({ success: true, packagesFound: 42 });
     vi.spyOn(api, 'fetchRegistries').mockResolvedValue(listResponse([makeRegistry()]));
     render(<PrivateRegistries />);
 
-    await waitFor(() => expect(screen.queryByText(/Loading registries/i)).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText(/acme-packages/i)).toBeInTheDocument());
 
-    const editBtn = screen.getByRole('button', { name: /Edit acme-packages/i });
-    fireEvent.click(editBtn);
-
-    expect(screen.getByRole('dialog', { name: /Edit registry/i })).toBeInTheDocument();
-    expect(screen.getByLabelText(/Name/i)).toHaveValue('acme-packages');
-  });
-
-  it('calls updateRegistry when edit form is submitted', async () => {
-    const updateSpy = vi.spyOn(api, 'updateRegistry').mockResolvedValue(makeRegistry());
-    vi.spyOn(api, 'fetchRegistries').mockResolvedValue(listResponse([makeRegistry()]));
-    render(<PrivateRegistries />);
-
-    await waitFor(() => expect(screen.queryByText(/Loading registries/i)).not.toBeInTheDocument());
-
-    fireEvent.click(screen.getByRole('button', { name: /Edit acme-packages/i }));
-
-    const nameInput = screen.getByLabelText(/Name/i);
-    fireEvent.change(nameInput, { target: { value: 'updated-registry' } });
-
-    fireEvent.click(screen.getByRole('button', { name: /Save Changes/i }));
+    const scanBtn = screen.getByRole('button', { name: /^Scan$/i });
+    fireEvent.click(scanBtn);
 
     await waitFor(() => {
-      expect(updateSpy).toHaveBeenCalledWith(
-        'reg-1',
-        expect.objectContaining({ name: 'updated-registry' }),
-      );
+      expect(scanSpy).toHaveBeenCalledWith('reg-1');
     });
   });
 
-  it('shows delete confirmation dialog', async () => {
-    vi.spyOn(api, 'fetchRegistries').mockResolvedValue(listResponse([makeRegistry()]));
-    render(<PrivateRegistries />);
-
-    await waitFor(() => expect(screen.queryByText(/Loading registries/i)).not.toBeInTheDocument());
-
-    const deleteBtn = screen.getByRole('button', { name: /Delete acme-packages/i });
-    fireEvent.click(deleteBtn);
-
-    expect(screen.getByRole('dialog', { name: /Confirm delete/i })).toBeInTheDocument();
-    expect(screen.getByText(/Delete Registry\?/i)).toBeInTheDocument();
-  });
-
-  it('calls deleteRegistry when delete is confirmed', async () => {
+  it('shows delete confirmation and deletes', async () => {
     const deleteSpy = vi.spyOn(api, 'deleteRegistry').mockResolvedValue(true);
     vi.spyOn(api, 'fetchRegistries').mockResolvedValue(listResponse([makeRegistry()]));
     render(<PrivateRegistries />);
 
-    await waitFor(() => expect(screen.queryByText(/Loading registries/i)).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText(/acme-packages/i)).toBeInTheDocument());
 
-    fireEvent.click(screen.getByRole('button', { name: /Delete acme-packages/i }));
+    const actionsBtn = screen.getByRole('button', { name: /Actions for acme-packages/i });
+    fireEvent.click(actionsBtn);
 
-    const confirmDialog = screen.getByRole('dialog', { name: /Confirm delete/i });
-    const confirmBtn = within(confirmDialog).getByRole('button', { name: /Delete/i });
+    const deleteBtn = screen.getByRole('menuitem', { name: /Delete/i });
+    fireEvent.click(deleteBtn);
+
+    await waitFor(() => expect(screen.getByRole('dialog', { name: /Delete registry/i })).toBeInTheDocument());
+
+    const confirmBtn = screen.getByRole('button', { name: /Delete registry/i });
     fireEvent.click(confirmBtn);
 
     await waitFor(() => {
@@ -166,32 +136,49 @@ describe('PrivateRegistries', () => {
     });
   });
 
-  it('expands registry details when row is clicked', async () => {
+  it('opens credentials modal from overflow menu', async () => {
     vi.spyOn(api, 'fetchRegistries').mockResolvedValue(listResponse([makeRegistry()]));
     vi.spyOn(api, 'fetchRegistryCredentials').mockResolvedValue(null);
-    vi.spyOn(api, 'fetchRegistryArtifacts').mockResolvedValue([]);
-    const { container } = render(<PrivateRegistries />);
+    render(<PrivateRegistries />);
 
-    await waitFor(() => expect(screen.queryByText(/Loading registries/i)).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText(/acme-packages/i)).toBeInTheDocument());
 
-    const row = container.querySelector('tr[role="button"]');
-    expect(row).not.toBeNull();
-    fireEvent.click(row!);
+    const actionsBtn = screen.getByRole('button', { name: /Actions for acme-packages/i });
+    fireEvent.click(actionsBtn);
 
-    await waitFor(() => expect(screen.getByText(/Registry Details/i)).toBeInTheDocument());
-    expect(screen.getByText(/No credentials configured/i)).toBeInTheDocument();
-    expect(screen.getByText(/No artifacts in this registry/i)).toBeInTheDocument();
+    const credsBtn = screen.getByRole('menuitem', { name: /Credentials/i });
+    fireEvent.click(credsBtn);
+
+    await waitFor(() => expect(screen.getByText(/Registry Credentials/i)).toBeInTheDocument());
+  });
+
+  it('filters registries by search query', async () => {
+    vi.spyOn(api, 'fetchRegistries').mockResolvedValue(listResponse([
+      makeRegistry({ id: '1', name: 'alpha-registry' }),
+      makeRegistry({ id: '2', name: 'beta-registry' }),
+    ]));
+    render(<PrivateRegistries />);
+
+    await waitFor(() => expect(screen.queryByText(/alpha-registry/i)).toBeInTheDocument());
+
+    const searchInput = screen.getByPlaceholderText(/Search registries/i);
+    fireEvent.change(searchInput, { target: { value: 'beta' } });
+
+    expect(screen.queryByText(/alpha-registry/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/beta-registry/i)).toBeInTheDocument();
   });
 
   it('shows validation error when saving with empty name', async () => {
     vi.spyOn(api, 'fetchRegistries').mockResolvedValue(listResponse([]));
     render(<PrivateRegistries />);
 
-    await waitFor(() => expect(screen.queryByText(/Loading registries/i)).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText(/No registries configured/i)).toBeInTheDocument());
 
-    const addBtns = screen.getAllByRole('button', { name: /Add Registry/i });
-    fireEvent.click(addBtns[0]);
-    fireEvent.click(screen.getByRole('button', { name: /Create/i }));
+    const createBtns = screen.getAllByText(/Create/i);
+    fireEvent.click(createBtns[0]);
+
+    await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: /Create registry/i }));
 
     await waitFor(() => expect(screen.getByText(/Name is required/i)).toBeInTheDocument());
   });
@@ -200,13 +187,14 @@ describe('PrivateRegistries', () => {
     vi.spyOn(api, 'fetchRegistries').mockResolvedValue(listResponse([]));
     render(<PrivateRegistries />);
 
-    await waitFor(() => expect(screen.queryByText(/Loading registries/i)).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText(/No registries configured/i)).toBeInTheDocument());
 
-    const addBtns = screen.getAllByRole('button', { name: /Add Registry/i });
-    fireEvent.click(addBtns[0]);
-    expect(screen.getByRole('dialog', { name: /Add registry/i })).toBeInTheDocument();
+    const createBtns = screen.getAllByText(/Create/i);
+    fireEvent.click(createBtns[0]);
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: /Cancel/i }));
+    const cancelBtn = screen.getAllByRole('button', { name: /Cancel/i });
+    fireEvent.click(cancelBtn[0]);
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 });

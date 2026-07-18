@@ -664,6 +664,47 @@ export async function fetchRegistryCredentials(registryId: string): Promise<Regi
   }
 }
 
+export async function upsertRegistryCredentials(
+  registryId: string,
+  data: { authType: string; username?: string; password?: string; token?: string; envVar?: string },
+): Promise<RegistryCredentials | null> {
+  try {
+    const res = await fetch(`${BASE}/api/registries/${encodeURIComponent(registryId)}/credentials`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+export async function deleteRegistryCredentials(registryId: string): Promise<boolean> {
+  try {
+    const res = await fetch(`${BASE}/api/registries/${encodeURIComponent(registryId)}/credentials`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function scanRegistry(registryId: string): Promise<{ success: boolean; packagesFound?: number; error?: string }> {
+  try {
+    const res = await fetch(`${BASE}/api/registries/${encodeURIComponent(registryId)}/scan`, {
+      method: 'POST',
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : 'Scan failed' };
+  }
+}
+
 export async function fetchRegistryArtifacts(registryId: string): Promise<RegistryArtifact[]> {
   try {
     const res = await fetch(`${BASE}/api/registries/${encodeURIComponent(registryId)}/artifacts`);

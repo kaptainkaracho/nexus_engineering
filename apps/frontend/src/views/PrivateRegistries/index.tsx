@@ -1,29 +1,33 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Button, Card, Container, Stack, Input, Alert, Badge } from '@nexus-engineering/shared';
-import type { ArtifactRegistry, RegistryCredentials, RegistryProviderType, RegistryArtifact } from '@nexus-engineering/shared';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Button, Card, Container, Stack, Input, Alert, Badge, RadioGroup } from '@nexus-engineering/shared';
+import type { ArtifactRegistry, RegistryProviderType, RegistryCredentials, RegistryArtifact } from '@nexus-engineering/shared';
 import {
   fetchRegistries,
   createRegistry,
   updateRegistry,
   deleteRegistry,
   toggleRegistry,
+  scanRegistry,
+  upsertRegistryCredentials,
+  deleteRegistryCredentials,
   fetchRegistryCredentials,
   fetchRegistryArtifacts,
   type RegistryCreateRequest,
 } from '../../api/client';
+import { CredentialsModal } from './CredentialsModal';
 
-const PROVIDER_TYPES: { value: RegistryProviderType; label: string }[] = [
-  { value: 'npm', label: 'npm' },
-  { value: 'pypi', label: 'PyPI' },
-  { value: 'maven', label: 'Maven' },
-  { value: 'generic', label: 'Generic' },
+const PROVIDER_TYPES: { value: RegistryProviderType; label: string; icon: string }[] = [
+  { value: 'npm', label: 'npm', icon: '📦' },
+  { value: 'pypi', label: 'PyPI', icon: '🐍' },
+  { value: 'maven', label: 'Maven', icon: 'M' },
+  { value: 'generic', label: 'Generic', icon: '🔲' },
 ];
 
 const VISIBILITY_OPTIONS = [
-  { value: 'private', label: 'Private' },
-  { value: 'team', label: 'Team' },
-  { value: 'organization', label: 'Organization' },
-] as const;
+  { value: 'private' as const, label: 'Private', description: 'Only you and admins' },
+  { value: 'team' as const, label: 'Team', description: 'Specific teams in your org' },
+  { value: 'organization' as const, label: 'Organization', description: 'All org members' },
+];
 
 type ModalMode = 'create' | 'edit' | null;
 
@@ -38,20 +42,69 @@ interface FormState {
 const emptyForm = (): FormState => ({
   name: '',
   description: '',
-  registryType: 'npm',
+  registryType: 'generic',
   url: '',
   visibility: 'private',
 });
 
-function formatDate(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+function formatRelative(iso: string | null): string {
+  if (!iso) return 'Never scanned';
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days}d ago`;
+  return new Date(iso).toLocaleDateString();
+}
+
+function TypeIcon({ type, size = 'md' }: { type: RegistryProviderType; size?: 'sm' | 'md' }) {
+  const p = PROVIDER_TYPES.find((t) => t.value === type);
+  const dim = size === 'sm' ? 'h-8 w-8 text-sm' : 'h-10 w-10 text-base';
+  const colors: Record<RegistryProviderType, string> = {
+    npm: 'bg-error-50 text-error-600 dark:bg-error-950 dark:text-error-400',
+    pypi: 'bg-info-50 text-info-600 dark:bg-info-950 dark:text-info-400',
+    maven: 'bg-warning-50 text-warning-600 dark:bg-warning-950 dark:text-warning-400',
+    generic: 'bg-neutral-50 text-neutral-600 dark:bg-neutral-950 dark:text-neutral-400',
+  };
+  return (
+    <span
+      className={`inline-flex ${dim} items-center justify-center rounded-lg ${colors[type]} font-bold`}
+      aria-hidden="true"
+    >
+      {p?.icon ?? '🔲'}
+    </span>
+  );
+}
+
+function Spinner({ className }: { className?: string }) {
+  return (
+    <svg className={`inline-block h-4 w-4 animate-spin ${className ?? ''}`} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+    </svg>
+  );
+}
+
+function ToastContainer({ toasts }: { toasts: Toast[] }) {
+  return (
+    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2" aria-live="polite">
+      {toasts.map((t) => (
+        <Alert key={t.id} variant={t.variant} title={t.title} dismissible onDismiss={() => {}}>
+          {t.message}
+        </Alert>
+      ))}
+    </div>
+  );
+}
+
+interface Toast {
+  id: string
+  variant: 'success' | 'error' | 'warning' | 'info'
+  title: string
+  message: string
 }
 
 export function PrivateRegistries() {
@@ -59,18 +112,36 @@ export function PrivateRegistries() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
+  const [search, setSearch] = useState('');
+  const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+
   const [modalMode, setModalMode] = useState<ModalMode>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
+  const [formErrors, setFormErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
+  const [credentialsModal, setCredentialsModal] = useState<{ registryId: string; registryName: string } | null>(null);
+
+  const [scanningId, setScanningId] = useState<string | null>(null);
+  const [toasts, setToasts] = useState<Toast[]>([]);
+
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [expandedCredentials, setExpandedCredentials] = useState<RegistryCredentials | null>(null);
   const [expandedArtifacts, setExpandedArtifacts] = useState<RegistryArtifact[]>([]);
   const [expanding, setExpanding] = useState(false);
+
+  const [overflowOpen, setOverflowOpen] = useState<string | null>(null);
+
+  const addToast = useCallback((variant: Toast['variant'], title: string, message: string) => {
+    const id = Date.now().toString();
+    setToasts((prev) => [...prev, { id, variant, title, message }]);
+    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 4000);
+  }, []);
 
   const loadRegistries = useCallback(async () => {
     setLoading(true);
@@ -86,12 +157,21 @@ export function PrivateRegistries() {
     }
   }, []);
 
-  useEffect(() => {
-    void loadRegistries();
-  }, [loadRegistries]);
+  useEffect(() => { void loadRegistries(); }, [loadRegistries]);
+
+  const filtered = useMemo(() => {
+    return registries.filter((r) => {
+      if (search && !r.name.toLowerCase().includes(search.toLowerCase())) return false;
+      if (typeFilter !== 'all' && r.registryType !== typeFilter) return false;
+      if (statusFilter === 'enabled' && !r.enabled) return false;
+      if (statusFilter === 'disabled' && r.enabled) return false;
+      return true;
+    });
+  }, [registries, search, typeFilter, statusFilter]);
 
   const handleOpenCreate = useCallback(() => {
     setForm(emptyForm());
+    setFormErrors({});
     setEditingId(null);
     setModalMode('create');
     setSaveError(null);
@@ -105,30 +185,39 @@ export function PrivateRegistries() {
       url: registry.url ?? '',
       visibility: registry.visibility,
     });
+    setFormErrors({});
     setEditingId(registry.id);
     setModalMode('edit');
     setSaveError(null);
+    setOverflowOpen(null);
   }, []);
 
   const handleCloseModal = useCallback(() => {
     setModalMode(null);
     setEditingId(null);
     setSaveError(null);
+    setFormErrors({});
   }, []);
 
   const handleFormChange = useCallback(
-    (field: keyof FormState) =>
-      (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setForm((prev) => ({ ...prev, [field]: e.target.value }));
-      },
-    [],
+    (field: keyof FormState, value: string) => {
+      setForm((prev) => ({ ...prev, [field]: value }));
+      if (formErrors[field]) setFormErrors((prev) => ({ ...prev, [field]: undefined }));
+    },
+    [formErrors],
   );
 
+  const validate = useCallback((): boolean => {
+    const errors: Partial<Record<keyof FormState, string>> = {};
+    if (!form.name.trim()) errors.name = 'Name is required';
+    else if (form.name.trim().length > 128) errors.name = 'Name must be 128 characters or fewer';
+    if (form.description.length > 500) errors.description = 'Description must be 500 characters or fewer';
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  }, [form]);
+
   const handleSave = useCallback(async () => {
-    if (!form.name.trim()) {
-      setSaveError('Name is required');
-      return;
-    }
+    if (!validate()) return;
     setSaving(true);
     setSaveError(null);
     try {
@@ -141,6 +230,7 @@ export function PrivateRegistries() {
           visibility: form.visibility,
         };
         await createRegistry(payload);
+        addToast('success', 'Registry created', `"${form.name.trim()}" created successfully`);
       } else if (modalMode === 'edit' && editingId) {
         await updateRegistry(editingId, {
           name: form.name.trim() || undefined,
@@ -148,6 +238,7 @@ export function PrivateRegistries() {
           url: form.url.trim() || undefined,
           visibility: form.visibility,
         });
+        addToast('success', 'Registry updated', `"${form.name.trim()}" updated successfully`);
       }
       handleCloseModal();
       void loadRegistries();
@@ -156,31 +247,56 @@ export function PrivateRegistries() {
     } finally {
       setSaving(false);
     }
-  }, [form, modalMode, editingId, handleCloseModal, loadRegistries]);
+  }, [form, modalMode, editingId, handleCloseModal, loadRegistries, validate, addToast]);
 
-  const handleDelete = useCallback(
-    async (id: string) => {
-      setDeleting(true);
-      try {
-        const ok = await deleteRegistry(id);
-        if (ok) {
-          setDeleteConfirm(null);
-          void loadRegistries();
-        }
-      } finally {
-        setDeleting(false);
+  const handleDelete = useCallback(async () => {
+    if (!deleteConfirm) return;
+    setDeleting(true);
+    try {
+      const ok = await deleteRegistry(deleteConfirm);
+      if (ok) {
+        const name = registries.find((r) => r.id === deleteConfirm)?.name ?? '';
+        setDeleteConfirm(null);
+        addToast('success', 'Registry deleted', `"${name}" has been deleted`);
+        void loadRegistries();
       }
-    },
-    [loadRegistries],
-  );
+    } finally {
+      setDeleting(false);
+    }
+  }, [deleteConfirm, registries, loadRegistries, addToast]);
 
   const handleToggle = useCallback(
     async (registry: ArtifactRegistry) => {
       await toggleRegistry(registry.id, !registry.enabled);
+      addToast('info', registry.enabled ? 'Registry disabled' : 'Registry enabled', `"${registry.name}" ${registry.enabled ? 'disabled' : 'enabled'}`);
       void loadRegistries();
     },
-    [loadRegistries],
+    [loadRegistries, addToast],
   );
+
+  const handleScan = useCallback(
+    async (registry: ArtifactRegistry) => {
+      setScanningId(registry.id);
+      setOverflowOpen(null);
+      try {
+        const result = await scanRegistry(registry.id);
+        if (result.success) {
+          addToast('success', 'Scan completed', `"${registry.name}" — ${result.packagesFound ?? 0} packages found`);
+        } else {
+          addToast('error', 'Scan failed', result.error ?? 'Unknown error');
+        }
+        void loadRegistries();
+      } finally {
+        setScanningId(null);
+      }
+    },
+    [loadRegistries, addToast],
+  );
+
+  const handleOpenCredentials = useCallback((registry: ArtifactRegistry) => {
+    setCredentialsModal({ registryId: registry.id, registryName: registry.name });
+    setOverflowOpen(null);
+  }, []);
 
   const handleExpand = useCallback(
     async (id: string) => {
@@ -220,255 +336,266 @@ export function PrivateRegistries() {
     }
   }, [modalMode, handleKeyDown]);
 
+  useEffect(() => {
+    if (overflowOpen) {
+      const close = () => setOverflowOpen(null);
+      document.addEventListener('click', close);
+      return () => document.removeEventListener('click', close);
+    }
+  }, [overflowOpen]);
+
   return (
     <Container size="lg">
+      <ToastContainer toasts={toasts} />
       <Stack gap={6}>
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-text-primary">Private Registries</h2>
+            <h2 className="text-2xl font-bold text-text-primary">Registries</h2>
             <p className="mt-1 text-sm text-text-secondary">
-              Manage private artifact registries for npm, PyPI, Maven, and generic packages.
-              Configure credentials, control visibility, and monitor registry artifacts.
+              Manage private artifact registries for your organization.
             </p>
           </div>
           <Button variant="primary" size="sm" onClick={handleOpenCreate}>
-            Add Registry
+            + Create
           </Button>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <Input
+            placeholder="Search registries..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-72"
+          />
+          <select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            className="h-10 rounded-lg border border-border bg-surface-primary px-3 text-sm text-text-primary"
+            aria-label="Filter by type"
+          >
+            <option value="all">All Types</option>
+            {PROVIDER_TYPES.map((t) => (
+              <option key={t.value} value={t.value}>{t.label}</option>
+            ))}
+          </select>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="h-10 rounded-lg border border-border bg-surface-primary px-3 text-sm text-text-primary"
+            aria-label="Filter by status"
+          >
+            <option value="all">All</option>
+            <option value="enabled">Enabled</option>
+            <option value="disabled">Disabled</option>
+          </select>
         </div>
 
         {loadError && (
           <Alert variant="error" title="Error" dismissible onDismiss={() => setLoadError(null)}>
-            {loadError}
+            <p className="text-sm">{loadError}</p>
+            <Button variant="ghost" size="sm" onClick={loadRegistries} className="mt-2">
+              Retry
+            </Button>
           </Alert>
         )}
 
         {loading && (
-          <Card padding="lg">
-            <div className="flex items-center justify-center py-12">
-              <div className="flex flex-col items-center gap-3">
-                <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary-500" />
-                <p className="text-sm text-text-tertiary">Loading registries…</p>
-              </div>
-            </div>
-          </Card>
+          <Stack gap={4}>
+            {[1, 2, 3].map((i) => (
+              <Card key={i} padding="md" className="animate-pulse">
+                <div className="flex items-start gap-4">
+                  <div className="h-10 w-10 rounded-lg bg-surface-tertiary" />
+                  <div className="flex-1 space-y-3">
+                    <div className="h-4 w-3/4 rounded bg-surface-tertiary" />
+                    <div className="h-3 w-1/2 rounded bg-surface-tertiary" />
+                    <div className="h-8 w-20 rounded bg-surface-tertiary" />
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </Stack>
         )}
 
-        {!loading && !loadError && registries.length === 0 && (
-          <Card variant="outlined" padding="lg">
-            <div className="flex flex-col items-center gap-3 py-8 text-center">
-              <span className="text-3xl" aria-hidden="true">📦</span>
-              <h3 className="text-lg font-semibold text-text-primary">No Registries Yet</h3>
+        {!loading && !loadError && filtered.length === 0 && registries.length === 0 && (
+          <Card padding="lg">
+            <div className="flex flex-col items-center gap-3 py-12 text-center">
+              <span className="text-4xl" aria-hidden="true">📦</span>
+              <h3 className="text-lg font-semibold text-text-primary">No registries configured</h3>
               <p className="max-w-md text-sm text-text-tertiary">
-                Private registries allow you to host and manage packages for your organization.
-                Click &quot;Add Registry&quot; to get started.
+                Connect your organization&apos;s private package registries to discover artifacts
+                from npm, PyPI, Maven, and more.
               </p>
               <Button variant="primary" size="sm" onClick={handleOpenCreate}>
-                Add Registry
+                + Create your first registry
               </Button>
             </div>
           </Card>
         )}
 
-        {!loading && !loadError && registries.length > 0 && (
-          <Stack gap={4}>
-            <Card padding="lg">
-              <Stack gap={3}>
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-medium uppercase tracking-wide text-text-tertiary">
-                    {registries.length} {registries.length === 1 ? 'Registry' : 'Registries'}
-                  </h3>
-                </div>
+        {!loading && !loadError && filtered.length === 0 && registries.length > 0 && (
+          <Card padding="md">
+            <p className="py-8 text-center text-sm text-text-tertiary">
+              No registries match your filters. Try adjusting your search or filter criteria.
+            </p>
+          </Card>
+        )}
 
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm" aria-label="Private registries">
-                    <thead>
-                      <tr className="border-b border-border text-xs uppercase tracking-wide text-text-tertiary">
-                        <th className="p-3 font-semibold" scope="col">Name</th>
-                        <th className="p-3 font-semibold" scope="col">Type</th>
-                        <th className="hidden p-3 font-semibold sm:table-cell" scope="col">Visibility</th>
-                        <th className="hidden p-3 font-semibold md:table-cell" scope="col">URL</th>
-                        <th className="p-3 font-semibold" scope="col">Status</th>
-                        <th className="p-3 font-semibold text-right" scope="col">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {registries.map((registry) => (
-                        <tr
-                          key={registry.id}
-                          className={`border-b border-border transition-colors hover:bg-surface-secondary/50 cursor-pointer ${
-                            expandedId === registry.id ? 'bg-primary-500/5' : ''
-                          }`}
+        {!loading && !loadError && filtered.length > 0 && (
+          <div className="grid gap-4 lg:grid-cols-2">
+            {filtered.map((registry) => (
+              <Card key={registry.id} padding="md" variant="default">
+                <div className="flex items-start gap-4">
+                  <TypeIcon type={registry.registryType} />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <button
                           onClick={() => handleExpand(registry.id)}
-                          tabIndex={0}
-                          role="button"
-                          aria-expanded={expandedId === registry.id}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              handleExpand(registry.id);
-                            }
-                          }}
+                          className="text-base font-semibold text-text-primary hover:text-primary-500 transition-colors text-left"
                         >
-                          <td className="p-3">
-                            <span className="font-medium text-text-primary">{registry.name}</span>
-                            {registry.description && (
-                              <p className="mt-0.5 text-xs text-text-tertiary truncate max-w-[200px]">
-                                {registry.description}
-                              </p>
-                            )}
-                          </td>
-                          <td className="p-3">
-                            <span className="inline-flex items-center rounded-full bg-primary-500/10 px-2 py-0.5 text-xs font-medium text-primary-700 dark:text-primary-300">
-                              {registry.registryType.toUpperCase()}
-                            </span>
-                          </td>
-                          <td className="hidden p-3 text-text-secondary sm:table-cell">
-                            {registry.visibility}
-                          </td>
-                          <td className="hidden max-w-[180px] truncate p-3 font-mono text-xs text-text-tertiary md:table-cell">
-                            {registry.url ?? '—'}
-                          </td>
-                          <td className="p-3">
-                            <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${
-                              registry.enabled
-                                ? 'bg-success-500/10 text-success-700 dark:text-success-300'
-                                : 'bg-neutral-500/10 text-neutral-600 dark:text-neutral-400'
-                            }`}>
-                              <span className={`inline-block h-1.5 w-1.5 rounded-full ${
-                                registry.enabled ? 'bg-success-500' : 'bg-neutral-400'
-                              }`} aria-hidden="true" />
-                              {registry.enabled ? 'Enabled' : 'Disabled'}
-                            </span>
-                          </td>
-                          <td className="p-3 text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={(e) => { e.stopPropagation(); handleToggle(registry); }}
-                                aria-label={registry.enabled ? 'Disable registry' : 'Enable registry'}
-                              >
-                                {registry.enabled ? 'Disable' : 'Enable'}
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={(e) => { e.stopPropagation(); handleOpenEdit(registry); }}
-                                aria-label={`Edit ${registry.name}`}
-                              >
-                                Edit
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={(e) => { e.stopPropagation(); setDeleteConfirm(registry.id); }}
-                                aria-label={`Delete ${registry.name}`}
-                              >
-                                Delete
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </Stack>
-            </Card>
-
-            {expandedId && (
-              <Card variant="outlined" padding="md" role="region" aria-label="Registry details">
-                <Stack gap={4}>
-                  <h4 className="text-sm font-semibold text-text-primary">Registry Details</h4>
-
-                  {expanding && (
-                    <div className="flex items-center justify-center py-4">
-                      <div className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-border border-t-primary-500" />
+                          {registry.name}
+                        </button>
+                        <div className="mt-1 flex flex-wrap items-center gap-2">
+                          <Badge variant="info">{registry.registryType.toUpperCase()}</Badge>
+                          <Badge variant={registry.enabled ? 'completed' : 'draft'}>
+                            {registry.enabled ? 'Enabled' : 'Disabled'}
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="relative">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => { e.stopPropagation(); setOverflowOpen(overflowOpen === registry.id ? null : registry.id); }}
+                          aria-label={`Actions for ${registry.name}`}
+                          aria-expanded={overflowOpen === registry.id}
+                        >
+                          ⋮
+                        </Button>
+                        {overflowOpen === registry.id && (
+                          <div
+                            className="absolute right-0 top-full z-40 mt-1 w-48 rounded-lg border border-border bg-surface-primary py-1 shadow-lg"
+                            role="menu"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <button role="menuitem" className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-text-primary hover:bg-surface-tertiary transition-colors" onClick={() => handleOpenEdit(registry)}>
+                              ✏️ Edit
+                            </button>
+                            <button role="menuitem" className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-text-primary hover:bg-surface-tertiary transition-colors" onClick={() => handleOpenCredentials(registry)}>
+                              🔑 Credentials
+                            </button>
+                            <button role="menuitem" className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-text-primary hover:bg-surface-tertiary transition-colors" onClick={() => { handleToggle(registry); setOverflowOpen(null); }}>
+                              {registry.enabled ? '⏸️ Disable' : '▶️ Enable'}
+                            </button>
+                            <hr className="my-1 border-border" />
+                            <button role="menuitem" className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-error-500 hover:bg-error-50 dark:hover:bg-error-950 transition-colors" onClick={() => { setDeleteConfirm(registry.id); setOverflowOpen(null); }}>
+                              🗑️ Delete
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  )}
 
-                  {!expanding && (
-                    <>
-                      <div>
-                        <h5 className="mb-2 text-xs font-medium uppercase tracking-wide text-text-tertiary">Credentials</h5>
-                        {expandedCredentials ? (
-                          <div className="rounded-lg border border-border bg-surface-secondary/50 p-3">
-                            <div className="grid gap-2 sm:grid-cols-2">
-                              <div>
-                                <span className="text-xs text-text-tertiary">Auth Type</span>
-                                <p className="text-sm font-medium text-text-primary">{expandedCredentials.authType}</p>
-                              </div>
-                              {expandedCredentials.username && (
-                                <div>
-                                  <span className="text-xs text-text-tertiary">Username</span>
-                                  <p className="text-sm font-mono text-text-primary">{expandedCredentials.username}</p>
-                                </div>
-                              )}
-                              {expandedCredentials.envVar && (
-                                <div>
-                                  <span className="text-xs text-text-tertiary">Environment Variable</span>
-                                  <p className="text-sm font-mono text-text-primary">{expandedCredentials.envVar}</p>
-                                </div>
-                              )}
+                    {registry.url && (
+                      <p className="mt-1 truncate text-sm text-text-secondary">{registry.url}</p>
+                    )}
+
+                    <div className="mt-3 flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-3 text-xs text-text-tertiary">
+                        <span>-- packages</span>
+                        <span>{formatRelative(null)}</span>
+                      </div>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        loading={scanningId === registry.id}
+                        disabled={scanningId === registry.id}
+                        onClick={(e) => { e.stopPropagation(); handleScan(registry); }}
+                      >
+                        {scanningId === registry.id ? 'Scanning...' : 'Scan'}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                {expandedId === registry.id && (
+                  <div className="mt-4 border-t border-border pt-4" role="region" aria-label={`Details for ${registry.name}`}>
+                    {expanding ? (
+                      <div className="flex items-center justify-center py-4">
+                        <Spinner className="h-5 w-5" />
+                      </div>
+                    ) : (
+                      <div className="space-y-3 text-sm">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <span className="text-xs text-text-tertiary">Visibility</span>
+                            <p className="font-medium text-text-primary capitalize">{registry.visibility}</p>
+                          </div>
+                          <div>
+                            <span className="text-xs text-text-tertiary">Created</span>
+                            <p className="font-medium text-text-primary">{new Date(registry.createdAt).toLocaleDateString()}</p>
+                          </div>
+                        </div>
+                        {registry.description && (
+                          <p className="text-text-secondary">{registry.description}</p>
+                        )}
+                        <div>
+                          <span className="text-xs font-medium text-text-tertiary">Credentials</span>
+                          {expandedCredentials ? (
+                            <div className="mt-1 rounded-md bg-surface-secondary/50 p-2">
+                              <p className="text-text-primary">{expandedCredentials.authType}</p>
+                              {expandedCredentials.username && <p className="text-xs text-text-tertiary font-mono">{expandedCredentials.username}</p>}
                             </div>
-                          </div>
-                        ) : (
-                          <p className="text-sm text-text-tertiary">No credentials configured.</p>
-                        )}
+                          ) : (
+                            <p className="mt-1 text-text-tertiary">No credentials configured</p>
+                          )}
+                        </div>
+                        <div>
+                          <span className="text-xs font-medium text-text-tertiary">Artifacts ({expandedArtifacts.length})</span>
+                          {expandedArtifacts.length > 0 ? (
+                            <div className="mt-1 max-h-32 overflow-y-auto">
+                              {expandedArtifacts.map((a) => (
+                                <p key={a.id} className="font-mono text-xs text-text-secondary">{a.artifactId}</p>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="mt-1 text-text-tertiary">No artifacts</p>
+                          )}
+                        </div>
                       </div>
-
-                      <div>
-                        <h5 className="mb-2 text-xs font-medium uppercase tracking-wide text-text-tertiary">
-                          Artifacts ({expandedArtifacts.length})
-                        </h5>
-                        {expandedArtifacts.length > 0 ? (
-                          <div className="overflow-x-auto">
-                            <table className="w-full text-left text-sm" aria-label="Registry artifacts">
-                              <thead>
-                                <tr className="border-b border-border text-xs uppercase text-text-tertiary">
-                                  <th className="py-2 pr-3 font-semibold" scope="col">Artifact ID</th>
-                                  <th className="py-2 pr-3 font-semibold" scope="col">Added</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {expandedArtifacts.map((artifact) => (
-                                  <tr key={artifact.id} className="border-b border-border last:border-0">
-                                    <td className="py-2 pr-3 font-mono text-xs text-text-primary">
-                                      {artifact.artifactId}
-                                    </td>
-                                    <td className="py-2 pr-3 text-xs text-text-secondary whitespace-nowrap">
-                                      {formatDate(artifact.addedAt)}
-                                    </td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-                        ) : (
-                          <p className="text-sm text-text-tertiary">No artifacts in this registry.</p>
-                        )}
-                      </div>
-                    </>
-                  )}
-                </Stack>
+                    )}
+                  </div>
+                )}
               </Card>
-            )}
-          </Stack>
+            ))}
+          </div>
+        )}
+
+        {!loading && !loadError && registries.length > 0 && (
+          <p className="text-center text-xs text-text-tertiary">
+            Showing {filtered.length} of {registries.length} {registries.length === 1 ? 'registry' : 'registries'}
+          </p>
         )}
       </Stack>
 
       {modalMode && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 sm:p-6"
           role="dialog"
           aria-modal="true"
-          aria-label={modalMode === 'create' ? 'Add registry' : 'Edit registry'}
+          aria-labelledby="registry-modal-title"
+          onClick={(e) => { if (e.target === e.currentTarget) handleCloseModal(); }}
         >
-          <Card padding="lg" className="w-full max-w-lg">
+          <Card padding="lg" className="w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <Stack gap={4}>
-              <h3 className="text-lg font-semibold text-text-primary">
-                {modalMode === 'create' ? 'Add Registry' : 'Edit Registry'}
-              </h3>
+              <div className="flex items-center justify-between">
+                <h3 id="registry-modal-title" className="text-lg font-semibold text-text-primary">
+                  {modalMode === 'create' ? 'Create Registry' : 'Edit Registry'}
+                </h3>
+                <Button variant="ghost" size="sm" onClick={handleCloseModal} aria-label="Close">
+                  ✕
+                </Button>
+              </div>
 
               {saveError && (
                 <Alert variant="error" title="Error" dismissible onDismiss={() => setSaveError(null)}>
@@ -476,68 +603,63 @@ export function PrivateRegistries() {
                 </Alert>
               )}
 
+              <div>
+                <Input
+                  label="Registry name *"
+                  value={form.name}
+                  onChange={(e) => handleFormChange('name', e.target.value)}
+                  placeholder="e.g., Internal npm Mirror"
+                  error={formErrors.name}
+                  fullWidth
+                  autoFocus
+                />
+              </div>
+
+              <RadioGroup
+                name="registryType"
+                label="Registry type"
+                options={PROVIDER_TYPES.map((t) => ({
+                  value: t.value,
+                  label: t.label,
+                  icon: <TypeIcon type={t.value} size="sm" />,
+                  disabled: modalMode === 'edit',
+                }))}
+                value={form.registryType}
+                onChange={(v: string) => handleFormChange('registryType', v)}
+              />
+
               <Input
-                label="Name *"
-                value={form.name}
-                onChange={handleFormChange('name')}
-                placeholder="my-private-registry"
+                label="URL"
+                value={form.url}
+                onChange={(e) => handleFormChange('url', e.target.value)}
+                placeholder="https://npm.mycompany.com"
+                helperText="Required for scanning"
                 fullWidth
               />
 
               <Input
                 label="Description"
                 value={form.description}
-                onChange={handleFormChange('description')}
-                placeholder="Optional description"
+                onChange={(e) => handleFormChange('description', e.target.value)}
+                placeholder="Describe what this registry is used for"
+                error={formErrors.description}
                 fullWidth
               />
 
-              <div>
-                <label htmlFor="registry-type" className="mb-1 block text-xs font-medium text-text-tertiary uppercase tracking-wide">
-                  Registry Type
-                </label>
-                <select
-                  id="registry-type"
-                  value={form.registryType}
-                  onChange={handleFormChange('registryType')}
-                  className="w-full rounded-lg border border-border bg-surface-primary px-3 py-2 text-sm text-text-primary transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  {PROVIDER_TYPES.map((t) => (
-                    <option key={t.value} value={t.value}>{t.label}</option>
-                  ))}
-                </select>
-              </div>
-
-              <Input
-                label="URL"
-                value={form.url}
-                onChange={handleFormChange('url')}
-                placeholder="https://registry.example.com"
-                fullWidth
+              <RadioGroup
+                name="visibility"
+                label="Visibility"
+                options={VISIBILITY_OPTIONS}
+                value={form.visibility}
+                onChange={(v: string) => handleFormChange('visibility', v)}
               />
-
-              <div>
-                <label htmlFor="registry-visibility" className="mb-1 block text-xs font-medium text-text-tertiary uppercase tracking-wide">
-                  Visibility
-                </label>
-                <select
-                  id="registry-visibility"
-                  value={form.visibility}
-                  onChange={handleFormChange('visibility')}
-                  className="w-full rounded-lg border border-border bg-surface-primary px-3 py-2 text-sm text-text-primary transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  {VISIBILITY_OPTIONS.map((v) => (
-                    <option key={v.value} value={v.value}>{v.label}</option>
-                  ))}
-                </select>
-              </div>
 
               <div className="flex items-center justify-end gap-2 pt-2">
                 <Button variant="ghost" size="sm" onClick={handleCloseModal} disabled={saving}>
                   Cancel
                 </Button>
                 <Button variant="primary" size="sm" onClick={handleSave} loading={saving}>
-                  {modalMode === 'create' ? 'Create' : 'Save Changes'}
+                  {modalMode === 'create' ? 'Create registry' : 'Save changes'}
                 </Button>
               </div>
             </Stack>
@@ -550,35 +672,49 @@ export function PrivateRegistries() {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
           role="dialog"
           aria-modal="true"
-          aria-label="Confirm delete"
+          aria-labelledby="delete-modal-title"
+          onClick={(e) => { if (e.target === e.currentTarget) setDeleteConfirm(null); }}
         >
           <Card padding="lg" className="w-full max-w-sm">
             <Stack gap={4}>
-              <h3 className="text-lg font-semibold text-text-primary">Delete Registry?</h3>
-              <p className="text-sm text-text-secondary">
-                This action cannot be undone. All associated artifacts and credentials will be permanently removed.
-              </p>
+              <h3 id="delete-modal-title" className="text-lg font-semibold text-text-primary">
+                Delete registry
+              </h3>
+              <Alert variant="warning" title="Are you sure?">
+                <p className="text-sm">
+                  This will permanently remove the registry configuration, all stored credentials,
+                  artifact associations, and scan history. The artifacts themselves will not be deleted.
+                </p>
+              </Alert>
               <div className="flex items-center justify-end gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setDeleteConfirm(null)}
-                  disabled={deleting}
-                >
+                <Button variant="ghost" size="sm" onClick={() => setDeleteConfirm(null)} disabled={deleting}>
                   Cancel
                 </Button>
-                <Button
-                  variant="danger"
-                  size="sm"
-                  loading={deleting}
-                  onClick={() => handleDelete(deleteConfirm)}
-                >
-                  Delete
+                <Button variant="danger" size="sm" loading={deleting} onClick={handleDelete}>
+                  Delete registry
                 </Button>
               </div>
             </Stack>
           </Card>
         </div>
+      )}
+
+      {credentialsModal && (
+        <CredentialsModal
+          registryId={credentialsModal.registryId}
+          registryName={credentialsModal.registryName}
+          onClose={() => setCredentialsModal(null)}
+          onSaved={() => {
+            setCredentialsModal(null);
+            addToast('success', 'Credentials saved', 'Registry credentials updated successfully');
+            void loadRegistries();
+          }}
+          onRemoved={() => {
+            setCredentialsModal(null);
+            addToast('info', 'Credentials removed', 'Registry credentials have been removed');
+            void loadRegistries();
+          }}
+        />
       )}
     </Container>
   );

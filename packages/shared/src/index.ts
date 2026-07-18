@@ -12,6 +12,7 @@ export {
   Nav,
   Badge,
   Alert,
+  RadioGroup,
 } from './design-system';
 
 export type {
@@ -27,6 +28,8 @@ export type {
   BadgeVariant,
   AlertProps,
   AlertVariant,
+  RadioOption,
+  RadioGroupProps,
 } from './design-system';
 
 export type {
@@ -102,3 +105,16 @@ export type {
   AuditLogFilter,
   AuditAction,
 } from './types';
+
+export type {
+  CoverageGap,
+  CoverageGapReport,
+  ImpactScope,
+  AffectedArtifact,
+  ImpactAnalysis,
+  LLMConfig,
+  LLMMessage,
+  LLMCompletionRequest,
+  LLMCompletionResponse,
+  TraceabilityQuery,
+} from './ai-types';
