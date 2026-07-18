@@ -45,3 +45,14 @@
   - UXDesigner → blocked on billing (THE-212 gate)
 - **Decision:** Pipeline healthy at 1/2 runners. CTO artifacts committed in `feat/THE-223-activate-idle-agents-wave-2` (a1124e4).
 - **Remaining:** All delegated via HEARTBEAT.md HB#149. CEO needed for billing resolution.
+
+### HB#150: Test Audit — TAC Route Failures Block Epic B
+- **Action:** CTO ran full test suite as quality gate check
+- **Frontend: 96/96 passed** ✅ — THE-208 (Audit Log Viewer) fully passing with 14 tests
+- **Backend: 239/242 passed** ⚠️ — 3 TAC route test failures discovered:
+  1. `tacRoutes.test.ts:93` — `listTacDocuments` search filter: expected `total >= 1`, got 0
+  2. `tacRoutes.test.ts:113` — `getTacDocument` by ID: returns `{ error }` instead of document
+  3. `tacRoutes.test.ts:159` — `validateTacDocument`: returns valid=true for invalid doc
+- **Root cause:** TAC route handlers exist (untracked) but have implementation bugs. Schema validation doesn't reject invalid docs, search doesn't match mock data, get-by-ID fails.
+- **Decision:** These failures must be fixed before THE-219 (Epic B) can be marked done. Route to BackendArchitect after THE-205 completion.
+- **Blocker:** BackendArchitect at WIP capacity (THE-205). TAC route fixes are queued for THE-219. `tacRoutes.ts` and `tacRoutes.test.ts` are uncommitted.
