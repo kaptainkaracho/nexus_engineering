@@ -109,7 +109,11 @@ export async function runTests() {
     if (doc3.type !== 'Json') throw new Error('JSON file should be parsed as Json type');
     if (typeof doc3.content !== 'object') throw new Error('JSON content should be object');
     
-    const keys = Array.isArray(doc3.content) ? doc3.content.join(', ') : typeof doc3.content === 'object' ? Object.keys(doc3.content).join(', ') : 'object';
+    const keys = Array.isArray(doc3.content)
+      ? doc3.content.join(', ')
+      : typeof doc3.content === 'object' && doc3.content !== null
+        ? Object.keys(doc3.content).join(', ')
+        : 'object';
     console.log(`  ✓ Parsed JSON document with keys: ${keys}`);
     passed++;
 
