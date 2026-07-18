@@ -104,7 +104,7 @@ function testFilterBySourceType() {
   db.buildGraphFromParsed(sampleParsedDocs())
 
   // Filter for source_id starting with 'req' — should match req-doc-1 which has 3 edges
-  let filteredEdges: typeof db.getGraphEdges()
+  let filteredEdges: ReturnType<typeof db.getGraphEdges>
   try {
     const result = db.buildGraph(['requirement'], undefined, undefined)
     filteredEdges = result.edges
