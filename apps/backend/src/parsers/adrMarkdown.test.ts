@@ -213,4 +213,32 @@ describe('RepositoryParser ADR-*.md support', () => {
     expect(result.documents[0].detectedType).toBe('adr');
     expect(result.documents[1].traceLinks!.length).toBeGreaterThan(0);
   });
+
+  it('integration: real repo sample ADR-001 parses into ArchitectureDecision', async () => {
+    const adrPath = path.resolve(
+      __dirname,
+      '../../../../packages/shared/requirements/decisions/ADR-001-use-markdown-adrs.md'
+    );
+    const adrFile: SharedFileMetadata = {
+      filePath: adrPath,
+      relativePath: 'packages/shared/requirements/decisions/ADR-001-use-markdown-adrs.md',
+      size: 2200,
+      contentHash: 'hash',
+      contentType: 'text',
+      detectedType: 'adr',
+    };
+
+    const result = await repositoryParser.parse([adrFile], '.');
+    expect(result.errors).toHaveLength(0);
+    expect(result.documents).toHaveLength(1);
+
+    const adr = result.documents[0].content as any;
+    expect(adr.id).toBe('ADR-001-use-markdown-adrs');
+    expect(adr.title).toContain('Use Markdown ADRs');
+    expect(adr.status).toBe('accepted');
+    expect(adr.context).toContain('lightweight');
+    expect(adr.decision).toContain('adopted ADR-*.md');
+    expect(adr.consequences.length).toBeGreaterThan(0);
+    expect(adr.supersededBy).toBeUndefined();
+  });
 });
