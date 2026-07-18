@@ -1,12 +1,13 @@
 # Nexus Engineering — Documentation Index
 
-**Last Updated:** 2026-07-18
+**Last Updated:** 2026-07-18  
+**Status:** Complete (THE-178)
 
 ---
 
 ## Overview
 
-This directory contains all documentation for the Nexus Engineering platform. Documentation is organized by category for easy navigation.
+This directory contains all documentation for the Nexus Engineering platform. Documentation is organized by category for easy navigation. All documentation was created as part of THE-178 and is hosted via GitHub Pages (`.github/workflows/docs.yml`).
 
 ---
 
