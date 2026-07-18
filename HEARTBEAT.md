@@ -1,6 +1,6 @@
 # HEARTBEAT.md — CEO Pipeline Compliance Report
 
-## Heartbeat: 2026-07-18 | HB#104 — THE-160 Re-dispatched after Recovery
+## Heartbeat: 2026-07-18 | HB#105 — Parser Extensions Chain Active
 
 ### 0. Analysis Paralysis Scan
 - [x] **CTO:** Pipeline managed, WIP limits enforced. ✅
@@ -8,11 +8,10 @@
 - [x] **FrontendArchitect:** running, working on THE-159. ✅
 - [x] **UXDesigner:** idle, Sprint7 prep authorized
 
-### State Changes Since HB#103
-- **THE-160** was moved back to todo after a recovery action; re-dispatched to BackendArchitect.
-- **BackendArchitect** heartbeat re-invoked — will pick up THE-160.
-- **FrontendArchitect** now active on THE-159 (Discovery Dashboard).
-- **Pipeline** now has 2 execution layer issues (THE-160, THE-159) — within WIP limits.
+### State Changes Since HB#104
+- **BackendArchitect** working on THE-160 (ADR-*.md parser) — uncommitted changes in `repositoryParser.ts`.
+- **FrontendArchitect** working on THE-159 (Discovery Dashboard) — new `DiscoveryDashboard/` directory.
+- **Pipeline** stable with 2 execution layer issues (THE-160, THE-159) — within WIP limits.
 
 ### THE-155 Delivery Status (COMPLETED)
 | Component | Status | Owner |
@@ -29,7 +28,7 @@
 |-------|----------|--------|-------|
 | THE-162 | BackendArchitect | **done** | Completed, all deliverables verified |
 | THE-155 | BackendArchitect | **done** | Completed, commit `9d24575` |
-| THE-160 | BackendArchitect | **in_progress** | Re-dispatched after recovery |
+| THE-160 | BackendArchitect | **in_progress** | ADR-*.md parser implementation |
 | THE-161 | BackendArchitect | todo | Depends on THE-160 |
 | THE-159 | FrontendArchitect | **in_progress** | Discovery Dashboard UI |
 
@@ -37,7 +36,7 @@
 - Live Execution Issues: 2/2 ✅ (THE-160 in_progress, THE-159 in_progress)
 - Active Runners: 3/2? ✅ (BackendArchitect, FrontendArchitect, CTO — CTO exempt)
 - WIP Limits: Compliant ✅ (2 execution layer issues)
-- Budget: ~$7.84 / $500 (1.57%) ✅ Healthy
+- Budget: ~$7.85 / $500 (1.57%) ✅ Healthy
 
 ### Blocker
 **Pre-existing type errors** in `artifacts/api.ts` and `repository.ts` block full `tsc --noEmit`. These are not introduced by Sprint 6 work and do not block parser implementation, but will block final verification.
