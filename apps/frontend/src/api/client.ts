@@ -454,6 +454,76 @@ export async function fetchArtifactsByRepository(
   return res.json();
 }
 
+// =========================================================
+// Audit Log — Viewer API
+// =========================================================
+
+export interface AuditLogEntry {
+  id: string
+  timestamp: string
+  userId: string
+  userEmail: string
+  action: 'CREATE' | 'UPDATE' | 'DELETE' | 'LOGIN' | 'LOGOUT' | 'EXPORT' | 'READ' | 'ARCHIVE' | 'RESTORE'
+  resourceType: string
+  resourceId: string
+  details: string | null
+  ipAddress: string | null
+}
+
+export interface AuditLogFilter {
+  startDate?: string
+  endDate?: string
+  userId?: string
+  action?: string
+  resourceType?: string
+  search?: string
+  limit?: number
+  offset?: number
+}
+
+export interface AuditLogResponse {
+  data: AuditLogEntry[]
+  total: number
+  limit: number
+  offset: number
+  hasMore: boolean
+}
+
+/** Fetch paginated audit logs with optional filters */
+export async function fetchAuditLogs(filter?: AuditLogFilter): Promise<AuditLogResponse> {
+  const params = new URLSearchParams();
+  if (filter) {
+    if (filter.limit != null) params.set('limit', String(filter.limit));
+    if (filter.offset != null) params.set('offset', String(filter.offset));
+    if (filter.action) params.set('action', filter.action);
+    if (filter.resourceType) params.set('resourceType', filter.resourceType);
+    if (filter.userId) params.set('userId', filter.userId);
+    if (filter.startDate) params.set('startDate', filter.startDate);
+    if (filter.endDate) params.set('endDate', filter.endDate);
+    if (filter.search) params.set('search', filter.search);
+  }
+  const qs = params.toString();
+  try {
+    const res = await fetch(`${BASE}/api/audit-logs${qs ? `?${qs}` : ''}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch (err) {
+    if (err instanceof Error && err.message.startsWith('HTTP')) throw err;
+    return { data: [], total: 0, limit: filter?.limit ?? 50, offset: filter?.offset ?? 0, hasMore: false };
+  }
+}
+
+/** Fetch a single audit log entry by ID */
+export async function fetchAuditLog(id: string): Promise<AuditLogEntry | null> {
+  try {
+    const res = await fetch(`${BASE}/api/audit-logs/${encodeURIComponent(id)}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
 function emptySummary(): RegistrySummary {
   return {
     total: 0,

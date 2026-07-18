@@ -10,6 +10,7 @@ import { AuthPage } from './views/Auth';
 import { ProtectedLayout, isAdmin } from './views/Auth/ProtectedRoute';
 import { AdminDashboard } from './views/AdminDashboard';
 import { RoleManagement } from './views/RoleManagement';
+import { AuditLogViewer } from './views/AuditLogViewer';
 import {
   getCurrentSession,
   clearSession,
@@ -29,7 +30,8 @@ type Section =
   | 'graph'
   | 'templates'
   | 'admin'
-  | 'roles';
+  | 'roles'
+  | 'audit-log';
 
 const VALID_SECTIONS: Section[] = [
   'overview',
@@ -44,6 +46,7 @@ const VALID_SECTIONS: Section[] = [
   'templates',
   'admin',
   'roles',
+  'audit-log',
 ];
 
 interface RouteState {
@@ -158,6 +161,7 @@ function App() {
     { label: 'Multi-Repo', href: '#multi-repo', active: activeSection === 'multi-repo' },
     { label: 'Graph Builder', href: '#graph', active: activeSection === 'graph' },
     { label: 'Templates', href: '#templates', active: activeSection === 'templates' },
+    { label: 'Audit Log', href: '#audit-log', active: activeSection === 'audit-log' },
     ...(isUserAdmin
       ? [
           { label: 'Organizations', href: '#admin', active: activeSection === 'admin' },
@@ -214,7 +218,9 @@ function App() {
         </Container>
       </header>
 
-          <Container size="lg">{activeSection === 'discovery' ? (
+          <Container size="lg">{activeSection === 'audit-log' ? (
+            <AuditLogViewer />
+          ) : activeSection === 'discovery' ? (
             <DiscoveryDashboard />
           ) : activeSection === 'multi-repo' ? (
             <MultiRepoDashboard />
