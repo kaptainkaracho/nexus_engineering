@@ -10,6 +10,7 @@
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "validate:requirements": "node scripts/validate-requirements.js",
+"validate:adrs": "node scripts/validate-adrs.js",
     "clean": "pnpm -r clean"
   },
   "dependencies": {

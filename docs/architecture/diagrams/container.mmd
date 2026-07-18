@@ -1,0 +1,25 @@
+C4Container
+  title Container diagram for Nexus Engineering
+
+  Person(engineer, "Engineer", "Uses Nexus to manage requirements and traceability")
+
+  System_Boundary(nexus, "Nexus Engineering") {
+    Container(webapp, "Single-Page Application", "React 19, Vite 6, Tailwind CSS", "Provides interactive UI for scanning, browsing, and visualizing artifacts")
+    Container(api, "API Server", "Fastify 5, TypeScript", "Handles auth, scanning, artifact CRUD, graph queries")
+    Container(db, "Database", "SQLite (better-sqlite3)", "Stores artifacts, users, graph, sessions")
+    Container(shared, "Shared Package", "TypeScript, JSON Schema", "Common types, schemas, design system, validators")
+
+    Rel(webapp, api, "REST API calls", "JSON/HTTP")
+    Rel(api, db, "Reads/Writes", "SQLite")
+    Rel(api, shared, "Uses", "Types/Schemas")
+    Rel(webapp, shared, "Uses", "Design System/Components")
+  }
+
+  System_Ext(github, "GitHub", "Source code repositories with YAML/MD artifacts")
+  System_Ext(ci, "GitHub Actions", "CI/CD pipeline")
+
+  Rel(api, github, "Clones/scans repos for artifacts")
+  Rel(ci, github, "Runs on PR/push events")
+  Rel(engineer, webapp, "Interacts via browser")
+
+  UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")

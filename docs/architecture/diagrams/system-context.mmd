@@ -1,0 +1,23 @@
+C4Context
+  title System Context diagram for Nexus Engineering
+
+  Person(engineer, "Engineer", "Uses Nexus to manage requirements and traceability")
+  Person(architect, "Architect", "Documents ADRs and reviews architecture")
+  Person(pm, "Product Manager", "Defines requirements and tracks progress")
+
+  System_Boundary(nexus, "Nexus Engineering") {
+    System(nexusApp, "Nexus Engineering App", "Scans repos, links artifacts, visualizes traceability")
+  }
+
+  System_Ext(github, "GitHub", "Source code and artifact repositories")
+  System_Ext(railway, "Railway", "Cloud hosting platform")
+
+  Rel(engineer, nexusApp, "Views artifacts, runs scans, explores graph")
+  Rel(architect, nexusApp, "Reviews ADRs and architecture models")
+  Rel(pm, nexusApp, "Tracks requirements and traceability")
+
+  Rel(nexusApp, github, "Scans repositories for artifacts")
+  Rel(nexusApp, railway, "Deployed on")
+  Rel(github, railway, "Triggers deploy via CI/CD")
+
+  UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")

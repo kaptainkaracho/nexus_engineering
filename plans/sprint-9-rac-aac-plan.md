@@ -30,23 +30,32 @@ These were delivered by UXDesigner (THE-190 sub-issue) and already committed.
 
 ---
 
-## Remaining Work
+## Completed (HB#129 — CTO self-execution)
 
-### RAC — Requirements as Code
+| # | Delivered | Notes |
+|---|-----------|-------|
+| RAC-1a | CI validation script reference fix (`.mts`→`.js`) | Fixed in `.github/workflows/ci.yml`, removed `continue-on-error` |
+| RAC-2a | Domain requirement directories (auth/, api/, ui/) | Created with first auth req doc (`user-auth.req.yaml`, 5 requirements linked to THE-191) |
+| AAC-2 | C4 architecture diagrams (System Context + Container) | Mermaid format in `docs/architecture/diagrams/system-context.mmd` + `container.mmd` |
+| AAC-3 | ADR validation CI job | Script at `scripts/validate-adrs.js`, CI job `adr-validate` in `ci.yml`, `validate:adrs` npm script |
 
-| # | Task | Est. | Assignee | Dependencies |
-|---|------|------|----------|-------------|
-| RAC-1 | CI validation for RAC YAML format + issue reference integrity | 1 HB | BackendArchitect | None |
-| RAC-2 | Domain requirement directories (auth/, api/, ui/, db/) + first real req docs | 1 HB | BackendArchitect | RAC-1 (CI first) |
-| RAC-3 | Validation JSON Schema for `req-doc/v1` format | 0.5 HB | BackendArchitect | RAC-1 |
+## Remaining Work — BackendArchitect (THE-194)
 
-### AAC — Architecture as Code
+### Wave 2 — BackendArchitect
 
-| # | Task | Est. | Assignee | Dependencies |
-|---|------|------|----------|-------------|
-| AAC-1 | Create ADRs for past major architecture decisions (see list below) | 1-2 HB | BackendArchitect | None |
-| AAC-2 | C4 architecture diagrams (System Context + Container) as PlantUML/Mermaid | 1 HB | BackendArchitect | AAC-1 |
-| AAC-3 | CI validation for ADR issue references | 0.5 HB | BackendArchitect | None |
+| # | Task | Est. | Dependencies |
+|---|------|------|-------------|
+| RAC-1b | RAC YAML format + issue reference CI validation — verify completeness | 0.5 HB | None (script exists) |
+| RAC-3 | Validation JSON Schema for `req-doc/v1` format | 0.5 HB | None |
+| AAC-1 | Create ADRs for past major architecture decisions (see list below) | 1-2 HB | None |
+| RAC-2b | Additional domain req docs (api/, ui/, db/) | 0.5 HB | None |
+
+### Priority ADRs to Create
+
+1. ADR-003: Graph Builder Architecture (traceability graph design)
+2. ADR-004: Repository Scanner Design (artifact auto-discovery)
+3. ADR-005: Artifact Registry Data Model
+4. ADR-006: Frontend Architecture (Vite + React + Design System)
 
 ### Priority ADRs to Create
 
@@ -91,18 +100,16 @@ All frontend-adjacent deliverables (C4 diagrams in UI, req doc viewers) must pas
 
 ---
 
-## Pipeline Compliance
+## Pipeline Compliance (HB#129)
 
-Current state after WIP enforcement:
+Updated state after THE-191 and THE-193 completed:
 
 | Agent | Active Issue | Status |
 |-------|-------------|--------|
-| BackendArchitect | `[BackendArchitect] Auth + RBAC Backend Implementation` | **in_progress** 🔄 |
-| UXDesigner | `[UXDesigner] Auth Flow Wireframes & Admin UI Mockups` | **in_progress** 🔄 |
-| FrontendArchitect | `[FrontendArchitect] Auth UI Implementation` | **todo** |
+| BackendArchitect | `[BackendArchitect] RAC + AAC Implementation` (THE-194) | **in_progress** 🟢 |
+| FrontendArchitect | `[FrontendArchitect] Auth UI Implementation` (THE-192) | **in_progress** 🟢 |
+| UXDesigner | `[UXDesigner] RAC + AAC Template Design` (THE-195) | **todo** (queued) |
 | CTO | THE-190 (orchestration) + THE-189 (orchestration) | **in_progress** 🔄 (exempt) |
-| Senior QA | None | **idle** |
 
 - Live execution issues: 2/2 ✅
 - Per-agent WIP: 1/1 ✅
-- RAC+AAC sub-issues: moved to `backlog` (will resume when capacity frees)
