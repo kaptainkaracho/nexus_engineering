@@ -1,0 +1,110 @@
+# =============================================================================
+# RAC Requirement Template
+# =============================================================================
+# This template defines the structure for Requirements as Code (RAC) files.
+# Copy this template and fill in the values for your requirements.
+#
+# Usage:
+#   1. Copy this file to your domain directory (e.g., docs/requirements/auth/)
+#   2. Rename it to describe your domain (e.g., authentication.req.yaml)
+#   3. Fill in the metadata and requirements sections
+#   4. Follow the naming convention: REQ-{DOMAIN}-{NUMBER}
+#
+# Examples:
+#   - REQ-AUTH-001 (Authentication requirement)
+#   - REQ-API-002 (API requirement)
+#   - REQ-UI-003 (UI requirement)
+# =============================================================================
+
+# Document metadata - identifies this requirement document
+nexus:
+  schema: req-doc/v1  # DO NOT CHANGE - identifies this as a RAC document
+  metadata:
+    domain: string    # Domain grouping (e.g., Authentication, API, UI, Database)
+    version: 1.0.0    # Semantic version of this requirement document
+    source: string    # Relative path to this file in the repository
+    author: string    # Optional: who created this document
+    createdAt: string # Optional: ISO 8601 date
+    updatedAt: string # Optional: ISO 8601 date
+
+# Requirements list - each item is a single requirement
+requirements:
+  - id: REQ-{DOMAIN}-{NUMBER}     # Unique identifier (e.g., REQ-AUTH-001)
+    type: functional               # Requirement type: functional | non-functional | system | user
+    title: string                  # Short, descriptive title (max 120 chars)
+    description: |                 # Detailed description (Markdown supported)
+      What this requirement specifies.
+      Use clear, unambiguous language.
+      Reference relevant standards or specs if applicable.
+    priority: medium               # Priority: low | medium | high | critical
+    status: proposed               # Status: proposed | approved | rejected | implemented | verified
+    tags:                          # Optional: keywords for filtering
+      - tag1
+      - tag2
+    acceptanceCriteria:            # Optional: specific criteria for verification
+      - "Given [context], when [action], then [result]"
+      - "Given [context], when [action], then [result]"
+    dependencies:                  # Optional: other requirement IDs this depends on
+      - REQ-{DOMAIN}-{NUMBER}
+    relatedIssues:                 # Optional: Paperclip issue references
+      - THE-{NUMBER}
+    notes:                         # Optional: additional context or rationale
+      Additional context or rationale for this requirement.
+
+# =============================================================================
+# FIELD DEFINITIONS
+# =============================================================================
+#
+# ID Format: REQ-{DOMAIN}-{NUMBER}
+#   - Domain: 3-5 uppercase letters (AUTH, API, UI, DB, PERF, SEC, etc.)
+#   - Number: 3-digit zero-padded number (001, 002, etc.)
+#   - Examples: REQ-AUTH-001, REQ-API-002, REQ-UI-003
+#
+# Types:
+#   - functional: Specific behavior the system must exhibit
+#   - non-functional: Quality attributes (performance, security, etc.)
+#   - system: System-level requirements (infrastructure, deployment)
+#   - user: User-facing requirements (UX, accessibility)
+#
+# Priority Levels:
+#   - low: Nice to have, can be deferred
+#   - medium: Should have, important but not critical
+#   - high: Must have, critical for release
+#   - critical: Blocking, must be resolved immediately
+#
+# Status Values:
+#   - proposed: Initial state, under review
+#   - approved: Accepted and ready for implementation
+#   - rejected: Not accepted, with documented rationale
+#   - implemented: Code complete, ready for verification
+#   - verified: Tested and confirmed working
+#
+# =============================================================================
+# EXAMPLE REQUIREMENT
+# =============================================================================
+#
+# - id: REQ-AUTH-001
+#   type: functional
+#   title: User Login with Email
+#   description: |
+#     The system MUST allow a user to log in using their email address
+#     and password. The email must be case-insensitive. Password validation
+#     must follow security best practices.
+#   priority: high
+#   status: approved
+#   tags:
+#     - auth
+#     - security
+#     - user
+#   acceptanceCriteria:
+#     - "Given a registered user, when they enter valid email and password, then they are authenticated"
+#     - "Given a user, when they enter invalid credentials, then they see an error message"
+#     - "Given a user, when they enter an unregistered email, then they see an error message"
+#   dependencies:
+#     - REQ-SEC-001
+#   relatedIssues:
+#     - THE-191
+#   notes: |
+#     Password requirements are defined in REQ-SEC-001.
+#     Rate limiting will be implemented in REQ-PERF-001.
+# =============================================================================

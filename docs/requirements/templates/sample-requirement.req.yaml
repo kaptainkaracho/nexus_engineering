@@ -1,0 +1,65 @@
+# =============================================================================
+# Sample Requirement Document
+# =============================================================================
+# This is a sample requirement document demonstrating the RAC format.
+# Use this as a reference when creating your own requirement documents.
+# =============================================================================
+
+nexus:
+  schema: req-doc/v1
+  metadata:
+    domain: Authentication
+    version: 1.0.0
+    source: docs/requirements/templates/sample-requirement.req.yaml
+    author: UXDesigner
+    createdAt: "2026-07-18"
+    updatedAt: "2026-07-18"
+
+requirements:
+  - id: REQ-AUTH-001
+    type: functional
+    title: User Login with Email
+    description: |
+      The system MUST allow a user to log in using their email address
+      and password. The email must be case-insensitive. Password validation
+      must follow security best practices.
+    priority: high
+    status: approved
+    tags:
+      - auth
+      - security
+      - user
+    acceptanceCriteria:
+      - "Given a registered user, when they enter valid email and password, then they are authenticated"
+      - "Given a user, when they enter invalid credentials, then they see an error message"
+      - "Given a user, when they enter an unregistered email, then they see an error message"
+    dependencies: []
+    relatedIssues:
+      - THE-191
+    notes: |
+      Password requirements are defined in REQ-SEC-001.
+      Rate limiting will be implemented in REQ-PERF-001.
+
+  - id: REQ-AUTH-002
+    type: non-functional
+    title: Session Timeout
+    description: |
+      Sessions MUST expire after 30 minutes of inactivity.
+      Users should be prompted before session expiry.
+      Expired sessions must be cleaned up from the database.
+    priority: medium
+    status: proposed
+    tags:
+      - auth
+      - security
+      - performance
+    acceptanceCriteria:
+      - "Given an active user, when they are inactive for 25 minutes, then they see a warning"
+      - "Given an inactive user, when 30 minutes pass, then their session is terminated"
+      - "Given expired sessions, when the cleanup runs, then they are removed from the database"
+    dependencies:
+      - REQ-AUTH-001
+    relatedIssues: []
+    notes: |
+      Cleanup job will run every 5 minutes.
+      Warning should allow users to extend their session.
