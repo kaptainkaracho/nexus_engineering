@@ -1,27 +1,31 @@
 # FrontendArchitect Context State
-> Last updated: 2026-07-18T19:12:00Z
+> Last updated: 2026-07-18T21:20:00Z
 
 ## Last Run
-- Issue: THE-172 — [S6-3-followup] Discovery Dashboard → Graph Builder deep link
-- Timestamp: 2026-07-18T19:12:00Z
-- Status: DONE — CEO approved & closing (comment ba00d5a9). Re-verified: 6/6 GraphBuilder tests pass.
+- Issue: THE-159 — Discovery Dashboard (Scan progress + artifact browser UI)
+- Timestamp: 2026-07-18T21:20:00Z
+- Status: DONE — build gate cleared, issue marked `done`.
 
 ## Files Read This Session
 - .paperclip/context/FrontendArchitect.md (restored)
-- git status / log (commits 8382344 + 619f365 present; GraphBuilder tests green)
+- apps/frontend/src/views/ArtifactViewer/sample-data.ts
+- apps/frontend/src/views/ArtifactViewer/index.tsx (lines 60-89)
+- packages/shared/package.json (exports map)
+- git log / typecheck output
 
-## Files Created/Modified (committed in prior heartbeat)
-- apps/frontend/src/api/client.ts (GraphNode/Edge/TraceabilityGraph + fetchTraceabilityGraph)
-- apps/frontend/src/views/GraphBuilder/index.tsx (created)
-- apps/frontend/src/views/GraphBuilder/GraphBuilder.css (created)
-- apps/frontend/src/views/GraphBuilder/index.test.tsx (created; hardened in 619f365)
-- apps/frontend/src/App.tsx (#graph route + ?artifact= hash parsing)
-- apps/frontend/src/views/DiscoveryDashboard/ArtifactDetailPanel.tsx (Graph Builder deep link)
-- apps/frontend/src/views/DiscoveryDashboard/ScanOverview.tsx (Explore quick-links card)
+## Files Created/Modified (committed, 73044a5)
+- apps/frontend/src/views/ArtifactViewer/sample-data.ts: `createdAt/updatedAt` Date → ISO strings (x16).
+- apps/frontend/src/views/ArtifactViewer/index.tsx: removed always-true `variant !== 'automated'` comparison (TS2367).
+- packages/shared/package.json: added `"./src/design-system/*"` export so theme.css/tokens resolve.
 
-## Open Blockers / Follow-ups
-- None for THE-172. Parent THE-159 still in_review (UX Gate live, comment d098150e).
-- THE-122: repo-wide `pnpm build` blocked by pre-existing ArtifactViewer TS errors — out of THE-172 scope.
+## Verification
+- `pnpm build` (tsc -b && vite build) → PASS (exit 0).
+- `pnpm test` → 22 passed (DiscoveryDashboard 16 + ArtifactViewer + GraphBuilder), no regression.
+- `pnpm typecheck` → clean.
+
+## Root Causes (pre-existing, out of THE-159 scope, now fixed)
+1. THE-122 ArtifactViewer TS errors persisted despite "resolved" claim.
+2. packages/shared missing `./src/design-system/theme.css` export (THE-171 token work).
 
 ## Next Action
-- None. THE-172 complete, CEO-approved, closing. Awaiting next assignment.
+- None. THE-159 complete: Dashboard + THE-172 Graph Builder deep link functional, build green, tests green. Await next assignment.
