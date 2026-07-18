@@ -1,6 +1,6 @@
 import type { TraceLink } from '@nexus-engineering/shared'
 import type { ParsedDocument } from '../parsers/repositoryParser'
-import { GraphBuilder, type TraceabilityGraph } from './graphBuilder.js'
+import { GraphBuilder, type TraceabilityGraph, type GraphNode } from './graphBuilder.js'
 import type { GraphNodeRow, GraphEdgeRow } from './graphDatabase'
 import { getGraphDatabase } from './graphDatabase'
 
@@ -73,8 +73,8 @@ export class GraphRepository {
     return { nodes: rows.nodes, edges: rows.edges }
   }
 
-  private _rowsToGraph(rows: { nodes: GraphNodeRow[]; edges: GraphEdgeRow[] }): TraceabilityGraph {
-    const nodes: Array<{ id: string; type: string; title?: string; name?: string }> = rows.nodes.map((n) => ({
+  private _rowsToGraph(rows: { nodes: GraphNodeRow[]; edges: GraphEdgeRow[]; totalNodes: number; totalEdges: number }): TraceabilityGraph {
+    const nodes: GraphNode[] = rows.nodes.map((n) => ({
       id: n.id,
       type: n.type,
       title: n.title,
@@ -94,13 +94,13 @@ export class GraphRepository {
     return rows.map((r) => ({
       id: '',
       version: '',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       source: '',
       sourceId: r.source_id,
-      sourceType: '' as any,
+      sourceType: 'requirement',
       targetId: r.target_id,
-      targetType: '' as any,
+      targetType: 'requirement',
       relationshipType: r.relationship_type as TraceLink['relationshipType'],
       confidence: r.confidence,
       description: r.description || undefined,

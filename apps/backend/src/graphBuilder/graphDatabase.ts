@@ -22,7 +22,7 @@ export interface GraphEdgeRow {
   updated_at: string
 }
 
-class GraphDatabase {
+export class GraphDatabase {
   private db: Database.Database
   private initialized = false
 
@@ -107,8 +107,8 @@ class GraphDatabase {
       UPDATE graph_nodes SET type = ?, title = ?, name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
     `)
 
-    const insertMany = this.db.transaction((nodes: typeof nodes) => {
-      for (const node of nodes) {
+    const insertMany = this.db.transaction((nodesToInsert: Array<{ id: string; type: string; title?: string; name?: string }>) => {
+      for (const node of nodesToInsert) {
         insertNode.run(node.id, node.type, node.title ?? null, node.name ?? null)
       }
     })

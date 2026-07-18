@@ -1,8 +1,15 @@
 import type { TraceLink } from '@nexus-engineering/shared'
 
+export type GraphNodeType =
+  | 'requirement'
+  | 'architectureModel'
+  | 'softwareComponent'
+  | 'testCase'
+  | 'traceLink'
+
 export interface GraphNode {
   id: string
-  type: 'requirement' | 'architectureModel' | 'softwareComponent' | 'testCase'
+  type: GraphNodeType
   title?: string
   name?: string
 }
