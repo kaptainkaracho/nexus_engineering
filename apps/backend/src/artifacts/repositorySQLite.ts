@@ -11,7 +11,7 @@ export const DEFAULT_ARTIFACT_DB_PATH = process.env.DATABASE_PATH
 import { mkdirSync } from 'node:fs'
 import { dirname } from 'node:path'
 import Database from 'better-sqlite3'
-import type { Artifact, ArtifactType, LifecycleState } from './repository'
+import type { Artifact, ArtifactError, ArtifactType, LifecycleState } from './repository'
 
 export interface ArtifactRow {
   id: string
@@ -261,7 +261,7 @@ function mapRowToArtifact(row: ArtifactRow): Artifact {
     repositoryPath: row.repository_path,
     lifecycle: row.lifecycle as LifecycleState,
     metadata: parseJson(row.metadata),
-    errors: parseJson(row.errors),
+    errors: parseJson(row.errors) as unknown as ArtifactError[],
     reparseCount: row.reparse_count,
     createdAt: row.created_at,
     updatedAt: row.updated_at,

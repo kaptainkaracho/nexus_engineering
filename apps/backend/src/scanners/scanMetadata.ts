@@ -74,6 +74,19 @@ export class ScanMetadataStore {
     return artifacts
   }
 
+  /**
+   * Paginated view over all detected artifacts (newest session first).
+   * `total` reflects the full flattened count so callers can page correctly.
+   */
+  getArtifactsPage(limit: number, offset: number): {
+    artifacts: DetectedArtifact[]
+    total: number
+  } {
+    const all = this.getAllArtifacts()
+    const artifacts = all.slice(offset, offset + limit)
+    return { artifacts, total: all.length }
+  }
+
   /** Remove all sessions (useful in tests). */
   clear(): void {
     this.sessions.clear()

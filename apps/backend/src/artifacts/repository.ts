@@ -24,6 +24,8 @@ export interface Artifact {
   metadata: Record<string, unknown>
   errors: ArtifactError[]
   reparseCount: number
+  relativePath?: string
+  fileName?: string
   createdAt: string
   updatedAt: string
   lastParsedAt?: string
@@ -37,32 +39,66 @@ function now(): string {
   return new Date().toISOString()
 }
 
+import { getArtifactStorage } from './repositorySQLite'
+
 export { now }
 
 let idCounter = 0
 const nextId = (): string => `art-${++idCounter}`
 
+// Lazy-load storage singleton — only instantiated when needed (e.g. server start).
+function getStorage() {
+  return getArtifactStorage()
+}
+
 export class ArtifactRegistry {
   private store = new Map<string, Artifact>()
+  private storageLoaded = false
 
-  create(artifact: Omit<Artifact, 'id' | 'createdAt' | 'updatedAt'>): Artifact {
+  /** Ensure SQLite rows are synced to the in-memory cache. Call once after startup or for fresh reads. */
+  private ensureStorageLoaded(): void {
+    if (this.storageLoaded) return
+    this.storageLoaded = true
+    
+    const storage = getStorage()
+    const rows = storage.findAll()
+    for (const row of rows) {
+      this.store.set(row.id, row)
+    }
+  }
+
+  create(artifact: Omit<Artifact, 'id' | 'createdAt' | 'updatedAt'> & { id?: string }): Artifact {
+    let id = artifact.id as string | undefined
+    if (!id) id = nextId()
+
     const item: Artifact = {
       ...artifact,
-      id: nextId(),
+      id,
       createdAt: now(),
       updatedAt: now(),
+      metadata: artifact.metadata ?? {},
+      errors: artifact.errors ?? [],
+      reparseCount: artifact.reparseCount ?? 0,
     }
+    
     this.store.set(item.id, item)
+    
+    // Persist to SQLite
+    try { getStorage().upsert(item) } catch {}
+    
     return item
   }
 
   createFromDetected(detected: DetectedArtifact, repositoryPath: string): Artifact {
+    const id = nextId()
     return this.create({
-      type: detected.artifactType as Exclude<ArtifactType, 'unknown'>,
+      type: detected.artifactType as Exclude<ArtifactType, 'unknown'>, 
       filePath: detected.filePath,
+      relativePath: detected.relativePath, 
+      fileName: detected.fileName,
       repositoryPath,
       lifecycle: 'discovered',
-      metadata: {},
+      metadata: { source: 'scan', detection: detected.fileName },
       errors: [],
       reparseCount: 0,
     })
@@ -81,6 +117,7 @@ export class ArtifactRegistry {
   }
 
   getAll(): Artifact[] {
+    this.ensureStorageLoaded()
     return Array.from(this.store.values())
   }
 
@@ -100,6 +137,10 @@ export class ArtifactRegistry {
     }
 
     this.store.set(id, updated)
+    
+    // Persist to SQLite 
+    try { getStorage().upsert(updated) } catch {}
+    
     return updated
   }
 
@@ -116,6 +157,10 @@ export class ArtifactRegistry {
     }
 
     this.store.set(id, updated)
+    
+    // Persist the error state to SQLite  
+    try { getStorage().upsert(updated) } catch {}
+    
     return updated
   }
 
@@ -131,11 +176,20 @@ export class ArtifactRegistry {
     }
 
     this.store.set(id, updated)
+    
+    // Persist to SQLite 
+    try { getStorage().upsert(updated) } catch {}
+    
     return updated
   }
 
   delete(id: string): boolean {
-    return this.store.delete(id)
+    const deleted = this.store.delete(id)
+    
+    // Also remove from SQLite persistence
+    try { getStorage().delete(id) } catch {}
+    
+    return deleted
   }
 
   getSummary(): { total: number; byType: Record<ArtifactType, number>; byLifecycle: Record<LifecycleState, number> } {
@@ -164,4 +218,4 @@ export class ArtifactRegistry {
   }
 }
 
-
+export const artifactRegistry = new ArtifactRegistry()

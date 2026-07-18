@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
-import { LifecycleState, artifactRegistry, now } from './repository'
-import type { ArtifactType } from './repository'
+import { LifecycleState, artifactRegistry, now } from '../artifacts/repository'
+import type { ArtifactType, PatchArtifactInput } from '../artifacts/repository'
 
 export async function artifactRegistryRoutes(server: FastifyInstance) {
   // =========================================================
@@ -91,8 +91,8 @@ export async function artifactRegistryRoutes(server: FastifyInstance) {
       return reply.status(400).send({ error: `Invalid lifecycle state '${body.lifecycle}'.` })
     }
 
-    const patchBody = {
-      lifecycle: body.lifecycle,
+    const patchBody: PatchArtifactInput = {
+      lifecycle: body.lifecycle as LifecycleState,
       metadata: typeof body.metadata === 'object' ? (body.metadata as Record<string, unknown>) : undefined,
     }
 

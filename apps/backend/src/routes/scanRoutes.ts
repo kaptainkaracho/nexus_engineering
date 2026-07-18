@@ -3,31 +3,60 @@ import { ScanOptions } from '@nexus-engineering/shared'
 import { scanRequirements } from './requirements'
 import { RepositoryScanner } from '../scanners/repositoryScanner'
 import { scanMetadataStore } from '../scanners/scanMetadata'
+import { parsePagination, buildPaginationMeta, paginate } from '../lib/pagination'
 
 /**
  * GET /api/scan
- * Comprehensive repository scanner endpoint
+ * Comprehensive repository scanner endpoint.
+ *
+ * Query params:
+ *   repositoryPath  (required) path to scan
+ *   limit / offset  pagination over fileMetadata + artifacts (default 100 / 0, capped at 1000)
+ *   computeHashes   compute SHA-256 per file (expensive; default false)
+ *   includeTree     build the full hierarchy tree in the response (default false)
  */
 export async function scanRepository (request: FastifyRequest, reply: FastifyReply) {
   try {
-    const { repositoryPath } = request.query as { repositoryPath: string }
-    
+    const q = request.query as Record<string, unknown>
+    const repositoryPath = q.repositoryPath as string
+
     if (!repositoryPath) {
-      return reply.status(400).send({ 
-        error: 'repositoryPath query parameter is required' 
+      return reply.status(400).send({
+        error: 'repositoryPath query parameter is required'
       })
     }
 
-    const scanner = new RepositoryScanner()
-    const result = await scanner.scan(repositoryPath)
+    let page
+    try {
+      page = parsePagination(q)
+    } catch (err) {
+      return reply.status(400).send({ error: (err as Error).message })
+    }
 
-    // Return processed repository data for UI consumption
+    const computeHashes = q.computeHashes === 'true' || q.computeHashes === true
+    const includeTree = q.includeTree === 'true' || q.includeTree === true
+
+    const scanner = new RepositoryScanner()
+    const result = await scanner.scan(repositoryPath, {
+      computeHashes,
+    } as ScanOptions)
+
+    const totalFiles = result.fileMetadata.length
+    const totalArtifacts = result.artifacts.length
+
+    // Return processed repository data for UI consumption.
+    // fileMetadata/artifacts are paginated slices; totals + envelope let the
+    // client page without re-scanning. The tree is opt-in because it is
+    // expensive to build and serialize for large repositories.
     return reply.send({
       scanId: result.scanId,
-      fileMetadata: result.fileMetadata,
+      fileMetadata: paginate(result.fileMetadata, page),
+      totalFiles,
+      artifacts: paginate(result.artifacts, page),
+      totalArtifacts,
       scanReport: result.scanReport,
-      artifacts: result.artifacts,
-      tree: buildRepositoryTree(result.fileMetadata)
+      ...(includeTree ? { tree: buildRepositoryTree(result.fileMetadata) } : {}),
+      pagination: buildPaginationMeta(page.limit, page.offset, Math.max(totalFiles, totalArtifacts)),
     })
   } catch (error) {
     reply.log.error(error as Error)
@@ -93,12 +122,25 @@ export async function getScanById (request: FastifyRequest, reply: FastifyReply)
 
 /**
  * GET /api/artifacts
- * List all detected artifacts across all completed scans.
+ * List detected artifacts across all completed scans (paginated).
+ *
+ * Query params: limit / offset (default 100 / 0, capped at 1000)
  */
 export async function listArtifacts (request: FastifyRequest, reply: FastifyReply) {
   try {
-    const artifacts = scanMetadataStore.getAllArtifacts()
-    return reply.send({ artifacts, total: artifacts.length })
+    let page
+    try {
+      page = parsePagination(request.query as Record<string, unknown>)
+    } catch (err) {
+      return reply.status(400).send({ error: (err as Error).message })
+    }
+
+    const { artifacts, total } = scanMetadataStore.getArtifactsPage(page.limit, page.offset)
+    return reply.send({
+      artifacts,
+      total,
+      pagination: buildPaginationMeta(page.limit, page.offset, total),
+    })
   } catch (error) {
     reply.log.error(error as Error)
     return reply.status(500).send({ error: 'Failed to list artifacts' })
