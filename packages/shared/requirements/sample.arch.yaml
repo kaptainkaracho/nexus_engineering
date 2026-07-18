@@ -1,0 +1,15 @@
+title: Use YAML-based Architecture Decision Records
+status: accepted
+context: |
+  We need a structured format for recording architecture decisions.
+  Markdown frontmatter was initially used but pure YAML provides better
+  machine readability and validation capabilities.
+decision: |
+  Adopt .arch.yaml as the format for Architecture Decision Records.
+  This provides explicit typing, validation, and easier programmatic access.
+consequences:
+  - All new ADRs must use .arch.yaml format
+  - Existing markdown ADRs will be migrated over time
+  - Parser must handle both formats during transition
+  - CI validation can be added for .arch.yaml files
+superseded_by: null

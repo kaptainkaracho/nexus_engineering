@@ -61,6 +61,7 @@ export type {
 } from './operations';
 
 export type {
+  ArchitectureDecision,
   FileMetadata,
   ScanOptions,
   ScanResult,

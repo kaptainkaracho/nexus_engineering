@@ -159,6 +159,18 @@ export interface RepositoryReader {
   streamFiles(patterns: string[], rootPath?: string): AsyncIterable<FileEntry>;
 }
 
+export interface ArchitectureDecision {
+  id: string;
+  title: string;
+  date: IsoDateString;
+  status: 'proposed' | 'accepted' | 'deprecated' | 'superseded';
+  deciders: string[];
+  context: string;
+  decision: string;
+  consequences: string[];
+  supersededBy?: string;
+}
+
 export interface FileEntry {
   filePath: string;
   relativePath: string;
