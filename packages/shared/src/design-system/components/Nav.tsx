@@ -95,7 +95,13 @@ export function Nav({ items, variant = 'horizontal', className }: NavProps) {
             className="absolute left-4 right-4 z-50 mt-2 rounded-xl border border-border bg-surface-primary p-2 shadow-lg"
             role="menu"
           >
-            {navList}
+            <ul className="flex flex-col gap-1">
+              {items.map((item) => (
+                <li key={item.href}>
+                  <NavLink item={item} variant="vertical" />
+                </li>
+              ))}
+            </ul>
           </div>
         )}
       </div>
