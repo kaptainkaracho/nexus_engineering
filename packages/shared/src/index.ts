@@ -70,4 +70,11 @@ export type {
   FileEntry,
   DetectedArtifact,
   ScanSession,
+  SpecStatus,
+  SpecPriority,
+  SpecRequirementStatus,
+  SpecReferenceType,
+  SpecReference,
+  SpecRequirement,
+  Specification,
 } from './types';

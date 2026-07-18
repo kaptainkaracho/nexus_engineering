@@ -12,6 +12,13 @@ import type {
   DocumentType,
   FileEntry,
   FileMetadata as SharedFileMetadata,
+  Specification,
+  SpecReference,
+  SpecRequirement,
+  SpecStatus,
+  SpecPriority,
+  SpecRequirementStatus,
+  SpecReferenceType,
 } from '@nexus-engineering/shared';
 
 export interface ParseResult {
@@ -25,7 +32,7 @@ export interface ParsedDocument {
   filePath: string;
   relativePath: string;
   type: DocumentType;
-  detectedType?: 'requirement' | 'architectureModel' | 'softwareComponent' | 'testCase' | 'traceLink';
+  detectedType?: 'requirement' | 'architectureModel' | 'softwareComponent' | 'testCase' | 'traceLink' | 'spec' | 'adr';
   content: string | Record<string, unknown>;
   metadata: {
     title?: string;
@@ -75,6 +82,39 @@ export class RepositoryParser {
     const { filePath, detectedType } = fileMetadata;
     
     const content = await this.readFileContent(filePath);
+
+    // Specification documents (.spec.yaml) get a structured Specification object
+    // built with field/reference validation and graceful degradation on bad data.
+    if (this.isSpecificationFile(filePath)) {
+      let parsedContent: string | Record<string, unknown>;
+      try {
+        parsedContent = this.parseContent(filePath, content);
+      } catch (error) {
+        console.warn(
+          `[spec.yaml] ${filePath}: malformed YAML — ${(error as Error).message}`
+        );
+        throw error;
+      }
+      const specification = this.buildSpecification(filePath, parsedContent);
+      const traceLinks = this.buildSpecTraceLinks(specification);
+
+      return {
+        id: randomUUID(),
+        filePath,
+        relativePath: fileMetadata.relativePath || path.relative(rootPath, filePath),
+        type: 'Md',
+        detectedType: 'spec',
+        content: specification,
+        metadata: {
+          title: specification.title,
+          version: specification.version,
+          status: specification.status,
+          requirementCount: specification.requirements.length,
+        },
+        traceLinks,
+      };
+    }
+
     const parsedContent = this.parseContent(filePath, content);
     const extractedType = this.detectContentType(filePath, detectedType, parsedContent);
     const metadata = this.extractMetadata(filePath, parsedContent, extractedType);
@@ -90,6 +130,10 @@ export class RepositoryParser {
       metadata,
       traceLinks
     };
+  }
+
+  private isSpecificationFile(filePath: string): boolean {
+    return filePath.toLowerCase().endsWith('.spec.yaml');
   }
 
   private async readFileContent(filePath: string): Promise<string> {
@@ -315,6 +359,179 @@ export class RepositoryParser {
     }
 
     return [];
+  }
+
+  // --- Specification documents (.spec.yaml) -------------------------------------
+
+  private buildSpecification(
+    filePath: string,
+    parsedContent: string | Record<string, unknown>
+  ): Specification {
+    if (!parsedContent || typeof parsedContent !== 'object') {
+      console.warn(
+        `[spec.yaml] ${filePath}: empty or non-object content — returning empty specification`
+      );
+      return { title: '', version: '', status: 'draft', requirements: [] };
+    }
+
+    const raw = parsedContent as Record<string, unknown>;
+
+    const title = typeof raw.title === 'string' ? raw.title : '';
+    if (!title) {
+      console.warn(`[spec.yaml] ${filePath}: missing required field "title"`);
+    }
+
+    const version = typeof raw.version === 'string' ? raw.version : '';
+    if (!version) {
+      console.warn(`[spec.yaml] ${filePath}: missing required field "version"`);
+    }
+
+    const status = this.coerceSpecStatus(raw.status, filePath);
+    const requirements = this.buildSpecRequirements(raw.requirements, filePath);
+
+    return { title, version, status, requirements };
+  }
+
+  private coerceSpecStatus(value: unknown, filePath: string): SpecStatus {
+    const allowed: SpecStatus[] = ['draft', 'active', 'deprecated'];
+    if (typeof value === 'string' && (allowed as string[]).includes(value)) {
+      return value as SpecStatus;
+    }
+    if (value !== undefined && value !== null) {
+      console.warn(
+        `[spec.yaml] ${filePath}: invalid status "${String(value)}" — defaulting to "draft"`
+      );
+    }
+    return 'draft';
+  }
+
+  private buildSpecRequirements(
+    value: unknown,
+    filePath: string
+  ): SpecRequirement[] {
+    if (!Array.isArray(value)) {
+      if (value !== undefined && value !== null) {
+        console.warn(`[spec.yaml] ${filePath}: "requirements" is not an array — ignoring`);
+      }
+      return [];
+    }
+
+    const requirements: SpecRequirement[] = [];
+
+    for (const [idx, item] of value.entries()) {
+      if (!item || typeof item !== 'object') {
+        console.warn(`[spec.yaml] ${filePath}: requirement #${idx} is not an object — skipping`);
+        continue;
+      }
+      const req = item as Record<string, unknown>;
+
+      const id = typeof req.id === 'string' ? req.id : '';
+      if (!id) {
+        console.warn(`[spec.yaml] ${filePath}: requirement #${idx} missing "id" — skipping`);
+        continue;
+      }
+
+      const title = typeof req.title === 'string' ? req.title : '';
+      const priority = this.coerceSpecPriority(req.priority, filePath, id);
+      const status = this.coerceSpecRequirementStatus(req.status, filePath, id);
+      const references = this.buildSpecReferences(req.references, filePath, id);
+
+      requirements.push({ id, title, priority, status, references });
+    }
+
+    return requirements;
+  }
+
+  private coerceSpecPriority(value: unknown, filePath: string, reqId: string): SpecPriority {
+    const allowed: SpecPriority[] = ['P0', 'P1', 'P2', 'P3'];
+    if (typeof value === 'string' && (allowed as string[]).includes(value)) {
+      return value as SpecPriority;
+    }
+    if (value !== undefined && value !== null) {
+      console.warn(
+        `[spec.yaml] ${filePath}: requirement ${reqId} invalid priority "${String(value)}" — defaulting to "P3"`
+      );
+    }
+    return 'P3';
+  }
+
+  private coerceSpecRequirementStatus(
+    value: unknown,
+    filePath: string,
+    reqId: string
+  ): SpecRequirementStatus {
+    const allowed: SpecRequirementStatus[] = ['proposed', 'approved', 'implemented', 'verified'];
+    if (typeof value === 'string' && (allowed as string[]).includes(value)) {
+      return value as SpecRequirementStatus;
+    }
+    if (value !== undefined && value !== null) {
+      console.warn(
+        `[spec.yaml] ${filePath}: requirement ${reqId} invalid status "${String(value)}" — defaulting to "proposed"`
+      );
+    }
+    return 'proposed';
+  }
+
+  private buildSpecReferences(
+    value: unknown,
+    filePath: string,
+    reqId: string
+  ): SpecReference[] {
+    if (!Array.isArray(value)) {
+      if (value !== undefined && value !== null) {
+        console.warn(`[spec.yaml] ${filePath}: requirement ${reqId} "references" is not an array`);
+      }
+      return [];
+    }
+
+    const references: SpecReference[] = [];
+
+    for (const [idx, item] of value.entries()) {
+      if (!item || typeof item !== 'object') {
+        console.warn(
+          `[spec.yaml] ${filePath}: requirement ${reqId} reference #${idx} is not an object — skipping`
+        );
+        continue;
+      }
+      const ref = item as Record<string, unknown>;
+      const type = typeof ref.type === 'string' ? ref.type : '';
+      const id = typeof ref.id === 'string' ? ref.id : '';
+
+      const allowedTypes: SpecReferenceType[] = ['req', 'arch', 'test'];
+      if (!(allowedTypes as string[]).includes(type)) {
+        console.warn(
+          `[spec.yaml] ${filePath}: requirement ${reqId} reference #${idx} invalid type "${type}" — skipping`
+        );
+        continue;
+      }
+      if (!id) {
+        console.warn(
+          `[spec.yaml] ${filePath}: requirement ${reqId} reference #${idx} missing "id" — skipping`
+        );
+        continue;
+      }
+
+      references.push({ type: type as SpecReferenceType, id });
+    }
+
+    return references;
+  }
+
+  private buildSpecTraceLinks(specification: Specification): ParsedTraceLink[] {
+    const traceLinks: ParsedTraceLink[] = [];
+
+    for (const req of specification.requirements) {
+      for (const ref of req.references) {
+        traceLinks.push({
+          sourceId: req.id,
+          targetId: ref.id,
+          relationshipType: ref.type === 'test' ? 'verifies' : 'tracesTo',
+          confidence: 'high',
+        });
+      }
+    }
+
+    return traceLinks;
   }
 }
 

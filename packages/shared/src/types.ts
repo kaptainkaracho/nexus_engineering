@@ -176,3 +176,29 @@ export interface FileEntry {
   relativePath: string;
   contentType: 'text' | 'binary';
 }
+
+// Specification Documents (.spec.yaml)
+export type SpecStatus = 'draft' | 'active' | 'deprecated';
+export type SpecPriority = 'P0' | 'P1' | 'P2' | 'P3';
+export type SpecRequirementStatus = 'proposed' | 'approved' | 'implemented' | 'verified';
+export type SpecReferenceType = 'req' | 'arch' | 'test';
+
+export interface SpecReference {
+  type: SpecReferenceType;
+  id: string;
+}
+
+export interface SpecRequirement {
+  id: string;
+  title: string;
+  priority: SpecPriority;
+  status: SpecRequirementStatus;
+  references: SpecReference[];
+}
+
+export interface Specification {
+  title: string;
+  version: string;
+  status: SpecStatus;
+  requirements: SpecRequirement[];
+}
