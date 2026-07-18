@@ -4,6 +4,7 @@ import { ArtifactViewer } from './views/ArtifactViewer';
 import { RepositoryFileTree } from './views/RepositoryTree';
 import { DiscoveryDashboard } from './views/DiscoveryDashboard';
 import { GraphBuilder } from './views/GraphBuilder';
+import { Templates } from './views/Templates';
 import { AuthPage } from './views/Auth';
 import {
   getCurrentSession,
@@ -20,7 +21,8 @@ type Section =
   | 'artefacts'
   | 'repository'
   | 'discovery'
-  | 'graph';
+  | 'graph'
+  | 'templates';
 
 const VALID_SECTIONS: Section[] = [
   'overview',
@@ -31,6 +33,7 @@ const VALID_SECTIONS: Section[] = [
   'repository',
   'discovery',
   'graph',
+  'templates',
 ];
 
 interface RouteState {
@@ -85,8 +88,20 @@ function App() {
     }, 1500);
   };
 
-  // Restore session on mount
+  const [resetToken, setResetToken] = useState<string | undefined>(undefined);
+
+  // Restore session on mount and check for reset-password token
   useEffect(() => {
+    const hash = window.location.hash.replace(/^#/, '');
+    const [sectionPart, queryPart] = hash.split('?');
+    if (sectionPart === 'reset-password' && queryPart) {
+      const params = new URLSearchParams(queryPart);
+      const token = params.get('token');
+      if (token) {
+        setResetToken(token);
+        window.history.replaceState(null, '', window.location.pathname);
+      }
+    }
     const session = getCurrentSession();
     if (session) {
       setUser(session.user);
@@ -129,6 +144,7 @@ function App() {
     { label: 'Repository', href: '#repository', active: activeSection === 'repository' },
     { label: 'Discovery', href: '#discovery', active: activeSection === 'discovery' },
     { label: 'Graph Builder', href: '#graph', active: activeSection === 'graph' },
+    { label: 'Templates', href: '#templates', active: activeSection === 'templates' },
   ];
 
   if (!authReady) {
@@ -136,7 +152,7 @@ function App() {
   }
 
   if (!user) {
-    return <AuthPage onAuthenticated={handleAuthenticated} />;
+    return <AuthPage onAuthenticated={handleAuthenticated} resetToken={resetToken} />;
   }
 
   return (
@@ -185,6 +201,8 @@ function App() {
             <RepositoryFileTree />
           ) : activeSection === 'graph' ? (
             <GraphBuilder selectedId={deepLinkArtifact} />
+          ) : activeSection === 'templates' ? (
+            <Templates />
           ) : (
            <>
              <Nav

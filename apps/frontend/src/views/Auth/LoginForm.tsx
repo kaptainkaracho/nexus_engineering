@@ -5,6 +5,7 @@ import { login, type LoginRequest } from '../../api/auth';
 export interface LoginFormProps {
   onSuccess: () => void;
   onSwitchToRegister: () => void;
+  onForgotPassword?: () => void;
 }
 
 function MailIcon() {
@@ -23,7 +24,7 @@ function LockIcon() {
   );
 }
 
-export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
+export function LoginForm({ onSuccess, onSwitchToRegister, onForgotPassword }: LoginFormProps) {
   const [form, setForm] = useState<LoginRequest>({ email: '', password: '' });
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [serverError, setServerError] = useState<string | null>(null);
@@ -106,6 +107,18 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
           fullWidth
           autoComplete="current-password"
         />
+
+        {onForgotPassword && (
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={onForgotPassword}
+              className="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+            >
+              Forgot password?
+            </button>
+          </div>
+        )}
 
         <Button type="submit" variant="primary" fullWidth loading={loading}>
           Sign In

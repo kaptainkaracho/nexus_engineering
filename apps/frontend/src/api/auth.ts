@@ -135,3 +135,50 @@ export async function fetchSession(): Promise<AuthSession | null> {
     return stored;
   }
 }
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ForgotPasswordResponse {
+  message: string;
+}
+
+export async function forgotPassword(data: ForgotPasswordRequest): Promise<ForgotPasswordResponse> {
+  const res = await fetch(`${BASE}/api/auth/forgot-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const err: AuthError = await res.json().catch(() => ({
+      message: `Request failed (HTTP ${res.status})`,
+    }));
+    throw err;
+  }
+
+  return res.json();
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  password: string;
+}
+
+export async function resetPassword(data: ResetPasswordRequest): Promise<{ message: string }> {
+  const res = await fetch(`${BASE}/api/auth/reset-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const err: AuthError = await res.json().catch(() => ({
+      message: `Reset failed (HTTP ${res.status})`,
+    }));
+    throw err;
+  }
+
+  return res.json();
+}
