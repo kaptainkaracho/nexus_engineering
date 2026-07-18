@@ -97,6 +97,14 @@ export function ArtifactDetailPanel({
               )}
             </MetaGroup>
 
+            <a
+              href="#repository"
+              className="inline-flex items-center gap-1 text-sm font-medium text-primary-600 transition-colors hover:text-primary-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+              aria-label={`Open ${artifactName(artifact)} in Repository Tree`}
+            >
+              View in Repository Tree &rarr;
+            </a>
+
             {artifact.errors.length > 0 && (
               <MetaGroup title={`Error history (${artifact.errors.length})`}>
                 <ul className="flex flex-col gap-2">
