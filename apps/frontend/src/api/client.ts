@@ -193,3 +193,133 @@ export async function scanRequirements(repositoryPath: string): Promise<{ scanne
     return { scanned: 0, total: 0 };
   }
 }
+
+// =========================================================
+// Discovery Dashboard — Artifact Registry + Scan API
+// =========================================================
+
+export type ArtifactType = 'requirement' | 'architecture' | 'adr' | 'spec' | 'unknown';
+export type LifecycleState = 'discovered' | 'parsed' | 'indexed' | 'related' | 'error';
+
+export interface ArtifactError {
+  message: string;
+  timestamp: string;
+  context?: Record<string, unknown>;
+}
+
+export interface DiscoveryArtifact {
+  id: string;
+  type: ArtifactType;
+  filePath: string;
+  repositoryPath: string;
+  relativePath?: string;
+  fileName?: string;
+  lifecycle: LifecycleState;
+  metadata: Record<string, unknown>;
+  errors: ArtifactError[];
+  reparseCount: number;
+  createdAt: string;
+  updatedAt: string;
+  lastParsedAt?: string;
+}
+
+export interface RegistrySummary {
+  total: number;
+  byType: Record<ArtifactType, number>;
+  byLifecycle: Record<LifecycleState, number>;
+}
+
+export interface RegistryResponse {
+  data: DiscoveryArtifact[];
+  summary: RegistrySummary;
+}
+
+export interface ScanTriggerResponse {
+  scanId: string;
+  status: 'running' | 'completed' | 'failed';
+  filesFound?: number;
+  artifactsDetected?: number;
+}
+
+export interface ScanStatus {
+  id: string;
+  startedAt: string;
+  completedAt?: string;
+  repositoryPath: string;
+  filesFound: number;
+  filesSkipped: number;
+  artifactsDetected: Array<{
+    artifactType: ArtifactType;
+    filePath: string;
+    relativePath: string;
+    fileName: string;
+    detectedAt: string;
+  }>;
+  errors: Array<{ path: string; message: string }>;
+  status: 'running' | 'completed' | 'failed';
+}
+
+const DEFAULT_REPOSITORY_PATH = '/repo';
+
+/** Fetch the full artifact registry and aggregate summary */
+export async function fetchRegistry(): Promise<RegistryResponse> {
+  try {
+    const res = await fetch(`${BASE}/api/artifacts/registry`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    const json = await res.json();
+    return { data: json.data ?? [], summary: json.summary ?? emptySummary() };
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('HTTP')) throw error;
+    return { data: [], summary: emptySummary() };
+  }
+}
+
+/** Fetch artifacts filtered by type from the registry */
+export async function fetchRegistryByType(type: ArtifactType): Promise<DiscoveryArtifact[]> {
+  try {
+    const res = await fetch(`${BASE}/api/artifacts/registry/type/${type}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    const json = await res.json();
+    return json.data ?? [];
+  } catch {
+    return [];
+  }
+}
+
+/** Trigger a repository scan; returns the scan id for status polling */
+export async function triggerScan(
+  repositoryPath: string = DEFAULT_REPOSITORY_PATH,
+): Promise<ScanTriggerResponse> {
+  const res = await fetch(`${BASE}/api/scan`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ repositoryPath }),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  return res.json();
+}
+
+/** Poll the status of an in-flight scan */
+export async function fetchScanStatus(scanId: string): Promise<ScanStatus> {
+  const res = await fetch(`${BASE}/api/scan/${encodeURIComponent(scanId)}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  return res.json();
+}
+
+/** Request a re-parse of a single artifact (resets to discovered) */
+export async function reparseArtifact(id: string): Promise<DiscoveryArtifact> {
+  const res = await fetch(`${BASE}/api/artifacts/registry/${encodeURIComponent(id)}/reparse`, {
+    method: 'POST',
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  const json = await res.json();
+  return json.data;
+}
+
+function emptySummary(): RegistrySummary {
+  return {
+    total: 0,
+    byType: { requirement: 0, architecture: 0, adr: 0, spec: 0, unknown: 0 },
+    byLifecycle: { discovered: 0, parsed: 0, indexed: 0, related: 0, error: 0 },
+  };
+}

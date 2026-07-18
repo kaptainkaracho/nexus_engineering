@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { Button, Input, Card, Container, Stack, Grid, Nav } from '@nexus-engineering/shared';
 import { ArtifactViewer } from './views/ArtifactViewer';
 import { RepositoryFileTree } from './views/RepositoryTree';
+import { DiscoveryDashboard } from './views/DiscoveryDashboard';
 
-type Section = 'overview' | 'buttons' | 'forms' | 'cards' | 'artefacts' | 'repository';
+type Section = 'overview' | 'buttons' | 'forms' | 'cards' | 'artefacts' | 'repository' | 'discovery';
 
 function App() {
   const [dark, setDark] = useState(false);
@@ -43,7 +44,7 @@ function App() {
   useEffect(() => {
     const hashToSection = (hash: string): Section => {
       const section = hash.replace('#', '') as Section;
-      return ['overview', 'buttons', 'forms', 'cards', 'artefacts', 'repository'].includes(section) ? section : 'overview';
+      return ['overview', 'buttons', 'forms', 'cards', 'artefacts', 'repository', 'discovery'].includes(section) ? section : 'overview';
     };
     setActiveSection(hashToSection(window.location.hash));
     const onHashChange = () => setActiveSection(hashToSection(window.location.hash));
@@ -58,6 +59,7 @@ function App() {
     { label: 'Cards', href: '#cards', active: activeSection === 'cards' },
     { label: 'Artefacts', href: '#artefacts', active: activeSection === 'artefacts' },
     { label: 'Repository', href: '#repository', active: activeSection === 'repository' },
+    { label: 'Discovery', href: '#discovery', active: activeSection === 'discovery' },
   ];
 
   return (
@@ -87,7 +89,9 @@ function App() {
         </Container>
       </header>
 
-          <Container size="lg">{activeSection === 'repository' ? (
+          <Container size="lg">{activeSection === 'discovery' ? (
+            <DiscoveryDashboard />
+          ) : activeSection === 'repository' ? (
             <RepositoryFileTree />
           ) : (
            <>

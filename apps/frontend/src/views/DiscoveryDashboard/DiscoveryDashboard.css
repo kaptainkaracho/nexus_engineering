@@ -1,0 +1,103 @@
+/* Discovery Dashboard — component-scoped styles
+ * Lifecycle + artifact-type badge palettes follow docs/design/discovery-dashboard/design-tokens.md.
+ * Explicit color values are used (not dynamic Tailwind classes) so the badges render
+ * reliably in both light and dark themes regardless of Tailwind JIT detection.
+ */
+
+.dash-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+  white-space: nowrap;
+}
+
+/* Lifecycle states */
+.dash-badge--discovered { background: rgba(59, 130, 246, 0.1); color: #2563EB; }
+.dash-badge--parsed     { background: rgba(34, 197, 94, 0.1);  color: #16A34A; }
+.dash-badge--indexed    { background: rgba(139, 92, 246, 0.1);  color: #7C3AED; }
+.dash-badge--related    { background: rgba(249, 115, 22, 0.1);   color: #C2410C; }
+.dash-badge--error      { background: rgba(239, 68, 68, 0.1);    color: #DC2626; }
+
+/* Artifact types */
+.dash-badge--type-requirement { background: rgba(14, 165, 233, 0.1); color: #0284C7; }
+.dash-badge--type-architecture { background: rgba(245, 158, 11, 0.1); color: #B45309; }
+.dash-badge--type-adr          { background: rgba(99, 102, 241, 0.1); color: #4338CA; }
+.dash-badge--type-spec         { background: rgba(20, 184, 166, 0.1); color: #0F766E; }
+.dash-badge--type-unknown      { background: rgba(100, 116, 139, 0.1); color: #475569; }
+
+.dark .dash-badge--discovered { color: #60A5FA; }
+.dark .dash-badge--parsed     { color: #4ADE80; }
+.dark .dash-badge--indexed    { color: #A78BFA; }
+.dark .dash-badge--related    { color: #FB923C; }
+.dark .dash-badge--error      { color: #F87171; }
+.dark .dash-badge--type-requirement { color: #38BDF8; }
+.dark .dash-badge--type-architecture { color: #FBBF24; }
+.dark .dash-badge--type-adr          { color: #818CF8; }
+.dark .dash-badge--type-spec         { color: #2DD4BF; }
+.dark .dash-badge--type-unknown      { color: #94A3B8; }
+
+/* Scan progress indicator */
+.dash-progress {
+  position: relative;
+  height: 0.25rem;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: var(--color-neutral-200);
+}
+.dark .dash-progress { background: var(--color-neutral-800); }
+
+.dash-progress__bar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  height: 100%;
+  border-radius: 9999px;
+  background: var(--color-primary-500);
+  transition: width var(--duration-slow) var(--ease-default);
+}
+
+.dash-progress__bar--indeterminate {
+  width: 35%;
+  animation: dash-progress-slide 1.2s var(--ease-default) infinite;
+}
+
+@keyframes dash-progress-slide {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(320%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dash-progress__bar--indeterminate { animation: none; width: 100%; }
+}
+
+/* Type breakdown bars */
+.dash-typebar {
+  height: 0.5rem;
+  width: 100%;
+  border-radius: 9999px;
+  overflow: hidden;
+  display: flex;
+  background: var(--color-neutral-200);
+}
+.dark .dash-typebar { background: var(--color-neutral-800); }
+
+.dash-typebar__segment { height: 100%; }
+
+/* Detail panel slide-in */
+.dash-panel {
+  transition: transform var(--duration-slow) var(--ease-default);
+}
+@media (prefers-reduced-motion: reduce) {
+  .dash-panel { transition: none; }
+}
+
+.dash-row-selected {
+  background: rgba(59, 130, 246, 0.08);
+}
+.dark .dash-row-selected { background: rgba(59, 130, 246, 0.16); }
