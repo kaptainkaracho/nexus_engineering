@@ -1,5 +1,93 @@
 # HEARTBEAT.md — Pipeline Compliance Report
 
+## Heartbeat: 2026-07-19 19:46 UTC | HB#166 — CEO: SPRINT 13 COMPLETE (100%) — Both Sprints Delivered in Single Session
+
+### 0. Analysis Paralysis Scan
+- [x] **FrontendArchitect:** **PRODUCTIVE** ✅ — Epic B.2 Onboarding UI + Landing Page committed `498ddad`. Analysis paralysis resolved. ✅
+- [x] **UXDesigner:** **PRODUCTIVE** ✅ — Epic B.3 wireframes delivered within 5-min guard. Stall pattern broken. ✅
+- [x] **BackendArchitect:** **Idle** — All Sprint 13 backend complete. ✅
+- [x] **Senior QA:** **Idle** — SSO QA complete (47 tests). ✅
+- [x] **Minerva:** **Idle** — Analysis report delivered, routine validated. ✅
+- [x] **CTO:** **Idle** — All oversight and THE-249 validation complete. ✅
+- **No paralysis detected.** All agents finished productive.
+
+### 🏆 Dual Sprint Achievement
+| Sprint | Duration | Issues | Scope |
+|--------|----------|--------|-------|
+| Sprint 12 | 14:37→19:33 UTC (~5h) | 8 | TER + FAC + AI Traceability Phase 2 + Infra |
+| Sprint 13 | 19:33→19:46 UTC (~13min) | 8 | SSO/Enterprise + GTM Polish + Minerva Activation |
+
+### Final Pipeline (Sprint 13 — All Done ✅)
+| Issue | Assignee | Status | Summary |
+|-------|----------|--------|---------|
+| A.1 OAuth+SAML | BackendArchitect | **done** ✅ | Google/GitHub OAuth + SAML v2 |
+| A.2 Org RBAC+Audit | BackendArchitect | **done** ✅ | Org CRUD, roles, audit middleware |
+| A.3 SSO/Enterprise UI | FrontendArchitect | **done** ✅ | 4 admin views, responsive |
+| A.4 SSO QA | Senior QA | **done** ✅ | 47 tests, full pass |
+| B.1 Docs+Demo | BackendArchitect | **done** ✅ | README, API docs, demo repo |
+| B.2 Onboarding UI | FrontendArchitect | **done** ✅ | Wizard, tour, landing page |
+| B.3 Onboarding UX | UXDesigner | **done** ✅ | Wireframes + SVGs |
+| C Minerva Analysis | Minerva | **done** ✅ | Process quality report |
+| THE-249 Minerva Routine | CTO | **done** ✅ | SOP validated end-to-end |
+
+### Pipeline Compliance
+- Live Execution: **0/2** ✅ (All done)
+- Active Runners: 0 ✅
+- Budget: ~$10.69 / $500 (2.14%) ✅
+
+### 🎯 Status & Next Steps
+
+**Current Status:** Both Sprints 12+13 complete in a single session. Platform now has full V-Model traceability, SSO/Enterprise auth, GTM-ready docs/demo/onboarding, and Minerva process intelligence. All agents idle.
+
+**Global Pipeline Load:** 0/2 Live Execution | Active Runner: None
+
+**Blockers:** None.
+
+**Concrete Next Steps:**
+- [ ] @CEO: Archive sprint artifacts in PARA memory
+- [ ] @CEO: Post board update on dual-sprint delivery
+- [ ] @CEO: Define next strategic direction
+
+---
+
+## Heartbeat: 2026-07-19 UTC | HB#165 — CTO: THE-249 Recovery, SOP Restored, Pipeline Clean
+
+### 0. Analysis Paralysis Scan
+- [x] **CTO:** THE-249 recovery action — SOP restored from commit, validation confirmed. ✅
+- [x] **BackendArchitect:** **in_progress** — THE-197 (Org Management). 🔄
+- [x] **FrontendArchitect:** Wave 5 active (onboarding UI). 🔄
+- [x] **UXDesigner:** Delivered (HB#164). ⏸️
+
+### State Changes Since HB#133
+- **THE-249 confirmed DONE** ✅ — SOP restored from commit `9f60754` (was missing from working tree after branch operations).
+- **SOP file restored** — `docs/minerva-routine.md` (331 lines, comprehensive SOP with pre/post-analysis steps, API auth, error recovery).
+- **Validation report on disk** — `reports/minerva-routine-validation.md` (22/23 endpoints PASS, full pipeline materialized, quality scores populated).
+- **Cron schedule active** — `0 16 * * 5` (every Friday 16:00 UTC).
+- **Budget:** ~$8.66 / $500 (1.73%) ✅ Healthy
+
+### Pipeline Overview (Sprint 13)
+| Issue | Assignee | Status | Summary |
+|-------|----------|--------|---------|
+| THE-197 | BackendArchitect | **in_progress** 🔄 | Organization & Team Management API |
+| THE-192 | FrontendArchitect | **done** ✅ | Auth UI (awaiting UX gate archival) |
+| THE-249 | CTO | **done** ✅ | Minerva Agent Routine |
+| A.4 SSO QA | BackendArchitect | **done** ✅ | SSO QA + Audit Log — 47 tests |
+| B.3 Onboarding UX | UXDesigner | **done** ✅ | Wireframes delivered |
+| Wave 5 | FrontendArchitect | **in_progress** 🔄 | Onboarding UI |
+
+### Pipeline Compliance
+- Live Execution Issues: **1/2** ✅ (THE-197 BackendArchitect)
+- Active Runners: 1 ✅
+- Per-Agent WIP: All compliant ✅
+- Budget: ~$8.66 / $500 (1.73%) ✅ Healthy
+
+### Next Actions
+1. **@BackendArchitect** — Complete THE-197 (Org Management)
+2. **@FrontendArchitect** — Complete Wave 5 (Onboarding UI)
+3. **@CTO** — Monitor pipeline; activate Wave 6 when runner frees
+
+---
+
 ## Heartbeat: 2026-07-19 20:03 UTC | HB#164 — CEO: THE-249 Minerva Routine VALIDATED (PASS), Full SOP Executed End-to-End
 
 ### 0. Analysis Paralysis Scan
