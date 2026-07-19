@@ -5,6 +5,7 @@ import { impactAnalyzer } from '../ai/impactAnalyzer'
 import { coverageAnalyzer } from '../ai/coverageAnalyzer'
 import { getLLMClient } from '../ai/llmClient'
 import { buildTraceabilityReportPrompt } from '../ai/promptTemplates'
+import { getGraphDatabase } from '../graphBuilder/graphDatabase'
 
 function parseList(value: unknown): string[] | undefined {
   if (value === undefined || value === null) return undefined
@@ -92,6 +93,146 @@ export async function getTraceabilityCoverage (request: FastifyRequest, reply: F
   } catch (error) {
     reply.log.error(error as Error)
     return reply.status(500).send({ error: 'Failed to compute traceability coverage' })
+  }
+}
+
+export async function getTraceabilityDependencies (request: FastifyRequest, reply: FastifyReply) {
+  try {
+    const query = request.query as {
+      artifactId?: string
+      depth?: string
+      direction?: string
+      relationshipTypes?: string
+      includeMetadata?: string
+    }
+
+    const { artifactId, depth, direction, relationshipTypes, includeMetadata } = query
+
+    // Validate depth parameter
+    const parsedDepth = depth ? Number(depth) : undefined
+    if (depth && (isNaN(parsedDepth) || parsedDepth < 0 || parsedDepth > 100)) {
+      return reply.status(400).send({ error: 'Invalid depth parameter. Must be a number between 0 and 100.' })
+    }
+
+    // Validate direction parameter
+    const validDirections = ['both', 'upstream', 'downstream'] as const
+    const parsedDirection = (direction as typeof validDirections[number]) ?? 'both'
+    if (!validDirections.includes(parsedDirection)) {
+      return reply.status(400).send({ error: `Invalid direction parameter. Must be one of: ${validDirections.join(', ')}` })
+    }
+
+    // Validate artifactId if provided
+    if (artifactId) {
+      const db = getGraphDatabase()
+      const node = db.getNode(artifactId)
+      if (!node) {
+        return reply.status(404).send({ error: `Artifact "${artifactId}" not found`, availableArtifacts: db.getGraphNodes().map(n => ({ id: n.id, type: n.type, title: n.title || n.name })) })
+      }
+    }
+
+    const relTypes = relationshipTypes ? String(relationshipTypes).split(',').map(s => s.trim()).filter(Boolean) : undefined
+
+    // Build traversal options
+    const traversalOptions: Parameters<typeof traverseGraph>[0] = {
+      depth: parsedDepth,
+      relationshipTypes: relTypes,
+    }
+
+    // If artifactId specified, seed from that specific node
+    if (artifactId) {
+      traversalOptions.seedIds = [artifactId]
+    }
+
+    const result = traverseGraph(traversalOptions)
+
+    // If direction is specified, filter edges accordingly
+    let filteredEdges = result.edges
+    if (direction === 'downstream' || direction === 'upstream') {
+      // For direction filtering, we need to identify upstream vs downstream nodes
+      // from the original seed (artifactId or all nodes if no seed)
+      const seeds = artifactId ? [artifactId] : result.nodes.map(n => n.id)
+      const downstreamNodes = new Set<string>(seeds)
+
+      // BFS to find downstream nodes
+      if (direction === 'downstream') {
+        const adj = new Map<string, string[]>()
+        for (const edge of result.edges) {
+          if (!adj.has(edge.source_id)) adj.set(edge.source_id, [])
+          adj.get(edge.source_id)!.push(edge.target_id)
+        }
+        const queue = [...seeds]
+        while (queue.length) {
+          const current = queue.shift()!
+          if (!adj.has(current)) continue
+          for (const neighbor of adj.get(current)!) {
+            if (!downstreamNodes.has(neighbor)) {
+              downstreamNodes.add(neighbor)
+              queue.push(neighbor)
+            }
+          }
+        }
+        // Keep only edges where source is in downstream set
+        filteredEdges = result.edges.filter(e => downstreamNodes.has(e.source_id))
+      } else {
+        const adj = new Map<string, string[]>()
+        for (const edge of result.edges) {
+          if (!adj.has(edge.target_id)) adj.set(edge.target_id, [])
+          adj.get(edge.target_id)!.push(edge.source_id)
+        }
+        const queue = [...seeds]
+        while (queue.length) {
+          const current = queue.shift()!
+          if (!adj.has(current)) continue
+          for (const neighbor of adj.get(current)!) {
+            if (!downstreamNodes.has(neighbor)) {
+              downstreamNodes.add(neighbor)
+              queue.push(neighbor)
+            }
+          }
+        }
+        // Keep only edges where source is in upstream set
+        filteredEdges = result.edges.filter(e => downstreamNodes.has(e.source_id))
+      }
+    }
+
+    const nodeIdSet = new Set(filteredEdges.map(e => e.source_id).concat(filteredEdges.map(e => e.target_id)))
+    const filteredNodes = result.nodes.filter(n => nodeIdSet.has(n.id))
+
+    const response: {
+      artifactId?: string
+      depth?: number
+      direction: string
+      relationshipTypes?: string[]
+      nodes: typeof filteredNodes
+      edges: typeof filteredEdges
+      totalNodes: number
+      totalEdges: number
+      metadata?: {
+        includeMetadata: boolean
+        seedNode?: { id: string; type: string; title?: string }
+      }
+    } = {
+      artifactId,
+      depth: parsedDepth,
+      direction: parsedDirection,
+      relationshipTypes: relTypes,
+      nodes: filteredNodes,
+      edges: filteredEdges,
+      totalNodes: filteredNodes.length,
+      totalEdges: filteredEdges.length,
+    }
+
+    if (includeMetadata === 'true') {
+      response.metadata = {
+        includeMetadata: true,
+        seedNode: artifactId ? { id: artifactId, type: result.nodes.find(n => n.id === artifactId)?.type, title: result.nodes.find(n => n.id === artifactId)?.title || result.nodes.find(n => n.id === artifactId)?.name } : undefined,
+      }
+    }
+
+    return reply.send(response)
+  } catch (error) {
+    reply.log.error(error as Error)
+    return reply.status(500).send({ error: 'Failed to compute dependency graph' })
   }
 }
 
@@ -184,6 +325,7 @@ function nativeMarkdownReport(report: Awaited<ReturnType<typeof coverageAnalyzer
 export function traceabilityRoutes (server: FastifyInstance) {
   server.get('/api/traceability/graph', getTraceabilityGraph)
   server.get('/api/traceability/impact/:artifactId', getTraceabilityImpact)
+  server.get('/api/traceability/dependencies', getTraceabilityDependencies)
   server.get('/api/traceability/coverage', getTraceabilityCoverage)
   server.get('/api/traceability/report', getTraceabilityReport)
 }

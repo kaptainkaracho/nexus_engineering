@@ -5,6 +5,7 @@ export interface GraphTraversalOptions {
   depth?: number
   filter?: string[]
   relationshipTypes?: string[]
+  seedIds?: string[]
 }
 
 export interface TraversedGraph {
@@ -49,9 +50,14 @@ export function traverseGraph(options: GraphTraversalOptions = {}): TraversedGra
     reverseAdjacency.get(edge.target_id)!.push(edge)
   }
 
-  const seeds = allowedTypes
-    ? allNodes.filter(n => allowedTypes.has(n.type))
-    : allNodes
+  let seeds: GraphNodeRow[]
+  if (options.seedIds?.length) {
+    seeds = allNodes.filter(n => options.seedIds!.includes(n.id))
+  } else if (allowedTypes) {
+    seeds = allNodes.filter(n => allowedTypes.has(n.type))
+  } else {
+    seeds = allNodes
+  }
 
   const visitedNodes = new Set<string>()
   const visitedEdges = new Set<GraphEdgeRow>()

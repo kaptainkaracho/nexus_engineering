@@ -60,4 +60,81 @@ describe('ImpactAnalyzer v2', () => {
     expect(result.chains.length).toBe(result.artifacts.length)
     expect(result.chains[0].path[0]).toBe('R1')
   })
+
+  it('handles empty scope (no artifactIds)', async () => {
+    const emptyAnalyzer = new ImpactAnalyzer()
+    const result = await emptyAnalyzer.analyzeV2({ artifactIds: [] })
+    expect(result.artifacts.length).toBe(0)
+    expect(result.summary.totalAffected).toBe(0)
+    expect(result.impactGraph.nodes.length).toBe(0)
+    expect(result.impactGraph.edges.length).toBe(0)
+    expect(result.chains.length).toBe(0)
+  })
+
+  it('handles artifact with no edges gracefully', async () => {
+    const db = getGraphDatabase()
+    db.upsertNode({ id: 'ORPHAN', type: 'requirement', title: 'Orphan requirement' })
+    const analyzer2 = new ImpactAnalyzer()
+    const result = await analyzer2.analyzeV2({ artifactIds: ['ORPHAN'] })
+    expect(result.artifacts.length).toBe(0)
+    expect(result.summary.totalAffected).toBe(0)
+  })
+
+  it('handles circular references without infinite loop', async () => {
+    const db = getGraphDatabase()
+    db.upsertNodes([
+      { id: 'CIRC-A', type: 'requirement', title: 'Circular A' },
+      { id: 'CIRC-B', type: 'feature', title: 'Circular B' },
+      { id: 'CIRC-C', type: 'testCase', title: 'Circular C' },
+    ])
+    db.upsertEdge({ sourceId: 'CIRC-A', targetId: 'CIRC-B', relationshipType: 'satisfies', confidence: 'high' })
+    db.upsertEdge({ sourceId: 'CIRC-B', targetId: 'CIRC-C', relationshipType: 'verifies', confidence: 'high' })
+    db.upsertEdge({ sourceId: 'CIRC-C', targetId: 'CIRC-A', relationshipType: 'validates', confidence: 'high' })
+    const analyzer3 = new ImpactAnalyzer()
+    const result = await analyzer3.analyzeV2({ artifactIds: ['CIRC-A'] })
+    expect(result.artifacts.length).toBeGreaterThan(0)
+    // Should not have infinite artifacts (circular refs should be deduped)
+    expect(result.summary.totalAffected).toBeLessThanOrEqual(3)
+    // All artifacts should have valid confidence scores
+    for (const a of result.artifacts) {
+      expect(a.confidenceScore).toBeGreaterThanOrEqual(0)
+      expect(a.confidenceScore).toBeLessThanOrEqual(100)
+    }
+  })
+
+  it('handles deep chains (depth=3) correctly', async () => {
+    const db = getGraphDatabase()
+    db.upsertNodes([
+      { id: 'DEEP-1', type: 'requirement', title: 'Deep 1' },
+      { id: 'DEEP-2', type: 'feature', title: 'Deep 2' },
+      { id: 'DEEP-3', type: 'softwareComponent', title: 'Deep 3' },
+      { id: 'DEEP-4', type: 'testCase', title: 'Deep 4' },
+      { id: 'DEEP-5', type: 'result', title: 'Deep 5' },
+    ])
+    db.upsertEdge({ sourceId: 'DEEP-1', targetId: 'DEEP-2', relationshipType: 'satisfies', confidence: 'high' })
+    db.upsertEdge({ sourceId: 'DEEP-2', targetId: 'DEEP-3', relationshipType: 'implements', confidence: 'high' })
+    db.upsertEdge({ sourceId: 'DEEP-3', targetId: 'DEEP-4', relationshipType: 'verifies', confidence: 'high' })
+    db.upsertEdge({ sourceId: 'DEEP-4', targetId: 'DEEP-5', relationshipType: 'produces', confidence: 'high' })
+    const analyzer4 = new ImpactAnalyzer()
+    const result = await analyzer4.analyzeV2({ artifactIds: ['DEEP-1'] })
+    // Should have direct (DEEP-2), indirect (DEEP-3), and transitive (DEEP-4, DEEP-5)
+    expect(result.summary.directCount).toBeGreaterThan(0)
+    expect(result.summary.indirectCount).toBeGreaterThan(0)
+    expect(result.summary.transitiveCount).toBeGreaterThan(0)
+    // Confidence should decay with distance
+    const direct = result.artifacts.find(a => a.impactLevel === 'direct')!
+    const transitive = result.artifacts.find(a => a.impactLevel === 'transitive')
+    if (direct && transitive) {
+      expect(transitive.confidenceScore).toBeLessThanOrEqual(direct.confidenceScore)
+    }
+  })
+
+  it('handles multiple artifactIds in scope', async () => {
+    const analyzer5 = new ImpactAnalyzer()
+    const result = await analyzer5.analyzeV2({ artifactIds: ['R1', 'F1'] })
+    expect(result.summary.totalAffected).toBeGreaterThan(0)
+    // Should include both seeds in the impact graph
+    expect(result.impactGraph.nodes.some(n => n.id === 'R1')).toBe(true)
+    expect(result.impactGraph.nodes.some(n => n.id === 'F1')).toBe(true)
+  })
 })

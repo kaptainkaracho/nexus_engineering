@@ -199,6 +199,43 @@ export interface TraceabilityReport {
   llmAnalysis?: string
 }
 
+export interface DependencyGraphQuery {
+  artifactId?: string
+  depth?: number
+  direction?: 'upstream' | 'downstream' | 'both'
+  relationshipTypes?: string[]
+  includeMetadata?: boolean
+}
+
+export interface DependencyGraphNode {
+  id: string
+  type: string
+  title?: string
+  name?: string
+}
+
+export interface DependencyGraphEdge {
+  sourceId: string
+  targetId: string
+  relationshipType: string
+  confidence: string
+}
+
+export interface DependencyGraphResponse {
+  artifactId?: string
+  depth?: number
+  direction: string
+  relationshipTypes?: string[]
+  nodes: DependencyGraphNode[]
+  edges: DependencyGraphEdge[]
+  totalNodes: number
+  totalEdges: number
+  metadata?: {
+    includeMetadata: boolean
+    seedNode?: { id: string; type: string; title?: string }
+  }
+}
+
 export interface StructuredLLMResponse {
   analysisType: string
   [key: string]: unknown

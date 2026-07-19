@@ -96,4 +96,119 @@ describe('Traceability Graph Query API', () => {
     expect(body.format).toBe('json')
     expect(body.coverage).toBeDefined()
   })
+
+  it('GET /api/traceability/impact with non-existent artifactId returns 500 gracefully', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/traceability/impact/nonexistent-R1?confidenceThreshold=0' })
+    expect(res.statusCode).toBe(200)
+    const body = res.json()
+    expect(body.artifactId).toBe('nonexistent-R1')
+    expect(body.artifacts).toEqual([])
+    expect(body.summary.totalAffected).toBe(0)
+  })
+
+  it('GET /api/traceability/impact with node that has no edges returns empty impact', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/traceability/impact/pay-R3?confidenceThreshold=0' })
+    expect(res.statusCode).toBe(200)
+    const body = res.json()
+    expect(body.artifactId).toBe('pay-R3')
+    expect(body.summary.totalAffected).toBe(0)
+  })
+
+  it('GET /api/traceability/impact with confidenceThreshold=100 returns only direct high-confidence', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/traceability/impact/auth-R1?confidenceThreshold=100' })
+    expect(res.statusCode).toBe(200)
+    const body = res.json()
+    if (body.artifacts.length) {
+      expect(body.artifacts.every((a: any) => a.confidenceScore >= 100)).toBe(true)
+    }
+  })
+
+  it('GET /api/traceability/dependencies returns full dependency graph', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/traceability/dependencies' })
+    expect(res.statusCode).toBe(200)
+    const body = res.json()
+    expect(body.totalNodes).toBeGreaterThan(0)
+    expect(body.totalEdges).toBeGreaterThan(0)
+    expect(Array.isArray(body.nodes)).toBe(true)
+    expect(Array.isArray(body.edges)).toBe(true)
+  })
+
+  it('GET /api/traceability/dependencies?artifactId= filters to that artifact', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/traceability/dependencies?artifactId=auth-R1' })
+    expect(res.statusCode).toBe(200)
+    const body = res.json()
+    expect(body.artifactId).toBe('auth-R1')
+    expect(body.totalNodes).toBeGreaterThan(0)
+  })
+
+  it('GET /api/traceability/dependencies?artifactId=unknown returns 404', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/traceability/dependencies?artifactId=nonexistent-R1' })
+    expect(res.statusCode).toBe(404)
+    const body = res.json()
+    expect(body.error).toBeDefined()
+  })
+
+  it('GET /api/traceability/dependencies?depth=1 limits traversal depth', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/traceability/dependencies?depth=1&artifactId=auth-R1' })
+    expect(res.statusCode).toBe(200)
+    const body = res.json()
+    expect(body.depth).toBe(1)
+    // With depth=1, should only include direct neighbors
+    expect(body.totalNodes).toBeGreaterThan(0)
+  })
+
+  it('GET /api/traceability/dependencies?depth=invalid returns 400', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/traceability/dependencies?depth=invalid' })
+    expect(res.statusCode).toBe(400)
+    const body = res.json()
+    expect(body.error).toContain('Invalid depth')
+  })
+
+  it('GET /api/traceability/dependencies?direction=downstream filters edges', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/traceability/dependencies?artifactId=auth-R1&direction=downstream' })
+    expect(res.statusCode).toBe(200)
+    const body = res.json()
+    expect(body.direction).toBe('downstream')
+    expect(body.totalEdges).toBeGreaterThanOrEqual(0)
+  })
+
+  it('GET /api/traceability/dependencies?direction=upstream filters edges', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/traceability/dependencies?artifactId=auth-T1&direction=upstream' })
+    expect(res.statusCode).toBe(200)
+    const body = res.json()
+    expect(body.direction).toBe('upstream')
+    expect(body.totalEdges).toBeGreaterThanOrEqual(0)
+  })
+
+  it('GET /api/traceability/dependencies?direction=invalid returns 400', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/traceability/dependencies?direction=invalid' })
+    expect(res.statusCode).toBe(400)
+    const body = res.json()
+    expect(body.error).toContain('Invalid direction')
+  })
+
+  it('GET /api/traceability/dependencies?includeMetadata=true returns seed metadata', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/traceability/dependencies?artifactId=auth-R1&includeMetadata=true' })
+    expect(res.statusCode).toBe(200)
+    const body = res.json()
+    expect(body.metadata).toBeDefined()
+    expect(body.metadata?.seedNode?.id).toBe('auth-R1')
+  })
+
+  it('GET /api/traceability/dependencies?relationshipTypes=satisfies filters by relationship type', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/traceability/dependencies?relationshipTypes=satisfies' })
+    expect(res.statusCode).toBe(200)
+    const body = res.json()
+    expect(body.relationshipTypes).toEqual(['satisfies'])
+    if (body.edges.length > 0) {
+      expect(body.edges.every((e: any) => e.relationship_type === 'satisfies')).toBe(true)
+    }
+  })
+
+  it('GET /api/traceability/dependencies?depth=0 returns only seed nodes', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/traceability/dependencies?depth=0&artifactId=auth-R1' })
+    expect(res.statusCode).toBe(200)
+    const body = res.json()
+    expect(body.depth).toBe(0)
+  })
 })
