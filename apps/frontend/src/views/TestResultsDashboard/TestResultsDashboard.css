@@ -1,0 +1,202 @@
+/* Test Results Dashboard — bespoke styling layered on the shared design system.
+   Utility classes (text-*, flex, gap-*, etc.) are provided by Tailwind; this file
+   only defines the dashboard-specific primitives that have no design-system equivalent. */
+
+.ter-skeletons {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .ter-skeletons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.ter-skeleton {
+  border-radius: 12px;
+  background: linear-gradient(90deg, var(--color-neutral-100), var(--color-neutral-200), var(--color-neutral-100));
+  background-size: 200% 100%;
+  animation: ter-shimmer 1.4s ease-in-out infinite;
+}
+
+.ter-skeleton-card {
+  min-height: 96px;
+}
+
+.dark .ter-skeleton {
+  background: linear-gradient(90deg, var(--color-neutral-800), var(--color-neutral-700), var(--color-neutral-800));
+  background-size: 200% 100%;
+}
+
+@keyframes ter-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.ter-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  border: 1px solid var(--color-neutral-200);
+  background: var(--color-neutral-50);
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.ter-filter-chip:hover {
+  border-color: var(--color-neutral-300);
+  color: var(--text-primary);
+}
+
+.ter-filter-chip.is-active {
+  border-color: var(--color-primary-500);
+  background: var(--color-primary-50);
+  color: var(--color-primary-700);
+}
+
+.dark .ter-filter-chip {
+  border-color: var(--color-neutral-700);
+  background: var(--color-neutral-800);
+  color: var(--text-secondary);
+}
+
+.dark .ter-filter-chip:hover {
+  border-color: var(--color-neutral-600);
+  color: var(--text-primary);
+}
+
+.dark .ter-filter-chip.is-active {
+  border-color: var(--color-primary-400);
+  background: var(--color-primary-950);
+  color: var(--color-primary-300);
+}
+
+.ter-filter-count {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.75rem;
+  opacity: 0.75;
+}
+
+.ter-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ter-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.ter-table caption {
+  text-align: left;
+}
+
+.ter-table thead th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+  border-bottom: 1px solid var(--color-neutral-200);
+}
+
+.dark .ter-table thead th {
+  border-bottom-color: var(--color-neutral-700);
+}
+
+.ter-table td {
+  padding: 0.625rem 0.75rem;
+  border-bottom: 1px solid var(--color-neutral-100);
+  color: var(--text-secondary);
+}
+
+.dark .ter-table td {
+  border-bottom-color: var(--color-neutral-800);
+}
+
+.ter-row {
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.ter-row:hover {
+  background: var(--color-neutral-50);
+}
+
+.ter-row:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: -2px;
+}
+
+.dark .ter-row:hover {
+  background: var(--color-neutral-800);
+}
+
+.ter-detail-row td {
+  background: var(--color-neutral-50);
+}
+
+.dark .ter-detail-row td {
+  background: var(--color-neutral-900);
+}
+
+.ter-error-block {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: var(--color-error-950);
+  color: var(--color-error-200);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 320px;
+  overflow: auto;
+}
+
+.ter-bar-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--color-neutral-200);
+  overflow: hidden;
+}
+
+.dark .ter-bar-track {
+  background: var(--color-neutral-800);
+}
+
+.ter-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.4s ease;
+}
+
+.ter-axis-label {
+  fill: var(--text-tertiary);
+  font-size: 10px;
+}
+
+.ter-axis-value {
+  fill: var(--text-primary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ter-skeleton,
+  .ter-bar-fill {
+    animation: none;
+    transition: none;
+  }
+}

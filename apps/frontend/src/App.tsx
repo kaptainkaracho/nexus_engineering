@@ -13,6 +13,7 @@ import { RoleManagement } from './views/RoleManagement';
 import { AuditLogViewer } from './views/AuditLogViewer';
 import { PrivateRegistries } from './views/PrivateRegistries';
 import { TacViewer } from './views/TacViewer';
+import { TestResultsDashboard } from './views/TestResultsDashboard';
 import {
   getCurrentSession,
   clearSession,
@@ -35,7 +36,8 @@ type Section =
   | 'roles'
   | 'audit-log'
   | 'registries'
-  | 'tac';
+  | 'tac'
+  | 'test-results';
 
 const VALID_SECTIONS: Section[] = [
   'overview',
@@ -53,6 +55,7 @@ const VALID_SECTIONS: Section[] = [
   'audit-log',
   'registries',
   'tac',
+  'test-results',
 ];
 
 interface RouteState {
@@ -174,6 +177,7 @@ function App() {
           { label: 'Roles', href: '#roles', active: activeSection === 'roles' },
           { label: 'Registries', href: '#registries', active: activeSection === 'registries' },
           { label: 'TAC', href: '#tac', active: activeSection === 'tac' },
+{ label: 'Test Results', href: '#test-results', active: activeSection === 'test-results' },
         ]
       : []),
   ];
@@ -252,6 +256,8 @@ function App() {
             </ProtectedLayout>
           ) : activeSection === 'tac' ? (
             <TacViewer />
+          ) : activeSection === 'test-results' ? (
+            <TestResultsDashboard />
           ) : (
            <>
              <Nav
