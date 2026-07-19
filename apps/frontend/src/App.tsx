@@ -14,6 +14,7 @@ import { AuditLogViewer } from './views/AuditLogViewer';
 import { PrivateRegistries } from './views/PrivateRegistries';
 import { TacViewer } from './views/TacViewer';
 import { TestResultsDashboard } from './views/TestResultsDashboard';
+import { FeatureBrowser } from './views/FeatureBrowser';
 import {
   getCurrentSession,
   clearSession,
@@ -37,7 +38,8 @@ type Section =
   | 'audit-log'
   | 'registries'
   | 'tac'
-  | 'test-results';
+  | 'test-results'
+  | 'features';
 
 const VALID_SECTIONS: Section[] = [
   'overview',
@@ -56,6 +58,7 @@ const VALID_SECTIONS: Section[] = [
   'registries',
   'tac',
   'test-results',
+  'features',
 ];
 
 interface RouteState {
@@ -177,9 +180,10 @@ function App() {
           { label: 'Roles', href: '#roles', active: activeSection === 'roles' },
           { label: 'Registries', href: '#registries', active: activeSection === 'registries' },
           { label: 'TAC', href: '#tac', active: activeSection === 'tac' },
-{ label: 'Test Results', href: '#test-results', active: activeSection === 'test-results' },
+    { label: 'Test Results', href: '#test-results', active: activeSection === 'test-results' },
         ]
       : []),
+    { label: 'Features', href: '#features', active: activeSection === 'features' },
   ];
 
   if (!authReady) {
@@ -258,6 +262,8 @@ function App() {
             <TacViewer />
           ) : activeSection === 'test-results' ? (
             <TestResultsDashboard />
+          ) : activeSection === 'features' ? (
+            <FeatureBrowser />
           ) : (
            <>
              <Nav

@@ -717,6 +717,118 @@ export async function fetchRegistryArtifacts(registryId: string): Promise<Regist
 }
 
 // =========================================================
+// Features as Code (FAC) — Feature Browser API
+// =========================================================
+
+export type FacStatus = 'draft' | 'approved' | 'implemented' | 'deprecated';
+
+export interface FacAcceptanceCriterion {
+  id: string;
+  given?: string;
+  when?: string;
+  then: string;
+  description?: string;
+}
+
+export interface FacUserStory {
+  id: string;
+  role: string;
+  want: string;
+  soThat?: string;
+  acceptanceCriteria: FacAcceptanceCriterion[];
+}
+
+export interface FacTraceLink {
+  type: string;
+  target: { id: string; documentId: string };
+  confidence?: 'high' | 'medium' | 'low';
+  description?: string;
+}
+
+export interface FacFeature {
+  id: string;
+  name: string;
+  description: string;
+  status?: FacStatus;
+  userStories: FacUserStory[];
+  traceLinks?: FacTraceLink[];
+  source: string;
+  documentId: string;
+}
+
+export interface FacListResponse {
+  features: FacFeature[];
+  documents: number;
+  total: number;
+}
+
+export interface FacDetailResponse {
+  feature: FacFeature;
+}
+
+export interface FacValidationResult {
+  valid: boolean;
+  schema?: string;
+  errors?: Record<string, string>;
+}
+
+/** List FAC features from the backend, optionally filtered by status/domain. */
+export async function fetchFacFeatures(params?: {
+  status?: string;
+  domain?: string;
+}): Promise<FacListResponse> {
+  const query = new URLSearchParams();
+  if (params?.status) query.set('status', params.status);
+  if (params?.domain) query.set('domain', params.domain);
+  const qs = query.toString();
+  try {
+    const res = await fetch(`${BASE}/api/fac${qs ? `?${qs}` : ''}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    const json = await res.json();
+    return {
+      features: json.features ?? [],
+      documents: json.documents ?? 0,
+      total: json.total ?? 0,
+    };
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('HTTP')) throw error;
+    return { features: [], documents: 0, total: 0 };
+  }
+}
+
+/** Fetch a single FAC feature by id. */
+export async function fetchFacFeature(id: string): Promise<FacDetailResponse | null> {
+  try {
+    const res = await fetch(`${BASE}/api/fac/${encodeURIComponent(id)}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    const json = await res.json();
+    return json.feature ? { feature: json.feature } : null;
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('HTTP')) throw error;
+    return null;
+  }
+}
+
+/** Validate a FAC feature document against the JSON schema (CI gate). */
+export async function validateFacDocument(payload: {
+  features: FacFeature[];
+  domain: string;
+}): Promise<FacValidationResult> {
+  try {
+    const res = await fetch(`${BASE}/api/fac/validate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return await res.json();
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('HTTP')) throw error;
+    return { valid: false, errors: { _network: 'Unable to reach the validation service' } };
+  }
+}
+
+// =========================================================
 // Test Acceptance Criteria (TAC) Document Viewer API
 // =========================================================
 
@@ -857,5 +969,62 @@ export async function validateTacDocument(
     return await res.json()
   } catch {
     return { valid: false, errors: { _network: 'Unable to reach the validation service' } }
+  }
+}
+
+export type ExecutionStatus = 'passed' | 'failed' | 'skipped' | 'error' | 'flaky';
+
+/** A single test execution result returned by the TER API */
+export interface TestExecution {
+  id: string;
+  suiteId: string;
+  caseId: string;
+  status: ExecutionStatus;
+  durationMs?: number;
+  startedAt?: string;
+  finishedAt?: string;
+  retries?: number;
+  error?: { message: string; type?: string; stack?: string };
+  artifacts?: Array<{ type: string; path?: string; url?: string }>;
+  traceLinks?: Array<{
+    type: string;
+    target: { id: string; documentId: string };
+    confidence?: 'high' | 'medium' | 'low';
+  }>;
+  source?: string;
+  documentId?: string;
+}
+
+export interface TestResultsResponse {
+  executions: TestExecution[];
+  documents: number;
+  total: number;
+  status?: ExecutionStatus;
+  suiteId?: string;
+}
+
+/** Fetch test execution results (TER) from the backend. */
+export async function fetchTestResults(params?: {
+  status?: ExecutionStatus;
+  suiteId?: string;
+}): Promise<TestResultsResponse> {
+  const query = new URLSearchParams();
+  if (params?.status) query.set('status', params.status);
+  if (params?.suiteId) query.set('suiteId', params.suiteId);
+  const qs = query.toString();
+  try {
+    const res = await fetch(`${BASE}/api/results${qs ? `?${qs}` : ''}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    const json = await res.json();
+    return {
+      executions: json.executions ?? [],
+      documents: json.documents ?? 0,
+      total: json.total ?? 0,
+      ...(json.status && { status: json.status }),
+      ...(json.suiteId && { suiteId: json.suiteId }),
+    };
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('HTTP')) throw error;
+    return { executions: [], documents: 0, total: 0 };
   }
 }
