@@ -45,3 +45,8 @@ export interface TestDocument {
   nexus: TestCaseNexusMetadata;
   suites: TestSuite[];
 }
+
+export interface TestLoadResult {
+  document: TestDocument | null;
+  errors: Map<string, string[]>;
+}

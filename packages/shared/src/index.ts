@@ -145,8 +145,8 @@ export type {
   TestCasePriority,
   TestSuite,
   TestDocument,
-  TestDocumentValidationResult,
-} from './tests';
+} from './tests/format';
+export type { TestDocumentValidationResult } from './tests/validator';
 
 export type {
   ResultsNexusMetadata,
@@ -156,9 +156,12 @@ export type {
   ExecutionError,
   ExecutionArtifact,
   TestExecution,
-  ResultsLoadResult,
-  ResultsDocumentValidationResult,
-} from './results';
+} from './results/format';
+export type { ResultsDocumentValidationResult } from './results/validator';
+
+export type { FeatureLoadResult } from './features/format';
+export type { ResultsLoadResult } from './results/format';
+export type { TestLoadResult } from './tests/format';
 
 export type {
   FeatureNexusMetadata,
@@ -168,9 +171,7 @@ export type {
   UserStory,
   AcceptanceCriterion,
   FeatureTraceLink,
-  FeatureLoadResult,
-  FeatureDocumentValidationResult,
-} from './features';
+} from './features/format';
 
 // FeatureLoader and related runtime exports omitted — they import Node.js 'fs'
 // and are server-only. Import directly from '@nexus-engineering/shared/features'

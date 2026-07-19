@@ -75,3 +75,9 @@ export interface ResultsDocument {
   nexus: ResultsNexusMetadata;
   executions: TestExecution[];
 }
+
+export interface ResultsLoadResult {
+  document: ResultsDocument | null;
+  errors: Map<string, string[]>;
+  violations?: any[];
+}

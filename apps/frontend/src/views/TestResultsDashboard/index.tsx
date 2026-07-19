@@ -153,7 +153,7 @@ export function TestResultsDashboard() {
             <StatCard
               label="Pass Rate"
               value={`${passRate}%`}
-              accent={passRate >= 90 ? '#16A34A' : passRate >= 70 ? '#8B5CF6' : '#DC2626'}
+              accent={passRate >= 90 ? 'var(--color-success-600)' : passRate >= 70 ? 'var(--color-warning-500)' : 'var(--color-error-600)'}
             />
             <StatCard label="Failed" value={counts.failed + counts.error} hint="failures + errors" />
             <StatCard label="Flaky" value={counts.flaky} hint="non-deterministic" />

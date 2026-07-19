@@ -1,10 +1,4 @@
 export { resultsDocSchema } from './schema';
-export {
-  ResultsLoader,
-  ValidatedResultsLoader,
-  resultsLoader,
-  validatedResultsLoader,
-} from './loader';
 export { validateExecutions, validateResultsDocument } from './validator';
 
 export type {
@@ -17,5 +11,4 @@ export type {
   TestExecution,
 } from './format';
 
-export type { ResultsLoadResult } from './loader';
 export type { ResultsDocumentValidationResult } from './validator';

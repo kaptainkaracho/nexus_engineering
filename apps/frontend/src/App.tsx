@@ -15,6 +15,7 @@ import { PrivateRegistries } from './views/PrivateRegistries';
 import { TacViewer } from './views/TacViewer';
 import { TestResultsDashboard } from './views/TestResultsDashboard';
 import { FeatureBrowser } from './views/FeatureBrowser';
+import { TraceGraph } from './views/TraceGraph';
 import {
   getCurrentSession,
   clearSession,
@@ -39,7 +40,8 @@ type Section =
   | 'registries'
   | 'tac'
   | 'test-results'
-  | 'features';
+  | 'features'
+  | 'trace-graph';
 
 const VALID_SECTIONS: Section[] = [
   'overview',
@@ -59,6 +61,7 @@ const VALID_SECTIONS: Section[] = [
   'tac',
   'test-results',
   'features',
+  'trace-graph',
 ];
 
 interface RouteState {
@@ -184,6 +187,7 @@ function App() {
         ]
       : []),
     { label: 'Features', href: '#features', active: activeSection === 'features' },
+    { label: 'Trace Graph', href: '#trace-graph', active: activeSection === 'trace-graph' },
   ];
 
   if (!authReady) {
@@ -264,6 +268,8 @@ function App() {
             <TestResultsDashboard />
           ) : activeSection === 'features' ? (
             <FeatureBrowser />
+          ) : activeSection === 'trace-graph' ? (
+            <TraceGraph />
           ) : (
            <>
              <Nav

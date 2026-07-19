@@ -972,6 +972,100 @@ export async function validateTacDocument(
   }
 }
 
+// =========================================================
+// AI Traceability (Epic C) — Graph, Impact, Coverage, Report
+// =========================================================
+
+import type {
+  AxisCoverage,
+  CrossArtifactGap,
+  DomainCoverage,
+  CoverageAnalysisReport,
+  AffectedArtifactV2,
+  ImpactGraph as SharedImpactGraph,
+  ImpactChain,
+  TraceabilityReport,
+} from '@nexus-engineering/shared';
+
+export type ConfidenceScore = number;
+
+export interface VAxisStats {
+  axis: 'requirement' | 'feature' | 'testCase' | 'result';
+  total: number;
+  linked: number;
+  coveragePercent: number;
+}
+
+export interface TraceGraphData {
+  nodes: Array<{ id: string; type: string; title?: string; confidenceScore?: number }>;
+  edges: Array<{ sourceId: string; targetId: string; relationshipType: string; confidence: string; confidenceScore: number }>;
+  totalNodes: number;
+  totalEdges: number;
+}
+
+export interface ImpactAnalysisData {
+  scope: { artifactIds: string[]; artifactTypes?: string[] };
+  artifactId: string;
+  confidenceThreshold: number;
+  artifacts: Array<{ id: string; type: string; title: string; impactLevel: 'direct' | 'indirect' | 'transitive'; relationshipType: string; confidenceScore: number }>;
+  impactGraph: SharedImpactGraph;
+  chains: Array<ImpactChain>;
+  summary: { totalAffected: number; directCount: number; indirectCount: number; transitiveCount: number; minConfidence: number; maxConfidence: number };
+}
+
+export type TraceabilityCoverageResponse = { overallCoveragePercent: number; axes: AxisCoverage[]; crossArtifactGaps: CrossArtifactGap[]; domainCoverage: DomainCoverage[] } | { domain: string; coverage: Pick<DomainCoverage, 'totalArtifacts' | 'coveredArtifacts' | 'coveragePercent'>; overallCoveragePercent: number };
+
+export type TraceabilityReportResult = { generatedAt: string; format: 'json' | 'markdown'; content: string; coverage?: CoverageAnalysisReport; gaps?: CrossArtifactGap[]; llmAnalysis?: string };
+
+/** Fetch the AI traceability graph with confidence-scored nodes/edges */
+export async function fetchTraceGraph(): Promise<TraceGraphData> {
+  try {
+    const res = await fetch(`${BASE}/api/traceability/graph`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch {
+    return { nodes: [], edges: [], totalNodes: 0, totalEdges: 0 };
+  }
+}
+
+/** Fetch impact analysis for a specific artifact */
+export async function fetchTraceImpact(artifactId: string, options?: { confidenceThreshold?: number; artifactType?: string }): Promise<ImpactAnalysisData> {
+  const params = new URLSearchParams({ artifactId });
+  if (options?.confidenceThreshold) params.set('confidenceThreshold', String(options.confidenceThreshold));
+  if (options?.artifactType) params.set('artifactType', options.artifactType);
+  try {
+    const res = await fetch(`${BASE}/api/traceability/impact/${encodeURIComponent(artifactId)}?${params}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch {
+    return { scope: { artifactIds: [] }, artifactId, confidenceThreshold: options?.confidenceThreshold ?? 0, artifacts: [], impactGraph: { nodes: [], edges: [] }, chains: [], summary: { totalAffected: 0, directCount: 0, indirectCount: 0, transitiveCount: 0, minConfidence: 0, maxConfidence: 0 } };
+  }
+}
+
+/** Fetch full coverage analysis report */
+export async function fetchTraceCoverage(domain?: string): Promise<CoverageAnalysisReport | { domain: string; coverage: any; overallCoveragePercent: number }> {
+  const qs = domain ? `?domain=${encodeURIComponent(domain)}` : '';
+  try {
+    const res = await fetch(`${BASE}/api/traceability/coverage${qs}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch {
+    return domain ? { domain, coverage: { totalArtifacts: 0, coveredArtifacts: 0, coveragePercent: 0, axes: [], gaps: [] }, overallCoveragePercent: 0 } : { overallCoveragePercent: 0, axes: [], crossArtifactGaps: [], domainCoverage: [{ domain: '', totalArtifacts: 0, coveredArtifacts: 0, coveragePercent: 0, axes: [], gaps: [] }], summary: { totalArtifacts: 0, totalGaps: 0, highRiskCount: 0, mediumRiskCount: 0, lowRiskCount: 0 } };
+  }
+}
+
+/** Fetch a full traceability report (JSON or markdown) */
+export async function fetchTraceReport(format?: 'json' | 'markdown'): Promise<TraceabilityReport> {
+  const qs = format ? `?format=${format}` : '';
+  try {
+    const res = await fetch(`${BASE}/api/traceability/report${qs}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch {
+    return { generatedAt: new Date().toISOString(), format: format ?? 'json', content: 'Unable to load report' };
+  }
+}
+
 export type ExecutionStatus = 'passed' | 'failed' | 'skipped' | 'error' | 'flaky';
 
 /** A single test execution result returned by the TER API */

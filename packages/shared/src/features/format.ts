@@ -84,3 +84,9 @@ export interface FeatureDocument {
   nexus: FeatureNexusMetadata;
   features: Feature[];
 }
+
+export interface FeatureLoadResult {
+  document: FeatureDocument | null;
+  errors: Map<string, string[]>;
+  violations?: any[];
+}
