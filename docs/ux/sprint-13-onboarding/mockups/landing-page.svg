@@ -1,0 +1,186 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1600" font-family="Inter, system-ui, sans-serif">
+  <defs>
+    <style>
+      .bg-surface { fill: #FFFFFF; }
+      .bg-secondary { fill: #F8FAFC; }
+      .bg-primary-50 { fill: #EFF6FF; }
+      .bg-primary-100 { fill: #DBEAFE; }
+      .bg-primary-500 { fill: #3B82F6; }
+      .bg-primary-950 { fill: #172554; }
+      .bg-border { fill: #E2E8F0; }
+      .bg-success-500 { fill: #22C55E; }
+      .text-primary { fill: #0F172A; }
+      .text-secondary { fill: #475569; }
+      .text-tertiary { fill: #94A3B8; }
+      .text-inverse { fill: #FFFFFF; }
+      .text-primary-500 { fill: #3B82F6; }
+      .text-primary-600 { fill: #2563EB; }
+      .stroke-border { stroke: #E2E8F0; }
+    </style>
+    <linearGradient id="heroGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#EFF6FF" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#F8FAFC"/>
+    </linearGradient>
+    <linearGradient id="ctaGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F8FAFC"/>
+      <stop offset="100%" stop-color="#EFF6FF" stop-opacity="0.3"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ==================== NAV ==================== -->
+  <rect x="0" y="0" width="1200" height="64" class="bg-surface" rx="0"/>
+  <rect x="0" y="63" width="1200" height="1" class="bg-border"/>
+  <text x="32" y="38" class="text-primary" font-size="18" font-weight="700">Nexus</text>
+  <text x="160" y="38" class="text-secondary" font-size="13" font-weight="500">Product</text>
+  <text x="260" y="38" class="text-secondary" font-size="13" font-weight="500">Discovery</text>
+  <text x="370" y="38" class="text-secondary" font-size="13" font-weight="500">Projects</text>
+  <text x="480" y="38" class="text-secondary" font-size="13" font-weight="500">Pricing</text>
+
+  <!-- Status indicator -->
+  <circle cx="880" cy="32" r="5" class="bg-success-500"/>
+  <text x="892" y="36" class="text-secondary" font-size="12">Operational</text>
+
+  <rect x="1010" y="14" width="80" height="36" rx="8" stroke="#E2E8F0" stroke-width="1" fill="#FFFFFF"/>
+  <text x="1050" y="37" text-anchor="middle" class="text-secondary" font-size="13" font-weight="500">Sign In</text>
+
+  <rect x="1100" y="14" width="80" height="36" rx="8" fill="#3B82F6"/>
+  <text x="1140" y="37" text-anchor="middle" class="text-inverse" font-size="13" font-weight="600">Get Started</text>
+
+  <!-- ==================== HERO ==================== -->
+  <rect x="0" y="64" width="1200" height="420" fill="url(#heroGrad)"/>
+  <text x="600" y="180" text-anchor="middle" class="text-primary" font-size="42" font-weight="700">Engineering Intelligence</text>
+  <text x="600" y="225" text-anchor="middle" class="text-primary" font-size="42" font-weight="700">for the Modern Enterprise</text>
+
+  <text x="600" y="270" text-anchor="middle" class="text-secondary" font-size="16">Connect your tools, trace requirements to deployments,</text>
+  <text x="600" y="292" text-anchor="middle" class="text-secondary" font-size="16">and ship with confidence.</text>
+
+  <!-- CTAs -->
+  <rect x="420" y="330" width="160" height="44" rx="8" fill="#3B82F6"/>
+  <text x="500" y="358" text-anchor="middle" class="text-inverse" font-size="14" font-weight="600">Get Started →</text>
+  <rect x="600" y="330" width="160" height="44" rx="8" stroke="#E2E8F0" stroke-width="1" fill="#FFFFFF"/>
+  <text x="680" y="358" text-anchor="middle" class="text-primary" font-size="14" font-weight="500">Watch Demo</text>
+
+  <!-- Social proof -->
+  <line x1="200" y1="410" x2="1000" y2="410" class="stroke-border" stroke-width="1"/>
+  <text x="600" y="430" text-anchor="middle" class="text-tertiary" font-size="12">Trusted by engineering teams at</text>
+  <rect x="300" y="445" width="100" height="24" rx="4" fill="#E2E8F0" opacity="0.5"/>
+  <rect x="550" y="445" width="100" height="24" rx="4" fill="#E2E8F0" opacity="0.5"/>
+  <rect x="800" y="445" width="100" height="24" rx="4" fill="#E2E8F0" opacity="0.5"/>
+
+  <!-- ==================== FEATURES ==================== -->
+  <rect x="0" y="484" width="1200" height="480" class="bg-surface"/>
+  <text x="600" y="540" text-anchor="middle" class="text-primary" font-size="28" font-weight="700">Everything you need to engineer</text>
+  <text x="600" y="570" text-anchor="middle" class="text-primary" font-size="28" font-weight="700">with confidence</text>
+
+  <!-- Feature cards grid -->
+  <!-- Row 1 -->
+  <rect x="80" y="600" width="320" height="140" rx="10" stroke="#E2E8F0" stroke-width="1" fill="#FFFFFF"/>
+  <rect x="100" y="620" width="44" height="44" rx="10" fill="#EFF6FF"/>
+  <text x="122" y="648" text-anchor="middle" class="text-primary-500" font-size="18">🎯</text>
+  <text x="160" y="642" class="text-primary" font-size="14" font-weight="600">Requirement Tracking</text>
+  <text x="100" y="668" class="text-secondary" font-size="11">Capture, organize, and trace requirements</text>
+  <text x="100" y="684" class="text-secondary" font-size="11">from ideation to deployment.</text>
+
+  <rect x="440" y="600" width="320" height="140" rx="10" stroke="#E2E8F0" stroke-width="1" fill="#FFFFFF"/>
+  <rect x="460" y="620" width="44" height="44" rx="10" fill="#EFF6FF"/>
+  <text x="482" y="648" text-anchor="middle" class="text-primary-500" font-size="18">🔍</text>
+  <text x="520" y="642" class="text-primary" font-size="14" font-weight="600">Artifact Discovery</text>
+  <text x="460" y="668" class="text-secondary" font-size="11">Automatically discover and index artifacts</text>
+  <text x="460" y="684" class="text-secondary" font-size="11">across connected registries.</text>
+
+  <rect x="800" y="600" width="320" height="140" rx="10" stroke="#E2E8F0" stroke-width="1" fill="#FFFFFF"/>
+  <rect x="820" y="620" width="44" height="44" rx="10" fill="#EFF6FF"/>
+  <text x="842" y="648" text-anchor="middle" class="text-primary-500" font-size="18">🔗</text>
+  <text x="880" y="642" class="text-primary" font-size="14" font-weight="600">Traceability Chains</text>
+  <text x="820" y="668" class="text-secondary" font-size="11">Visualize end-to-end traceability from</text>
+  <text x="820" y="684" class="text-secondary" font-size="11">requirements through deployments.</text>
+
+  <!-- Row 2 -->
+  <rect x="80" y="760" width="320" height="140" rx="10" stroke="#E2E8F0" stroke-width="1" fill="#FFFFFF"/>
+  <rect x="100" y="780" width="44" height="44" rx="10" fill="#EFF6FF"/>
+  <text x="122" y="808" text-anchor="middle" class="text-primary-500" font-size="18">📊</text>
+  <text x="160" y="802" class="text-primary" font-size="14" font-weight="600">Quality Analytics</text>
+  <text x="100" y="828" class="text-secondary" font-size="11">Real-time quality scores, trend analysis,</text>
+  <text x="100" y="844" class="text-secondary" font-size="11">and actionable insights.</text>
+
+  <rect x="440" y="760" width="320" height="140" rx="10" stroke="#E2E8F0" stroke-width="1" fill="#FFFFFF"/>
+  <rect x="460" y="780" width="44" height="44" rx="10" fill="#EFF6FF"/>
+  <text x="482" y="808" text-anchor="middle" class="text-primary-500" font-size="18">🔐</text>
+  <text x="520" y="802" class="text-primary" font-size="14" font-weight="600">Enterprise Security</text>
+  <text x="460" y="828" class="text-secondary" font-size="11">SSO, SAML, OAuth, RBAC, and audit logs.</text>
+  <text x="460" y="844" class="text-secondary" font-size="11">Enterprise-grade out of the box.</text>
+
+  <rect x="800" y="760" width="320" height="140" rx="10" stroke="#E2E8F0" stroke-width="1" fill="#FFFFFF"/>
+  <rect x="820" y="780" width="44" height="44" rx="10" fill="#EFF6FF"/>
+  <text x="842" y="808" text-anchor="middle" class="text-primary-500" font-size="18">🚀</text>
+  <text x="880" y="802" class="text-primary" font-size="14" font-weight="600">Deployment Insights</text>
+  <text x="820" y="828" class="text-secondary" font-size="11">Track deployments, monitor release quality,</text>
+  <text x="820" y="844" class="text-secondary" font-size="11">and correlate changes to outcomes.</text>
+
+  <!-- ==================== STATS ==================== -->
+  <rect x="0" y="964" width="1200" height="160" class="bg-surface"/>
+  <rect x="0" y="964" width="1200" height="1" class="bg-border"/>
+  <rect x="0" y="1123" width="1200" height="1" class="bg-border"/>
+
+  <text x="600" y="1030" text-anchor="middle" class="text-primary-500" font-size="36" font-weight="700">99.9%</text>
+  <text x="600" y="1052" text-anchor="middle" class="text-secondary" font-size="13">Platform Uptime</text>
+
+  <line x1="700" y1="1005" x2="700" y2="1070" class="stroke-border" stroke-width="1"/>
+
+  <text x="800" y="1030" text-anchor="middle" class="text-primary-500" font-size="36" font-weight="700">10,000+</text>
+  <text x="800" y="1052" text-anchor="middle" class="text-secondary" font-size="13">Projects Tracked</text>
+
+  <line x1="900" y1="1005" x2="900" y2="1070" class="stroke-border" stroke-width="1"/>
+
+  <text x="1000" y="1030" text-anchor="middle" class="text-primary-500" font-size="36" font-weight="700">500+</text>
+  <text x="1000" y="1052" text-anchor="middle" class="text-secondary" font-size="13">Integrations Supported</text>
+
+  <!-- ==================== CTA SECTION ==================== -->
+  <rect x="0" y="1124" width="1200" height="220" fill="url(#ctaGrad)"/>
+
+  <text x="600" y="1210" text-anchor="middle" class="text-primary" font-size="28" font-weight="700">Ready to transform your engineering workflow?</text>
+  <text x="600" y="1240" text-anchor="middle" class="text-secondary" font-size="15">Start shipping with confidence today.</text>
+
+  <rect x="475" y="1265" width="250" height="48" rx="8" fill="#3B82F6"/>
+  <text x="600" y="1297" text-anchor="middle" class="text-inverse" font-size="15" font-weight="600">Start Free →</text>
+
+  <text x="600" y="1325" text-anchor="middle" class="text-tertiary" font-size="12">No credit card required. Free tier includes 3 users.</text>
+
+  <!-- ==================== FOOTER ==================== -->
+  <rect x="0" y="1344" width="1200" height="256" class="bg-surface"/>
+  <rect x="0" y="1344" width="1200" height="1" class="bg-border"/>
+
+  <text x="80" y="1385" class="text-primary" font-size="16" font-weight="700">Nexus</text>
+  <text x="80" y="1410" class="text-tertiary" font-size="12">Engineering Intelligence</text>
+  <text x="80" y="1430" class="text-tertiary" font-size="11">© 2026 Nexus Engineering</text>
+
+  <!-- Product -->
+  <text x="400" y="1385" class="text-primary" font-size="12" font-weight="600">Product</text>
+  <text x="400" y="1410" class="text-tertiary" font-size="12">Features</text>
+  <text x="400" y="1430" class="text-tertiary" font-size="12">Pricing</text>
+  <text x="400" y="1450" class="text-tertiary" font-size="12">Integrations</text>
+  <text x="400" y="1470" class="text-tertiary" font-size="12">Changelog</text>
+
+  <!-- Company -->
+  <text x="600" y="1385" class="text-primary" font-size="12" font-weight="600">Company</text>
+  <text x="600" y="1410" class="text-tertiary" font-size="12">About</text>
+  <text x="600" y="1430" class="text-tertiary" font-size="12">Blog</text>
+  <text x="600" y="1450" class="text-tertiary" font-size="12">Careers</text>
+  <text x="600" y="1470" class="text-tertiary" font-size="12">Contact</text>
+
+  <!-- Legal -->
+  <text x="800" y="1385" class="text-primary" font-size="12" font-weight="600">Legal</text>
+  <text x="800" y="1410" class="text-tertiary" font-size="12">Privacy</text>
+  <text x="800" y="1430" class="text-tertiary" font-size="12">Terms</text>
+  <text x="800" y="1450" class="text-tertiary" font-size="12">Security</text>
+  <text x="800" y="1470" class="text-tertiary" font-size="12">Cookies</text>
+
+  <!-- Bottom bar -->
+  <rect x="0" y="1520" width="1200" height="1" class="bg-border"/>
+  <text x="600" y="1545" text-anchor="middle" class="text-tertiary" font-size="11">© 2026 Nexus Engineering. All rights reserved.</text>
+
+  <!-- Section labels -->
+  <text x="32" y="1560" class="text-tertiary" font-size="11">Section: Hero</text>
+  <text x="32" y="1575" class="text-tertiary" font-size="11">Section: Features</text>
+  <text x="32" y="1590" class="text-tertiary" font-size="11">Section: Stats + CTA + Footer</text>
+</svg>
