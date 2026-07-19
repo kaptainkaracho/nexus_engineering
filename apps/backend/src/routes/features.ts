@@ -4,7 +4,7 @@ import * as fs from 'fs'
 import { fileURLToPath } from 'node:url'
 import { dirname } from 'node:path'
 import * as yaml from 'js-yaml'
-import { validatedFeatureLoader } from '@nexus-engineering/shared/features'
+import { getValidatedFeatureLoader } from '@nexus-engineering/shared/features'
 import type { FeatureDocument, Feature } from '@nexus-engineering/shared/features'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -44,10 +44,11 @@ export async function listFeatures(request: FastifyRequest, reply: FastifyReply)
   try {
     const { status, domain } = request.query as { status?: string; domain?: string }
     const featuresDir = getFeaturesDir()
+    const loader = await getValidatedFeatureLoader()
 
     let filePaths: string[]
     try {
-      filePaths = await validatedFeatureLoader.findFeatureFiles(featuresDir)
+      filePaths = await loader.findFeatureFiles(featuresDir)
     } catch {
       return reply.send({ features: [], documents: 0, total: 0 })
     }
@@ -57,7 +58,7 @@ export async function listFeatures(request: FastifyRequest, reply: FastifyReply)
     const flattened: FlatFeature[] = []
     for (const fp of filePaths) {
       try {
-        const doc = await validatedFeatureLoader.loadFeatureFile(fp)
+        const doc = await loader.loadFeatureFile(fp)
         const docId = doc.nexus?.metadata?.domain || path.basename(fp)
         for (const feature of doc.features) {
           flattened.push({ ...feature, source: fp, documentId: docId })
@@ -96,11 +97,12 @@ export async function getFeature(request: FastifyRequest, reply: FastifyReply) {
     if (!id) return reply.status(400).send({ error: 'Feature id is required' })
 
     const featuresDir = getFeaturesDir()
-    const filePaths = await validatedFeatureLoader.findFeatureFiles(featuresDir)
+    const loader = await getValidatedFeatureLoader()
+    const filePaths = await loader.findFeatureFiles(featuresDir)
 
     for (const fp of filePaths) {
       try {
-        const doc = await validatedFeatureLoader.loadFeatureFile(fp)
+        const doc = await loader.loadFeatureFile(fp)
         const match = doc.features.find((f) => f.id === id)
         if (match) {
           return reply.send({
@@ -132,12 +134,13 @@ export async function getFeaturesByStatus(request: FastifyRequest, reply: Fastif
     }
 
     const featuresDir = getFeaturesDir()
-    const filePaths = await validatedFeatureLoader.findFeatureFiles(featuresDir)
+    const loader = await getValidatedFeatureLoader()
+    const filePaths = await loader.findFeatureFiles(featuresDir)
     const matched: FlatFeature[] = []
 
     for (const fp of filePaths) {
       try {
-        const doc = await validatedFeatureLoader.loadFeatureFile(fp)
+        const doc = await loader.loadFeatureFile(fp)
         const docId = doc.nexus?.metadata?.domain || path.basename(fp)
         for (const feature of doc.features) {
           if (feature.status === status) matched.push({ ...feature, source: fp, documentId: docId })
