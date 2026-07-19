@@ -15,7 +15,6 @@ import { aacRoutes } from './routes/aacRoutes'
 import { organizationsRoutes } from './routes/organizations'
 import { registryRoutes } from './routes/registryRoutes'
 import { auditLogRoutes } from './routes/auditLogRoutes'
-import { aiRoutes } from './routes/aiRoutes'
 import { tacRoutes } from './routes/tacRoutes'
 
 const server = fastify({ logger: true })
@@ -65,7 +64,6 @@ const start = async () => {
     registryRoutes(server)
     multiRepoRoutes(server)
     auditLogRoutes(server)
-    aiRoutes(server)
     tacRoutes(server)
 
     // SPA fallback: serve index.html for any non-API GET route in production.
