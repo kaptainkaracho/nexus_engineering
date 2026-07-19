@@ -16,6 +16,7 @@ import { TacViewer } from './views/TacViewer';
 import { TestResultsDashboard } from './views/TestResultsDashboard';
 import { FeatureBrowser } from './views/FeatureBrowser';
 import { TraceGraph } from './views/TraceGraph';
+import { ImpactAnalysis } from './views/ImpactAnalysis';
 import { SSOSettings } from './views/SSOSettings';
 import { OrgAdmin } from './views/OrgAdmin';
 import { LandingPage } from './views/LandingPage';
@@ -46,6 +47,7 @@ type Section =
   | 'test-results'
   | 'features'
   | 'trace-graph'
+  | 'impact-analysis'
   | 'sso'
   | 'org'
   | 'landing'
@@ -72,6 +74,7 @@ const VALID_SECTIONS: Section[] = [
   'test-results',
   'features',
   'trace-graph',
+  'impact-analysis',
   'landing',
   'onboarding',
 ];
@@ -216,6 +219,7 @@ function App() {
       : []),
     { label: 'Features', href: '#features', active: activeSection === 'features' },
     { label: 'Trace Graph', href: '#trace-graph', active: activeSection === 'trace-graph' },
+    { label: 'Impact Analysis', href: '#impact-analysis', active: activeSection === 'impact-analysis' },
   ];
 
   if (!authReady) {
@@ -313,8 +317,10 @@ function App() {
               <OrgAdmin />
             </ProtectedLayout>
            ) : activeSection === 'trace-graph' ? (
-            <TraceGraph />
-          ) : (
+             <TraceGraph />
+            ) : activeSection === 'impact-analysis' ? (
+             <ImpactAnalysis />
+            ) : (
            <>
              <Nav
                items={navItems.map((item) => ({

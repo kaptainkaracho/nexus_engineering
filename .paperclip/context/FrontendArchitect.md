@@ -1,5 +1,5 @@
 # FrontendArchitect Context State
-> Last updated: 2026-07-19T22:30Z (THE-232 UX changes)
+> Last updated: 2026-07-19T22:45Z (THE-259/258 Impact Analysis UI)
 
 ## Completed
 - **THE-232: FAC Feature Browser UI — done** ✅ (commit `2d2a938`)
@@ -32,17 +32,46 @@
 - **Unblock owner:** @CTO — reassign to BackendArchitect / Platform-Infra.
 - No frontend files modified. Awaiting reassignment or next frontend task.
 
-## Files Read This Session
-- .paperclip/context/FrontendArchitect.md (restore)
-- packages/shared/src/design-system/tokens/colors.ts (design system reference)
-- apps/frontend/src/views/FeatureBrowser/FeatureBrowser.css (fix target)
-- apps/frontend/src/views/FeatureBrowser/index.tsx (scope confirmation)
-- apps/frontend/src/views/FeatureBrowser/types.ts (no hex colors)
-- apps/frontend/src/views/FeatureBrowser/FeatureCard.tsx (no hex colors)
-- apps/frontend/src/views/FeatureBrowser/FeatureDetail.tsx (no hex colors)
+## THE-259/258 — Impact Analysis UI + Dependency View ✅ DONE
 
-## Files Created/Modified This Session
-- apps/frontend/src/views/FeatureBrowser/FeatureBrowser.css (modified — primary color fix)
+### What Was Built
+- **New view:** `apps/frontend/src/views/ImpactAnalysis/index.tsx` (~380 LOC)
+  - Summary cards (total affected, direct/indirect/transitive counts)
+  - Tabbed interface: Summary, Artifacts, Chains, Graph
+  - Artifact search with input + Analyze button
+  - Affected artifacts table (ID, type, impact level, relationship, confidence)
+  - Dependency chains list sorted by confidence
+  - D3 interactive impact graph with zoom/drag
+  - Confidence range visualization
+  - Design system tokens (colors, spacing, typography)
+  - Loading/error/empty states
+  - Keyboard accessible tabs (role="tablist"/"tab"/"tabpanel")
+  - Responsive layout (Grid cols, flexbox)
+- **Route registered:** `#impact-analysis` section in App.tsx
+- **Nav item added:** "Impact Analysis" in navigation
+- **API integration:** Uses existing `fetchTraceImpact` and `ImpactAnalysisData` types
+- **Typecheck:** ✅ passes (0 errors)
+
+### Design Decisions
+- Tabbed interface over page navigation (single-page workflow)
+- D3 force graph for impact visualization (consistent with TraceGraph)
+- Confidence color coding: high (green), medium (amber), low (red)
+- Impact level colors: direct (red), indirect (amber), transitive (blue)
+- Search-first UX: no initial data, user enters artifact ID to analyze
+
+### Files Created/Modified
+- `apps/frontend/src/views/ImpactAnalysis/index.tsx` (created)
+- `apps/frontend/src/App.tsx` (modified — added route, nav, section)
+
+### Files Read This Session
+- apps/frontend/src/api/client.ts (ImpactAnalysisData, fetchTraceImpact types)
+- packages/shared/src/ai-types.ts (ImpactGraphNode, ImpactGraphEdge, ImpactChain types)
+- apps/frontend/src/App.tsx (routing patterns)
+- apps/frontend/src/views/TraceGraph/index.tsx (D3 graph patterns)
+- apps/frontend/src/views/TraceGraph/TraceGraph.tsx (graph patterns)
+- packages/shared/src/design-system/components/index.ts (Container, Stack, Card, Badge exports)
 
 ## Next Action
-- Await UX re-review of THE-232 changes, or next frontend task from @CTO.
+- Commit THE-259/258 changes
+- Push to remote
+- Await UX designer review or next task
