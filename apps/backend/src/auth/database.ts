@@ -71,6 +71,17 @@ export interface RefreshTokenRow {
   revoked: number
 }
 
+export interface OAuthAccountRow {
+  id: string
+  provider: string
+  provider_user_id: string
+  user_id: string
+  email: string
+  display_name: string | null
+  avatar_url: string | null
+  created_at: string
+}
+
 export class AuthDatabase {
   private db: Database.Database
   private initialized = false
@@ -151,6 +162,28 @@ export class AuthDatabase {
 
     this.db.exec(`
       CREATE INDEX IF NOT EXISTS idx_refresh_tokens_hash ON refresh_tokens (token_hash)
+    `)
+
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS oauth_accounts (
+        id TEXT PRIMARY KEY,
+        provider TEXT NOT NULL,
+        provider_user_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        email TEXT NOT NULL,
+        display_name TEXT,
+        avatar_url TEXT,
+        created_at TEXT NOT NULL,
+        UNIQUE(provider, provider_user_id),
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `)
+
+    this.db.exec(`
+      CREATE INDEX IF NOT EXISTS idx_oauth_accounts_user ON oauth_accounts (user_id)
+    `)
+    this.db.exec(`
+      CREATE INDEX IF NOT EXISTS idx_oauth_accounts_provider ON oauth_accounts (provider, provider_user_id)
     `)
 
     this.seedDefaults()
@@ -263,6 +296,35 @@ export class AuthDatabase {
 
   revokeAllUserRefreshTokens(userId: string): void {
     this.db.prepare('UPDATE refresh_tokens SET revoked = 1 WHERE user_id = ?').run(userId)
+  }
+
+  createOAuthAccount(account: {
+    id: string
+    provider: string
+    providerUserId: string
+    userId: string
+    email: string
+    displayName: string | null
+    avatarUrl: string | null
+  }): OAuthAccountRow {
+    const now = new Date().toISOString()
+    this.db.prepare(`
+      INSERT INTO oauth_accounts (id, provider, provider_user_id, user_id, email, display_name, avatar_url, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(account.id, account.provider, account.providerUserId, account.userId, account.email, account.displayName, account.avatarUrl, now)
+    return this.findOAuthAccount(account.provider, account.providerUserId)!
+  }
+
+  findOAuthAccount(provider: string, providerUserId: string): OAuthAccountRow | undefined {
+    return this.db.prepare('SELECT * FROM oauth_accounts WHERE provider = ? AND provider_user_id = ?').get(provider, providerUserId) as OAuthAccountRow | undefined
+  }
+
+  findOAuthAccountByUserId(provider: string, userId: string): OAuthAccountRow | undefined {
+    return this.db.prepare('SELECT * FROM oauth_accounts WHERE provider = ? AND user_id = ?').get(provider, userId) as OAuthAccountRow | undefined
+  }
+
+  deleteOAuthAccount(id: string): void {
+    this.db.prepare('DELETE FROM oauth_accounts WHERE id = ?').run(id)
   }
 
   updateUser(id: string, updates: { displayName?: string; roleId?: string; isActive?: boolean }): boolean {

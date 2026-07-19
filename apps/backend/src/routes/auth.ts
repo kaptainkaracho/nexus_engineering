@@ -13,6 +13,8 @@ import { getAuthDatabase } from '../auth/database'
 import type { RegisterRequest, LoginRequest, RefreshRequest } from '@nexus-engineering/shared'
 import { auditLogRepository } from '../auditLog/repository'
 import { logAuditAction } from '../auditLog/middleware'
+import { oauthRoutes } from '../auth/oauth/routes'
+import { samlRoutes } from '../auth/saml/routes'
 
 async function register(request: FastifyRequest, reply: FastifyReply) {
   try {
@@ -114,4 +116,7 @@ export function authRoutes(server: FastifyInstance) {
   })
 
   server.get('/api/auth/roles', { preHandler: [authenticate] }, getRoles)
+
+  oauthRoutes(server)
+  samlRoutes(server)
 }
