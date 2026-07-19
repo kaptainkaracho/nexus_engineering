@@ -444,6 +444,8 @@ export interface ArtifactRegistry {
   createdBy: string
   createdAt: string
   updatedAt: string
+  /** Populated on list endpoints; number of artifacts linked to this registry */
+  artifactCount?: number
 }
 
 export interface RegistryArtifact {

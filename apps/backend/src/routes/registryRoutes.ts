@@ -14,6 +14,34 @@ function validateRegistryType(type: string): type is RegistryProviderType {
 
 // --- Registry Handlers ---
 
+// Org-scoped list resolved from the authenticated user (used by the frontend
+// Private Registry dashboard, which calls GET /api/registries with no orgId).
+async function listMyRegistries(request: FastifyRequest, reply: FastifyReply) {
+  try {
+    const userId = request.user!.sub
+
+    const orgs = await orgRepository.listOrganizations(userId)
+    if (!orgs.length) {
+      return reply.send({ data: [], total: 0 })
+    }
+
+    const orgId = orgs[0].id
+    const registries = await orgRepository.listRegistriesByOrganization(orgId)
+
+    const data = await Promise.all(
+      registries.map(async (registry) => ({
+        ...registry,
+        artifactCount: (await orgRepository.listRegistryArtifacts(registry.id)).length,
+      })),
+    )
+
+    return reply.send({ data, total: data.length })
+  } catch (error) {
+    reply.log.error(error as Error)
+    return reply.status(500).send({ error: 'Failed to list registries' })
+  }
+}
+
 async function listRegistries(request: FastifyRequest, reply: FastifyReply) {
   try {
     const { orgId } = request.params as { orgId: string }
@@ -428,6 +456,9 @@ export function registryRoutes(server: FastifyInstance) {
   // Registry CRUD (scoped to organization)
   server.get('/api/organizations/:orgId/registries', { preHandler: [authenticate] }, listRegistries)
   server.post('/api/organizations/:orgId/registries', { preHandler: [authenticate, requirePermission('admin:all')] }, createRegistry)
+
+  // Org-scoped registry list resolved from the authenticated user (frontend dashboard)
+  server.get('/api/registries', { preHandler: [authenticate] }, listMyRegistries)
 
   // Registry CRUD (direct access)
   server.get('/api/registries/:id', { preHandler: [authenticate] }, getRegistry)
