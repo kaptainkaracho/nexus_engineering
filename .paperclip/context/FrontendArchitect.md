@@ -52,7 +52,7 @@ Symptom: `adapter_failed` errors when agent context exceeds 65536 tokens.
 - **THE-256 → `blocked`**
 - **Unblock owner:** @CTO — reassign to BackendArchitect / Platform-Infra.
 - Durable progress: wrote `reports/THE-256-session-rotation-spec.md` (implementation spec
-  for the reassigned owner). Committed `TBD`.
+  for the reassigned owner). Committed `9ad2e04`.
 - No frontend files modified (none are relevant). Awaiting reassignment or next frontend task.
 
 ## Files Read This Session
