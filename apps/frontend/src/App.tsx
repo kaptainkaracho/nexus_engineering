@@ -18,6 +18,8 @@ import { FeatureBrowser } from './views/FeatureBrowser';
 import { TraceGraph } from './views/TraceGraph';
 import { SSOSettings } from './views/SSOSettings';
 import { OrgAdmin } from './views/OrgAdmin';
+import { LandingPage } from './views/LandingPage';
+import { OnboardingFlow } from './views/OnboardingFlow';
 import {
   getCurrentSession,
   clearSession,
@@ -45,7 +47,9 @@ type Section =
   | 'features'
   | 'trace-graph'
   | 'sso'
-  | 'org';
+  | 'org'
+  | 'landing'
+  | 'onboarding';
 
 const VALID_SECTIONS: Section[] = [
   'overview',
@@ -68,6 +72,8 @@ const VALID_SECTIONS: Section[] = [
   'test-results',
   'features',
   'trace-graph',
+  'landing',
+  'onboarding',
 ];
 
 interface RouteState {
@@ -217,7 +223,15 @@ function App() {
   }
 
   if (!user) {
-    return <AuthPage onAuthenticated={handleAuthenticated} resetToken={resetToken} />;
+    const hash = window.location.hash.replace(/^#/, '');
+    if (hash === 'login' || hash === 'register' || hash.startsWith('reset-password') || hash.startsWith('forgot-password') || hash.startsWith('auth/')) {
+      return <AuthPage onAuthenticated={handleAuthenticated} resetToken={resetToken} />;
+    }
+    return <LandingPage />;
+  }
+
+  if (activeSection === 'onboarding') {
+    return <OnboardingFlow />;
   }
 
   return (
