@@ -12,6 +12,7 @@ import { AdminDashboard } from './views/AdminDashboard';
 import { RoleManagement } from './views/RoleManagement';
 import { AuditLogViewer } from './views/AuditLogViewer';
 import { PrivateRegistries } from './views/PrivateRegistries';
+import { TacViewer } from './views/TacViewer';
 import {
   getCurrentSession,
   clearSession,
@@ -33,7 +34,8 @@ type Section =
   | 'admin'
   | 'roles'
   | 'audit-log'
-  | 'registries';
+  | 'registries'
+  | 'tac';
 
 const VALID_SECTIONS: Section[] = [
   'overview',
@@ -50,6 +52,7 @@ const VALID_SECTIONS: Section[] = [
   'roles',
   'audit-log',
   'registries',
+  'tac',
 ];
 
 interface RouteState {
@@ -170,6 +173,7 @@ function App() {
           { label: 'Organizations', href: '#admin', active: activeSection === 'admin' },
           { label: 'Roles', href: '#roles', active: activeSection === 'roles' },
           { label: 'Registries', href: '#registries', active: activeSection === 'registries' },
+          { label: 'TAC', href: '#tac', active: activeSection === 'tac' },
         ]
       : []),
   ];
@@ -242,10 +246,12 @@ function App() {
             <ProtectedLayout allowedRoles={['admin']}>
               <RoleManagement />
             </ProtectedLayout>
-          ) : activeSection === 'registries' ? (
+           ) : activeSection === 'registries' ? (
             <ProtectedLayout allowedRoles={['admin']}>
               <PrivateRegistries />
             </ProtectedLayout>
+          ) : activeSection === 'tac' ? (
+            <TacViewer />
           ) : (
            <>
              <Nav

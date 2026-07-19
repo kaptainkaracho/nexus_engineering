@@ -715,3 +715,147 @@ export async function fetchRegistryArtifacts(registryId: string): Promise<Regist
     return [];
   }
 }
+
+// =========================================================
+// Test Acceptance Criteria (TAC) Document Viewer API
+// =========================================================
+
+export interface TacDocumentSummary {
+  id: string
+  filePath: string
+  domain: string
+  version: string
+  source: string
+  suiteCount: number
+  caseCount: number
+}
+
+export interface TacListResponse {
+  data: TacDocumentSummary[]
+  total: number
+}
+
+export type TacTraceLinkType =
+  | 'verifies'
+  | 'satisfies'
+  | 'dependsOn'
+  | 'tracesTo'
+  | 'refines'
+  | 'conflictsWith'
+
+export interface TacTraceLink {
+  type: TacTraceLinkType
+  target: { id: string; documentId: string }
+  confidence?: 'high' | 'medium' | 'low'
+  description?: string
+}
+
+export interface TacScenario {
+  given: string
+  when: string
+  then: string
+}
+
+export interface TacTestCase {
+  id: string
+  title: string
+  type: 'unit' | 'integration' | 'e2e' | 'performance' | 'security' | 'usability'
+  priority: 'low' | 'medium' | 'high' | 'critical'
+  description?: string
+  traceLinks?: TacTraceLink[]
+  scenario?: TacScenario
+  acceptanceCriteria?: string[]
+  tags?: string[]
+  automated?: boolean
+  steps?: string[]
+  expectedResult?: string
+}
+
+export interface TacSuite {
+  id: string
+  name: string
+  description?: string
+  domain?: string
+  cases: TacTestCase[]
+}
+
+export interface TacDocumentMetadata {
+  domain: string
+  version: string
+  source: string
+}
+
+export interface TacDocument {
+  nexus: {
+    schema: string
+    metadata: TacDocumentMetadata
+  }
+  suites: TacSuite[]
+}
+
+export interface TacValidationError {
+  field: string
+  message: string
+}
+
+export interface TacValidationResult {
+  valid: boolean
+  errors: Record<string, string>
+}
+
+/** List TAC documents, optionally filtered by a free-text search query */
+export async function fetchTacDocuments(query?: string): Promise<TacListResponse> {
+  const params = new URLSearchParams()
+  if (query) params.set('q', query)
+  const qs = params.toString()
+  try {
+    const res = await fetch(`${BASE}/api/tac${qs ? `?${qs}` : ''}`)
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
+    const json = await res.json()
+    return { data: json.data ?? [], total: json.total ?? json.data?.length ?? 0 }
+  } catch (err) {
+    if (err instanceof Error && err.message.startsWith('HTTP')) throw err
+    return { data: [], total: 0 }
+  }
+}
+
+/** Fetch a single TAC document by its id */
+export async function fetchTacDocument(id: string): Promise<TacDocument | null> {
+  try {
+    const res = await fetch(`${BASE}/api/tac/${encodeURIComponent(id)}`)
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
+    const json = await res.json()
+    return json.data ?? null
+  } catch {
+    return null
+  }
+}
+
+/** Fetch the JSON schema for TAC documents (used for authoring/validation) */
+export async function fetchTacSchema(): Promise<any | null> {
+  try {
+    const res = await fetch(`${BASE}/api/tac/schema`)
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
+    const json = await res.json()
+    return json.data ?? null
+  } catch {
+    return null
+  }
+}
+
+/** Validate a TAC document payload against the schema */
+export async function validateTacDocument(
+  document: Record<string, unknown>,
+): Promise<TacValidationResult> {
+  try {
+    const res = await fetch(`${BASE}/api/tac/validate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ document }),
+    })
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
+    return await res.json()
+  } catch {
+    return { valid: false, errors: { _network: 'Unable to reach the validation service' } }
+  }
+}
