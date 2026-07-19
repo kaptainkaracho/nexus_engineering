@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import type { ArtifactRegistry, RegistryCredentials, RegistryProviderType } from '@nexus-engineering/shared'
 import { orgRepository } from '../organizations/repository'
-import { authenticate, requirePermission } from '../auth/middleware'
+import { authenticate, requirePermission, requireOrgRole } from '../auth/middleware'
 import { artifactRegistry as artifactRegistryStore } from '../artifacts/repository'
 import { registryScanner } from '../scanners/registryScanner'
 
@@ -455,26 +455,26 @@ async function scanRegistry(request: FastifyRequest, reply: FastifyReply) {
 export function registryRoutes(server: FastifyInstance) {
   // Registry CRUD (scoped to organization)
   server.get('/api/organizations/:orgId/registries', { preHandler: [authenticate] }, listRegistries)
-  server.post('/api/organizations/:orgId/registries', { preHandler: [authenticate, requirePermission('admin:all')] }, createRegistry)
+  server.post('/api/organizations/:orgId/registries', { preHandler: [authenticate, requireOrgRole('org:admin')] }, createRegistry)
 
   // Org-scoped registry list resolved from the authenticated user (frontend dashboard)
   server.get('/api/registries', { preHandler: [authenticate] }, listMyRegistries)
 
   // Registry CRUD (direct access)
   server.get('/api/registries/:id', { preHandler: [authenticate] }, getRegistry)
-  server.put('/api/registries/:id', { preHandler: [authenticate, requirePermission('admin:all')] }, updateRegistry)
-  server.delete('/api/registries/:id', { preHandler: [authenticate, requirePermission('admin:all')] }, deleteRegistry)
+  server.put('/api/registries/:id', { preHandler: [authenticate, requireOrgRole('org:admin')] }, updateRegistry)
+  server.delete('/api/registries/:id', { preHandler: [authenticate, requireOrgRole('org:admin')] }, deleteRegistry)
 
   // Registry Artifacts
   server.get('/api/registries/:id/artifacts', { preHandler: [authenticate] }, listRegistryArtifacts)
-  server.post('/api/registries/:id/artifacts', { preHandler: [authenticate, requirePermission('admin:all')] }, addArtifactToRegistry)
-  server.delete('/api/registries/:id/artifacts/:artifactId', { preHandler: [authenticate, requirePermission('admin:all')] }, removeArtifactFromRegistry)
+  server.post('/api/registries/:id/artifacts', { preHandler: [authenticate, requireOrgRole('org:admin')] }, addArtifactToRegistry)
+  server.delete('/api/registries/:id/artifacts/:artifactId', { preHandler: [authenticate, requireOrgRole('org:admin')] }, removeArtifactFromRegistry)
 
   // Registry Credentials
   server.get('/api/registries/:id/credentials', { preHandler: [authenticate] }, getRegistryCredentials)
-  server.put('/api/registries/:id/credentials', { preHandler: [authenticate, requirePermission('admin:all')] }, upsertRegistryCredentials)
-  server.delete('/api/registries/:id/credentials', { preHandler: [authenticate, requirePermission('admin:all')] }, deleteRegistryCredentials)
+  server.put('/api/registries/:id/credentials', { preHandler: [authenticate, requireOrgRole('org:admin')] }, upsertRegistryCredentials)
+  server.delete('/api/registries/:id/credentials', { preHandler: [authenticate, requireOrgRole('org:admin')] }, deleteRegistryCredentials)
 
   // Registry Scan
-  server.post('/api/registries/:id/scan', { preHandler: [authenticate, requirePermission('admin:all')] }, scanRegistry)
+  server.post('/api/registries/:id/scan', { preHandler: [authenticate, requireOrgRole('org:admin')] }, scanRegistry)
 }

@@ -483,6 +483,7 @@ export interface AuditLogFilter {
   userId?: string
   action?: string
   resourceType?: string
+  orgId?: string
   search?: string
   limit?: number
   offset?: number
@@ -505,6 +506,7 @@ export async function fetchAuditLogs(filter?: AuditLogFilter): Promise<AuditLogR
     if (filter.action) params.set('action', filter.action);
     if (filter.resourceType) params.set('resourceType', filter.resourceType);
     if (filter.userId) params.set('userId', filter.userId);
+    if (filter.orgId) params.set('orgId', filter.orgId);
     if (filter.startDate) params.set('startDate', filter.startDate);
     if (filter.endDate) params.set('endDate', filter.endDate);
     if (filter.search) params.set('search', filter.search);
@@ -528,6 +530,7 @@ export async function exportAuditLogs(format: 'csv' | 'json', filter?: AuditLogF
     if (filter.action) params.set('action', filter.action);
     if (filter.resourceType) params.set('resourceType', filter.resourceType);
     if (filter.userId) params.set('userId', filter.userId);
+    if (filter.orgId) params.set('orgId', filter.orgId);
     if (filter.startDate) params.set('startDate', filter.startDate);
     if (filter.endDate) params.set('endDate', filter.endDate);
     if (filter.search) params.set('search', filter.search);

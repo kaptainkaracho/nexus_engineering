@@ -1,4 +1,4 @@
-import type { AuditLog, AuditLogFilter, AuditAction } from '@nexus-engineering/shared'
+import type { AuditLog, AuditLogFilter, AuditAction, AuditLogRetentionConfig } from '@nexus-engineering/shared'
 import { getAuditLogDatabase } from './database'
 import { customAlphabet } from 'nanoid'
 
@@ -15,6 +15,7 @@ export class AuditLogRepository {
     resourceId: string,
     details?: string | null,
     ipAddress?: string | null,
+    orgId?: string | null,
   ): Promise<AuditLog> {
     const entry: AuditLog = {
       id: nanoid() + '-audit',
@@ -26,6 +27,7 @@ export class AuditLogRepository {
       resourceId,
       details: details || null,
       ipAddress: ipAddress || null,
+      orgId: orgId || null,
     }
 
     this.db.insert(entry)
@@ -38,6 +40,18 @@ export class AuditLogRepository {
 
   async getById(id: string): Promise<AuditLog | undefined> {
     return this.db.findById(id)
+  }
+
+  async purgeOldEntries(): Promise<number> {
+    return this.db.purgeOldEntries()
+  }
+
+  getRetentionConfig(): AuditLogRetentionConfig {
+    return this.db.getRetentionConfig()
+  }
+
+  setRetentionConfig(config: Partial<AuditLogRetentionConfig>): AuditLogRetentionConfig {
+    return this.db.setRetentionConfig(config)
   }
 }
 

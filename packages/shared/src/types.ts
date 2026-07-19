@@ -353,6 +353,7 @@ export interface JwtPayload {
   email: string
   role: string
   permissions: string[]
+  orgId?: string
 }
 
 export interface LoginRequest {
@@ -402,7 +403,7 @@ export interface OrganizationMember {
   id: string
   organizationId: string
   userId: string
-  role: 'admin' | 'member'
+  role: 'org:admin' | 'org:member' | 'org:viewer'
   joinedAt: string
 }
 
@@ -471,6 +472,7 @@ export interface AuditLog {
   resourceId: string
   details: string | null
   ipAddress: string | null
+  orgId: string | null
 }
 
 export interface AuditLogFilter {
@@ -482,4 +484,11 @@ export interface AuditLogFilter {
   search?: string
   limit?: number
   offset?: number
+  orgId?: string
+  page?: number
+}
+
+export interface AuditLogRetentionConfig {
+  ttlDays: number
+  enabled: boolean
 }

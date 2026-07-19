@@ -16,6 +16,8 @@ import { TacViewer } from './views/TacViewer';
 import { TestResultsDashboard } from './views/TestResultsDashboard';
 import { FeatureBrowser } from './views/FeatureBrowser';
 import { TraceGraph } from './views/TraceGraph';
+import { SSOSettings } from './views/SSOSettings';
+import { OrgAdmin } from './views/OrgAdmin';
 import {
   getCurrentSession,
   clearSession,
@@ -41,7 +43,9 @@ type Section =
   | 'tac'
   | 'test-results'
   | 'features'
-  | 'trace-graph';
+  | 'trace-graph'
+  | 'sso'
+  | 'org';
 
 const VALID_SECTIONS: Section[] = [
   'overview',
@@ -55,6 +59,8 @@ const VALID_SECTIONS: Section[] = [
   'graph',
   'templates',
   'admin',
+  'sso',
+  'org',
   'roles',
   'audit-log',
   'registries',
@@ -69,12 +75,26 @@ interface RouteState {
   artifact: string | null;
 }
 
+const ADMIN_SUB_ROUTES: Record<string, Section> = {
+  sso: 'sso',
+  org: 'org',
+  audit: 'audit-log',
+};
+
 function parseHash(hash: string): RouteState {
   const raw = hash.replace(/^#/, '');
   const [sectionPart, queryPart] = raw.split('?');
-  const section = (VALID_SECTIONS.includes(sectionPart as Section)
-    ? sectionPart
-    : 'overview') as Section;
+  const parts = sectionPart.split('/');
+  const top = parts[0];
+  const sub = parts[1];
+  let section: Section;
+  if (top === 'admin' && sub && ADMIN_SUB_ROUTES[sub]) {
+    section = ADMIN_SUB_ROUTES[sub];
+  } else if (VALID_SECTIONS.includes(top as Section)) {
+    section = top as Section;
+  } else {
+    section = 'overview';
+  }
   const artifact = queryPart ? new URLSearchParams(queryPart).get('artifact') : null;
   return { section, artifact };
 }
@@ -180,6 +200,8 @@ function App() {
     ...(isUserAdmin
       ? [
           { label: 'Organizations', href: '#admin', active: activeSection === 'admin' },
+          { label: 'SSO Settings', href: '#admin/sso', active: activeSection === 'sso' },
+          { label: 'Org Admin', href: '#admin/org', active: activeSection === 'org' },
           { label: 'Roles', href: '#roles', active: activeSection === 'roles' },
           { label: 'Registries', href: '#registries', active: activeSection === 'registries' },
           { label: 'TAC', href: '#tac', active: activeSection === 'tac' },
@@ -268,7 +290,15 @@ function App() {
             <TestResultsDashboard />
           ) : activeSection === 'features' ? (
             <FeatureBrowser />
-          ) : activeSection === 'trace-graph' ? (
+           ) : activeSection === 'sso' ? (
+            <ProtectedLayout allowedRoles={['admin']}>
+              <SSOSettings />
+            </ProtectedLayout>
+          ) : activeSection === 'org' ? (
+            <ProtectedLayout allowedRoles={['admin']}>
+              <OrgAdmin />
+            </ProtectedLayout>
+           ) : activeSection === 'trace-graph' ? (
             <TraceGraph />
           ) : (
            <>

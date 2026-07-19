@@ -12,6 +12,7 @@ export interface OrgStore {
   listOrganizationsForUser(userId: string): Organization[]
   updateOrganization(id: string, updates: Partial<Organization>): Organization | undefined
   deleteOrganization(id: string): boolean
+  isOrganizationOwner(userId: string, organizationId: string): boolean
 
   // Teams
   insertTeam(team: Team): Team
@@ -24,8 +25,10 @@ export interface OrgStore {
   insertOrganizationMember(member: OrganizationMember): OrganizationMember
   findOrganizationMember(organizationId: string, userId: string): OrganizationMember | undefined
   listOrganizationMembers(organizationId: string): OrganizationMember[]
+  listOrganizationMembersByUser(userId: string): OrganizationMember[]
   updateOrganizationMember(organizationId: string, userId: string, role: string): OrganizationMember | undefined
   deleteOrganizationMember(organizationId: string, userId: string): boolean
+  countOrganizationMembers(organizationId: string): number
 
   // Team Members
   insertTeamMember(member: TeamMember): TeamMember
@@ -120,12 +123,24 @@ class SQLiteOrgStore implements OrgStore {
     return this.database.listOrganizationMembers(organizationId)
   }
 
+  listOrganizationMembersByUser(userId: string): OrganizationMember[] {
+    return this.database.listOrganizationMembersByUser(userId)
+  }
+
   updateOrganizationMember(organizationId: string, userId: string, role: string): OrganizationMember | undefined {
     return this.database.updateOrganizationMember(organizationId, userId, role)
   }
 
   deleteOrganizationMember(organizationId: string, userId: string): boolean {
     return this.database.deleteOrganizationMember(organizationId, userId)
+  }
+
+  countOrganizationMembers(organizationId: string): number {
+    return this.database.countOrganizationMembers(organizationId)
+  }
+
+  isOrganizationOwner(userId: string, organizationId: string): boolean {
+    return this.database.isOrganizationOwner(userId, organizationId)
   }
 
   insertTeamMember(member: TeamMember): TeamMember {

@@ -70,6 +70,7 @@ export function AuditLogViewer() {
   const [searchText, setSearchText] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [orgFilter, setOrgFilter] = useState('');
   const [exporting, setExporting] = useState<'csv' | 'json' | null>(null);
 
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
@@ -108,9 +109,10 @@ export function AuditLogViewer() {
       search: searchText || undefined,
       startDate: startDate || undefined,
       endDate: endDate || undefined,
+      orgId: orgFilter || undefined,
     });
     setExpandedRow(null);
-  }, [actionFilter, resourceTypeFilter, searchText, startDate, endDate]);
+  }, [actionFilter, resourceTypeFilter, searchText, startDate, endDate, orgFilter]);
 
   const handleResetFilters = useCallback(() => {
     setActionFilter('');
@@ -118,6 +120,7 @@ export function AuditLogViewer() {
     setSearchText('');
     setStartDate('');
     setEndDate('');
+    setOrgFilter('');
     setFilter(emptyFilter());
     setExpandedRow(null);
   }, []);
@@ -138,6 +141,7 @@ export function AuditLogViewer() {
         const blob = await exportAuditLogs(format, {
           action: actionFilter || undefined,
           resourceType: resourceTypeFilter || undefined,
+          orgId: orgFilter || undefined,
           search: searchText || undefined,
           startDate: startDate || undefined,
           endDate: endDate || undefined,
@@ -154,7 +158,7 @@ export function AuditLogViewer() {
         setExporting(null);
       }
     },
-    [actionFilter, resourceTypeFilter, searchText, startDate, endDate],
+    [actionFilter, resourceTypeFilter, searchText, startDate, endDate, orgFilter],
   );
 
   const handleKeyDown = useCallback(
@@ -164,7 +168,7 @@ export function AuditLogViewer() {
     [handleApplyFilters],
   );
 
-  const isDefaultFilter = !actionFilter && !resourceTypeFilter && !searchText && !startDate && !endDate;
+  const isDefaultFilter = !actionFilter && !resourceTypeFilter && !searchText && !startDate && !endDate && !orgFilter;
 
   return (
     <Container size="lg">
@@ -242,6 +246,20 @@ export function AuditLogViewer() {
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:gap-4">
+              <div className="flex-1">
+                <label htmlFor="audit-org-filter" className="mb-1 block text-xs font-medium text-text-tertiary uppercase tracking-wide">
+                  Org ID
+                </label>
+                <input
+                  id="audit-org-filter"
+                  type="text"
+                  value={orgFilter}
+                  onChange={(e) => setOrgFilter(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Filter by org…"
+                  className="w-full rounded-lg border border-border bg-surface-primary px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                />
+              </div>
               <div className="flex-[2]">
                 <label htmlFor="audit-search" className="mb-1 block text-xs font-medium text-text-tertiary uppercase tracking-wide">
                   Search

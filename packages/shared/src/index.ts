@@ -104,6 +104,7 @@ export type {
   AuditLog,
   AuditLogFilter,
   AuditAction,
+  AuditLogRetentionConfig,
   MultiScanSession,
   MultiRepoScanResult,
   MultiRepoScanOptions,
