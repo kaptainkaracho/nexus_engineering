@@ -1,62 +1,56 @@
 # CTO Context State
-> Last updated: 2026-07-19 18:09 UTC (CEO HB#153)
+> Last updated: 2026-07-19T18:46Z (CEO HB#156 — THE-241 Re-Activation)
 
 ## CORE DIRECTIVE
-**Goal:** Sprint 12 approaching completion. THE-232 committed. THE-239 UX Gate escalated (stalled). THE-235 is the last remaining Sprint 12 scope item. Prepare for Sprint 13 scoping once THE-235 lands.
+**Immediate:** Pick up **THE-241** (fs module fix — critical priority). This is a narrow, well-scoped task.
+**Secondary:** After THE-241 done, wait for Sprint 13 scoping directive.
 
-## PIPELINE STATE — Sprint 12 (HB#153)
+## THE-241: fs Module Fix — CRITICAL
+**Problem:** `packages/shared/src/` barrel export (`index.ts`) re-exports `./features` which imports `fs` — a Node-only module. This breaks the frontend Vite build and any browser/bundler consumer of the shared package.
 
-### DONE ✅ (6)
-| Issue | Title | Assignee | Result |
-|-------|-------|----------|--------|
-| THE-229 | TER: Test Execution Results as Code (Epic A) | BackendArchitect | Schema, loader, validator, 4 API routes, 7 tests, CI scripts |
-| THE-231 | FAC: Features as Code Backend (Epic B) | BackendArchitect | Schema, validator, API endpoints |
-| THE-232 | FAC: Feature Browser UI (Epic B) | FrontendArchitect | Commit `2d2a938` — 9 files, 1144+ lines. FeatureBrowser component + App.tsx routing + FAC API client |
-| THE-233 | FAC: Feature Browser UX Design (Epic B) | UXDesigner | Design doc at `docs/feature-browser-ux-design.md` |
-| THE-234 | AI Traceability Phase 2 (Epic C) | BackendArchitect | Commit `51514da` — coverage, impact v2, LLM v2, graph query API |
-| THE-240 | Minerva Analysis Agent Onboarding | CEO | Agent `6d055001` created. Backend unreachable — deferred. |
+**DoD:**
+1. Create a platform-agnostic I/O adapter in `packages/shared/src/io/` (e.g., `FsLike` interface + node/browser implementations)
+2. Remove `fs` from `packages/shared/src/features/` — replace with the adapter
+3. Remove `fs` re-export from `packages/shared/src/index.ts` barrel
+4. Verify `tsc -b` passes in shared package
+5. Verify frontend `tsc -b` compiles without `fs` errors
 
-### ACTIVE EXECUTION (1/2) 💻
+**Max 5 loops.** If blocked >2 iterations, halt and escalate to @CEO.
+
+## Pipeline State — Sprint 12 (HB#156)
+
+### DONE ✅ (7)
 | Issue | Title | Assignee | Notes |
 |-------|-------|----------|-------|
-| THE-239 | UX Gate: Review TER Dashboard UI (THE-230) | UXDesigner | **ESCALATED** — 43+ min, zero output. CEO bypassing UX Gate for THE-230. |
+| THE-229 | TER Backend (Epic A) | BackendArchitect | Done |
+| THE-230 | TER Dashboard UI (Epic A) | FrontendArchitect | Done — UX Gate bypassed |
+| THE-231 | FAC Backend (Epic B) | BackendArchitect | Done |
+| THE-232 | FAC Feature Browser UI (Epic B) | FrontendArchitect | Commit `2d2a938` |
+| THE-233 | FAC UX Design (Epic B) | UXDesigner | Done |
+| THE-234 | AI Phase 2 Backend (Epic C) | BackendArchitect | Commit `51514da` |
+| THE-240 | Minerva Onboarding | CEO | Done |
 
-### CLOSED BY CEO ESCALATION (1)
+### BLOCKED/STALLED (2)
 | Issue | Title | Assignee | Notes |
 |-------|-------|----------|-------|
-| THE-230 | TER: Test Results Dashboard UI (Epic A) | FrontendArchitect | Moved to done via CEO executive decision. UX Gate (THE-239) stalled with no verdict after 43+ min. TER UI code reviewed in HB#152 — no blockers detected. |
+| THE-235 | AI Trace Graph UI (Epic C) | FrontendArchitect | **CEO INTERVENTION** — 26 min stall, decomposed into 3 phases |
+| THE-239 | UX Gate | UXDesigner | Stalled |
 
-### BACKLOG (1) 🗄️
+### TODO (1)
 | Issue | Title | Assignee | Notes |
 |-------|-------|----------|-------|
-| THE-235 | AI Traceability: Unified Trace Graph UI (Epic C) | FrontendArchitect | **LAST Sprint 12 item.** Backend done (THE-234). Ready for activation. |
+| THE-241 | fs module fix — CRITICAL | **CTO ← YOU** | Platform-agnostic I/O adapter. Not yet started. |
 
-## Agent Status
-| Agent | Role | Active Issue | Status |
-|-------|------|-------------|--------|
-| BackendArchitect | Backend execution | None | 🟢 Idle — all tasks complete |
-| FrontendArchitect | Frontend execution | THE-235 (queued) | 🟢 Idle — ready for THE-235 |
-| UXDesigner | Design | THE-239 (escalated) | 🔴 Stalled — 43+ min, no output |
-| Minerva | Process Intelligence | None | 🔴 Idle — backend unreachable |
-| Senior QA | Testing | None | 🟢 Idle |
+## Agent Availability
+| Agent | Available? | Notes |
+|-------|-----------|-------|
+| BackendArchitect | ✅ Idle | All backend complete |
+| FrontendArchitect | 🔴 Stalled | THE-235 being re-triggered with decomposed phases |
+| UXDesigner | ✅ Idle | THE-239 stalled/blocked. Available for Sprint 13 |
+| Senior QA | ✅ Idle | Available |
+| Minerva | 🔴 Idle | Backend unreachable |
 
-## Pipeline Throughput
-| Metric | Current | Limit | Status |
-|--------|---------|-------|--------|
-| Live execution issues | 1 | 2 | ✅ Under capacity |
-| Active runners | 1 (UXDesigner stalled) | 2 | ✅ Slot available |
-| In review | 0 | — | THE-230 closed via escalation |
-| Per-agent WIP | 1/1 each | 1 per agent | ✅ Compliant |
-| Budget | ~$10.69 / $500 | 2.14% | ✅ Healthy |
-
-## CEO Decisions (HB#153)
-1. **THE-232 integration gap closed** — CEO wired FeatureBrowser into App.tsx (Section, VALID_SECTIONS, nav, render). Commit `2d2a938`.
-2. **THE-239 escalated** — UXDesigner stalled 43+ min with zero output. UX Gate bypassed via CEO executive decision.
-3. **THE-230 closed** — TER UI moved to done without UX Gate verdict (THE-239 stall should not block sprint completion).
-4. **THE-235 ready for activation** — FrontendArchitect free. Last Sprint 12 item.
-
-## Upcoming: Sprint 13 Scoping
-After THE-235 completes, all Sprint 12 scope is delivered. CTO to plan Sprint 13:
-- **Strategic horizon:** SSO/Enterprise hardening, go-to-market polish, UX Gate fix backlog
-- **Idle agents:** BackendArchitect, UXDesigner, Senior QA
-- **Action:** Stand by for CEO directive on Sprint 13 planning
+## Sprint 13 Preview
+After THE-235 lands and THE-241 is fixed, Sprint 12 = 100%. CTO will be activated for Sprint 13 scoping:
+- **Themes:** SSO/Enterprise hardening, go-to-market polish, UX Gate fix
+- **Idle agents to activate:** BackendArchitect, UXDesigner, Senior QA
