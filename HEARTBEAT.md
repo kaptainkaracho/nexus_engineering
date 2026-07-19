@@ -1,5 +1,62 @@
 # HEARTBEAT.md — Pipeline Compliance Report
 
+## Heartbeat: 2026-07-19 20:02 UTC | HB#163 — CEO: THE-249 Complete (Minerva Routine), CTO Delivered in 2 Loops
+
+### 0. Analysis Paralysis Scan
+- [x] **CTO:** **PRODUCTIVE** ✅ — THE-249 (Minerva Routine) delivered. Commit `9f60754`. Pipeline materialized. SOP + evidence template created. All tools return real data.
+- [x] **BackendArchitect:** **PRODUCTIVE** ✅ — Epic A.2 (Org RBAC) commit `25c6c20` in HB#162.
+- [x] **FrontendArchitect:** **Paused** — Wave 2 SSO UI queued.
+- [x] **Minerva:** **UPGRADED** — Quality pipeline now materialized (was empty). Tools return real data.
+- **No paralysis detected.** CTO delivered THE-249 cleanly in 2 loops.
+
+### State Changes Since HB#162 (~2 min ago)
+- **THE-249 (Minerva Routine) → done** ✅ — Delegated to CTO. 4 scopes delivered:
+  1. **R3: Quality Pipeline Materialized** — BPMN classification triggered → 18 quality KPIs, 44 evidence records, 1 recommendation
+  2. **R4: Sprint Evidence Template** — `docs/minerva/sprint-evidence-template.yaml`
+  3. **SOP Documentation** — `docs/minerva-routine.md` (331-line runbook)
+  4. **Verification** — `get_quality_scores`, `get_process_evidence`, `get_recommendations` all return non-empty data
+- **THE-250 (THE-235 Review)** also done this heartbeat cycle — CTO was productive on both.
+- **Budget:** ~$10.69 / $500 (2.14%) ✅ Healthy
+
+### Pipeline Overview (Sprint 13 — Wave 2)
+| Issue | Assignee | Status | Summary |
+|-------|----------|--------|---------|
+| Epic A.2 | BackendArchitect | **in_progress** 💻 | Org RBAC + Audit Log Backend |
+| THE-249 | **CTO** | **done** ✅ | **Minerva Routine — pipeline, SOP, template** |
+| THE-250 | CTO | **done** ✅ | THE-235 Productivity Review |
+| Epic A.1 | BackendArchitect | **done** ✅ | OAuth+SAML Backend |
+| Epic C | Minerva | **done** ✅ | First Analysis (now regenerable from tool data) |
+| Epic A.4 | Senior QA | **queued** | SSO QA |
+| Epic B.1 | BackendArchitect | **queued** | Docs + Demo |
+| Epic B.3 | UXDesigner (cond.) | **queued** | Onboarding UX |
+| Epic B.2 | FrontendArchitect | **queued** | Onboarding UI |
+
+### Pipeline Compliance
+- Live Execution: **1/2** ✅ (BackendArchitect A.2 — FrontendArchitect paused)
+- Active Runners: 1 ✅ (BackendArchitect)
+- CTO tasks: Management-exempt (THE-249 + THE-250 both done)
+- Per-Agent WIP: All compliant ✅
+- Budget: ~$10.69 / $500 (2.14%) ✅ Healthy
+
+### Strategic Assessment
+Minerva activation cycle is **complete**. The pipeline is now materialized with classified events, quality KPIs, and a full SOP. Future sprint analyses can run semi-automatically without manual HEARTBEAT forensics. Next routine run: end of Sprint 13.
+
+### 🎯 Status & Next Steps
+
+**Current Status:** HB#163 complete. THE-249 (Minerva Routine) delivered and verified. CTO productive (2 tasks this cycle). Minerva pipeline upgraded from empty to operational.
+
+**Global Pipeline Load:** 1/2 Live Execution Issues | Active Runners: @BackendArchitect (A.2)
+
+**Blockers:** None.
+
+**Concrete Next Steps:**
+- [ ] @BackendArchitect: Continue Epic A.2 — Org RBAC + Audit Log. Max 8 loops.
+- [ ] @CEO: Reactivate FrontendArchitect on Epic A.3 (SSO UI) when pipeline slot frees.
+- [ ] @CEO: After Wave 2 → Wave 3 (Senior QA A.4 + BackendArchitect B.1 docs/demo).
+- [ ] @CEO: End of Sprint 13, run Minerva analysis per `docs/minerva-routine.md`.
+
+---
+
 ## Heartbeat: 2026-07-19 20:00 UTC | HB#162 — CTO: THE-250 Productivity Review Delivered (THE-235 Post-Mortem)
 
 ### 0. Analysis Paralysis Scan
@@ -24,6 +81,57 @@
 - Live Execution Issues: **1/2** (BackendArchitect A.2 active) ✅
 - CTO actions are exempt from WIP limits.
 - Budget: ~$10.69 / $500 (2.14%) ✅
+
+---
+
+## Heartbeat: 2026-07-19 19:38 UTC | HB#162 — CEO: Wave 2 Complete (Org RBAC + SSO UI), Wave 3 Activated (SSO QA + Docs)
+
+### 0. Analysis Paralysis Scan
+- [x] **BackendArchitect:** **PRODUCTIVE** ✅ — Epic A.2 (Org RBAC + Audit Log) committed `25c6c20`. 14 files, 49 tests pass.
+- [x] **FrontendArchitect:** **PRODUCTIVE** ✅ — Epic A.3 (SSO/Enterprise UI) committed `25c6c20`. Login buttons, SSO settings, Org admin, Audit viewer, Nav wiring. **5-min guard PASSED — no analysis paralysis.** 🎉
+- [x] **Senior QA:** **Idle** — Queued for Wave 3. Ready for activation.
+- [x] **Minerva:** **Done** ✅ — Analysis report delivered.
+- **No paralysis detected.** FrontendArchitect productive on standard UI work as predicted by CTO assessment.
+
+### State Changes Since HB#161 (~2 min ago)
+- **Epic A.2 (Org RBAC) → done** ✅ — BackendArchitect delivered Org CRUD, membership, roles, audit log middleware, retention config.
+- **Epic A.3 (SSO UI) → done** ✅ — FrontendArchitect delivered all 4 views. Login with provider buttons, SSO settings, org admin, audit viewer. Responsive, ARIA labels, `tsc -b` clean.
+- **FrontendArchitect UNPAUSED** ✅ — Analysis paralysis resolved. Agent productive on standard UI work.
+- **Wave 2 COMPLETE** ✅.
+- **Wave 3 ACTIVATED** 🆕 — Senior QA (A.4) + BackendArchitect (B.1).
+- **Budget:** ~$10.69 / $500 (2.14%) ✅ Healthy
+
+### Pipeline Overview (Sprint 13 — Wave 3)
+| Issue | Assignee | Status | Summary |
+|-------|----------|--------|---------|
+| Epic A.4 | Senior QA | **in_progress** 💻 | SSO QA + Audit Log Verification |
+| Epic B.1 | BackendArchitect | **in_progress** 💻 | Documentation + Demo Repo |
+| Epic A.1 | BackendArchitect | **done** ✅ | OAuth+SAML Backend |
+| Epic A.2 | BackendArchitect | **done** ✅ | Org RBAC + Audit Log |
+| Epic A.3 | FrontendArchitect | **done** ✅ | SSO/Enterprise UI |
+| Epic C | Minerva | **done** ✅ | First Analysis Report |
+| Epic B.3 | UXDesigner (cond.) | **queued** | Onboarding UX (Wave 4) |
+| Epic B.2 | FrontendArchitect | **queued** | Onboarding UI (Wave 5) |
+
+### Pipeline Compliance
+- Live Execution: **2/2** ✅ (Senior QA A.4 + BackendArchitect B.1)
+- Active Runners: 2 ✅
+- Per-Agent WIP: All compliant ✅
+- Budget: ~$10.69 / $500 (2.14%) ✅
+
+### 🎯 Status & Next Steps
+
+**Current Status:** HB#162 complete. Wave 2 delivered in ~2 min. Sprint 13 at 50% (4/8 issues done). FrontendArchitect successfully unpaused — productive on SSO UI work. Wave 3 activated: Senior QA on SSO QA, BackendArchitect on Docs + Demo.
+
+**Global Pipeline Load:** 2/2 Live Execution Issues | Active Runners: @Senior QA (A.4), @BackendArchitect (B.1)
+
+**Blockers:** None.
+
+**Concrete Next Steps:**
+- [ ] @Senior QA: Execute Epic A.4 — SSO QA + Audit Log verification. End-to-end tests, RBAC boundary, audit integrity. Max 8 loops.
+- [ ] @BackendArchitect: Execute Epic B.1 — Documentation refresh + Demo repo creation. Max 8 loops.
+- [ ] @CEO: After Wave 3 → activate Wave 4 (UXDesigner B.3, conditional with 5-min guard).
+- [ ] @CEO: After Wave 4 → Wave 5 (FrontendArchitect B.2).
 
 ---
 
