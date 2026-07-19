@@ -331,24 +331,24 @@ export function AuditLogViewer() {
                     </h3>
                     <div className="flex items-center gap-1">
                       <span className="text-xs text-text-tertiary">Export</span>
-                      <button
-                        type="button"
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         disabled={exporting === 'csv'}
                         onClick={() => handleExport('csv')}
-                        className="inline-flex items-center rounded-md border border-border px-2 py-1 text-xs font-medium text-text-secondary hover:bg-surface-tertiary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Export as CSV"
                       >
                         {exporting === 'csv' ? 'Exporting…' : 'CSV'}
-                      </button>
-                      <button
-                        type="button"
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         disabled={exporting === 'json'}
                         onClick={() => handleExport('json')}
-                        className="inline-flex items-center rounded-md border border-border px-2 py-1 text-xs font-medium text-text-secondary hover:bg-surface-tertiary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Export as JSON"
                       >
                         {exporting === 'json' ? 'Exporting…' : 'JSON'}
-                      </button>
+                      </Button>
                     </div>
                   </div>
                   <span className="text-xs text-text-tertiary shrink-0">
@@ -360,6 +360,9 @@ export function AuditLogViewer() {
                   <table className="w-full text-left text-sm" aria-label="Audit log entries">
                     <thead>
                       <tr className="border-b border-border text-xs uppercase tracking-wide text-text-tertiary">
+                        <th className="w-10 p-3" scope="col">
+                          <span className="sr-only">Toggle details</span>
+                        </th>
                         <th className="p-3 font-semibold" scope="col">Timestamp</th>
                         <th className="p-3 font-semibold" scope="col">User</th>
                         <th className="p-3 font-semibold" scope="col">Action</th>
@@ -372,20 +375,22 @@ export function AuditLogViewer() {
                       {logs.map((entry) => (
                         <tr
                           key={entry.id}
-                          className={`border-b border-border transition-colors hover:bg-surface-secondary/50 cursor-pointer ${
+                          className={`border-b border-border transition-colors hover:bg-surface-secondary/50 ${
                             expandedRow === entry.id ? 'bg-primary-500/5' : ''
                           }`}
-                          onClick={() => setExpandedRow(expandedRow === entry.id ? null : entry.id)}
-                          tabIndex={0}
-                          role="button"
-                          aria-expanded={expandedRow === entry.id}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              setExpandedRow(expandedRow === entry.id ? null : entry.id);
-                            }
-                          }}
                         >
+                          <td className="p-3">
+                            <button
+                              type="button"
+                              className="inline-flex items-center justify-center rounded p-1 text-text-tertiary hover:text-text-primary hover:bg-surface-tertiary transition-colors"
+                              onClick={() => setExpandedRow(expandedRow === entry.id ? null : entry.id)}
+                              aria-expanded={expandedRow === entry.id}
+                              aria-label={`${expandedRow === entry.id ? 'Collapse' : 'Expand'} details for ${entry.userEmail}`}
+                              aria-controls={expandedRow === entry.id ? 'audit-entry-details' : undefined}
+                            >
+                              {expandedRow === entry.id ? '▼' : '▶'}
+                            </button>
+                          </td>
                           <td className="p-3 text-text-primary whitespace-nowrap" title={formatTimestampFull(entry.timestamp)}>
                             {formatTimestamp(entry.timestamp)}
                           </td>
@@ -447,7 +452,7 @@ export function AuditLogViewer() {
             </Card>
 
             {expandedRow && (
-              <Card variant="outlined" padding="md" role="region" aria-label="Entry details">
+              <Card variant="outlined" padding="md" role="region" aria-label="Entry details" id="audit-entry-details">
                 {(() => {
                   const entry = logs.find((l) => l.id === expandedRow);
                   if (!entry) return null;

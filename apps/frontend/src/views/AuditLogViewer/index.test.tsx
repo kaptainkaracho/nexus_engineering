@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { AuditLogViewer } from './index';
 import * as api from '../../api/client';
 import type { AuditLogEntry, AuditLogFilter } from '../../api/client';
@@ -125,14 +125,12 @@ describe('AuditLogViewer', () => {
 
     await waitFor(() => expect(screen.queryByText(/Loading audit logs/i)).not.toBeInTheDocument());
 
-    const row = screen.getByRole('button', { name: /CREATE/ });
-    fireEvent.click(row);
+    const toggleBtn = screen.getByRole('button', { name: /Expand details for alice/i });
+    fireEvent.click(toggleBtn);
 
-    const heading = screen.getByText(/Entry Details/i);
-    expect(heading).toBeInTheDocument();
-    const detailsCard = heading.closest('div');
-    expect(detailsCard).toHaveTextContent('Created new org');
-    expect(detailsCard).toHaveTextContent('192.168.1.1');
+    const detailsCard = screen.getByRole('region', { name: 'Entry details' });
+    expect(within(detailsCard).getByText('Created new org')).toBeInTheDocument();
+    expect(within(detailsCard).getByText('192.168.1.1')).toBeInTheDocument();
   });
 
   it('navigates pages with pagination controls', async () => {
