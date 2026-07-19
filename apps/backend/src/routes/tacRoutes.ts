@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import * as path from 'path'
 import { fileURLToPath } from 'node:url'
 import { dirname } from 'node:path'
-import { TestLoader, testDocSchema, validateTestDocument } from '@nexus-engineering/shared'
+import { TestLoader, testDocSchema, validateTestDocument } from '@nexus-engineering/shared/test-utils'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)

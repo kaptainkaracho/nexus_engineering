@@ -1,0 +1,24 @@
+title: Authentication Session Specification
+version: 1.0.0
+status: active
+requirements:
+  - id: SPEC-AUTH-SESS-001
+    title: Refresh token rotates on use
+    priority: P0
+    status: implemented
+    references:
+      - type: req
+        id: REQ-AUTH-002
+      - type: arch
+        id: adr-001-auth-strategy
+      - type: test
+        id: TC-AUTH-REFRESH-ROTATE
+  - id: SPEC-AUTH-SESS-002
+    title: Revoked tokens are rejected cluster-wide
+    priority: P0
+    status: proposed
+    references:
+      - type: req
+        id: REQ-AUTH-002
+      - type: test
+        id: TC-AUTH-REVOKE

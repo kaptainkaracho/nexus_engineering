@@ -1,0 +1,33 @@
+title: Authentication Login Specification
+version: 1.0.0
+status: active
+requirements:
+  - id: SPEC-AUTH-LOGIN-001
+    title: Valid credentials issue a session
+    priority: P0
+    status: implemented
+    references:
+      - type: req
+        id: REQ-AUTH-001
+      - type: arch
+        id: adr-001-auth-strategy
+      - type: test
+        id: TC-AUTH-LOGIN-HAPPY
+  - id: SPEC-AUTH-LOGIN-002
+    title: Invalid credentials are rate limited
+    priority: P0
+    status: implemented
+    references:
+      - type: req
+        id: REQ-AUTH-001
+      - type: test
+        id: TC-AUTH-LOGIN-RATELIMIT
+  - id: SPEC-AUTH-LOGIN-003
+    title: Weak passwords are rejected
+    priority: P1
+    status: approved
+    references:
+      - type: req
+        id: REQ-AUTH-003
+      - type: test
+        id: TC-AUTH-PASSWORD-POLICY

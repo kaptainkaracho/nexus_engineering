@@ -1,0 +1,24 @@
+title: Audit Log Query Specification
+version: 1.0.0
+status: active
+requirements:
+  - id: SPEC-AUDIT-QRY-001
+    title: Events queryable by actor and date range
+    priority: P1
+    status: implemented
+    references:
+      - type: req
+        id: REQ-AUDIT-002
+      - type: test
+        id: TC-AUDIT-QUERY
+  - id: SPEC-AUDIT-QRY-002
+    title: Events older than 7 years are archived
+    priority: P2
+    status: proposed
+    references:
+      - type: req
+        id: REQ-AUDIT-002
+      - type: arch
+        id: adr-002-audit-log-storage
+      - type: test
+        id: TC-AUDIT-RETENTION
