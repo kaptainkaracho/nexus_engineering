@@ -33,22 +33,26 @@ platform core, not this repo, and is outside FrontendArchitect scope.
 **Issue:** R1-Fix: Session rotation to stop 65536-token context-window overflow
 **Objective:** Implement session rotation to prevent context-window overflow.
 
-### Finding
+### Finding (rigorous, re-verified 2026-07-19T22:10Z)
 THE-256 addresses the 65536-token context overflow found in THE-253 analysis (runs #12, #18).
 Symptom: `adapter_failed` errors when agent context exceeds 65536 tokens.
 
-**Verification performed in the Nexus repo (`apps/frontend` + whole-tree grep):**
-- Zero frontend code references `session rotation`, `context window`, `65536`, `token limit`,
-  `adapter_failed`, or any agent session management logic.
+**Verification performed in the Nexus repo (full-tree grep + built bundle):**
+- Zero **source** files reference `session rotation`, `context window`, `65536`, `token limit`,
+  `adapter_failed`, or any agent-session/token-management logic.
+- The ONLY `65536` in `apps/frontend/dist/assets/index-*.js` is **React's internal fiber
+  flag** (`a.flags |= 65536` → ForceUpdate/Snapshot bit) + unrelated numeric enums.
+  No `adapter_failed` string exists anywhere in the bundle.
 - The frontend auth session (`apps/frontend/src/api/auth.ts`) manages **user auth sessions**
-  (login/logout/token refresh), not AI agent context windows.
-- Session rotation is a **Paperclip platform core** mechanism — it lives in the agent runtime
-  that manages model context windows, not in the React application layer.
-- The frontend has no code surface to change.
+  (login/logout/token refresh in `sessionStorage`), NOT AI agent context windows.
+- Session rotation is a **Paperclip platform core / agent-runtime** mechanism that manages
+  the LLM prompt window — it is not part of the Nexus application repository.
 
 ### Disposition
 - **THE-256 → `blocked`**
 - **Unblock owner:** @CTO — reassign to BackendArchitect / Platform-Infra.
+- Durable progress: wrote `reports/THE-256-session-rotation-spec.md` (implementation spec
+  for the reassigned owner). Committed `TBD`.
 - No frontend files modified (none are relevant). Awaiting reassignment or next frontend task.
 
 ## Files Read This Session
@@ -58,9 +62,10 @@ Symptom: `adapter_failed` errors when agent context exceeds 65536 tokens.
 - apps/frontend/src/api/auth.ts (scope confirmation)
 - reports/failure-classification.md (THE-253 analysis)
 - reports/THE-255-reclassification-spec.md (prior disposition)
+- apps/frontend/dist/assets/index-*.js (bundle grep — confirmed React fiber flag, not session logic)
 
 ## Files Created/Modified This Session
-- (none — both THE-255 and THE-256 are out-of-domain)
+- reports/THE-256-session-rotation-spec.md (created — implementation spec for reassignee)
 
 ## Next Action
 - Awaiting @CTO reassignment of THE-256 → BackendArchitect/Platform-Infra, or next frontend-relevant task.
