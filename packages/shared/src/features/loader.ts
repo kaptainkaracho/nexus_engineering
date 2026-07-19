@@ -1,25 +1,28 @@
 import * as yaml from 'js-yaml';
-import { promises as fs } from 'fs';
 import path from 'path';
 import Ajv from 'ajv';
 import { featureDocSchema } from './schema';
 import type { FeatureDocument } from './format';
+import type { FileSystemAdapter } from './fileSystem';
+import { nodeFs } from './fileSystem-node';
 
 /**
  * Load and validate Features as Code documents (.feature.yaml) from filesystem
  */
 export class FeatureLoader {
   private ajv: Ajv;
+  private fs: FileSystemAdapter;
 
-  constructor() {
+  constructor(fs?: FileSystemAdapter) {
     this.ajv = new Ajv();
+    this.fs = fs ?? nodeFs;
   }
 
   /**
    * Find all .feature.yaml files in a directory (recursively)
    */
   async findFeatureFiles(dirPath: string): Promise<string[]> {
-    const entries = await fs.readdir(dirPath, { withFileTypes: true });
+    const entries = await this.fs.readdir(dirPath, { withFileTypes: true });
     const results: string[] = [];
 
     for (const entry of entries) {
@@ -44,7 +47,7 @@ export class FeatureLoader {
    * Load and structurally validate a single FAC file
    */
   async loadFeatureFile(filePath: string): Promise<FeatureDocument> {
-    const fileContents = await fs.readFile(filePath, 'utf-8');
+    const fileContents = await this.fs.readFile(filePath, 'utf-8');
     const doc = yaml.load(fileContents) as any;
 
     const validate = this.ajv.compile(featureDocSchema);
