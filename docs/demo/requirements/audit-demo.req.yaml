@@ -1,0 +1,48 @@
+nexus:
+  schema: req-doc/v1
+  metadata:
+    domain: Audit Log
+    version: 1.0.0
+    source: docs/demo/requirements/audit-demo.req.yaml
+    documentId: DEMO-AUDIT
+    author: BackendArchitect
+    createdAt: "2026-07-19"
+    updatedAt: "2026-07-19"
+requirements:
+  - id: DEMO-REQ-AUDIT-001
+    type: functional
+    title: Structured Audit Event Capture
+    description: All mutating API endpoints MUST record audit events capturing who did what, when, and on which resource. Events include user ID, email, action, resource type, resource ID, IP address, and org ID.
+    priority: high
+    status: approved
+    tags: [audit, compliance]
+    acceptanceCriteria:
+      - "Given any CREATE/UPDATE/DELETE request, when processed, then an audit event is recorded"
+      - "Given a LOGIN event, when authenticated, then the event includes user identity and IP"
+      - "Given an audit event, when stored, then the timestamp is accurate to the second"
+    relatedIssues: [THE-XX2]
+  - id: DEMO-REQ-AUDIT-002
+    type: functional
+    title: Audit Log Query and Export
+    description: Authorized users MUST be able to query audit logs with filters (org, action, date range, user) and export as JSON or CSV.
+    priority: medium
+    status: approved
+    tags: [audit, query, export]
+    acceptanceCriteria:
+      - "Given audit events exist, when queried with filters, then matching events are returned with pagination"
+      - "Given a query with orgId filter, when results are returned, then only events for that org are included"
+      - "Given an export request with format=csv, when processed, then a CSV file is returned"
+    dependencies: [DEMO-REQ-AUDIT-001]
+    relatedIssues: [THE-XX2]
+  - id: DEMO-REQ-AUDIT-003
+    type: non-functional
+    title: Audit Log Retention
+    description: Audit logs MUST have configurable retention policies. Old entries beyond the TTL must be automatically purged. Retention settings require admin permissions.
+    priority: medium
+    status: approved
+    tags: [audit, retention, compliance]
+    acceptanceCriteria:
+      - "Given a retention config with 30-day TTL, when the purge runs, then entries older than 30 days are deleted"
+      - "Given an admin user, when they update retention config, then the new TTL takes effect"
+    dependencies: [DEMO-REQ-AUDIT-001]
+    relatedIssues: [THE-XX2]

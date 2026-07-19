@@ -1,0 +1,87 @@
+nexus:
+  schema: feature-doc/v1
+  metadata:
+    domain: SSO and Authentication
+    version: 1.0.0
+    source: docs/demo/features/sso-demo.feature.yaml
+    author: Product Team
+    createdAt: "2026-07-19"
+    updatedAt: "2026-07-19"
+features:
+  - id: feat-demo-sso-login
+    name: SSO Login Buttons
+    description: Display branded login buttons for Google, GitHub, and SAML SSO on the login page.
+    status: approved
+    userStories:
+      - id: us-demo-sso-1
+        role: user
+        want: log in with my Google account
+        soThat: I don't need to remember another password
+        acceptanceCriteria:
+          - id: ac-demo-sso-1-1
+            given: I am on the login page
+            when: I click "Sign in with Google"
+            then: I am redirected to Google's OAuth consent screen
+          - id: ac-demo-sso-1-2
+            given: I am on the login page
+            when: I click "Sign in with GitHub"
+            then: I am redirected to GitHub's OAuth authorization page
+    traceLinks:
+      - type: satisfies
+        target:
+          id: DEMO-REQ-AUTH-002
+          documentId: DEMO-AUTH
+        confidence: high
+  - id: feat-demo-org-admin
+    name: Organization Admin Panel
+    description: Provide an admin panel for managing organization members, roles, and settings.
+    status: approved
+    userStories:
+      - id: us-demo-org-1
+        role: org admin
+        want: see a list of all organization members
+        soThat: I know who has access
+        acceptanceCriteria:
+          - id: ac-demo-org-1-1
+            given: I am an org:admin
+            when: I view the org admin panel
+            then: I see all members with their roles and join dates
+      - id: us-demo-org-2
+        role: org admin
+        want: change a member's role
+        soThat: I can grant or restrict access
+        acceptanceCriteria:
+          - id: ac-demo-org-2-1
+            given: I am an org:admin viewing the member list
+            when: I change a member's role to org:viewer
+            then: the member's permissions are updated immediately
+    traceLinks:
+      - type: satisfies
+        target:
+          id: DEMO-REQ-ORG-002
+          documentId: DEMO-ORG
+        confidence: high
+  - id: feat-demo-audit-viewer
+    name: Audit Log Viewer
+    description: Provide a searchable, filterable audit log viewer for compliance monitoring.
+    status: approved
+    userStories:
+      - id: us-demo-audit-1
+        role: admin
+        want: view audit logs filtered by date range and action type
+        soThat: I can investigate specific events
+        acceptanceCriteria:
+          - id: ac-demo-audit-1-1
+            given: I am an admin
+            when: I filter by action type "LOGIN" and date range "last 7 days"
+            then: I see all login events from the past week
+          - id: ac-demo-audit-1-2
+            given: I am viewing audit log results
+            when: I click "Export CSV"
+            then: a CSV file is downloaded with the filtered results
+    traceLinks:
+      - type: satisfies
+        target:
+          id: DEMO-REQ-AUDIT-002
+          documentId: DEMO-AUDIT
+        confidence: high

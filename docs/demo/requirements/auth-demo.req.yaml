@@ -1,0 +1,63 @@
+nexus:
+  schema: req-doc/v1
+  metadata:
+    domain: Authentication
+    version: 1.0.0
+    source: docs/demo/requirements/auth-demo.req.yaml
+    documentId: DEMO-AUTH
+    author: BackendArchitect
+    createdAt: "2026-07-19"
+    updatedAt: "2026-07-19"
+requirements:
+  - id: DEMO-REQ-AUTH-001
+    type: functional
+    title: Email and Password Login
+    description: The system MUST authenticate users via email and password. Emails are case-insensitive. Passwords must be hashed with bcrypt. Failed attempts must be rate limited.
+    priority: critical
+    status: approved
+    tags: [auth, security]
+    acceptanceCriteria:
+      - "Given a registered user, when valid credentials are supplied, then a JWT session is issued"
+      - "Given a user, when invalid credentials are supplied, then a generic error is returned"
+      - "Given a user, when 5 failed attempts occur within 15 minutes, then the account is temporarily locked"
+    dependencies: []
+    relatedIssues: [THE-191, THE-220]
+  - id: DEMO-REQ-AUTH-002
+    type: functional
+    title: OAuth Login with Google and GitHub
+    description: The system MUST support OAuth 2.0 login via Google and GitHub identity providers. Token exchange and user linking must create or link accounts by email match.
+    priority: high
+    status: approved
+    tags: [auth, sso, oauth]
+    acceptanceCriteria:
+      - "Given an unregistered user, when they authenticate via Google, then an account is created and linked"
+      - "Given a registered user with matching email, when they authenticate via GitHub, then the OAuth account is linked to their existing account"
+      - "Given an OAuth user, when they return, then they are authenticated without re-linking"
+    dependencies: [DEMO-REQ-AUTH-001]
+    relatedIssues: [THE-XX1]
+  - id: DEMO-REQ-AUTH-003
+    type: functional
+    title: SAML v2 Single Sign-On
+    description: The system MUST support SAML v2 SSO for enterprise identity providers. The ACS endpoint must accept SAML responses and map attributes (email, name, role) to user accounts.
+    priority: high
+    status: approved
+    tags: [auth, sso, saml, enterprise]
+    acceptanceCriteria:
+      - "Given a valid SAML response, when the ACS endpoint receives it, then a user is authenticated or created"
+      - "Given a SAML response with role attribute, when the user is created, then the role is mapped from the assertion"
+      - "Given a valid IdP, when metadata is requested, then valid SAML metadata XML is returned"
+    dependencies: [DEMO-REQ-AUTH-001]
+    relatedIssues: [THE-XX1]
+  - id: DEMO-REQ-AUTH-004
+    type: non-functional
+    title: Session Management with JWT
+    description: Access tokens MUST expire in 15 minutes. Refresh tokens MUST be revocable server-side and rotate on each use. Revoked tokens must be rejected even before expiry.
+    priority: high
+    status: approved
+    tags: [auth, security]
+    acceptanceCriteria:
+      - "Given a valid refresh token, when used, then a new access token is issued and the refresh token rotates"
+      - "Given a revoked refresh token, when reused, then access is denied and all sessions are terminated"
+      - "Given an expired access token, when a request is made, then 401 is returned"
+    dependencies: [DEMO-REQ-AUTH-001]
+    relatedIssues: [THE-191]

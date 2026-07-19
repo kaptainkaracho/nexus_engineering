@@ -1,0 +1,38 @@
+title: Structured audit log with query API and retention
+status: accepted
+context: |
+  Enterprise compliance requirements demand a complete audit trail of all
+  mutating operations. The audit log must capture who, what, when, and on
+  which resource, support filtering and export, and have configurable retention.
+decision: |
+  Implement a structured audit log with the following design:
+  1. Middleware on all mutating endpoints automatically records audit events
+  2. Events include: id, timestamp, userId, userEmail, action, resourceType,
+     resourceId, details, ipAddress, orgId
+  3. Query API supports filters: orgId, action, date range (from/to), userId,
+     resourceType, and full-text search
+  4. Export in JSON and CSV formats
+  5. Configurable retention TTL with automatic purge
+  6. Admin-only access to audit endpoints
+consequences:
+  - Zero additional effort per endpoint (middleware handles recording)
+  - CSV export enables external SIEM integration
+  - Retention purge must be scheduled (cron or on-demand via API)
+  - Audit events increase database write volume proportionally to API usage
+superseded_by: null
+traceLinks:
+  - type: satisfies
+    target:
+      id: DEMO-REQ-AUDIT-001
+      documentId: DEMO-AUDIT
+    confidence: high
+  - type: satisfies
+    target:
+      id: DEMO-REQ-AUDIT-002
+      documentId: DEMO-AUDIT
+    confidence: high
+  - type: satisfies
+    target:
+      id: DEMO-REQ-AUDIT-003
+      documentId: DEMO-AUDIT
+    confidence: high

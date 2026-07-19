@@ -1,0 +1,38 @@
+title: Authentication uses JWT with OAuth and SAML federation
+status: accepted
+context: |
+  The Nexus platform must support multiple authentication mechanisms:
+  email/password for local users, OAuth 2.0 for Google/GitHub social login,
+  and SAML v2 for enterprise SSO. All mechanisms must produce compatible
+  JWT access tokens for downstream service validation.
+decision: |
+  Issue short-lived JWT access tokens (15 minutes) signed with RS256.
+  Support three authentication paths:
+  1. Email/password with bcrypt hashing
+  2. OAuth 2.0 authorization code flow for Google and GitHub
+  3. SAML v2 HTTP-POST binding for enterprise IdPs
+  All paths produce identical JWT payloads with sub, email, role, permissions,
+  and orgId claims. User linking is based on email matching.
+consequences:
+  - Services validate tokens locally via public key (no network call on hot path)
+  - OAuth and SAML users can link multiple identities to one account
+  - Enterprise deployments can enforce SAML-only authentication
+  - Revocation has up to 15-minute window for access tokens
+  - OAuth and SAML provider configs are managed via environment variables
+superseded_by: null
+traceLinks:
+  - type: satisfies
+    target:
+      id: DEMO-REQ-AUTH-001
+      documentId: DEMO-AUTH
+    confidence: high
+  - type: satisfies
+    target:
+      id: DEMO-REQ-AUTH-002
+      documentId: DEMO-AUTH
+    confidence: high
+  - type: satisfies
+    target:
+      id: DEMO-REQ-AUTH-003
+      documentId: DEMO-AUTH
+    confidence: high

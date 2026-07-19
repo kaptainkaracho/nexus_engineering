@@ -1,0 +1,48 @@
+nexus:
+  schema: req-doc/v1
+  metadata:
+    domain: Organization Management
+    version: 1.0.0
+    source: docs/demo/requirements/org-demo.req.yaml
+    documentId: DEMO-ORG
+    author: BackendArchitect
+    createdAt: "2026-07-19"
+    updatedAt: "2026-07-19"
+requirements:
+  - id: DEMO-REQ-ORG-001
+    type: functional
+    title: Organization CRUD
+    description: The system MUST support creating, reading, updating, and deleting organizations. Each organization has a unique slug, name, description, and owner.
+    priority: high
+    status: approved
+    tags: [org, rbac]
+    acceptanceCriteria:
+      - "Given an authenticated user, when they create an organization, then they become the org:admin owner"
+      - "Given an existing slug, when a user tries to create an org with that slug, then a 409 error is returned"
+      - "Given an org:admin, when they update the organization, then changes are persisted"
+    relatedIssues: [THE-XX2]
+  - id: DEMO-REQ-ORG-002
+    type: functional
+    title: Organization Member Management
+    description: Organization admins MUST be able to invite, add, remove members and assign org-scoped roles (org:admin, org:member, org:viewer).
+    priority: high
+    status: approved
+    tags: [org, rbac, members]
+    acceptanceCriteria:
+      - "Given an org:admin, when they invite a user, then the user becomes a member with the specified role"
+      - "Given an org:admin, when they remove a member, then that user loses access to the org"
+      - "Given a user, when they join an org, then they are added as org:member"
+    dependencies: [DEMO-REQ-ORG-001]
+    relatedIssues: [THE-XX2]
+  - id: DEMO-REQ-ORG-003
+    type: functional
+    title: Cross-Org Data Isolation
+    description: All data queries MUST be scoped to the user's organization. A user in one organization MUST NOT access data from another organization.
+    priority: critical
+    status: approved
+    tags: [org, security, isolation]
+    acceptanceCriteria:
+      - "Given a user in Org A, when they query data, then only Org A data is returned"
+      - "Given a user in Org A, when they attempt to access Org B data directly, then access is denied"
+    dependencies: [DEMO-REQ-ORG-001]
+    relatedIssues: [THE-XX2]

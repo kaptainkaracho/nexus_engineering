@@ -1,0 +1,206 @@
+# Demo Project Trace Links
+# Defines cross-document traceability for the demo project
+traceLinks:
+  - sourceId: DEMO-REQ-AUTH-001
+    sourceType: requirement
+    targetId: DEMO-REQ-AUTH-002
+    targetType: requirement
+    relationshipType: dependsOn
+    confidence: high
+    description: OAuth login depends on email/password authentication infrastructure
+  - sourceId: DEMO-REQ-AUTH-001
+    sourceType: requirement
+    targetId: DEMO-REQ-AUTH-003
+    targetType: requirement
+    relationshipType: dependsOn
+    confidence: high
+    description: SAML login depends on email/password authentication infrastructure
+  - sourceId: DEMO-REQ-AUTH-001
+    sourceType: requirement
+    targetId: DEMO-REQ-AUTH-004
+    targetType: requirement
+    relationshipType: dependsOn
+    confidence: high
+    description: Session management depends on login
+  - sourceId: DEMO-REQ-ORG-002
+    sourceType: requirement
+    targetId: DEMO-REQ-ORG-001
+    targetType: requirement
+    relationshipType: dependsOn
+    confidence: high
+    description: Member management requires organization to exist
+  - sourceId: DEMO-REQ-ORG-003
+    sourceType: requirement
+    targetId: DEMO-REQ-ORG-001
+    targetType: requirement
+    relationshipType: dependsOn
+    confidence: high
+    description: Data isolation requires organization context
+  - sourceId: DEMO-REQ-AUDIT-002
+    sourceType: requirement
+    targetId: DEMO-REQ-AUDIT-001
+    targetType: requirement
+    relationshipType: dependsOn
+    confidence: high
+    description: Query and export depend on event capture
+  - sourceId: DEMO-REQ-AUDIT-003
+    sourceType: requirement
+    targetId: DEMO-REQ-AUDIT-001
+    targetType: requirement
+    relationshipType: dependsOn
+    confidence: high
+    description: Retention policy applies to captured events
+  - sourceId: adr-demo-auth
+    sourceType: architecture
+    targetId: DEMO-REQ-AUTH-001
+    targetType: requirement
+    relationshipType: satisfies
+    confidence: high
+    description: JWT architecture satisfies auth requirements
+  - sourceId: adr-demo-auth
+    sourceType: architecture
+    targetId: DEMO-REQ-AUTH-002
+    targetType: requirement
+    relationshipType: satisfies
+    confidence: high
+    description: OAuth support satisfies SSO requirements
+  - sourceId: adr-demo-auth
+    sourceType: architecture
+    targetId: DEMO-REQ-AUTH-003
+    targetType: requirement
+    relationshipType: satisfies
+    confidence: high
+    description: SAML support satisfies enterprise SSO requirements
+  - sourceId: adr-demo-org
+    sourceType: architecture
+    targetId: DEMO-REQ-ORG-001
+    targetType: requirement
+    relationshipType: satisfies
+    confidence: high
+    description: Org architecture satisfies org CRUD requirements
+  - sourceId: adr-demo-org
+    sourceType: architecture
+    targetId: DEMO-REQ-ORG-002
+    targetType: requirement
+    relationshipType: satisfies
+    confidence: high
+    description: Org architecture satisfies member management requirements
+  - sourceId: adr-demo-org
+    sourceType: architecture
+    targetId: DEMO-REQ-ORG-003
+    targetType: requirement
+    relationshipType: satisfies
+    confidence: high
+    description: Org architecture satisfies data isolation requirements
+  - sourceId: adr-demo-audit
+    sourceType: architecture
+    targetId: DEMO-REQ-AUDIT-001
+    targetType: requirement
+    relationshipType: satisfies
+    confidence: high
+    description: Audit architecture satisfies event capture requirements
+  - sourceId: adr-demo-audit
+    sourceType: architecture
+    targetId: DEMO-REQ-AUDIT-002
+    targetType: requirement
+    relationshipType: satisfies
+    confidence: high
+    description: Audit architecture satisfies query/export requirements
+  - sourceId: adr-demo-audit
+    sourceType: architecture
+    targetId: DEMO-REQ-AUDIT-003
+    targetType: requirement
+    relationshipType: satisfies
+    confidence: high
+    description: Audit architecture satisfies retention requirements
+  - sourceId: feat-demo-sso-login
+    sourceType: feature
+    targetId: DEMO-REQ-AUTH-002
+    targetType: requirement
+    relationshipType: satisfies
+    confidence: high
+    description: SSO login feature implements OAuth requirement
+  - sourceId: feat-demo-org-admin
+    sourceType: feature
+    targetId: DEMO-REQ-ORG-002
+    targetType: requirement
+    relationshipType: satisfies
+    confidence: high
+    description: Org admin feature implements member management requirement
+  - sourceId: feat-demo-audit-viewer
+    sourceType: feature
+    targetId: DEMO-REQ-AUDIT-002
+    targetType: requirement
+    relationshipType: satisfies
+    confidence: high
+    description: Audit viewer feature implements query/export requirement
+  - sourceId: demo-exec-login-pass
+    sourceType: testResult
+    targetId: DEMO-REQ-AUTH-001
+    targetType: requirement
+    relationshipType: verifies
+    confidence: high
+    description: Login test verifies email/password auth
+  - sourceId: demo-exec-oauth-pass
+    sourceType: testResult
+    targetId: DEMO-REQ-AUTH-002
+    targetType: requirement
+    relationshipType: verifies
+    confidence: high
+    description: OAuth test verifies Google/GitHub login
+  - sourceId: demo-exec-saml-pass
+    sourceType: testResult
+    targetId: DEMO-REQ-AUTH-003
+    targetType: requirement
+    relationshipType: verifies
+    confidence: high
+    description: SAML test verifies enterprise SSO
+  - sourceId: demo-exec-token-refresh
+    sourceType: testResult
+    targetId: DEMO-REQ-AUTH-004
+    targetType: requirement
+    relationshipType: verifies
+    confidence: high
+    description: Token refresh test verifies session management
+  - sourceId: demo-exec-org-create
+    sourceType: testResult
+    targetId: DEMO-REQ-ORG-001
+    targetType: requirement
+    relationshipType: verifies
+    confidence: high
+    description: Org create test verifies CRUD operations
+  - sourceId: demo-exec-org-invite
+    sourceType: testResult
+    targetId: DEMO-REQ-ORG-002
+    targetType: requirement
+    relationshipType: verifies
+    confidence: high
+    description: Org invite test verifies member management
+  - sourceId: demo-exec-org-isolation
+    sourceType: testResult
+    targetId: DEMO-REQ-ORG-003
+    targetType: requirement
+    relationshipType: verifies
+    confidence: high
+    description: Isolation test verifies cross-org data access control
+  - sourceId: demo-exec-audit-capture
+    sourceType: testResult
+    targetId: DEMO-REQ-AUDIT-001
+    targetType: requirement
+    relationshipType: verifies
+    confidence: high
+    description: Audit capture test verifies event recording
+  - sourceId: demo-exec-audit-query
+    sourceType: testResult
+    targetId: DEMO-REQ-AUDIT-002
+    targetType: requirement
+    relationshipType: verifies
+    confidence: high
+    description: Audit query test verifies filtering and pagination
+  - sourceId: demo-exec-audit-retention
+    sourceType: testResult
+    targetId: DEMO-REQ-AUDIT-003
+    targetType: requirement
+    relationshipType: verifies
+    confidence: high
+    description: Audit retention test verifies TTL purge
