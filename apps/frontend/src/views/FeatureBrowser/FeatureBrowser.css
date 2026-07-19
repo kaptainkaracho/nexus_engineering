@@ -63,8 +63,8 @@
   background: var(--fb-surface-secondary, #f3f4f6);
 }
 .fb-filter-chip.is-active {
-  background: var(--fb-primary-500, #6366f1);
-  border-color: var(--fb-primary-500, #6366f1);
+  background: var(--fb-primary-500, #3B82F6);
+  border-color: var(--fb-primary-500, #3B82F6);
   color: #ffffff;
 }
 .fb-filter-count {
