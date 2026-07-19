@@ -5,7 +5,8 @@ export type BadgeVariant =
   | 'approved' | 'implemented' | 'verified' | 'proposed' | 'rejected'
   | 'completed' | 'draft' | 'ready' | 'automated' | 'manual' | 'partially-automated'
   | 'satisfies' | 'verifies' | 'tracesTo' | 'dependsOn' | 'refines' | 'conflictsWith'
-  | 'block' | 'part' | 'port' | 'unit' | 'info';
+  | 'block' | 'part' | 'port' | 'unit' | 'info'
+  | 'integration' | 'e2e' | 'performance' | 'security' | 'usability';
 
 interface PaletteEntry { light: string; dark: string }
 
@@ -36,6 +37,11 @@ const PALETTE: Record<BadgeVariant, PaletteEntry> = {
   port:             { light: 'info-500/10',             dark: 'dark:bg-info-950 dark:text-info-300' },
   unit:             { light: 'success-500/10',          dark: 'dark:bg-success-950 dark:text-success-300' },
   info:             { light: 'info-500/10',             dark: 'dark:bg-info-950 dark:text-info-300' },
+  integration:      { light: 'secondary-500/10',        dark: 'dark:bg-secondary-950 dark:text-secondary-300' },
+  e2e:              { light: 'primary-500/10',          dark: 'dark:bg-primary-950 dark:text-primary-300' },
+  performance:      { light: 'warning-500/10',          dark: 'dark:bg-warning-950 dark:text-warning-300' },
+  security:         { light: 'error-500/10',            dark: 'dark:bg-error-950 dark:text-error-300' },
+  usability:        { light: 'success-500/10',          dark: 'dark:bg-success-950 dark:text-success-300' },
 };
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {

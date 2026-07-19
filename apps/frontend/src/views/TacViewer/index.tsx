@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Card, Container, Stack, Input } from '@nexus-engineering/shared';
+import { Badge, Button, Card, Container, Stack, Input } from '@nexus-engineering/shared';
 import {
   fetchTacDocuments,
   fetchTacDocument,
@@ -8,32 +8,6 @@ import {
   type TacDocument,
   type TacTestCase,
 } from '../../api/client';
-
-const TYPE_COLORS: Record<string, string> = {
-  unit: 'bg-info-500/10 text-info-700 dark:text-info-300',
-  integration: 'bg-secondary-500/10 text-secondary-700 dark:text-secondary-300',
-  e2e: 'bg-primary-500/10 text-primary-700 dark:text-primary-300',
-  performance: 'bg-warning-500/10 text-warning-700 dark:text-warning-300',
-  security: 'bg-error-500/10 text-error-700 dark:text-error-300',
-  usability: 'bg-success-500/10 text-success-700 dark:text-success-300',
-};
-
-const PRIORITY_COLORS: Record<string, string> = {
-  low: 'bg-neutral-500/10 text-neutral-700 dark:text-neutral-300',
-  medium: 'bg-info-500/10 text-info-700 dark:text-info-300',
-  high: 'bg-warning-500/10 text-warning-700 dark:text-warning-300',
-  critical: 'bg-error-500/10 text-error-700 dark:text-error-300',
-};
-
-function Badge({ label, color }: { label: string; color: string }) {
-  return (
-    <span
-      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${color}`}
-    >
-      {label}
-    </span>
-  );
-}
 
 function TestCaseCard({ testCase }: { testCase: TacTestCase }) {
   const [openTrace, setOpenTrace] = useState<string | null>(null)
@@ -67,10 +41,10 @@ function TestCaseCard({ testCase }: { testCase: TacTestCase }) {
       <Stack gap={3}>
         <div className="flex flex-wrap items-center gap-2">
           <span className="font-mono text-xs text-text-tertiary">{testCase.id}</span>
-          <Badge label={testCase.type} color={TYPE_COLORS[testCase.type] ?? 'bg-neutral-500/10 text-neutral-700'} />
-          <Badge label={testCase.priority} color={PRIORITY_COLORS[testCase.priority] ?? 'bg-neutral-500/10 text-neutral-700'} />
+          <Badge variant={testCase.type}>{testCase.type}</Badge>
+          <Badge variant={testCase.priority}>{testCase.priority}</Badge>
           {testCase.automated && (
-            <Badge label="Automated" color="bg-success-500/10 text-success-700 dark:text-success-300" />
+            <Badge variant="automated">Automated</Badge>
           )}
         </div>
 
