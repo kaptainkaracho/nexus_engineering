@@ -12,3 +12,5 @@ export type {
 } from './format';
 
 export type { FileSystemAdapter } from './fileSystem';
+
+export { FeatureLoader, ValidatedFeatureLoader, getFeatureLoader, getValidatedFeatureLoader } from './loader';

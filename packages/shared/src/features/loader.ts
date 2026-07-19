@@ -1,10 +1,29 @@
 import * as yaml from 'js-yaml';
-import path from 'path';
 import Ajv from 'ajv';
 import { featureDocSchema } from './schema';
 import type { FeatureDocument } from './format';
 import type { FileSystemAdapter } from './fileSystem';
-import { nodeFs } from './fileSystem-node';
+
+// Lazy-loaded Node.js dependencies — static top-level imports of these would
+// pull `fs/promises` and `path` into the frontend bundle and break TS resolution.
+let _pathModule: typeof import('path') | null = null
+
+async function getPathModule(): Promise<typeof import('path')> {
+  if (!_pathModule) {
+    _pathModule = await import('path')
+  }
+  return _pathModule
+}
+
+let _defaultFs: FileSystemAdapter | null = null
+
+async function getDefaultFs(): Promise<FileSystemAdapter> {
+  if (!_defaultFs) {
+    const mod = await import('./fileSystem-node')
+    _defaultFs = mod.nodeFs
+  }
+  return _defaultFs
+}
 
 /**
  * Load and validate Features as Code documents (.feature.yaml) from filesystem
@@ -15,13 +34,22 @@ export class FeatureLoader {
 
   constructor(fs?: FileSystemAdapter) {
     this.ajv = new Ajv();
-    this.fs = fs ?? nodeFs;
+    this.fs = fs ?? (() => {
+      if (typeof process === 'undefined') {
+        throw new Error('FeatureLoader requires a FileSystemAdapter in non-Node environments')
+      }
+      if (!_defaultFs) {
+        throw new Error('Default FileSystemAdapter not yet initialized. Use getFeatureLoader() factory instead.')
+      }
+      return _defaultFs
+    })();
   }
 
   /**
    * Find all .feature.yaml files in a directory (recursively)
    */
   async findFeatureFiles(dirPath: string): Promise<string[]> {
+    const path = await getPathModule();
     const entries = await this.fs.readdir(dirPath, { withFileTypes: true });
     const results: string[] = [];
 
@@ -129,7 +157,22 @@ export class ValidatedFeatureLoader extends FeatureLoader {
 }
 
 /**
- * Singleton instances for global use
+ * Lazy singleton factories — resolve the Node.js FileSystemAdapter
+ * on first call so the shared package can be type-checked in browser contexts.
  */
-export const featureLoader = new FeatureLoader();
-export const validatedFeatureLoader = new ValidatedFeatureLoader();
+let _featureLoader: FeatureLoader | null = null
+let _validatedFeatureLoader: ValidatedFeatureLoader | null = null
+
+export async function getFeatureLoader(): Promise<FeatureLoader> {
+  if (!_featureLoader) {
+    _featureLoader = new FeatureLoader(await getDefaultFs())
+  }
+  return _featureLoader
+}
+
+export async function getValidatedFeatureLoader(): Promise<ValidatedFeatureLoader> {
+  if (!_validatedFeatureLoader) {
+    _validatedFeatureLoader = new ValidatedFeatureLoader(await getDefaultFs())
+  }
+  return _validatedFeatureLoader
+}
