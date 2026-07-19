@@ -1,5 +1,5 @@
 # FrontendArchitect Context State
-> Last updated: 2026-07-19T22:00Z (THE-256 out-of-domain flag)
+> Last updated: 2026-07-19T22:30Z (THE-232 UX changes)
 
 ## Completed
 - **THE-232: FAC Feature Browser UI — done** ✅ (commit `2d2a938`)
@@ -8,64 +8,41 @@
 - **THE-235 Phase 1+: Mock Data Dashboard — done** ✅ (commit `3c04856`, pushed)
 - **THE-235 Phase 3: D3 Interactive Graph — done** ✅ (commit `f4720cd`, pushed)
 
-## THE-255 — FINAL DISPOSITION: 🔴 BLOCKED (domain/ownership mismatch)
+## THE-232 — UX GATE CHANGES REQUESTED ✅ FIXED
 
-**Issue:** R1-Fix: Reclassify liveness failures (plan-only / done-not-flipped / blocked)
-**Objective:** Implement THE-253 RC-1/RC-2/RC-3 in the Paperclip liveness classifier.
+**UX Gate Verdict:** 🔄 Changes Requested (2 issues)
 
-### Finding
-RC-1/RC-2/RC-3 mutate the **Paperclip core liveness classifier** + session-rotation config.
-Verified the Nexus repo (whole-tree grep) contains ZERO liveness/failure-classification code,
-and the frontend `views/` do not display run-failure rates. The classifier lives in Paperclip
-platform core, not this repo, and is outside FrontendArchitect scope.
+### Issue 1: Hardcoded primary color mismatch — FIXED ✅
+- **File:** `apps/frontend/src/views/FeatureBrowser/FeatureBrowser.css:66-67`
+- **Was:** `#6366f1` (indigo-500)
+- **Fix:** `#3B82F6` (design system primary-500)
+- **Commit:** `fff785f`
 
-### Action taken (durable progress)
-- Wrote `reports/THE-255-reclassification-spec.md` — precise RC-1/RC-2/RC-3 implementation
-  spec for the reassignee. Committed `025cb17`.
+### Issue 2: (Truncated in prior report — awaiting full report)
+- Awaiting complete UX gate report for second issue
 
 ### Disposition
-- **THE-255 → `blocked`**
+- Issue 1 resolved and committed. Ready for UX re-review.
+
+## THE-255 — FINAL DISPOSITION: 🔴 BLOCKED (domain/ownership mismatch)
 - **Unblock owner:** @CTO — reassign to BackendArchitect / Platform-Infra.
-- No frontend files modified (none are relevant). Awaiting reassignment or next frontend task.
+- No frontend files modified. Awaiting reassignment or next frontend task.
 
 ## THE-256 — FINAL DISPOSITION: 🔴 BLOCKED (domain/ownership mismatch)
-
-**Issue:** R1-Fix: Session rotation to stop 65536-token context-window overflow
-**Objective:** Implement session rotation to prevent context-window overflow.
-
-### Finding (rigorous, re-verified 2026-07-19T22:10Z)
-THE-256 addresses the 65536-token context overflow found in THE-253 analysis (runs #12, #18).
-Symptom: `adapter_failed` errors when agent context exceeds 65536 tokens.
-
-**Verification performed in the Nexus repo (full-tree grep + built bundle):**
-- Zero **source** files reference `session rotation`, `context window`, `65536`, `token limit`,
-  `adapter_failed`, or any agent-session/token-management logic.
-- The ONLY `65536` in `apps/frontend/dist/assets/index-*.js` is **React's internal fiber
-  flag** (`a.flags |= 65536` → ForceUpdate/Snapshot bit) + unrelated numeric enums.
-  No `adapter_failed` string exists anywhere in the bundle.
-- The frontend auth session (`apps/frontend/src/api/auth.ts`) manages **user auth sessions**
-  (login/logout/token refresh in `sessionStorage`), NOT AI agent context windows.
-- Session rotation is a **Paperclip platform core / agent-runtime** mechanism that manages
-  the LLM prompt window — it is not part of the Nexus application repository.
-
-### Disposition
-- **THE-256 → `blocked`**
 - **Unblock owner:** @CTO — reassign to BackendArchitect / Platform-Infra.
-- Durable progress: wrote `reports/THE-256-session-rotation-spec.md` (implementation spec
-  for the reassigned owner). Committed `9ad2e04`.
-- No frontend files modified (none are relevant). Awaiting reassignment or next frontend task.
+- No frontend files modified. Awaiting reassignment or next frontend task.
 
 ## Files Read This Session
 - .paperclip/context/FrontendArchitect.md (restore)
-- apps/frontend/src/views/TacViewer/index.tsx (scope confirmation)
-- apps/frontend/src/api/client.ts (scope confirmation)
-- apps/frontend/src/api/auth.ts (scope confirmation)
-- reports/failure-classification.md (THE-253 analysis)
-- reports/THE-255-reclassification-spec.md (prior disposition)
-- apps/frontend/dist/assets/index-*.js (bundle grep — confirmed React fiber flag, not session logic)
+- packages/shared/src/design-system/tokens/colors.ts (design system reference)
+- apps/frontend/src/views/FeatureBrowser/FeatureBrowser.css (fix target)
+- apps/frontend/src/views/FeatureBrowser/index.tsx (scope confirmation)
+- apps/frontend/src/views/FeatureBrowser/types.ts (no hex colors)
+- apps/frontend/src/views/FeatureBrowser/FeatureCard.tsx (no hex colors)
+- apps/frontend/src/views/FeatureBrowser/FeatureDetail.tsx (no hex colors)
 
 ## Files Created/Modified This Session
-- reports/THE-256-session-rotation-spec.md (created — implementation spec for reassignee)
+- apps/frontend/src/views/FeatureBrowser/FeatureBrowser.css (modified — primary color fix)
 
 ## Next Action
-- Awaiting @CTO reassignment of THE-256 → BackendArchitect/Platform-Infra, or next frontend-relevant task.
+- Await UX re-review of THE-232 changes, or next frontend task from @CTO.
