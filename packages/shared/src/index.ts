@@ -122,24 +122,46 @@ export type {
   TraceabilityQuery,
 } from './ai-types';
 
-export {
-  testDocSchema,
-  TestLoader,
-  ValidatedTestLoader,
-  testLoader,
-  validatedTestLoader,
-  validateTestTraceLinks,
-  validateTestDocument,
-} from './tests';
-
 export type {
   TestCaseNexusMetadata,
   GherkinScenario,
   TestCaseType,
   TestCasePriority,
-  TestCase,
   TestSuite,
   TestDocument,
-  TestLoadResult,
   TestDocumentValidationResult,
 } from './tests';
+
+export type {
+  ResultsNexusMetadata,
+  ResultsDocument,
+  ExecutionStatus,
+  ResultsTraceLink,
+  ExecutionError,
+  ExecutionArtifact,
+  TestExecution,
+  ResultsLoadResult,
+  ResultsDocumentValidationResult,
+} from './results';
+
+export type {
+  FeatureNexusMetadata,
+  FeatureDocument,
+  Feature,
+  FeatureStatus,
+  UserStory,
+  AcceptanceCriterion,
+  FeatureTraceLink,
+  FeatureLoadResult,
+  FeatureDocumentValidationResult,
+} from './features';
+
+export {
+  featureDocSchema,
+  FeatureLoader,
+  ValidatedFeatureLoader,
+  featureLoader,
+  validatedFeatureLoader,
+  validateFeatures,
+  validateFeatureDocument,
+} from './features';

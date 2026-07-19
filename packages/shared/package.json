@@ -7,14 +7,22 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
+    "./test-utils": "./src/tests/index.ts",
     "./requirements/loader": "./src/requirements/loader.ts",
     "./requirements/schema": "./src/requirements/schema.ts",
+    "./results": "./src/results/index.ts",
+    "./results/loader": "./src/results/loader.ts",
+    "./results/schema": "./src/results/schema.ts",
+    "./features": "./src/features/index.ts",
+    "./features/loader": "./src/features/loader.ts",
+    "./features/schema": "./src/features/schema.ts",
     "./src/design-system/*": "./src/design-system/*"
   },
   "scripts": {
     "build": "tsc",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "ajv": "^8.17.1",

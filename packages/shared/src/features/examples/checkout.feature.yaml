@@ -1,0 +1,62 @@
+nexus:
+  schema: feature-doc/v1
+  metadata:
+    domain: checkout
+    version: "1.0.0"
+    source: product
+    author: product-team
+    createdAt: "2026-07-19"
+    updatedAt: "2026-07-19"
+features:
+  - id: feat-one-click-checkout
+    name: One-Click Checkout
+    description: Allow returning customers to complete a purchase with a single tap using a saved payment method.
+    status: approved
+    userStories:
+      - id: us-oc-1
+        role: returning customer
+        want: complete my purchase with one tap
+        soThat: I can avoid re-entering payment and shipping details
+        acceptanceCriteria:
+          - id: ac-oc-1-1
+            given: I am a signed-in returning customer with a saved card
+            when: I tap "Buy now" on a product page
+            then: the order is placed using my saved payment and shipping details
+          - id: ac-oc-1-2
+            given: I have no saved payment method
+            when: I tap "Buy now"
+            then: I am prompted to add a payment method before the order is placed
+      - id: us-oc-2
+        role: returning customer
+        want: see an order confirmation immediately
+        soThat: I have confidence the purchase succeeded
+        acceptanceCriteria:
+          - id: ac-oc-2-1
+            then: an order confirmation screen appears within 1 second of tapping "Buy now"
+    traceLinks:
+      - type: satisfies
+        target:
+          id: REQ-CHECKOUT-001
+          documentId: requirements/checkout
+        confidence: high
+        description: Satisfies the fast checkout requirement
+  - id: feat-guest-checkout
+    name: Guest Checkout
+    description: Allow users to purchase without creating an account.
+    status: draft
+    userStories:
+      - id: us-gc-1
+        role: guest shopper
+        want: buy a product without registering
+        soThat: I can purchase quickly without committing to an account
+        acceptanceCriteria:
+          - id: ac-gc-1-1
+            given: I am on the checkout page without an account
+            when: I complete the guest checkout form
+            then: the order is placed and I receive a confirmation email
+    traceLinks:
+      - type: satisfies
+        target:
+          id: REQ-CHECKOUT-002
+          documentId: requirements/checkout
+        confidence: medium

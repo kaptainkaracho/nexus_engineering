@@ -1,0 +1,75 @@
+nexus:
+  schema: results-doc/v1
+  metadata:
+    domain: authentication
+    version: "1.0.0"
+    source: vitest
+    runId: run-2026-07-19-001
+    ci:
+      provider: github-actions
+      pipelineId: "4821"
+      jobId: "12"
+      commit: a1b2c3d4e5f6
+      branch: main
+executions:
+  - id: exec-login-pass
+    suiteId: suite-auth
+    caseId: TC-LOGIN-001
+    status: passed
+    durationMs: 142
+    startedAt: "2026-07-19T14:00:00.000Z"
+    finishedAt: "2026-07-19T14:00:00.142Z"
+    retries: 0
+    traceLinks:
+      - type: verifies
+        target:
+          id: REQ-AUTH-001
+          documentId: auth
+        confidence: high
+  - id: exec-logout-flaky
+    suiteId: suite-auth
+    caseId: TC-LOGOUT-002
+    status: flaky
+    durationMs: 318
+    startedAt: "2026-07-19T14:00:01.000Z"
+    finishedAt: "2026-07-19T14:00:01.318Z"
+    retries: 1
+    traceLinks:
+      - type: verifies
+        target:
+          id: REQ-AUTH-002
+          documentId: auth
+        confidence: medium
+  - id: exec-token-fail
+    suiteId: suite-auth
+    caseId: TC-TOKEN-003
+    status: failed
+    durationMs: 57
+    startedAt: "2026-07-19T14:00:02.000Z"
+    finishedAt: "2026-07-19T14:00:02.057Z"
+    retries: 0
+    error:
+      message: "Expected 200 OK but received 401 Unauthorized"
+      type: AssertionError
+      stack: "at TokenService.verify (token.ts:42:11)"
+    artifacts:
+      - type: screenshot
+        path: artifacts/token-fail.png
+    traceLinks:
+      - type: verifies
+        target:
+          id: REQ-AUTH-003
+          documentId: auth
+        confidence: high
+  - id: exec-2fa-skip
+    suiteId: suite-auth
+    caseId: TC-2FA-004
+    status: skipped
+    durationMs: 0
+    retries: 0
+    traceLinks:
+      - type: verifies
+        target:
+          id: REQ-AUTH-004
+          documentId: auth
+        confidence: low
