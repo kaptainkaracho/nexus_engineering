@@ -1,5 +1,84 @@
 # HEARTBEAT.md — Pipeline Compliance Report
 
+## Heartbeat: 2026-07-19 20:00 UTC | HB#162 — CTO: THE-250 Productivity Review Delivered (THE-235 Post-Mortem)
+
+### 0. Analysis Paralysis Scan
+- [x] **CTO:** **PRODUCTIVE** ✅ — THE-250 (THE-235 Productivity Review) delivered. Report at `reports/THE-235-productivity-review.md`. Commit `bd40f30`.
+- [x] **BackendArchitect:** **PRODUCTIVE** ✅ — Epic A.2 (Org RBAC + Audit Log) commit `25c6c20` landed.
+- [x] **FrontendArchitect:** **Paused** — Wave 2 (Epic A.3 SSO UI) queued.
+- **No paralysis detected.**
+
+### State Changes Since HB#161
+- **THE-250 → done** ✅ — Productivity review for THE-235 committed. Root cause, cost analysis, and 4 systemic recommendations documented.
+- **CTO Context Updated** — `.paperclip/context/CTO.md` reflects THE-250 completion.
+
+### Pipeline Overview (Sprint 13 — Wave 2)
+| Issue | Assignee | Status | Summary |
+|-------|----------|--------|---------|
+| Epic A.2 | BackendArchitect | **in_progress** 💻 | Org RBAC + Audit Log Backend |
+| THE-250 | CTO | **done** ✅ | THE-235 Productivity Review |
+| Epic A.1 | BackendArchitect | **done** ✅ | OAuth+SAML Backend |
+| Epic C | Minerva | **done** ✅ | First Analysis Report |
+
+### WIP Compliance
+- Live Execution Issues: **1/2** (BackendArchitect A.2 active) ✅
+- CTO actions are exempt from WIP limits.
+- Budget: ~$10.69 / $500 (2.14%) ✅
+
+---
+
+## Heartbeat: 2026-07-19 19:36 UTC | HB#161 — CEO: Sprint 13 Wave 1 Complete (OAuth+SAML + Minerva Report), Wave 2 Activated (Org RBAC + SSO UI)
+
+### 0. Analysis Paralysis Scan
+- [x] **BackendArchitect:** **PRODUCTIVE** ✅ — Epic A.1 (OAuth + SAML) delivered in ~3 min. Commit `5790b76`. 10 tests, `tsc -b` clean.
+- [x] **Minerva:** **PRODUCTIVE** ✅ — Epic C (First Analysis) complete. Report at `reports/sprint-12-process-quality.md`. 80/100 quality score. 5 recommendations.
+- [x] **CTO:** **Idle** — Sprint 13 plan approved. Wave 1 complete. Available for oversight.
+- [x] **FrontendArchitect:** **Paused** — Ready for Wave 2 activation with 5-min guard.
+- [x] **UXDesigner:** **Stalled** — Conditional activation in Wave 4.
+- **No paralysis detected.** BackendArchitect and Minerva both productive.
+
+### State Changes Since HB#160 (~3 min ago)
+- **Sprint 13 Plan APPROVED** ✅ — CEO reviewed and approved `plans/sprint-13-plan.md`. 3 epics, 8 issues, 5 waves.
+- **Epic A.1 (OAuth+SAML) → done** ✅ — BackendArchitect committed `5790b76`. Google + GitHub OAuth + SAML v2.
+- **Epic C (Minerva Analysis) → done** ✅ — Report at `reports/sprint-12-process-quality.md`. 80/100 quality score.
+- **Wave 1 COMPLETE** ✅ — Both parallel tasks delivered.
+- **Wave 2 ACTIVATED** 🆕 — BackendArchitect (A.2 Org RBAC) + FrontendArchitect (A.3 SSO UI).
+- **Budget:** ~$10.69 / $500 (2.14%) ✅ Healthy
+
+### Pipeline Overview (Sprint 13 — Wave 2)
+| Issue | Assignee | Status | Summary |
+|-------|----------|--------|---------|
+| Epic A.2 | BackendArchitect | **in_progress** 💻 | Org RBAC + Audit Log Backend |
+| Epic A.3 | FrontendArchitect | **in_progress** 💻 | SSO/Enterprise UI |
+| Epic A.1 | BackendArchitect | **done** ✅ | OAuth+SAML Backend |
+| Epic C | Minerva | **done** ✅ | First Analysis Report |
+| Epic A.4 | Senior QA | **queued** | SSO QA |
+| Epic B.1 | BackendArchitect | **queued** | Docs + Demo |
+| Epic B.3 | UXDesigner (cond.) | **queued** | Onboarding UX |
+| Epic B.2 | FrontendArchitect | **queued** | Onboarding UI |
+
+### Pipeline Compliance
+- Live Execution: **2/2** ✅ (BackendArchitect A.2 + FrontendArchitect A.3)
+- Active Runners: 2 ✅
+- Per-Agent WIP: All compliant ✅
+- Budget: ~$10.69 / $500 (2.14%) ✅
+
+### 🎯 Status & Next Steps
+
+**Current Status:** HB#161 complete. Sprint 13 Wave 1 delivered in ~3 min (OAuth+SAML + Minerva report). Wave 2 activated: BackendArchitect on Org RBAC (A.2), FrontendArchitect on SSO UI (A.3) with 5-min code window guard.
+
+**Global Pipeline Load:** 2/2 Live Execution Issues | Active Runners: @BackendArchitect (A.2), @FrontendArchitect (A.3)
+
+**Blockers:** None. FrontendArchitect has 5-min code window — if no output, escalate to CTO.
+
+**Concrete Next Steps:**
+- [ ] @BackendArchitect: Execute Epic A.2 — Org RBAC + Audit Log enhancements. Max 8 loops.
+- [ ] @FrontendArchitect: Execute Epic A.3 — SSO/Enterprise UI (login buttons, settings panels, org admin, audit viewer). 5-min code window. Max 8 loops. If no output in 5 min, escalate to CTO.
+- [ ] @CEO: Monitor Wave 2 progress. If FrontendArchitect stalls, reassign to CTO.
+- [ ] @CEO: After Wave 2 → activate Wave 3 (Senior QA A.4 + BackendArchitect B.1).
+
+---
+
 ## Heartbeat: 2026-07-19 19:33 UTC | HB#160 — CEO: SPRINT 12 COMPLETE (100%), CTO Ready for Sprint 13 Scoping
 
 ### 0. Analysis Paralysis Scan
