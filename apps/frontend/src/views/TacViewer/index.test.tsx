@@ -162,6 +162,32 @@ describe('TacViewer', () => {
     expect(screen.getByText(/Select a Document/i)).toBeInTheDocument();
   });
 
+  it('opens a linked requirement when a trace link is clicked', async () => {
+    vi.spyOn(api, 'fetchTacDocuments').mockResolvedValue(tacList([makeSummary()]));
+    vi.spyOn(api, 'fetchTacDocument').mockResolvedValue(makeDoc());
+    vi.spyOn(api, 'fetchRequirement').mockResolvedValue({
+      id: 'REQ-AUTH-001',
+      title: 'Users can register',
+      description: 'A new user must be able to create an account',
+      priority: 'high',
+      status: 'approved',
+      type: 'functional',
+    });
+    render(<TacViewer />);
+
+    await waitFor(() => expect(screen.getByText('auth')).toBeInTheDocument());
+    const option = screen.getByRole('option', { name: /auth/i });
+    fireEvent.click(within(option).getByRole('button'));
+
+    await waitFor(() => expect(screen.getByText('Register with valid email and password')).toBeInTheDocument());
+
+    const traceBtn = screen.getByRole('button', { name: 'REQ-AUTH-001' });
+    fireEvent.click(traceBtn);
+
+    await waitFor(() => expect(screen.getByText('Users can register')).toBeInTheDocument());
+    expect(screen.getByText(/A new user must be able to create an account/)).toBeInTheDocument();
+  });
+
   it('searches documents with a debounced query', async () => {
     const fetchSpy = vi
       .spyOn(api, 'fetchTacDocuments')

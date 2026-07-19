@@ -3,6 +3,7 @@ import { Button, Card, Container, Stack, Input } from '@nexus-engineering/shared
 import {
   fetchTacDocuments,
   fetchTacDocument,
+  fetchRequirement,
   type TacDocumentSummary,
   type TacDocument,
   type TacTestCase,
@@ -35,6 +36,32 @@ function Badge({ label, color }: { label: string; color: string }) {
 }
 
 function TestCaseCard({ testCase }: { testCase: TacTestCase }) {
+  const [openTrace, setOpenTrace] = useState<string | null>(null)
+  const [reqDetail, setReqDetail] = useState<Record<string, { title?: string; description?: string; priority?: string; status?: string; type?: string; tags?: string[] } | null>>({})
+  const [reqLoading, setReqLoading] = useState<string | null>(null)
+
+  const handleTraceClick = useCallback(
+    async (targetId: string) => {
+      if (openTrace === targetId) {
+        setOpenTrace(null)
+        return
+      }
+      setOpenTrace(targetId)
+      if (reqDetail[targetId] === undefined) {
+        setReqLoading(targetId)
+        try {
+          const req = await fetchRequirement(targetId)
+          setReqDetail((prev) => ({ ...prev, [targetId]: req }))
+        } catch {
+          setReqDetail((prev) => ({ ...prev, [targetId]: null }))
+        } finally {
+          setReqLoading(null)
+        }
+      }
+    },
+    [openTrace, reqDetail],
+  )
+
   return (
     <Card variant="outlined" padding="md">
       <Stack gap={3}>
@@ -113,20 +140,76 @@ function TestCaseCard({ testCase }: { testCase: TacTestCase }) {
               Trace Links
             </p>
             <ul className="space-y-1">
-              {testCase.traceLinks.map((link, i) => (
-                <li key={i} className="text-sm text-text-secondary">
-                  <span className="font-mono text-xs text-primary-600 dark:text-primary-300">
-                    {link.type}
-                  </span>{' '}
-                  → {link.target.id}
-                  <span className="ml-1 font-mono text-xs text-text-tertiary">
-                    ({link.target.documentId})
-                  </span>
-                  {link.confidence && (
-                    <span className="ml-1 text-xs text-text-tertiary">· {link.confidence}</span>
-                  )}
-                </li>
-              ))}
+              {testCase.traceLinks.map((link, i) => {
+                const isOpen = openTrace === link.target.id
+                const detail = reqDetail[link.target.id]
+                return (
+                  <li key={i} className="text-sm text-text-secondary">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="font-mono text-xs text-primary-600 dark:text-primary-300">
+                        {link.type}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleTraceClick(link.target.id)}
+                        aria-expanded={isOpen}
+                        aria-controls={isOpen ? `trace-${link.target.id}` : undefined}
+                        className="rounded px-1 font-mono text-xs text-primary-600 underline decoration-dotted underline-offset-2 hover:text-primary-700 dark:text-primary-300 dark:hover:text-primary-200"
+                      >
+                        {link.target.id}
+                      </button>
+                      <span className="font-mono text-xs text-text-tertiary">
+                        ({link.target.documentId})
+                      </span>
+                      {link.confidence && (
+                        <span className="text-xs text-text-tertiary">· {link.confidence}</span>
+                      )}
+                    </div>
+                    {isOpen && (
+                      <div
+                        id={`trace-${link.target.id}`}
+                        className="mt-2 rounded-lg border border-border bg-surface-secondary/50 p-3"
+                      >
+                        {reqLoading === link.target.id && (
+                          <p className="text-xs text-text-tertiary">Loading requirement…</p>
+                        )}
+                        {reqLoading !== link.target.id && detail === null && (
+                          <p className="text-xs text-text-tertiary">
+                            Requirement “{link.target.id}” could not be loaded.
+                          </p>
+                        )}
+                        {reqLoading !== link.target.id && detail && (
+                          <Stack gap={1}>
+                            <p className="text-sm font-semibold text-text-primary">
+                              {detail.title ?? link.target.id}
+                            </p>
+                            {detail.description && (
+                              <p className="text-xs text-text-secondary">{detail.description}</p>
+                            )}
+                            <div className="flex flex-wrap gap-1.5 pt-1">
+                              {detail.type && (
+                                <span className="rounded-md bg-surface-tertiary px-2 py-0.5 text-xs text-text-tertiary">
+                                  {detail.type}
+                                </span>
+                              )}
+                              {detail.priority && (
+                                <span className="rounded-md bg-surface-tertiary px-2 py-0.5 text-xs text-text-tertiary">
+                                  {detail.priority}
+                                </span>
+                              )}
+                              {detail.status && (
+                                <span className="rounded-md bg-surface-tertiary px-2 py-0.5 text-xs text-text-tertiary">
+                                  {detail.status}
+                                </span>
+                              )}
+                            </div>
+                          </Stack>
+                        )}
+                      </div>
+                    )}
+                  </li>
+                )
+              })}
             </ul>
           </div>
         )}
