@@ -5,6 +5,8 @@ export type GraphNodeType =
   | 'architectureModel'
   | 'softwareComponent'
   | 'testCase'
+  | 'feature'
+  | 'result'
   | 'traceLink'
 
 export interface GraphNode {

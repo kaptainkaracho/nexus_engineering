@@ -84,3 +84,122 @@ export interface TraceabilityQuery {
   includeMetadata?: boolean
   maxDepth?: number
 }
+
+// ---------------------------------------------------------------------------
+// AI Traceability Phase 2 (Epic C) — enhanced analysis contracts
+// ---------------------------------------------------------------------------
+
+export const V_MODEL_AXES = ['requirement', 'feature', 'testCase', 'result'] as const
+export type TraceabilityAxis = (typeof V_MODEL_AXES)[number]
+
+export const CONFIDENCE_SCORE: Record<'high' | 'medium' | 'low', number> = {
+  high: 1.0,
+  medium: 0.7,
+  low: 0.4,
+}
+
+export interface AxisCoverage {
+  axis: TraceabilityAxis
+  total: number
+  linked: number
+  coveragePercent: number
+}
+
+export type CrossArtifactGapType =
+  | 'missingDownstream'
+  | 'missingUpstream'
+  | 'orphan'
+
+export interface CrossArtifactGap {
+  axis: TraceabilityAxis
+  artifactId: string
+  artifactTitle?: string
+  gapType: CrossArtifactGapType
+  detail: string
+  severity: 'high' | 'medium' | 'low'
+}
+
+export interface DomainCoverage {
+  domain: string
+  totalArtifacts: number
+  coveredArtifacts: number
+  coveragePercent: number
+  axes: AxisCoverage[]
+  gaps: CrossArtifactGap[]
+}
+
+export interface CoverageAnalysisReport {
+  overallCoveragePercent: number
+  axes: AxisCoverage[]
+  crossArtifactGaps: CrossArtifactGap[]
+  domainCoverage: DomainCoverage[]
+  summary: {
+    totalArtifacts: number
+    totalGaps: number
+    highRiskCount: number
+    mediumRiskCount: number
+    lowRiskCount: number
+  }
+}
+
+// Impact v2: confidence-scored chains + graph-ready structures
+export interface AffectedArtifactV2 extends AffectedArtifact {
+  confidenceScore: number
+}
+
+export interface ImpactGraphNode {
+  id: string
+  type: string
+  title?: string
+  confidenceScore?: number
+}
+
+export interface ImpactGraphEdge {
+  sourceId: string
+  targetId: string
+  relationshipType: string
+  confidence: string
+  confidenceScore: number
+}
+
+export interface ImpactGraph {
+  nodes: ImpactGraphNode[]
+  edges: ImpactGraphEdge[]
+}
+
+export interface ImpactChain {
+  artifactId: string
+  confidenceScore: number
+  level: 'direct' | 'indirect' | 'transitive'
+  path: string[]
+}
+
+export interface ImpactAnalysisV2 {
+  scope: ImpactScope
+  artifacts: AffectedArtifactV2[]
+  impactGraph: ImpactGraph
+  chains: ImpactChain[]
+  summary: {
+    totalAffected: number
+    directCount: number
+    indirectCount: number
+    transitiveCount: number
+    minConfidence: number
+    maxConfidence: number
+  }
+}
+
+// LLM structured outputs + reports
+export interface TraceabilityReport {
+  generatedAt: string
+  format: 'markdown' | 'json'
+  content: string
+  coverage?: CoverageAnalysisReport
+  gaps?: CrossArtifactGap[]
+  llmAnalysis?: string
+}
+
+export interface StructuredLLMResponse {
+  analysisType: string
+  [key: string]: unknown
+}

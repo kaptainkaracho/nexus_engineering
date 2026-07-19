@@ -2,9 +2,11 @@ import type { RequirementTraceLink } from '../types';
 
 export interface TestCaseNexusMetadata {
   schema: 'test-doc/v1';
-  domain: string;
-  version: string;
-  source: string;
+  metadata: {
+    domain: string;
+    version: string;
+    source: string;
+  };
 }
 
 export interface GherkinScenario {

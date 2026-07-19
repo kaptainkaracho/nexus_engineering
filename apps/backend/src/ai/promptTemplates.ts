@@ -19,6 +19,33 @@ export interface ImpactAnalysisContext {
   }
 }
 
+export interface CoverageReportContext {
+  axes: Array<{ axis: string; total: number; linked: number; coveragePercent: number }>
+  crossArtifactGaps: Array<{ axis: string; artifactId: string; gapType: string; detail: string; severity: string }>
+  domainCoverage: Array<{ domain: string; coveragePercent: number }>
+  overallCoveragePercent: number
+}
+
+export interface GapSummaryContext {
+  gaps: Array<{
+    axis: string
+    artifactId: string
+    artifactTitle?: string
+    gapType: string
+    detail: string
+    severity: string
+  }>
+  totalGaps: number
+  highRiskCount: number
+}
+
+export interface ImpactBriefingContext {
+  changedArtifactId: string
+  changedArtifactType: string
+  affectedArtifacts: Array<{ id: string; type: string; impactLevel: string; confidenceScore: number; path: string[] }>
+  totalAffected: number
+}
+
 export function buildTraceabilityPrompt(context: TraceabilityAnalysisContext): LLMMessage[] {
   const systemPrompt = `You are a traceability analysis AI for an engineering system. Analyze the provided traceability graph and identify patterns, gaps, and improvement opportunities. Respond in JSON format.`
 
@@ -90,6 +117,70 @@ Provide a JSON response with:
 1. "affectedArtifacts": Array of { artifactId, artifactType, impactLevel: "direct"|"indirect"|"transitive", path: string[] }
 2. "riskAssessment": Overall risk level and rationale
 3. "recommendations": Suggested review order or actions`
+
+  return [
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: userPrompt },
+  ]
+}
+
+/**
+ * Phase 2 — Executive traceability report prompt (markdown narrative output).
+ */
+export function buildTraceabilityReportPrompt(context: CoverageReportContext): LLMMessage[] {
+  const systemPrompt = `You are a senior engineering traceability analyst. Produce a concise, professional traceability status report in MARKDOWN. Use headings, bullet lists, and a short executive summary. Do not return JSON for this prompt — return human-readable markdown only.`
+
+  const userPrompt = `Coverage by V-Model axis:
+${context.axes.map(a => `- ${a.axis}: ${a.linked}/${a.total} covered (${a.coveragePercent}%)`).join('\n')}
+
+Overall coverage: ${context.overallCoveragePercent}%
+
+Coverage by domain:
+${context.domainCoverage.map(d => `- ${d.domain}: ${d.coveragePercent}%`).join('\n')}
+
+Known cross-artifact gaps (${context.crossArtifactGaps.length}):
+${context.crossArtifactGaps.slice(0, 25).map(g => `- [${g.severity}] ${g.axis}/${g.artifactId}: ${g.detail}`).join('\n')}
+
+Write a markdown report with: 1) Executive Summary 2) Coverage by Axis 3) Domain Breakdown 4) Key Gaps & Risks 5) Recommended Actions.`
+
+  return [
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: userPrompt },
+  ]
+}
+
+/**
+ * Phase 2 — Gap summary prompt (structured JSON output for downstream parsing).
+ */
+export function buildGapSummaryPrompt(context: GapSummaryContext): LLMMessage[] {
+  const systemPrompt = `You are a coverage gap analyst. Summarize the provided traceability gaps and return STRICT JSON with this schema: { "summary": string, "topRisks": string[], "recommendedLinks": Array<{ from: string, to: string, relationship: string }>, "coverageScore": number }.`
+
+  const userPrompt = `There are ${context.totalGaps} gaps (${context.highRiskCount} high-risk).
+
+Gaps:
+${context.gaps.slice(0, 40).map(g => `- [${g.severity}] ${g.axis}/${g.artifactId} (${g.gapType}): ${g.detail}`).join('\n')}
+
+Return JSON only.`
+
+  return [
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: userPrompt },
+  ]
+}
+
+/**
+ * Phase 2 — Impact briefing prompt (structured JSON output for downstream parsing).
+ */
+export function buildImpactBriefingPrompt(context: ImpactBriefingContext): LLMMessage[] {
+  const systemPrompt = `You are a change-impact analyst. Given a changed artifact and its affected downstream artifacts, produce a briefing as STRICT JSON with this schema: { "briefing": string, "riskLevel": "low"|"medium"|"high", "reviewOrder": string[], "mitigations": string[] }.`
+
+  const userPrompt = `Changed artifact: ${context.changedArtifactId} (${context.changedArtifactType})
+Total affected downstream artifacts: ${context.totalAffected}
+
+Affected:
+${context.affectedArtifacts.slice(0, 40).map(a => `- ${a.id} (${a.type}) [${a.impactLevel}, confidence ${a.confidenceScore}] path: ${a.path.join(' -> ')}`).join('\n')}
+
+Return JSON only.`
 
   return [
     { role: 'system', content: systemPrompt },

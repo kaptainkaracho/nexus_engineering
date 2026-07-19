@@ -18,6 +18,7 @@ import { auditLogRoutes } from './routes/auditLogRoutes'
 import { tacRoutes } from './routes/tacRoutes'
 import { resultsRoutes } from './routes/results'
 import { featuresRoutes } from './routes/features'
+import { traceabilityRoutes } from './routes/traceability'
 
 const server = fastify({ logger: true })
 
@@ -69,6 +70,7 @@ const start = async () => {
     tacRoutes(server)
     resultsRoutes(server)
     featuresRoutes(server)
+    traceabilityRoutes(server)
 
     // SPA fallback: serve index.html for any non-API GET route in production.
     if (process.env.NODE_ENV === 'production' && existsSync(frontendDist)) {

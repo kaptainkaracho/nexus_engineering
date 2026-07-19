@@ -120,7 +120,23 @@ export type {
   LLMCompletionRequest,
   LLMCompletionResponse,
   TraceabilityQuery,
+  TraceabilityAxis,
+  AxisCoverage,
+  CrossArtifactGap,
+  CrossArtifactGapType,
+  DomainCoverage,
+  CoverageAnalysisReport,
+  AffectedArtifactV2,
+  ImpactGraphNode,
+  ImpactGraphEdge,
+  ImpactGraph,
+  ImpactChain,
+  ImpactAnalysisV2,
+  TraceabilityReport,
+  StructuredLLMResponse,
 } from './ai-types';
+
+export { V_MODEL_AXES, CONFIDENCE_SCORE } from './ai-types';
 
 export type {
   TestCaseNexusMetadata,
@@ -156,12 +172,6 @@ export type {
   FeatureDocumentValidationResult,
 } from './features';
 
-export {
-  featureDocSchema,
-  FeatureLoader,
-  ValidatedFeatureLoader,
-  featureLoader,
-  validatedFeatureLoader,
-  validateFeatures,
-  validateFeatureDocument,
-} from './features';
+// FeatureLoader and related runtime exports omitted — they import Node.js 'fs'
+// and are server-only. Import directly from '@nexus-engineering/shared/features'
+// in server contexts if needed.
