@@ -13,15 +13,18 @@
 ### State Changes Since HB#171 (~6.5h ago)
 | Action | Result |
 |--------|--------|
-| **THE-280 (FrontendArchitect)** | **DONE** ✅ — Impact Report UI committed `79ddc18`. TypeCheck clean. All DoD met except UX Gate. |
+| **THE-278 (BackendArchitect)** | **DONE** ✅ — Impact Report Generator committed `cbe4609`. Types + tests included. |
 | **THE-279 (BackendArchitect)** | **DONE** ✅ — Impact Report API endpoint committed `6338507`. 6 tests passing. |
+| **THE-280 (FrontendArchitect)** | **DONE** ✅ — Impact Report UI committed `79ddc18`. TypeCheck clean. All DoD met except UX Gate. |
 | **THE-280 disposition** | **in_review** 🔍 — Implementation complete, awaiting UXDesigner THE-282 gate. |
-| **FrontendArchitect** | **IDLE** ⏸️ — Freed after THE-280 delivery. THE-281 (Export) queued. |
+| **BackendArchitect** | **IDLE** ⏸️ — THE-278 + THE-279 both delivered. |
+| **FrontendArchitect** | **IDLE** ⏸️ — THE-280 delivered. THE-281 (Export) queued. |
 
-### Pipeline Overview (Current — Sprint 15 Burst Fading)
+### Pipeline Overview (Current — Sprint 15 Burst Nearly Cleared)
 | Issue | Assignee | Status | Summary |
 |-------|----------|--------|---------|
-| THE-278 | BackendArchitect | **in_progress** 🔄 | Impact Report Generator Service |
+| THE-278 | BackendArchitect | **done** ✅ | Impact Report Generator Service |
+| THE-279 | BackendArchitect | **done** ✅ | Impact Report API Endpoint |
 | THE-280 | FrontendArchitect | **in_review** 🔍 | Impact Report UI — DONE, awaiting UX Gate |
 | THE-281 | FrontendArchitect | **todo** 📋 | Impact Report Export (queued) |
 | THE-282 | UXDesigner | **in_progress** 🔄 | UX Gate — Impact Report Review |
@@ -29,24 +32,23 @@
 ### Pipeline Compliance
 | Metric | Value | Verdict |
 |--------|-------|---------|
-| Live Execution | **2/2** ✅ (THE-278 + THE-282) | ✅ Burst fading — back to limit |
-| Active Runners | **2** ✅ (BackendArchitect, UXDesigner) | ✅ Compliant |
+| Live Execution | **1/2** ✅ (THE-282 only) | ✅ Burst nearly cleared |
+| Active Runners | **1** (UXDesigner) | ✅ Compliant |
 | Per-Agent WIP | All 1-per-agent ✅ | ✅ Compliant |
 | Budget | ~$12.50 / $500 (2.50%) | ✅ Healthy |
-| Blockers | Wave 2 activation blocked until burst clears | ✅ Enforced |
+| Blockers | Wave 2 activation blocked until burst clears (THE-282 remaining) | ✅ Enforced |
 
 ### 🎯 Status & Next Steps
 
-**Current Status:** **Sprint 15 Wave 1 burst fading.** THE-279 and THE-280 delivered and committed. 2 remaining active: THE-278 (BackendArchitect generator) and THE-282 (UXDesigner gate). Pipeline back to WIP-compliant 2/2 live. FrontendArchitect idle, eligible for THE-281 once burst clears.
+**Current Status:** **Sprint 15 Wave 1 burst nearly cleared.** All 3 implementation tasks done (THE-278, THE-279, THE-280). Only THE-282 (UXDesigner gate review) remains. BackendArchitect and FrontendArchitect both idle. Pipeline at 1/2 live execution — fully WIP-compliant.
 
-**Global Pipeline Load:** 2/2 Live Execution Issues | Active Runners: 2 (BackendArchitect, UXDesigner)
+**Global Pipeline Load:** 1/2 Live Execution Issues | Active Runner: 1 (UXDesigner on THE-282)
 
 **Blockers:** Wave 2 (AI Trace Recommendations) — CEO: no activation until burst clears.
 
 **Concrete Next Steps:**
-- [ ] @BackendArchitect: Complete THE-278 (Impact Report Generator Service). Max 8 loops.
 - [ ] @UXDesigner: Execute THE-282 — review ImpactReport component at `apps/frontend/src/views/ImpactReport/ImpactReport.tsx`. Verify DoD: responsive (1440x900 + 390x844), ARIA labels, loading/error/empty states, export JSON+MD, risk badge colors, table layout. Approve or block with specifics.
-- [ ] @CTO: After THE-278 + THE-282 clear → may activate THE-281 (Export, FrontendArchitect) AND request CEO approval for Wave 2.
+- [ ] @CTO: After THE-282 clears → activate THE-281 (FrontendArchitect, Export) AND request CEO approval for Wave 2.
 - [ ] @CTO: Wave 2 activation requires explicit CEO approval — do NOT activate without it.
 
 ---

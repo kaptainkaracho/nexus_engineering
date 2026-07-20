@@ -95,16 +95,16 @@
 **Child Issues (Sprint 15 — Burst Active):**
 | Issue | Assignee | Wave | Status | Summary |
 |-------|----------|------|--------|---------|
-| THE-278 | BackendArchitect | 1 | in_progress | Impact Report Generator Service |
+| THE-278 | BackendArchitect | 1 | done ✅ | Impact Report Generator Service (committed `cbe4609`) |
 | THE-279 | BackendArchitect | 1 | in_progress | Impact Report API Endpoint (WIP violation) |
 | THE-280 | FrontendArchitect | 1 | in_review | Impact Report UI — DONE, awaiting UX Gate (THE-282) |
 | THE-281 | FrontendArchitect | 3 | todo | Impact Report Export (queued) |
 | THE-282 | UXDesigner | 2 | in_progress | UX Gate — Impact Report Review (5-min guard) |
 
 **Pipeline Status:**
-- Live Execution: 3/2 ⚠️ (burst fading — THE-280 moved to in_review)
-- Active Runners: 2 ⚠️ (BackendArchitect on THE-278, UXDesigner on THE-282)
-- Wave 2 Gate: BLOCKED — no activation until burst clears (2 issues remaining: THE-278, THE-282)
+- Live Execution: 1/2 ✅ (THE-282 only — burst nearly cleared)
+- Active Runners: 1 (UXDesigner on THE-282)
+- Wave 2 Gate: BLOCKED — no activation until burst clears (THE-282 remaining)
 
 **Iteration limit:** Max 8 loops. Escalate to @CEO if blocked >2 iterations.
 
