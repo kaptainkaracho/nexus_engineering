@@ -128,3 +128,39 @@ No further work needed.
 ### Disposition
 - FrontendArchitect work: COMPLETE (no errors to fix)
 - THE-291: CLOSED — durable progress committed
+
+## THE-294 — NL Query UI (Frontend) (Epic D)
+**Status: in_progress** — UI view, types, API client, and routing complete; awaiting commit
+
+### Work Done This Heartbeat
+- Created `apps/frontend/src/views/NLQuery/NLQuery.tsx` (216 lines):
+  - Query textarea with `⌘/Ctrl + Enter` keyboard shortcut
+  - Empty state with suggestion grid (4 suggestions)
+  - Loading skeleton, error+retry, and empty-result states
+  - Result cards with Badge, confidence %, source, description
+- Created `apps/frontend/src/views/NLQuery/index.tsx` (index export)
+- Added `NlQueryResult` + `NlQuerySuggestion` types to `apps/frontend/src/api/client.ts`
+- Added `nlQuery(query: string)` async fetch to `apps/frontend/src/api/client.ts` (POST `/api/nl/query`)
+- Registered `nl-query` route in `App.tsx`:
+  - Section type union member
+  - VALID_SECTIONS array
+  - Nav item (label: "NL Query")
+  - Conditional render branch → `<NLQuery />`
+
+### Verification
+- `tsc --noEmit` — No errors found
+
+### Files Created
+- `apps/frontend/src/views/NLQuery/NLQuery.tsx`
+- `apps/frontend/src/views/NLQuery/index.tsx`
+
+### Files Modified
+- `apps/frontend/src/api/client.ts` (NlQueryResult, NlQuerySuggestion types + nlQuery function)
+- `apps/frontend/src/App.tsx` (Section type, VALID_SECTIONS, nav item, render branch)
+
+### Blockers
+- Backend `/api/nl/query` endpoint not yet implemented (frontend uses stub/mock during development)
+
+### Next Action
+- Commit changes and push branch
+- Reassign to @BackendEngineer for `/api/nl/query` endpoint

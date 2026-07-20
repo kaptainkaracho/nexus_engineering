@@ -23,6 +23,7 @@ import { OrgAdmin } from './views/OrgAdmin';
 import { LandingPage } from './views/LandingPage';
 import { OnboardingFlow } from './views/OnboardingFlow';
 import { RecommendationsPanel } from './views/RecommendationsPanel';
+import { NLQuery } from './views/NLQuery';
 import {
   getCurrentSession,
   clearSession,
@@ -52,6 +53,7 @@ type Section =
   | 'impact-analysis'
   | 'impact-report'
   | 'recommendations'
+  | 'nl-query'
   | 'sso'
   | 'org'
   | 'landing'
@@ -81,6 +83,7 @@ const VALID_SECTIONS: Section[] = [
   'impact-analysis',
   'impact-report',
   'recommendations',
+  'nl-query',
   'landing',
   'onboarding',
 ];
@@ -228,6 +231,7 @@ function App() {
     { label: 'Impact Analysis', href: '#impact-analysis', active: activeSection === 'impact-analysis' },
     { label: 'Impact Report', href: '#impact-report', active: activeSection === 'impact-report' },
     { label: 'Recommendations', href: '#recommendations', active: activeSection === 'recommendations' },
+    { label: 'NL Query', href: '#nl-query', active: activeSection === 'nl-query' },
   ];
 
   if (!authReady) {
@@ -330,9 +334,11 @@ function App() {
               <ImpactAnalysis />
             ) : activeSection === 'impact-report' ? (
               <ImpactReport />
-           ) : activeSection === 'recommendations' ? (
-              <RecommendationsPanel />
-           ) : (
+) : activeSection === 'recommendations' ? (
+               <RecommendationsPanel />
+            ) : activeSection === 'nl-query' ? (
+               <NLQuery />
+            ) : (
            <>
              <Nav
                items={navItems.map((item) => ({
