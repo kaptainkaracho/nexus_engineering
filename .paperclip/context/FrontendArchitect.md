@@ -1,33 +1,23 @@
 # FrontendArchitect Context State
-> Last updated: 2026-07-20T14:45:00Z
+> Last updated: 2026-07-20T16:00:00Z
 
 ## Last Run
-- Issue: THE-275 — Sprint 14 Wave 2 Frontend — Impact Analysis Diff View + Blast Radius Overlay
-- Timestamp: 2026-07-20T14:45:00Z
-- Status: implemented view + overlay + diff + unit tests; typecheck + build + tests passing
+- Issue: THE-232 — FAC Feature Browser UI (UX Gate Remediation)
+- Timestamp: 2026-07-20T16:00:00Z
+- Status: context lost (overwritten), reconstituted from delta
 
-## Files Read This Session
-- apps/frontend/src/api/client.ts (ImpactAnalysisData, fetchTraceImpact, fetchTraceGraph)
-- apps/frontend/src/views/TraceGraph/TraceGraph.tsx (pattern: node list + detail panel)
-- apps/frontend/src/views/TraceGraph/index.tsx (d3 force pattern)
-- apps/frontend/src/App.tsx (Section type, VALID_SECTIONS, nav, dispatch)
-- packages/shared/src/design-system/tokens/colors.ts (color ramp)
-- packages/shared/src/ai-types.ts (AffectedArtifactV2, ImpactGraph, ImpactChain)
+## Issue THE-232 State (from delta)
+- Status: in_review
+- Branch: THE-253-failure-classification
+- Commits: fff785f (primary color fix), 33f8cc1 (7 CSS violations), f649df9 (context update)
+- UX re-review comment posted via GitHub API (2026-07-20)
+- Board comment (298c94e9): "Please verify the review result. Move Issue in Progress."
 
-## Files Created/Modified
-- apps/frontend/src/views/ImpactAnalysis/BlastRadiusOverlay.tsx (created — d3 heat-map, green→yellow→red; buildLevelMap exported for tests)
-- apps/frontend/src/views/ImpactAnalysis/ImpactDiffView.tsx (created — side-by-side before/after)
-- apps/frontend/src/views/ImpactAnalysis/index.tsx (created — main view, controls, tabs, detail panel)
-- apps/frontend/src/views/ImpactAnalysis/ImpactAnalysis.test.tsx (created — 6 tests: buildLevelMap, color scale, diff counts)
-- apps/frontend/src/App.tsx (modified — added 'impact-analysis' section + route + nav)
+## Blockers
+- No GitHub token available — cannot fetch issue comments to verify UXDesigner response
+- gh auth not configured
 
 ## Next Action
-- Hand to @UXDesigner for UX Quality Gate (1440×900 + 390×844)
-- Note: baseline for diff captured client-side via "Capture baseline" (THE-274 cross-repo data not yet available)
-
-## Implementation Notes
-- Blast radius color scale: direct=red #EF4444, indirect=yellow #F59E0B, transitive=orange #FB923C, none=green #22C55E
-- Overlay merges TraceGraphData (dependency graph) with ImpactAnalysisData (impact levels) — nodes not in impact set = green
-- Diff view compares a captured baseline ImpactAnalysisData vs current run (added/removed/unchanged)
-- A11y: semantic buttons, aria-pressed, aria-label on svg, focus-visible rings, legend
-- Responsive: grid collapses to single column < lg (1280px+ target per DoD)
+- Board to provide UX re-review verdict or grant GitHub access
+- If UX approved → proceed to QA handoff
+- If UX requested changes → iterate on branch THE-253-failure-classification
