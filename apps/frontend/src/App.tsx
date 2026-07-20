@@ -25,6 +25,7 @@ import { OnboardingFlow } from './views/OnboardingFlow';
 import { RecommendationsPanel } from './views/RecommendationsPanel';
 import { NLTraceQuery } from './views/NLTraceQuery';
 import { QualityDashboard } from './views/QualityDashboard';
+import { GateConfigPanel } from './components/trace-gate';
 import {
   getCurrentSession,
   clearSession,
@@ -56,6 +57,7 @@ type Section =
   | 'recommendations'
   | 'nl-query'
   | 'quality-dashboard'
+  | 'trace-gate'
   | 'sso'
   | 'org'
   | 'landing'
@@ -87,6 +89,7 @@ const VALID_SECTIONS: Section[] = [
   'recommendations',
   'nl-query',
   'quality-dashboard',
+  'trace-gate',
   'landing',
   'onboarding',
 ];
@@ -236,6 +239,7 @@ function App() {
     { label: 'Recommendations', href: '#recommendations', active: activeSection === 'recommendations' },
     { label: 'NL Query', href: '#nl-query', active: activeSection === 'nl-query' },
     { label: 'Quality Dashboard', href: '#quality-dashboard', active: activeSection === 'quality-dashboard' },
+    { label: 'Trace Gate', href: '#trace-gate', active: activeSection === 'trace-gate' },
   ];
 
   if (!authReady) {
@@ -344,6 +348,8 @@ function App() {
                <NLTraceQuery />
             ) : activeSection === 'quality-dashboard' ? (
                <QualityDashboard />
+            ) : activeSection === 'trace-gate' ? (
+               <GateConfigPanel />
             ) : (
            <>
              <Nav
