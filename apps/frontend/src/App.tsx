@@ -17,6 +17,7 @@ import { TestResultsDashboard } from './views/TestResultsDashboard';
 import { FeatureBrowser } from './views/FeatureBrowser';
 import { TraceGraph } from './views/TraceGraph';
 import { ImpactAnalysis } from './views/ImpactAnalysis';
+import { DependencyView } from './views/DependencyView';
 import { SSOSettings } from './views/SSOSettings';
 import { OrgAdmin } from './views/OrgAdmin';
 import { LandingPage } from './views/LandingPage';
@@ -48,6 +49,7 @@ type Section =
   | 'features'
   | 'trace-graph'
   | 'impact-analysis'
+  | 'dependency-view'
   | 'sso'
   | 'org'
   | 'landing'
@@ -75,6 +77,7 @@ const VALID_SECTIONS: Section[] = [
   'features',
   'trace-graph',
   'impact-analysis',
+  'dependency-view',
   'landing',
   'onboarding',
 ];
@@ -220,6 +223,7 @@ function App() {
     { label: 'Features', href: '#features', active: activeSection === 'features' },
     { label: 'Trace Graph', href: '#trace-graph', active: activeSection === 'trace-graph' },
     { label: 'Impact Analysis', href: '#impact-analysis', active: activeSection === 'impact-analysis' },
+    { label: 'Dependency View', href: '#dependency-view', active: activeSection === 'dependency-view' },
   ];
 
   if (!authReady) {
@@ -319,7 +323,9 @@ function App() {
            ) : activeSection === 'trace-graph' ? (
              <TraceGraph />
             ) : activeSection === 'impact-analysis' ? (
-             <ImpactAnalysis />
+             <ImpactAnalysis artifactId={deepLinkArtifact || 'art-1'} />
+            ) : activeSection === 'dependency-view' ? (
+             <DependencyView />
             ) : (
            <>
              <Nav
