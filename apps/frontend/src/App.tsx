@@ -17,6 +17,7 @@ import { TestResultsDashboard } from './views/TestResultsDashboard';
 import { FeatureBrowser } from './views/FeatureBrowser';
 import { TraceGraph } from './views/TraceGraph';
 import { ImpactAnalysis } from './views/ImpactAnalysis';
+import { ImpactReport } from './views/ImpactReport';
 import { SSOSettings } from './views/SSOSettings';
 import { OrgAdmin } from './views/OrgAdmin';
 import { LandingPage } from './views/LandingPage';
@@ -48,6 +49,7 @@ type Section =
   | 'features'
   | 'trace-graph'
   | 'impact-analysis'
+  | 'impact-report'
   | 'sso'
   | 'org'
   | 'landing'
@@ -75,6 +77,7 @@ const VALID_SECTIONS: Section[] = [
   'features',
   'trace-graph',
   'impact-analysis',
+  'impact-report',
   'landing',
   'onboarding',
 ];
@@ -220,6 +223,7 @@ function App() {
     { label: 'Features', href: '#features', active: activeSection === 'features' },
     { label: 'Trace Graph', href: '#trace-graph', active: activeSection === 'trace-graph' },
     { label: 'Impact Analysis', href: '#impact-analysis', active: activeSection === 'impact-analysis' },
+    { label: 'Impact Report', href: '#impact-report', active: activeSection === 'impact-report' },
   ];
 
   if (!authReady) {
@@ -320,7 +324,9 @@ function App() {
               <TraceGraph />
             ) : activeSection === 'impact-analysis' ? (
               <ImpactAnalysis />
-          ) : (
+            ) : activeSection === 'impact-report' ? (
+              <ImpactReport />
+           ) : (
            <>
              <Nav
                items={navItems.map((item) => ({

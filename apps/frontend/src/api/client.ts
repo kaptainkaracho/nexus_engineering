@@ -988,6 +988,7 @@ import type {
   ImpactGraph as SharedImpactGraph,
   ImpactChain,
   TraceabilityReport,
+  ImpactReport,
 } from '@nexus-engineering/shared';
 
 export type ConfidenceScore = number;
@@ -1067,6 +1068,51 @@ export async function fetchTraceReport(format?: 'json' | 'markdown'): Promise<Tr
   } catch {
     return { generatedAt: new Date().toISOString(), format: format ?? 'json', content: 'Unable to load report' };
   }
+}
+
+/** Fetch the auto-generated impact report for recent repository changes */
+export async function fetchImpactReport(params?: {
+  file?: string;
+  branch?: string;
+  base?: string;
+}): Promise<ImpactReport> {
+  const query = new URLSearchParams();
+  if (params?.file) query.set('file', params.file);
+  if (params?.branch) query.set('branch', params.branch);
+  if (params?.base) query.set('base', params.base);
+  const qs = query.toString();
+  try {
+    const res = await fetch(`${BASE}/api/traceability/impact-report${qs ? `?${qs}` : ''}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch (err) {
+    if (err instanceof Error && err.message.startsWith('HTTP')) throw err;
+    return emptyImpactReport();
+  }
+}
+
+function emptyImpactReport(): ImpactReport {
+  return {
+    summary: {
+      totalAffected: 0,
+      directCount: 0,
+      indirectCount: 0,
+      transitiveCount: 0,
+      requirementCount: 0,
+      featureCount: 0,
+      testCount: 0,
+      adrCount: 0,
+      minConfidence: 0,
+      maxConfidence: 0,
+    },
+    affectedRequirements: [],
+    affectedFeatures: [],
+    affectedTests: [],
+    affectedAdrs: [],
+    riskLevel: 'low',
+    recommendations: [],
+    metadata: { changedFiles: [], resolvedArtifactIds: [], generatedAt: new Date().toISOString() },
+  };
 }
 
 export type ExecutionStatus = 'passed' | 'failed' | 'skipped' | 'error' | 'flaky';
