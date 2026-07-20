@@ -1171,3 +1171,125 @@ export async function fetchTestResults(params?: {
     return { executions: [], documents: 0, total: 0 };
   }
 }
+
+// =========================================================
+// AI Trace Recommendations (Wave 2)
+// =========================================================
+
+export type RecommendationSeverity = 'critical' | 'high' | 'medium' | 'low';
+export type RecommendationCategory = 'coverage' | 'trace' | 'test' | 'requirements' | 'architecture';
+export type RecommendationStatus = 'pending' | 'accepted' | 'dismissed';
+
+export interface Recommendation {
+  id: string;
+  sourceArtifact: { id: string; type: string; title: string };
+  targetArtifact: { id: string; type: string; title: string };
+  matchScore: number;
+  confidence: TraceConfidence;
+  description: string;
+  category: RecommendationCategory;
+  severity: RecommendationSeverity;
+  status: RecommendationStatus;
+}
+
+export interface RecommendationBatchEntry {
+  artifactId: string;
+  artifactType: string;
+  artifactTitle: string;
+  recommendations: Recommendation[];
+}
+
+export interface RecommendationBatchResponse {
+  sessionId: string;
+  entries: RecommendationBatchEntry[];
+  totalRecommendations: number;
+  byCategory: Record<RecommendationCategory, number>;
+  bySeverity: Record<RecommendationSeverity, number>;
+  generatedAt: string;
+}
+
+export interface RecommendationAcceptRequest {
+  reason?: string;
+}
+
+export interface RecommendationAcceptResponse {
+  success: boolean;
+  traceLink?: { id: string; sourceId: string; targetId: string; relationshipType: string };
+}
+
+export interface CrossArtifactGap {
+  sourceType: string;
+  targetType: string;
+  totalPairs: number;
+  coveredPairs: number;
+  gapPercent: number;
+  sampleGaps: Array<{ sourceId: string; targetId: string }>;
+}
+
+/** Fetch AI trace recommendations for a specific artifact */
+export async function fetchRecommendations(
+  artifactId: string,
+  options?: { threshold?: number; topN?: number },
+): Promise<Recommendation[]> {
+  const params = new URLSearchParams({ artifactId });
+  if (options?.threshold) params.set('threshold', String(options.threshold));
+  if (options?.topN) params.set('topN', String(options.topN));
+  const qs = params.toString();
+  try {
+    const res = await fetch(`${BASE}/api/traceability/recommendations?${qs}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    const json = await res.json();
+    return json.data ?? [];
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('HTTP')) throw error;
+    return [];
+  }
+}
+
+/** Run batch recommendations for a file/module/directory */
+export async function triggerRecommendationBatch(
+  target: { type: string; path: string },
+): Promise<RecommendationBatchResponse> {
+  const res = await fetch(`${BASE}/api/traceability/recommendations/batch`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(target),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  return res.json();
+}
+
+/** Accept a recommendation (creates a trace link) */
+export async function acceptRecommendation(
+  id: string,
+  data?: RecommendationAcceptRequest,
+): Promise<RecommendationAcceptResponse> {
+  const res = await fetch(`${BASE}/api/traceability/recommendations/${encodeURIComponent(id)}/accept`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: data ? JSON.stringify(data) : undefined,
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  return res.json();
+}
+
+/** Dismiss a recommendation */
+export async function dismissRecommendation(id: string): Promise<boolean> {
+  const res = await fetch(`${BASE}/api/traceability/recommendations/${encodeURIComponent(id)}/dismiss`, {
+    method: 'POST',
+  });
+  return res.ok;
+}
+
+/** Fetch cross-artifact coverage gaps */
+export async function fetchCoverageGaps(): Promise<CrossArtifactGap[]> {
+  try {
+    const res = await fetch(`${BASE}/api/traceability/gaps`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    const json = await res.json();
+    return json.data ?? [];
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('HTTP')) throw error;
+    return [];
+  }
+}

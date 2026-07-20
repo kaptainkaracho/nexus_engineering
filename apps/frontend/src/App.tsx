@@ -22,6 +22,7 @@ import { SSOSettings } from './views/SSOSettings';
 import { OrgAdmin } from './views/OrgAdmin';
 import { LandingPage } from './views/LandingPage';
 import { OnboardingFlow } from './views/OnboardingFlow';
+import { RecommendationsPanel } from './views/RecommendationsPanel';
 import {
   getCurrentSession,
   clearSession,
@@ -50,6 +51,7 @@ type Section =
   | 'trace-graph'
   | 'impact-analysis'
   | 'impact-report'
+  | 'recommendations'
   | 'sso'
   | 'org'
   | 'landing'
@@ -78,6 +80,7 @@ const VALID_SECTIONS: Section[] = [
   'trace-graph',
   'impact-analysis',
   'impact-report',
+  'recommendations',
   'landing',
   'onboarding',
 ];
@@ -224,6 +227,7 @@ function App() {
     { label: 'Trace Graph', href: '#trace-graph', active: activeSection === 'trace-graph' },
     { label: 'Impact Analysis', href: '#impact-analysis', active: activeSection === 'impact-analysis' },
     { label: 'Impact Report', href: '#impact-report', active: activeSection === 'impact-report' },
+    { label: 'Recommendations', href: '#recommendations', active: activeSection === 'recommendations' },
   ];
 
   if (!authReady) {
@@ -326,6 +330,8 @@ function App() {
               <ImpactAnalysis />
             ) : activeSection === 'impact-report' ? (
               <ImpactReport />
+           ) : activeSection === 'recommendations' ? (
+              <RecommendationsPanel />
            ) : (
            <>
              <Nav
