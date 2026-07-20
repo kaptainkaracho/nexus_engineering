@@ -184,3 +184,52 @@ The earlier `17968f6` used an ad-hoc `NLQuery/` structure, `nlQuery()` fn, `/api
 
 ## Next Action
 - THE-294: done — no further work needed
+
+## THE-303 — Trace Quality Dashboard UI (Frontend)
+**Status: in_review — UX Quality Gate pending (interaction c47d972b)**
+
+### Commits
+- `f793fdf` — feat(frontend): add Trace Quality Dashboard UI (THE-303) — QualityDashboard view + index export + App routing
+- Branch: `THE-303-quality-dashboard` (pushed)
+
+### Work Done
+- Created `apps/frontend/src/views/QualityDashboard/QualityDashboard.tsx` (~430 lines)
+  - 4 panels: Health Overview, Coverage by Axis, Domain Breakdown, Gap List
+  - Loading state (skeleton shimmer)
+  - Empty state (no data)
+  - Error state (with retry)
+  - Responsive grid (mobile 1-col → desktop 3-col)
+  - ARIA: progressbars, table scope, aria-busy
+  - Design tokens: healthColor/healthBg/coverageBarColor scales
+- Created `apps/frontend/src/views/QualityDashboard/index.tsx`
+- Updated `apps/frontend/src/App.tsx`:
+  - Added 'quality-dashboard' to Section type + VALID_SECTIONS
+  - Added nav item "Quality Dashboard" → `#quality-dashboard`
+  - Added render branch → `<QualityDashboard />`
+- `tsc --noEmit` — No errors found
+
+### DoD Checklist
+- [x] Dashboard renders in navigation under 'quality-dashboard' section
+- [x] 4 panels: Health Overview, Coverage by Axis, Domain Breakdown, Gap List
+- [x] All states handled: loading, empty, error
+- [x] TypeScript clean (tsc --noEmit — re-verified after backend changes)
+- [x] UXGate: requested via pending interaction c47d972b (request_confirmation)
+- [x] Issue status set to `in_review` with review path
+
+### Verification (this heartbeat)
+- `rtk npx tsc --noEmit --project apps/frontend/tsconfig.json` → No errors found (frontend still clean after backend gaps endpoint landed at traceability.ts:471)
+- Backend `GET /api/traceability/gaps` confirmed registered → dashboard no longer blocked by backend
+
+### Review Path
+- UX Quality Gate handoff comment posted (comment 52401e74) with full panel/spec/token/state breakdown
+- Pending interaction c47d972b (kind=request_confirmation): "Approve the UX Quality Gate for the Trace Quality Dashboard (THE-303)?"
+- Issue status: `in_review` (set 2026-07-20)
+
+### Blockers
+- None. Awaiting UXDesigner approval of the Quality Gate (review path owns next action).
+
+### Next Action
+- @UXDesigner: approve/reject UX Quality Gate interaction c47d972b
+  - If approved → proceed to QA handoff (Step 6)
+  - If changes requested → implement fixes, re-hand to UX Gate
+- On UX approval: optionally create QA handoff + mark ready for merge
