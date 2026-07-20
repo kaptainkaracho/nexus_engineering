@@ -1,13 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Card, Stack, Container, Badge, Button } from '@nexus-engineering/shared';
 import {
-  fetchTraceCoverage,
-  fetchCoverageGaps,
+  Card, Stack, Container, Badge, Button,
   type CoverageAnalysisReport,
   type AxisCoverage,
   type DomainCoverage,
   type CrossArtifactGap,
-} from '../../api/client';
+} from '@nexus-engineering/shared';
+import { fetchTraceCoverage } from '../../api/client';
 
 const AXIS_LABELS: Record<string, string> = {
   requirement: 'Requirement',
@@ -77,7 +76,6 @@ function artifactTypeLabel(type: string): string {
 
 interface DashboardData {
   report: CoverageAnalysisReport;
-  gaps: CrossArtifactGap[];
 }
 
 function EmptyState() {
@@ -115,7 +113,7 @@ function LoadingState() {
     <Container size="lg">
       <Stack gap={6}>
         {[0, 1, 2, 3].map((i) => (
-          <Card key={i} padding="xl" role="status" aria-busy="true">
+          <Card key={i} padding="lg" role="status" aria-busy="true">
             <Stack gap={4}>
               <div className="h-5 w-48 animate-pulse rounded-lg bg-surface-tertiary" />
               <div className="h-32 w-full animate-pulse rounded-lg bg-surface-tertiary" />
@@ -174,7 +172,7 @@ function HealthOverview({ report }: { report: CoverageAnalysisReport }) {
   ];
 
   return (
-    <Card padding="xl">
+    <Card padding="lg">
       <Stack gap={4}>
         <h3 className="text-base font-semibold text-text-primary">Health Overview</h3>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
@@ -214,7 +212,7 @@ function HealthOverview({ report }: { report: CoverageAnalysisReport }) {
 function CoverageByAxis({ axes }: { axes: AxisCoverage[] }) {
   if (!axes || axes.length === 0) {
     return (
-      <Card padding="xl">
+      <Card padding="lg">
         <Stack gap={4}>
           <h3 className="text-base font-semibold text-text-primary">Coverage by Axis</h3>
           <p className="text-sm text-text-secondary">No axis data available.</p>
@@ -226,7 +224,7 @@ function CoverageByAxis({ axes }: { axes: AxisCoverage[] }) {
   const maxPct = Math.max(...axes.map((a) => a.coveragePercent ?? 0), 1);
 
   return (
-    <Card padding="xl">
+    <Card padding="lg">
       <Stack gap={4}>
         <h3 className="text-base font-semibold text-text-primary">Coverage by Axis</h3>
         <div className="space-y-4">
@@ -263,7 +261,7 @@ function CoverageByAxis({ axes }: { axes: AxisCoverage[] }) {
 function DomainBreakdown({ domains }: { domains: DomainCoverage[] }) {
   if (!domains || domains.length === 0) {
     return (
-      <Card padding="xl">
+      <Card padding="lg">
         <Stack gap={4}>
           <h3 className="text-base font-semibold text-text-primary">Domain Breakdown</h3>
           <p className="text-sm text-text-secondary">No domain data available.</p>
@@ -273,7 +271,7 @@ function DomainBreakdown({ domains }: { domains: DomainCoverage[] }) {
   }
 
   return (
-    <Card padding="xl">
+    <Card padding="lg">
       <Stack gap={4}>
         <h3 className="text-base font-semibold text-text-primary">Domain Breakdown</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -329,7 +327,7 @@ function DomainBreakdown({ domains }: { domains: DomainCoverage[] }) {
 function GapList({ gaps }: { gaps: CrossArtifactGap[] }) {
   if (!gaps || gaps.length === 0) {
     return (
-      <Card padding="xl">
+      <Card padding="lg">
         <Stack gap={4}>
           <h3 className="text-base font-semibold text-text-primary">Gap List</h3>
           <p className="text-sm text-text-secondary">No gaps found — traceability is complete.</p>
@@ -339,7 +337,7 @@ function GapList({ gaps }: { gaps: CrossArtifactGap[] }) {
   }
 
   return (
-    <Card padding="xl">
+    <Card padding="lg">
       <Stack gap={4}>
         <div className="flex items-center justify-between">
           <h3 className="text-base font-semibold text-text-primary">Gap List</h3>
@@ -389,15 +387,11 @@ export function QualityDashboard() {
     setLoading(true);
     setError(null);
     try {
-      const [report, gaps] = await Promise.all([
-        fetchTraceCoverage(),
-        fetchCoverageGaps(),
-      ]);
+      const report = await fetchTraceCoverage();
       // Normalize report to CoverageAnalysisReport shape
       if ('overallCoveragePercent' in report && 'axes' in report) {
-        setData({ report: report as CoverageAnalysisReport, gaps });
+        setData({ report: report as CoverageAnalysisReport });
       } else {
-        // Handle the alternate shape: { domain, coverage, overallCoveragePercent }
         const alternate = report as { domain: string; coverage: any; overallCoveragePercent: number };
         setData({
           report: {
@@ -422,7 +416,6 @@ export function QualityDashboard() {
               lowRiskCount: 0,
             },
           } as CoverageAnalysisReport,
-          gaps,
         });
       }
     } catch (err) {
@@ -454,7 +447,7 @@ export function QualityDashboard() {
         <HealthOverview report={data.report} />
         <CoverageByAxis axes={data.report.axes ?? []} />
         <DomainBreakdown domains={data.report.domainCoverage ?? []} />
-        <GapList gaps={data.gaps} />
+        <GapList gaps={data.report.crossArtifactGaps ?? []} />
       </Stack>
     </Container>
   );
