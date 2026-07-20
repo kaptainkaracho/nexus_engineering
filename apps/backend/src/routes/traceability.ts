@@ -6,7 +6,10 @@ import { impactAnalyzer } from '../ai/impactAnalyzer'
 import { coverageAnalyzer } from '../ai/coverageAnalyzer'
 import { getLLMClient } from '../ai/llmClient'
 import { buildTraceabilityReportPrompt } from '../ai/promptTemplates'
+import { existsSync } from 'fs'
+import { execFileSync } from 'child_process'
 import { getGraphDatabase } from '../graphBuilder/graphDatabase'
+import { ImpactReportGenerator } from '../services/impactReportGenerator'
 
 function parseList(value: unknown): string[] | undefined {
   if (value === undefined || value === null) return undefined
@@ -325,10 +328,92 @@ function nativeMarkdownReport(report: Awaited<ReturnType<typeof coverageAnalyzer
   return lines.join('\n')
 }
 
+export async function getTraceabilityImpactReport (request: FastifyRequest, reply: FastifyReply) {
+  try {
+    const query = request.query as { file?: string; branch?: string; base?: string }
+
+    const file = query.file
+    if (!file) {
+      return reply.status(400).send({ error: 'file query parameter is required' })
+    }
+
+    const branch = query.branch || 'main'
+    const base = query.base || 'HEAD~1'
+
+    // 404 for a file that does not exist on disk.
+    if (!existsSync(file)) {
+      return reply.status(404).send({ error: `File "${file}" not found`, file })
+    }
+
+    // Resolve the changed file to traceable artifact ids deterministically so
+    // the report is produced regardless of how the underlying generator resolves
+    // files. The generator still receives the file change for its own analysis.
+    const resolvedIds = resolveFileToArtifactIds(file)
+    const generator = new ImpactReportGenerator()
+    const report = await generator.generate({ fileChanges: [file], artifactIds: resolvedIds })
+
+    const commitCount = countCommits(base, branch)
+
+    return reply.send({
+      report,
+      generatedAt: new Date().toISOString(),
+      metadata: { file, branch, base, commitCount },
+    })
+  } catch (error) {
+    reply.log.error(error as Error)
+    return reply.status(500).send({ error: 'Failed to generate impact report' })
+  }
+}
+
+/**
+ * Deterministically resolve a changed file path to traceable artifact ids in
+ * the graph. Uses exact id match and file-stem matching so the resolution does
+ * not depend on generator internals.
+ */
+function resolveFileToArtifactIds(file: string): string[] {
+  const db = getGraphDatabase()
+  const nodes = db.getGraphNodes()
+  const ids = new Set(nodes.map(n => n.id))
+  const base = file.split(/[\\/]/).pop() ?? file
+  const stem = base.replace(/\.[^.]+$/, '')
+
+  const resolved = new Set<string>()
+  if (ids.has(file)) resolved.add(file)
+  else if (ids.has(stem)) resolved.add(stem)
+  else {
+    for (const n of nodes) {
+      const nodeStem = n.id.split(/[\\/]/).pop()?.replace(/\.[^.]+$/, '') ?? n.id
+      if (nodeStem === stem) resolved.add(n.id)
+    }
+  }
+  return [...resolved]
+}
+
+/**
+ * Count commits between `base` and `branch` using git. Best-effort: returns 0
+ * when git is unavailable or the range is invalid so the report can still be
+ * produced.
+ */
+function countCommits(base: string, branch: string): number {
+  try {
+    const out = execFileSync('git', ['rev-list', '--count', `${base}..${branch}`], {
+      cwd: process.cwd(),
+      encoding: 'utf-8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+      timeout: 5000,
+    })
+    const parsed = parseInt(out.trim(), 10)
+    return Number.isFinite(parsed) ? parsed : 0
+  } catch {
+    return 0
+  }
+}
+
 export function traceabilityRoutes (server: FastifyInstance) {
   server.get('/api/traceability/graph', getTraceabilityGraph)
   server.get('/api/traceability/impact/:artifactId', getTraceabilityImpact)
   server.get('/api/traceability/dependencies', getTraceabilityDependencies)
   server.get('/api/traceability/coverage', getTraceabilityCoverage)
   server.get('/api/traceability/report', getTraceabilityReport)
+  server.get('/api/traceability/impact-report', getTraceabilityImpactReport)
 }
