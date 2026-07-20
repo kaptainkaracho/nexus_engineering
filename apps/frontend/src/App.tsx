@@ -24,6 +24,7 @@ import { LandingPage } from './views/LandingPage';
 import { OnboardingFlow } from './views/OnboardingFlow';
 import { RecommendationsPanel } from './views/RecommendationsPanel';
 import { NLTraceQuery } from './views/NLTraceQuery';
+import { QualityDashboard } from './views/QualityDashboard';
 import {
   getCurrentSession,
   clearSession,
@@ -54,6 +55,7 @@ type Section =
   | 'impact-report'
   | 'recommendations'
   | 'nl-query'
+  | 'quality-dashboard'
   | 'sso'
   | 'org'
   | 'landing'
@@ -84,6 +86,7 @@ const VALID_SECTIONS: Section[] = [
   'impact-report',
   'recommendations',
   'nl-query',
+  'quality-dashboard',
   'landing',
   'onboarding',
 ];
@@ -232,6 +235,7 @@ function App() {
     { label: 'Impact Report', href: '#impact-report', active: activeSection === 'impact-report' },
     { label: 'Recommendations', href: '#recommendations', active: activeSection === 'recommendations' },
     { label: 'NL Query', href: '#nl-query', active: activeSection === 'nl-query' },
+    { label: 'Quality Dashboard', href: '#quality-dashboard', active: activeSection === 'quality-dashboard' },
   ];
 
   if (!authReady) {
@@ -338,6 +342,8 @@ function App() {
                <RecommendationsPanel />
             ) : activeSection === 'nl-query' ? (
                <NLTraceQuery />
+            ) : activeSection === 'quality-dashboard' ? (
+               <QualityDashboard />
             ) : (
            <>
              <Nav
