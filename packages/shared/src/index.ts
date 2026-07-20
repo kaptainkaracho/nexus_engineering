@@ -148,6 +148,14 @@ export type {
   TraceRecommendation,
   RecommendationQuery,
   RecommendationResponse,
+  NLQueryIntent,
+  NLQueryEntityFilters,
+  ParsedNLQuery,
+  NLQueryTraceLink,
+  NLQueryResultItem,
+  NLQueryResult,
+  NLQueryRequest,
+  NLQueryResponse,
 } from './ai-types';
 
 export { V_MODEL_AXES, CONFIDENCE_SCORE } from './ai-types';
