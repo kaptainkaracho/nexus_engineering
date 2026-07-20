@@ -1,5 +1,5 @@
 # CTO Context State
-> Last updated: 2026-07-20T18:00Z (THE-280 disposition: in_review → UXDesigner gate)
+> Last updated: 2026-07-20T18:30Z (THE-279 done, THE-280 in_review, pipeline at capacity)
 
 ## COMPLETED
 - **THE-241 (fs module fix)** — Done. `1f4ce06` ✅
@@ -8,6 +8,7 @@
 - **THE-247 (Minerva MCP config)** — Done. `1252608` ✅
 - **THE-235 Phase 3 (D3 graph vis)** — Done. `f4720cd` ✅
 - **THE-250 (THE-235 productivity review)** — Delivered. `reports/THE-235-productivity-review.md` ✅
+- **THE-279 (Impact Report API)** — Done. `6338507`. CTO disposition posted. ✅
 - **Sprint 12: All 8 execution issues complete** 🏆
 
 ## THE-255: R1-Fix Liveness Reclassification — BLOCKED (Platform Escalation)
@@ -96,15 +97,17 @@
 | Issue | Assignee | Wave | Status | Summary |
 |-------|----------|------|--------|---------|
 | THE-278 | BackendArchitect | 1 | done ✅ | Impact Report Generator Service (committed `cbe4609`) |
-| THE-279 | BackendArchitect | 1 | in_progress | Impact Report API Endpoint (WIP violation) |
+| THE-279 | BackendArchitect | 1 | done ✅ | Impact Report API Endpoint (commit `6338507`, CTO verified) |
 | THE-280 | FrontendArchitect | 1 | in_review | Impact Report UI — DONE, awaiting UX Gate (THE-282) |
-| THE-281 | FrontendArchitect | 3 | todo | Impact Report Export (queued) |
-| THE-282 | UXDesigner | 2 | in_progress | UX Gate — Impact Report Review (5-min guard) |
+| THE-281 | FrontendArchitect | 3 | done ✅ | Impact Report Export (committed `44e1bd5`) |
+| THE-282 | UXDesigner | 2 | todo | UX Gate — Impact Report Review (unassigned) |
 
-**Pipeline Status:**
+**Pipeline Status (2026-07-20T18:30Z):**
 - Live Execution: 1/2 ✅ (THE-282 only — burst nearly cleared)
 - Active Runners: 1 (UXDesigner on THE-282)
-- Wave 2 Gate: BLOCKED — no activation until burst clears (THE-282 remaining)
+- THE-280: in_review, blocked on THE-282 (UX Gate)
+- THE-281: done ✅ (committed `44e1bd5`)
+- THE-282: needs UXDesigner assignment
 
 **Iteration limit:** Max 8 loops. Escalate to @CEO if blocked >2 iterations.
 
