@@ -211,4 +211,44 @@ describe('Traceability Graph Query API', () => {
     const body = res.json()
     expect(body.depth).toBe(0)
   })
+
+  describe('cross-repo traversal (repoUrl)', () => {
+    beforeAll(() => {
+      const db = getGraphDatabase()
+      db.upsertNodes([
+        { id: 'svcX::R1', type: 'requirement', title: 'X requirement' },
+        { id: 'svcY::F1', type: 'feature', title: 'Y feature' },
+        { id: 'svcZ::T1', type: 'testCase', title: 'Z test' },
+      ])
+      db.upsertEdge({ sourceId: 'svcX::R1', targetId: 'svcY::F1', relationshipType: 'satisfies', confidence: 'high' })
+      db.upsertEdge({ sourceId: 'svcY::F1', targetId: 'svcZ::T1', relationshipType: 'verifies', confidence: 'high' })
+    })
+
+    it('annotates nodes/edges with repo boundaries and merges across repos', async () => {
+      const res = await app.inject({ method: 'GET', url: '/api/traceability/dependencies?artifactId=svcX::R1&depth=5&repoUrl=svcX,svcY,svcZ' })
+      expect(res.statusCode).toBe(200)
+      const body = res.json()
+      expect(body.repos).toEqual(expect.arrayContaining(['svcX', 'svcY', 'svcZ']))
+      expect(body.crossRepoEdgeCount).toBeGreaterThanOrEqual(2)
+      expect(body.nodes.every((n: any) => typeof n.repo === 'string')).toBe(true)
+      const crossEdge = body.edges.find((e: any) => e.source_id === 'svcX::R1' && e.target_id === 'svcY::F1')
+      expect(crossEdge?.crossRepo).toBe(true)
+    })
+
+    it('scopes the dependency graph to requested repos only', async () => {
+      const res = await app.inject({ method: 'GET', url: '/api/traceability/dependencies?artifactId=svcX::R1&depth=5&repoUrl=svcX,svcY' })
+      expect(res.statusCode).toBe(200)
+      const body = res.json()
+      expect(body.nodes.some((n: any) => n.repo === 'svcZ')).toBe(false)
+      expect(body.edges.every((e: any) => body.nodes.some((n: any) => n.id === e.source_id) && body.nodes.some((n: any) => n.id === e.target_id))).toBe(true)
+    })
+
+    it('omits cross-repo fields when repoUrl is not provided (single-repo compatibility)', async () => {
+      const res = await app.inject({ method: 'GET', url: '/api/traceability/dependencies?artifactId=auth-R1' })
+      expect(res.statusCode).toBe(200)
+      const body = res.json()
+      expect(body.repos).toBeUndefined()
+      expect(body.crossRepoEdgeCount).toBeUndefined()
+    })
+  })
 })

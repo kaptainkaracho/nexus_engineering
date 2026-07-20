@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import type { ImpactScope, TraceabilityReport, DomainCoverage } from '@nexus-engineering/shared'
 import { traverseGraph } from '../services/traceabilityService'
+import { resolveNodeRepo } from '../services/crossRepoTraversal'
 import { impactAnalyzer } from '../ai/impactAnalyzer'
 import { coverageAnalyzer } from '../ai/coverageAnalyzer'
 import { getLLMClient } from '../ai/llmClient'
@@ -104,9 +105,11 @@ export async function getTraceabilityDependencies (request: FastifyRequest, repl
       direction?: string
       relationshipTypes?: string
       includeMetadata?: string
+      repoUrl?: string
     }
 
-    const { artifactId, depth, direction, relationshipTypes, includeMetadata } = query
+    const { artifactId, depth, direction, relationshipTypes, includeMetadata, repoUrl } = query
+    const repos = repoUrl ? String(repoUrl).split(',').map(s => s.trim()).filter(Boolean) : undefined
 
     // Validate depth parameter
     const parsedDepth = depth ? Number(depth) : undefined
@@ -195,14 +198,41 @@ export async function getTraceabilityDependencies (request: FastifyRequest, repl
       }
     }
 
-    const nodeIdSet = new Set(filteredEdges.map(e => e.source_id).concat(filteredEdges.map(e => e.target_id)))
-    const filteredNodes = result.nodes.filter(n => nodeIdSet.has(n.id))
+    let nodeIdSet = new Set(filteredEdges.map(e => e.source_id).concat(filteredEdges.map(e => e.target_id)))
+    let filteredNodes = result.nodes.filter(n => nodeIdSet.has(n.id))
+
+    // Cross-repo scoping: when repoUrl is supplied, restrict the unified graph to
+    // the requested repositories and annotate every node/edge with repo boundary
+    // information so the client can render a merged multi-repo dependency tree.
+    let crossRepo: { repos: string[]; crossRepoEdgeCount: number } | undefined
+    if (repos && repos.length) {
+      const repoScope = new Set(repos)
+      filteredNodes = filteredNodes.filter(n => repoScope.has(resolveNodeRepo(n.id)))
+      nodeIdSet = new Set(filteredNodes.map(n => n.id))
+      filteredEdges = filteredEdges.filter(e => nodeIdSet.has(e.source_id) && nodeIdSet.has(e.target_id))
+    }
+
+    if (repos !== undefined) {
+      filteredNodes = filteredNodes.map(n => ({ ...n, repo: resolveNodeRepo(n.id) })) as typeof filteredNodes
+      filteredEdges = filteredEdges.map(e => {
+        const sourceRepo = resolveNodeRepo(e.source_id)
+        const targetRepo = resolveNodeRepo(e.target_id)
+        return { ...e, sourceRepo, targetRepo, crossRepo: sourceRepo !== targetRepo }
+      }) as typeof filteredEdges
+      crossRepo = {
+        repos: Array.from(new Set(filteredNodes.map(n => resolveNodeRepo(n.id)))).sort(),
+        crossRepoEdgeCount: filteredEdges.filter(e => resolveNodeRepo(e.source_id) !== resolveNodeRepo(e.target_id)).length,
+      }
+    }
 
     const response: {
       artifactId?: string
       depth?: number
       direction: string
       relationshipTypes?: string[]
+      repoUrl?: string[]
+      repos?: string[]
+      crossRepoEdgeCount?: number
       nodes: typeof filteredNodes
       edges: typeof filteredEdges
       totalNodes: number
@@ -216,6 +246,9 @@ export async function getTraceabilityDependencies (request: FastifyRequest, repl
       depth: parsedDepth,
       direction: parsedDirection,
       relationshipTypes: relTypes,
+      repoUrl: repos,
+      repos: crossRepo?.repos,
+      crossRepoEdgeCount: crossRepo?.crossRepoEdgeCount,
       nodes: filteredNodes,
       edges: filteredEdges,
       totalNodes: filteredNodes.length,
