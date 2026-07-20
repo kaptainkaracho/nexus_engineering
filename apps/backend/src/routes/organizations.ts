@@ -1,8 +1,8 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import type { Organization, Team } from '@nexus-engineering/shared'
 import { orgRepository } from '../organizations/repository'
-import { authenticate, requirePermission } from '../auth/middleware'
-import { getOrgDatabase } from '../organizations/database'
+import { authenticate, requirePermission, requireOrgRole } from '../auth/middleware'
+import { logAuditAction } from '../auditLog/middleware'
 
 // --- Organization Handlers ---
 
@@ -58,8 +58,9 @@ export async function createOrganization(request: FastifyRequest, reply: Fastify
       ownerId: request.user!.sub,
     })
 
-    await orgRepository.addOrganizationMember(organization.id, request.user!.sub, 'admin')
+    await orgRepository.addOrganizationMember(organization.id, request.user!.sub, 'org:admin')
 
+    logAuditAction(request, 'CREATE', 'organization', organization.id)
     return reply.status(201).send(organization)
   } catch (error) {
     reply.log.error(error as Error)
@@ -92,6 +93,7 @@ export async function updateOrganization(request: FastifyRequest, reply: Fastify
       return reply.status(404).send({ error: 'Organization not found' })
     }
 
+    logAuditAction(request, 'UPDATE', 'organization', id, JSON.stringify(Object.keys(updates)))
     return reply.send(updated)
   } catch (error) {
     reply.log.error(error as Error)
@@ -112,6 +114,7 @@ export async function deleteOrganization(request: FastifyRequest, reply: Fastify
       return reply.status(404).send({ error: 'Organization not found' })
     }
 
+    logAuditAction(request, 'DELETE', 'organization', id)
     return reply.send({ message: `Organization ${id} deleted successfully` })
   } catch (error) {
     reply.log.error(error as Error)
@@ -145,7 +148,7 @@ export async function listOrganizationMembers(request: FastifyRequest, reply: Fa
 export async function addOrganizationMember(request: FastifyRequest, reply: FastifyReply) {
   try {
     const { id } = request.params as { id: string }
-    const body = request.body as { userId: string; role?: 'admin' | 'member' }
+    const body = request.body as { userId: string; role?: 'org:admin' | 'org:member' | 'org:viewer' }
 
     if (!id || !body.userId) {
       return reply.status(400).send({ error: 'Organization ID and user ID are required' })
@@ -161,7 +164,8 @@ export async function addOrganizationMember(request: FastifyRequest, reply: Fast
       return reply.status(409).send({ error: 'User is already a member of this organization' })
     }
 
-    const member = await orgRepository.addOrganizationMember(id, body.userId, body.role || 'member')
+    const member = await orgRepository.addOrganizationMember(id, body.userId, body.role || 'org:member')
+    logAuditAction(request, 'CREATE', 'organizationMember', `${id}:${body.userId}`)
     return reply.status(201).send(member)
   } catch (error) {
     reply.log.error(error as Error)
@@ -178,8 +182,8 @@ export async function updateOrganizationMember(request: FastifyRequest, reply: F
       return reply.status(400).send({ error: 'Organization ID, user ID, and role are required' })
     }
 
-    if (!['admin', 'member'].includes(body.role)) {
-      return reply.status(400).send({ error: 'Role must be "admin" or "member"' })
+    if (!['org:admin', 'org:member', 'org:viewer'].includes(body.role)) {
+      return reply.status(400).send({ error: 'Role must be "org:admin", "org:member", or "org:viewer"' })
     }
 
     const updated = await orgRepository.updateOrganizationMemberRole(id, userId, body.role)
@@ -187,6 +191,7 @@ export async function updateOrganizationMember(request: FastifyRequest, reply: F
       return reply.status(404).send({ error: 'Organization member not found' })
     }
 
+    logAuditAction(request, 'UPDATE', 'organizationMember', `${id}:${userId}`, `role=${body.role}`)
     return reply.send(updated)
   } catch (error) {
     reply.log.error(error as Error)
@@ -207,10 +212,67 @@ export async function removeOrganizationMember(request: FastifyRequest, reply: F
       return reply.status(404).send({ error: 'Organization member not found' })
     }
 
+    logAuditAction(request, 'DELETE', 'organizationMember', `${id}:${userId}`)
     return reply.send({ message: 'Member removed from organization successfully' })
   } catch (error) {
     reply.log.error(error as Error)
     return reply.status(500).send({ error: 'Failed to remove organization member' })
+  }
+}
+
+// --- Invite / Join / Leave ---
+
+export async function inviteMember(request: FastifyRequest, reply: FastifyReply) {
+  try {
+    const { id } = request.params as { id: string }
+    const body = request.body as { userId: string; role?: 'org:admin' | 'org:member' | 'org:viewer' }
+
+    if (!id || !body.userId) {
+      return reply.status(400).send({ error: 'Organization ID and user ID are required' })
+    }
+
+    const member = await orgRepository.inviteMember(id, body.userId, body.role)
+    logAuditAction(request, 'CREATE', 'invite', `${id}:${body.userId}`)
+    return reply.status(201).send(member)
+  } catch (error) {
+    const msg = (error as Error).message
+    if (msg.includes('already a member')) {
+      return reply.status(409).send({ error: msg })
+    }
+    reply.log.error(error as Error)
+    return reply.status(500).send({ error: 'Failed to invite member' })
+  }
+}
+
+export async function joinOrganization(request: FastifyRequest, reply: FastifyReply) {
+  try {
+    const { id } = request.params as { id: string }
+    if (!id) {
+      return reply.status(400).send({ error: 'Organization ID is required' })
+    }
+
+    const member = await orgRepository.joinOrganization(id, request.user!.sub)
+    logAuditAction(request, 'CREATE', 'join', `${id}:${request.user!.sub}`)
+    return reply.status(201).send(member)
+  } catch (error) {
+    reply.log.error(error as Error)
+    return reply.status(500).send({ error: 'Failed to join organization' })
+  }
+}
+
+export async function leaveOrganization(request: FastifyRequest, reply: FastifyReply) {
+  try {
+    const { id } = request.params as { id: string }
+    if (!id) {
+      return reply.status(400).send({ error: 'Organization ID is required' })
+    }
+
+    await orgRepository.leaveOrganization(id, request.user!.sub)
+    logAuditAction(request, 'DELETE', 'leave', `${id}:${request.user!.sub}`)
+    return reply.send({ message: 'Left organization successfully' })
+  } catch (error) {
+    reply.log.error(error as Error)
+    return reply.status(500).send({ error: 'Failed to leave organization' })
   }
 }
 
@@ -272,6 +334,7 @@ export async function createTeam(request: FastifyRequest, reply: FastifyReply) {
     }
 
     const team = await orgRepository.createTeam(orgId, body)
+    logAuditAction(request, 'CREATE', 'team', team.id, `orgId=${orgId}`)
     return reply.status(201).send(team)
   } catch (error) {
     reply.log.error(error as Error)
@@ -293,6 +356,7 @@ export async function updateTeam(request: FastifyRequest, reply: FastifyReply) {
       return reply.status(404).send({ error: 'Team not found' })
     }
 
+    logAuditAction(request, 'UPDATE', 'team', id, JSON.stringify(Object.keys(updates)))
     return reply.send(updated)
   } catch (error) {
     reply.log.error(error as Error)
@@ -313,6 +377,7 @@ export async function deleteTeam(request: FastifyRequest, reply: FastifyReply) {
       return reply.status(404).send({ error: 'Team not found' })
     }
 
+    logAuditAction(request, 'DELETE', 'team', id)
     return reply.send({ message: `Team ${id} deleted successfully` })
   } catch (error) {
     reply.log.error(error as Error)
@@ -363,6 +428,7 @@ export async function addTeamMember(request: FastifyRequest, reply: FastifyReply
     }
 
     const member = await orgRepository.addTeamMember(id, body.userId, body.role || 'member')
+    logAuditAction(request, 'CREATE', 'teamMember', `${id}:${body.userId}`)
     return reply.status(201).send(member)
   } catch (error) {
     reply.log.error(error as Error)
@@ -388,6 +454,7 @@ export async function updateTeamMember(request: FastifyRequest, reply: FastifyRe
       return reply.status(404).send({ error: 'Team member not found' })
     }
 
+    logAuditAction(request, 'UPDATE', 'teamMember', `${id}:${userId}`, `role=${body.role}`)
     return reply.send(updated)
   } catch (error) {
     reply.log.error(error as Error)
@@ -408,6 +475,7 @@ export async function removeTeamMember(request: FastifyRequest, reply: FastifyRe
       return reply.status(404).send({ error: 'Team member not found' })
     }
 
+    logAuditAction(request, 'DELETE', 'teamMember', `${id}:${userId}`)
     return reply.send({ message: 'Member removed from team successfully' })
   } catch (error) {
     reply.log.error(error as Error)
@@ -417,32 +485,42 @@ export async function removeTeamMember(request: FastifyRequest, reply: FastifyRe
 
 // --- Route Registration ---
 
-export function organizationsRoutes(server: FastifyInstance) {
+function registerOrgRoutes(server: FastifyInstance, prefix: string) {
   // Organizations
-  server.get('/api/organizations', { preHandler: [authenticate] }, listOrganizations)
-  server.get('/api/organizations/:id', { preHandler: [authenticate] }, getOrganization)
-  server.post('/api/organizations', { preHandler: [authenticate] }, createOrganization)
-  server.put('/api/organizations/:id', { preHandler: [authenticate, requirePermission('admin:all')] }, updateOrganization)
-  server.delete('/api/organizations/:id', { preHandler: [authenticate, requirePermission('admin:all')] }, deleteOrganization)
+  server.get(`${prefix}`, { preHandler: [authenticate] }, listOrganizations)
+  server.get(`${prefix}/:id`, { preHandler: [authenticate] }, getOrganization)
+  server.post(`${prefix}`, { preHandler: [authenticate] }, createOrganization)
+  server.put(`${prefix}/:id`, { preHandler: [authenticate, requireOrgRole('org:admin')] }, updateOrganization)
+  server.delete(`${prefix}/:id`, { preHandler: [authenticate, requireOrgRole('org:admin')] }, deleteOrganization)
 
   // Organization Members
-  server.get('/api/organizations/:id/members', { preHandler: [authenticate] }, listOrganizationMembers)
-  server.post('/api/organizations/:id/members', { preHandler: [authenticate, requirePermission('admin:all')] }, addOrganizationMember)
-  server.put('/api/organizations/:id/members/:userId', { preHandler: [authenticate, requirePermission('admin:all')] }, updateOrganizationMember)
-  server.delete('/api/organizations/:id/members/:userId', { preHandler: [authenticate, requirePermission('admin:all')] }, removeOrganizationMember)
+  server.get(`${prefix}/:id/members`, { preHandler: [authenticate] }, listOrganizationMembers)
+  server.post(`${prefix}/:id/members`, { preHandler: [authenticate, requireOrgRole('org:admin')] }, addOrganizationMember)
+  server.put(`${prefix}/:id/members/:userId`, { preHandler: [authenticate, requireOrgRole('org:admin')] }, updateOrganizationMember)
+  server.delete(`${prefix}/:id/members/:userId`, { preHandler: [authenticate, requireOrgRole('org:admin')] }, removeOrganizationMember)
+
+  // Invite / Join / Leave
+  server.post(`${prefix}/:id/invite`, { preHandler: [authenticate, requireOrgRole('org:admin')] }, inviteMember)
+  server.post(`${prefix}/:id/join`, { preHandler: [authenticate] }, joinOrganization)
+  server.post(`${prefix}/:id/leave`, { preHandler: [authenticate] }, leaveOrganization)
 
   // Teams (scoped to organization)
-  server.get('/api/organizations/:orgId/teams', { preHandler: [authenticate] }, listTeams)
-  server.post('/api/organizations/:orgId/teams', { preHandler: [authenticate, requirePermission('admin:all')] }, createTeam)
+  server.get(`${prefix}/:orgId/teams`, { preHandler: [authenticate] }, listTeams)
+  server.post(`${prefix}/:orgId/teams`, { preHandler: [authenticate, requireOrgRole('org:admin')] }, createTeam)
 
   // Teams (direct access)
-  server.get('/api/teams/:id', { preHandler: [authenticate] }, getTeam)
-  server.put('/api/teams/:id', { preHandler: [authenticate, requirePermission('admin:all')] }, updateTeam)
-  server.delete('/api/teams/:id', { preHandler: [authenticate, requirePermission('admin:all')] }, deleteTeam)
+  server.get(`/api/teams/:id`, { preHandler: [authenticate] }, getTeam)
+  server.put(`/api/teams/:id`, { preHandler: [authenticate, requireOrgRole('org:admin')] }, updateTeam)
+  server.delete(`/api/teams/:id`, { preHandler: [authenticate, requireOrgRole('org:admin')] }, deleteTeam)
 
   // Team Members
-  server.get('/api/teams/:id/members', { preHandler: [authenticate] }, listTeamMembers)
-  server.post('/api/teams/:id/members', { preHandler: [authenticate, requirePermission('admin:all')] }, addTeamMember)
-  server.put('/api/teams/:id/members/:userId', { preHandler: [authenticate, requirePermission('admin:all')] }, updateTeamMember)
-  server.delete('/api/teams/:id/members/:userId', { preHandler: [authenticate, requirePermission('admin:all')] }, removeTeamMember)
+  server.get(`/api/teams/:id/members`, { preHandler: [authenticate] }, listTeamMembers)
+  server.post(`/api/teams/:id/members`, { preHandler: [authenticate, requireOrgRole('org:admin')] }, addTeamMember)
+  server.put(`/api/teams/:id/members/:userId`, { preHandler: [authenticate, requireOrgRole('org:admin')] }, updateTeamMember)
+  server.delete(`/api/teams/:id/members/:userId`, { preHandler: [authenticate, requireOrgRole('org:admin')] }, removeTeamMember)
+}
+
+export function organizationsRoutes(server: FastifyInstance) {
+  registerOrgRoutes(server, '/api/organizations')
+  registerOrgRoutes(server, '/api/orgs')
 }

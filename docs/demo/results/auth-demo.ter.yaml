@@ -1,0 +1,186 @@
+nexus:
+  schema: results-doc/v1
+  metadata:
+    domain: Authentication Demo
+    version: 1.0.0
+    source: docs/demo/results/auth-demo.ter.yaml
+    runId: demo-run-auth-001
+    ci:
+      provider: github-actions
+      pipelineId: demo-001
+      jobId: auth-suite
+      commit: a1b2c3d4
+      branch: main
+executions:
+  - id: demo-exec-login-pass
+    suiteId: suite-auth
+    caseId: TC-DEMO-LOGIN-001
+    status: passed
+    durationMs: 142
+    startedAt: "2026-07-19T10:00:00.000Z"
+    finishedAt: "2026-07-19T10:00:00.142Z"
+    retries: 0
+    traceLinks:
+      - type: verifies
+        target:
+          id: DEMO-REQ-AUTH-001
+          documentId: DEMO-AUTH
+        confidence: high
+  - id: demo-exec-oauth-pass
+    suiteId: suite-auth
+    caseId: TC-DEMO-OAUTH-001
+    status: passed
+    durationMs: 234
+    startedAt: "2026-07-19T10:00:01.000Z"
+    finishedAt: "2026-07-19T10:00:01.234Z"
+    retries: 0
+    traceLinks:
+      - type: verifies
+        target:
+          id: DEMO-REQ-AUTH-002
+          documentId: DEMO-AUTH
+        confidence: high
+  - id: demo-exec-saml-pass
+    suiteId: suite-auth
+    caseId: TC-DEMO-SAML-001
+    status: passed
+    durationMs: 567
+    startedAt: "2026-07-19T10:00:02.000Z"
+    finishedAt: "2026-07-19T10:00:02.567Z"
+    retries: 0
+    traceLinks:
+      - type: verifies
+        target:
+          id: DEMO-REQ-AUTH-003
+          documentId: DEMO-AUTH
+        confidence: high
+  - id: demo-exec-token-refresh
+    suiteId: suite-auth
+    caseId: TC-DEMO-TOKEN-001
+    status: passed
+    durationMs: 89
+    startedAt: "2026-07-19T10:00:03.000Z"
+    finishedAt: "2026-07-19T10:00:03.089Z"
+    retries: 0
+    traceLinks:
+      - type: verifies
+        target:
+          id: DEMO-REQ-AUTH-004
+          documentId: DEMO-AUTH
+        confidence: high
+  - id: demo-exec-org-create
+    suiteId: suite-org
+    caseId: TC-DEMO-ORG-001
+    status: passed
+    durationMs: 198
+    startedAt: "2026-07-19T10:01:00.000Z"
+    finishedAt: "2026-07-19T10:01:00.198Z"
+    retries: 0
+    traceLinks:
+      - type: verifies
+        target:
+          id: DEMO-REQ-ORG-001
+          documentId: DEMO-ORG
+        confidence: high
+  - id: demo-exec-org-invite
+    suiteId: suite-org
+    caseId: TC-DEMO-ORG-002
+    status: passed
+    durationMs: 156
+    startedAt: "2026-07-19T10:01:01.000Z"
+    finishedAt: "2026-07-19T10:01:01.156Z"
+    retries: 0
+    traceLinks:
+      - type: verifies
+        target:
+          id: DEMO-REQ-ORG-002
+          documentId: DEMO-ORG
+        confidence: high
+  - id: demo-exec-org-isolation
+    suiteId: suite-org
+    caseId: TC-DEMO-ORG-003
+    status: passed
+    durationMs: 112
+    startedAt: "2026-07-19T10:01:02.000Z"
+    finishedAt: "2026-07-19T10:01:02.112Z"
+    retries: 0
+    traceLinks:
+      - type: verifies
+        target:
+          id: DEMO-REQ-ORG-003
+          documentId: DEMO-ORG
+        confidence: high
+  - id: demo-exec-audit-capture
+    suiteId: suite-audit
+    caseId: TC-DEMO-AUDIT-001
+    status: passed
+    durationMs: 73
+    startedAt: "2026-07-19T10:02:00.000Z"
+    finishedAt: "2026-07-19T10:02:00.073Z"
+    retries: 0
+    traceLinks:
+      - type: verifies
+        target:
+          id: DEMO-REQ-AUDIT-001
+          documentId: DEMO-AUDIT
+        confidence: high
+  - id: demo-exec-audit-query
+    suiteId: suite-audit
+    caseId: TC-DEMO-AUDIT-002
+    status: passed
+    durationMs: 95
+    startedAt: "2026-07-19T10:02:01.000Z"
+    finishedAt: "2026-07-19T10:02:01.095Z"
+    retries: 0
+    traceLinks:
+      - type: verifies
+        target:
+          id: DEMO-REQ-AUDIT-002
+          documentId: DEMO-AUDIT
+        confidence: high
+  - id: demo-exec-audit-retention
+    suiteId: suite-audit
+    caseId: TC-DEMO-AUDIT-003
+    status: passed
+    durationMs: 67
+    startedAt: "2026-07-19T10:02:02.000Z"
+    finishedAt: "2026-07-19T10:02:02.067Z"
+    retries: 0
+    traceLinks:
+      - type: verifies
+        target:
+          id: DEMO-REQ-AUDIT-003
+          documentId: DEMO-AUDIT
+        confidence: high
+  - id: demo-exec-trace-links
+    suiteId: suite-trace
+    caseId: TC-DEMO-TRACE-001
+    status: passed
+    durationMs: 45
+    startedAt: "2026-07-19T10:03:00.000Z"
+    finishedAt: "2026-07-19T10:03:00.045Z"
+    retries: 0
+    traceLinks:
+      - type: verifies
+        target:
+          id: DEMO-REQ-AUTH-001
+          documentId: DEMO-AUTH
+        confidence: medium
+  - id: demo-exec-trace-flaky
+    suiteId: suite-trace
+    caseId: TC-DEMO-TRACE-002
+    status: flaky
+    durationMs: 312
+    startedAt: "2026-07-19T10:03:01.000Z"
+    finishedAt: "2026-07-19T10:03:01.312Z"
+    retries: 1
+    error:
+      message: "Timeout waiting for graph render"
+      type: TimeoutError
+      stack: "at GraphBuilder.render (graphBuilder.ts:85:9)"
+    traceLinks:
+      - type: verifies
+        target:
+          id: DEMO-REQ-AUTH-002
+          documentId: DEMO-AUTH
+        confidence: low

@@ -215,6 +215,52 @@ export interface RepositoryReader {
   streamFiles(patterns: string[], rootPath?: string): AsyncIterable<FileEntry>;
 }
 
+// Multi-Repo Support
+export interface MultiScanSession {
+  id: string;
+  startedAt: IsoDateString;
+  completedAt?: IsoDateString;
+  repositoryPaths: string[];
+  scanIds: string[];
+  filesFound: number;
+  filesSkipped: number;
+  artifactsDetected: number;
+  perRepoResults: Array<{
+    repositoryPath: string;
+    scanId: string;
+    status: 'running' | 'completed' | 'failed';
+    filesFound: number;
+    artifactsDetected: number;
+    error?: string;
+  }>;
+  errors: Array<{ path: string; message: string }>;
+  status: 'running' | 'completed' | 'failed';
+  scanMode: 'parallel' | 'sequential';
+}
+
+export interface MultiRepoScanResult {
+  sessionId: string;
+  scans: Array<{
+    repositoryPath: string;
+    scanId: string;
+    status: 'completed' | 'failed';
+    filesFound: number;
+    artifactsDetected: number;
+    scanReport: ScanReport;
+    error?: string;
+  }>;
+  totalFilesFound: number;
+  totalArtifactsDetected: number;
+  scanTimeMs: number;
+  errors: Array<{ path: string; message: string }>;
+}
+
+export interface MultiRepoScanOptions {
+  repositoryPaths: string[];
+  scanMode?: 'parallel' | 'sequential';
+  scanOptions?: ScanOptions;
+}
+
 export type ArchitectureDecisionStatus = 'proposed' | 'accepted' | 'deprecated' | 'superseded';
 
 export interface ArchitectureDecision {
@@ -307,6 +353,7 @@ export interface JwtPayload {
   email: string
   role: string
   permissions: string[]
+  orgId?: string
 }
 
 export interface LoginRequest {
@@ -356,7 +403,7 @@ export interface OrganizationMember {
   id: string
   organizationId: string
   userId: string
-  role: 'admin' | 'member'
+  role: 'org:admin' | 'org:member' | 'org:viewer'
   joinedAt: string
 }
 
@@ -366,4 +413,82 @@ export interface TeamMember {
   userId: string
   role: 'lead' | 'member'
   joinedAt: string
+}
+
+// --- Private Artifact Registries ---
+
+export type RegistryProviderType = 'npm' | 'pypi' | 'maven' | 'generic'
+
+export interface RegistryCredentials {
+  id: string
+  registryId: string
+  authType: 'none' | 'basic' | 'token' | 'env'
+  username: string | null
+  /** Encrypted at rest; decrypted in-memory only during scan */
+  secretValue: string | null
+  /** Environment variable name when authType is 'env' */
+  envVar: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ArtifactRegistry {
+  id: string
+  name: string
+  description: string | null
+  organizationId: string
+  visibility: 'private' | 'team' | 'organization'
+  allowedRoles: string[] | null
+  registryType: RegistryProviderType
+  url: string | null
+  enabled: boolean
+  createdBy: string
+  createdAt: string
+  updatedAt: string
+  /** Populated on list endpoints; number of artifacts linked to this registry */
+  artifactCount?: number
+}
+
+export interface RegistryArtifact {
+  id: string
+  registryId: string
+  artifactId: string
+  addedBy: string
+  addedAt: string
+  metadata?: Record<string, unknown>
+}
+
+// --- Audit Log Types ---
+
+export type AuditAction = 'CREATE' | 'UPDATE' | 'DELETE' | 'LOGIN' | 'LOGOUT' | 'EXPORT' | 'READ' | 'ARCHIVE' | 'RESTORE'
+
+export interface AuditLog {
+  id: string
+  timestamp: string
+  userId: string
+  userEmail: string
+  action: AuditAction
+  resourceType: string
+  resourceId: string
+  details: string | null
+  ipAddress: string | null
+  orgId: string | null
+}
+
+export interface AuditLogFilter {
+  startDate?: string
+  endDate?: string
+  userId?: string
+  action?: AuditAction
+  resourceType?: string
+  search?: string
+  limit?: number
+  offset?: number
+  orgId?: string
+  page?: number
+}
+
+export interface AuditLogRetentionConfig {
+  ttlDays: number
+  enabled: boolean
 }

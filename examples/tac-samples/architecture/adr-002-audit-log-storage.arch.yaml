@@ -1,0 +1,18 @@
+title: Audit events are stored append-only with a per-partition hash chain
+status: accepted
+context: |
+  Compliance requires an immutable, tamper-evident audit trail. A naive
+  mutable log table would allow an operator (or attacker) to silently edit
+  history, defeating the audit purpose.
+decision: |
+  Persist audit events to an append-only store where each record carries the
+  hash of the previous record within its partition, forming a hash chain.
+  Any mutation or deletion breaks the chain and is detectable by a periodic
+  verifier job. Retention beyond 90 days moves records to immutable cold
+  storage.
+consequences:
+  - Audit records cannot be updated or deleted in the hot store
+  - A periodic verifier job is required to detect tampering
+  - Cold storage must also be immutable (object-lock enabled bucket)
+  - Query patterns must be built around append-only semantics
+superseded_by: null

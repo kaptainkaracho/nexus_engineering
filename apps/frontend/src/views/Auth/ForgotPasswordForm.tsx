@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Input, Stack } from '@nexus-engineering/shared';
+import { Alert, Button, Input, Stack } from '@nexus-engineering/shared';
 import { forgotPassword } from '../../api/auth';
 
 export interface ForgotPasswordFormProps {
@@ -85,12 +85,9 @@ export function ForgotPasswordForm({ onBackToLogin }: ForgotPasswordFormProps) {
         </Stack>
 
         {error && (
-          <div
-            className="rounded-lg border border-error-500/40 bg-error-50 px-4 py-3 text-sm text-error-700 dark:bg-error-950 dark:text-error-300"
-            role="alert"
-          >
+          <Alert variant="error">
             {error}
-          </div>
+          </Alert>
         )}
 
         <Input

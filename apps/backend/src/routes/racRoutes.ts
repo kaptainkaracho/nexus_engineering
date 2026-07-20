@@ -8,7 +8,7 @@ import { reqDocSchema } from '@nexus-engineering/shared/requirements/schema'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
-const RAC_DIR = path.resolve(__dirname, '../../../docs/requirements')
+const RAC_DIR = path.resolve(__dirname, '../../../../docs/requirements')
 
 function mapRacDocument(doc: any, filePath: string) {
   return {

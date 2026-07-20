@@ -3,12 +3,24 @@ import { Button, Input, Card, Container, Stack, Grid, Nav } from '@nexus-enginee
 import { ArtifactViewer } from './views/ArtifactViewer';
 import { RepositoryFileTree } from './views/RepositoryTree';
 import { DiscoveryDashboard } from './views/DiscoveryDashboard';
+import { MultiRepoDashboard } from './views/MultiRepoDashboard';
 import { GraphBuilder } from './views/GraphBuilder';
 import { Templates } from './views/Templates';
 import { AuthPage } from './views/Auth';
 import { ProtectedLayout, isAdmin } from './views/Auth/ProtectedRoute';
 import { AdminDashboard } from './views/AdminDashboard';
 import { RoleManagement } from './views/RoleManagement';
+import { AuditLogViewer } from './views/AuditLogViewer';
+import { PrivateRegistries } from './views/PrivateRegistries';
+import { TacViewer } from './views/TacViewer';
+import { TestResultsDashboard } from './views/TestResultsDashboard';
+import { FeatureBrowser } from './views/FeatureBrowser';
+import { TraceGraph } from './views/TraceGraph';
+import { ImpactAnalysis } from './views/ImpactAnalysis';
+import { SSOSettings } from './views/SSOSettings';
+import { OrgAdmin } from './views/OrgAdmin';
+import { LandingPage } from './views/LandingPage';
+import { OnboardingFlow } from './views/OnboardingFlow';
 import {
   getCurrentSession,
   clearSession,
@@ -24,10 +36,22 @@ type Section =
   | 'artefacts'
   | 'repository'
   | 'discovery'
+  | 'multi-repo'
   | 'graph'
   | 'templates'
   | 'admin'
-  | 'roles';
+  | 'roles'
+  | 'audit-log'
+  | 'registries'
+  | 'tac'
+  | 'test-results'
+  | 'features'
+  | 'trace-graph'
+  | 'impact-analysis'
+  | 'sso'
+  | 'org'
+  | 'landing'
+  | 'onboarding';
 
 const VALID_SECTIONS: Section[] = [
   'overview',
@@ -37,10 +61,22 @@ const VALID_SECTIONS: Section[] = [
   'artefacts',
   'repository',
   'discovery',
+  'multi-repo',
   'graph',
   'templates',
   'admin',
+  'sso',
+  'org',
   'roles',
+  'audit-log',
+  'registries',
+  'tac',
+  'test-results',
+  'features',
+  'trace-graph',
+  'impact-analysis',
+  'landing',
+  'onboarding',
 ];
 
 interface RouteState {
@@ -48,12 +84,26 @@ interface RouteState {
   artifact: string | null;
 }
 
+const ADMIN_SUB_ROUTES: Record<string, Section> = {
+  sso: 'sso',
+  org: 'org',
+  audit: 'audit-log',
+};
+
 function parseHash(hash: string): RouteState {
   const raw = hash.replace(/^#/, '');
   const [sectionPart, queryPart] = raw.split('?');
-  const section = (VALID_SECTIONS.includes(sectionPart as Section)
-    ? sectionPart
-    : 'overview') as Section;
+  const parts = sectionPart.split('/');
+  const top = parts[0];
+  const sub = parts[1];
+  let section: Section;
+  if (top === 'admin' && sub && ADMIN_SUB_ROUTES[sub]) {
+    section = ADMIN_SUB_ROUTES[sub];
+  } else if (VALID_SECTIONS.includes(top as Section)) {
+    section = top as Section;
+  } else {
+    section = 'overview';
+  }
   const artifact = queryPart ? new URLSearchParams(queryPart).get('artifact') : null;
   return { section, artifact };
 }
@@ -152,14 +202,24 @@ function App() {
     { label: 'Artefacts', href: '#artefacts', active: activeSection === 'artefacts' },
     { label: 'Repository', href: '#repository', active: activeSection === 'repository' },
     { label: 'Discovery', href: '#discovery', active: activeSection === 'discovery' },
+    { label: 'Multi-Repo', href: '#multi-repo', active: activeSection === 'multi-repo' },
     { label: 'Graph Builder', href: '#graph', active: activeSection === 'graph' },
     { label: 'Templates', href: '#templates', active: activeSection === 'templates' },
+    { label: 'Audit Log', href: '#audit-log', active: activeSection === 'audit-log' },
     ...(isUserAdmin
       ? [
           { label: 'Organizations', href: '#admin', active: activeSection === 'admin' },
+          { label: 'SSO Settings', href: '#admin/sso', active: activeSection === 'sso' },
+          { label: 'Org Admin', href: '#admin/org', active: activeSection === 'org' },
           { label: 'Roles', href: '#roles', active: activeSection === 'roles' },
+          { label: 'Registries', href: '#registries', active: activeSection === 'registries' },
+          { label: 'TAC', href: '#tac', active: activeSection === 'tac' },
+    { label: 'Test Results', href: '#test-results', active: activeSection === 'test-results' },
         ]
       : []),
+    { label: 'Features', href: '#features', active: activeSection === 'features' },
+    { label: 'Trace Graph', href: '#trace-graph', active: activeSection === 'trace-graph' },
+    { label: 'Impact Analysis', href: '#impact-analysis', active: activeSection === 'impact-analysis' },
   ];
 
   if (!authReady) {
@@ -167,7 +227,15 @@ function App() {
   }
 
   if (!user) {
-    return <AuthPage onAuthenticated={handleAuthenticated} resetToken={resetToken} />;
+    const hash = window.location.hash.replace(/^#/, '');
+    if (hash === 'login' || hash === 'register' || hash.startsWith('reset-password') || hash.startsWith('forgot-password') || hash.startsWith('auth/')) {
+      return <AuthPage onAuthenticated={handleAuthenticated} resetToken={resetToken} />;
+    }
+    return <LandingPage />;
+  }
+
+  if (activeSection === 'onboarding') {
+    return <OnboardingFlow />;
   }
 
   return (
@@ -210,8 +278,12 @@ function App() {
         </Container>
       </header>
 
-          <Container size="lg">{activeSection === 'discovery' ? (
+          <Container size="lg">{activeSection === 'audit-log' ? (
+            <AuditLogViewer />
+          ) : activeSection === 'discovery' ? (
             <DiscoveryDashboard />
+          ) : activeSection === 'multi-repo' ? (
+            <MultiRepoDashboard />
           ) : activeSection === 'repository' ? (
             <RepositoryFileTree />
           ) : activeSection === 'graph' ? (
@@ -226,7 +298,29 @@ function App() {
             <ProtectedLayout allowedRoles={['admin']}>
               <RoleManagement />
             </ProtectedLayout>
-          ) : (
+           ) : activeSection === 'registries' ? (
+            <ProtectedLayout allowedRoles={['admin']}>
+              <PrivateRegistries />
+            </ProtectedLayout>
+          ) : activeSection === 'tac' ? (
+            <TacViewer />
+          ) : activeSection === 'test-results' ? (
+            <TestResultsDashboard />
+          ) : activeSection === 'features' ? (
+            <FeatureBrowser />
+           ) : activeSection === 'sso' ? (
+            <ProtectedLayout allowedRoles={['admin']}>
+              <SSOSettings />
+            </ProtectedLayout>
+          ) : activeSection === 'org' ? (
+            <ProtectedLayout allowedRoles={['admin']}>
+              <OrgAdmin />
+            </ProtectedLayout>
+           ) : activeSection === 'trace-graph' ? (
+             <TraceGraph />
+            ) : activeSection === 'impact-analysis' ? (
+             <ImpactAnalysis />
+            ) : (
            <>
              <Nav
                items={navItems.map((item) => ({

@@ -1,0 +1,1684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Private Registry UX Mockups</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --color-primary-50: #EFF6FF;
+  --color-primary-100: #DBEAFE;
+  --color-primary-200: #BFDBFE;
+  --color-primary-300: #93C5FD;
+  --color-primary-400: #60A5FA;
+  --color-primary-500: #3B82F6;
+  --color-primary-600: #2563EB;
+  --color-primary-700: #1D4ED8;
+  --color-primary-800: #1E40AF;
+  --color-primary-900: #1E3A8A;
+  --color-primary-950: #172554;
+  --color-secondary-500: #10B981;
+  --color-success-50: #F0FDF4;
+  --color-success-500: #22C55E;
+  --color-success-700: #15803D;
+  --color-warning-50: #FFFBEB;
+  --color-warning-500: #F59E0B;
+  --color-warning-700: #B45309;
+  --color-error-50: #FEF2F2;
+  --color-error-500: #EF4444;
+  --color-error-700: #B91C1C;
+  --color-info-50: #F0F9FF;
+  --color-info-500: #0EA5E9;
+  --color-info-700: #0369A1;
+  --color-neutral-50: #F8FAFC;
+  --color-neutral-100: #F1F5F9;
+  --color-neutral-200: #E2E8F0;
+  --color-neutral-300: #CBD5E1;
+  --color-neutral-400: #94A3B8;
+  --color-neutral-500: #64748B;
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155;
+  --color-neutral-800: #1E293B;
+  --color-neutral-900: #0F172A;
+  --color-neutral-950: #020617;
+  --surface-primary: #FFFFFF;
+  --surface-secondary: #F8FAFC;
+  --surface-tertiary: #F1F5F9;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-tertiary: #94A3B8;
+  --text-inverse: #FFFFFF;
+  --border-default: #E2E8F0;
+  --border-hover: #CBD5E1;
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-default: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --radius-sm: 0.375rem;
+  --radius-default: 0.5rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  background: var(--surface-secondary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Layout */
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 16rem;
+  background: var(--surface-primary);
+  border-right: 1px solid var(--border-default);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.sidebar-logo {
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem;
+  border-bottom: 1px solid var(--border-default);
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--text-primary);
+  gap: 0.5rem;
+}
+
+.sidebar-nav {
+  padding: 1rem 0.75rem;
+  flex: 1;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-default);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: default;
+  margin-bottom: 0.125rem;
+  transition: all var(--duration-fast) var(--ease-default);
+}
+
+.nav-item:hover { background: var(--color-neutral-100); color: var(--text-primary); }
+.nav-item.active { background: var(--color-primary-50); color: var(--color-primary-700); font-weight: 600; }
+
+.nav-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Top bar */
+.topbar {
+  height: 4rem;
+  background: var(--surface-primary);
+  border-bottom: 1px solid var(--border-default);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+}
+
+/* Content area */
+.main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem 2rem;
+}
+
+/* Page header */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-tertiary);
+  margin-bottom: 0.5rem;
+}
+
+.breadcrumb a { color: var(--color-primary-600); text-decoration: none; cursor: default; }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb span { color: var(--text-primary); font-weight: 500; }
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-default);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  cursor: default;
+  transition: all var(--duration-fast) var(--ease-default);
+  line-height: 1.25rem;
+  white-space: nowrap;
+}
+
+.btn:active { transform: scale(0.97); }
+
+.btn-primary {
+  background: var(--color-primary-600);
+  color: white;
+  border-color: var(--color-primary-600);
+}
+
+.btn-primary:hover { background: var(--color-primary-700); }
+.btn-secondary {
+  background: var(--surface-primary);
+  color: var(--text-primary);
+  border-color: var(--border-default);
+}
+.btn-secondary:hover { background: var(--color-neutral-50); border-color: var(--border-hover); }
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border-color: transparent;
+}
+.btn-ghost:hover { background: var(--color-neutral-100); color: var(--text-primary); }
+.btn-danger {
+  background: var(--color-error-600);
+  color: white;
+  border-color: var(--color-error-600);
+}
+.btn-danger:hover { background: var(--color-error-700); }
+.btn-sm { padding: 0.375rem 0.75rem; font-size: 0.8125rem; }
+.btn-xs { padding: 0.25rem 0.5rem; font-size: 0.75rem; }
+.btn-icon { padding: 0.375rem; min-width: 2rem; justify-content: center; }
+
+/* Cards */
+.card {
+  background: var(--surface-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.card-body { padding: 1.25rem; }
+
+/* Filter bar */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.input {
+  display: flex;
+  align-items: center;
+  background: var(--surface-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-default);
+  padding: 0 0.75rem;
+  transition: border-color var(--duration-fast) var(--ease-default);
+}
+
+.input:focus-within { border-color: var(--color-primary-500); box-shadow: 0 0 0 3px var(--color-primary-100); }
+
+.input-icon { color: var(--text-tertiary); width: 1rem; height: 1rem; flex-shrink: 0; }
+
+.input-field {
+  border: none;
+  outline: none;
+  padding: 0.5rem 0.5rem;
+  font-size: 0.875rem;
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  background: transparent;
+  width: 100%;
+}
+
+.input-field::placeholder { color: var(--text-tertiary); }
+
+.w-72 { width: 18rem; }
+
+/* Select */
+.select {
+  display: flex;
+  align-items: center;
+  background: var(--surface-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-default);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  gap: 0.5rem;
+  cursor: default;
+  font-family: var(--font-sans);
+  min-width: 8rem;
+}
+
+.select:hover { border-color: var(--border-hover); }
+
+/* Badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+}
+
+.badge-success { background: var(--color-success-50); color: var(--color-success-700); }
+.badge-error { background: var(--color-error-50); color: var(--color-error-700); }
+.badge-warning { background: var(--color-warning-50); color: var(--color-warning-700); }
+.badge-info { background: var(--color-info-50); color: var(--color-info-700); }
+.badge-neutral { background: var(--color-neutral-100); color: var(--color-neutral-600); }
+
+/* Registry Cards */
+.registry-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.75rem;
+  transition: box-shadow var(--duration-fast) var(--ease-default);
+}
+
+.registry-card:hover { box-shadow: var(--shadow-md); }
+
+.registry-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.registry-icon-npm { background: var(--color-error-50); color: var(--color-error-500); }
+.registry-icon-pypi { background: var(--color-info-50); color: var(--color-info-500); }
+.registry-icon-maven { background: var(--color-warning-50); color: var(--color-warning-500); }
+.registry-icon-generic { background: var(--color-neutral-100); color: var(--color-neutral-500); }
+
+.registry-info { flex: 1; min-width: 0; }
+
+.registry-name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-primary-700);
+  cursor: default;
+  margin-bottom: 0.25rem;
+}
+
+.registry-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.registry-type { font-size: 0.75rem; color: var(--text-tertiary); }
+.registry-url { font-size: 0.8125rem; color: var(--text-secondary); max-width: 20rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.registry-status { display: flex; align-items: center; gap: 0.75rem; font-size: 0.8125rem; color: var(--text-tertiary); margin-top: 0.375rem; }
+
+.registry-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.overflow-trigger {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-default);
+  color: var(--text-tertiary);
+  cursor: default;
+}
+
+.overflow-trigger:hover { background: var(--color-neutral-100); color: var(--text-secondary); }
+
+/* Pilot scanning state */
+.registry-card.scanning {
+  border-left: 3px solid var(--color-primary-500);
+}
+@keyframes pulse-border {
+  0%, 100% { border-left-color: var(--color-primary-500); }
+  50% { border-left-color: var(--color-primary-300); }
+}
+
+.registry-card.scanning { animation: pulse-border 2s ease-in-out infinite; }
+
+/* Empty state */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.empty-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--radius-xl);
+  background: var(--color-neutral-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  color: var(--text-tertiary);
+}
+
+.empty-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.empty-text {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  max-width: 24rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+/* Error state */
+.error-state {
+  padding: 1rem 1.25rem;
+}
+
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-radius: var(--radius-default);
+  border: 1px solid transparent;
+}
+
+.alert-error { background: var(--color-error-50); border-color: var(--color-error-200); color: var(--color-error-700); }
+.alert-success { background: var(--color-success-50); border-color: var(--color-success-200); color: var(--color-success-700); }
+.alert-info { background: var(--color-info-50); border-color: var(--color-info-200); color: var(--color-info-700); }
+.alert-warning { background: var(--color-warning-50); border-color: var(--color-warning-200); color: var(--color-warning-700); }
+
+.alert-icon { width: 1.25rem; height: 1.25rem; flex-shrink: 0; margin-top: 0.0625rem; }
+.alert-content { flex: 1; }
+.alert-title { font-weight: 600; font-size: 0.875rem; margin-bottom: 0.125rem; }
+.alert-text { font-size: 0.8125rem; }
+.alert-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+
+/* Loading skeleton */
+.skeleton {
+  background: linear-gradient(90deg, var(--color-neutral-100) 25%, var(--color-neutral-200) 50%, var(--color-neutral-100) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: var(--radius-default);
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-card {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.skeleton-icon { width: 2.5rem; height: 2.5rem; border-radius: var(--radius-lg); flex-shrink: 0; }
+.skeleton-lines { flex: 1; }
+.skeleton-line { height: 0.875rem; margin-bottom: 0.5rem; }
+.skeleton-line-sm { height: 0.75rem; width: 60%; }
+
+/* Modal overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(15, 23, 42, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  background: var(--surface-primary);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  width: 100%;
+  max-width: 32rem;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.modal-header h2 { font-size: 1.125rem; font-weight: 600; }
+
+.modal-close { width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-default); color: var(--text-tertiary); cursor: default; }
+.modal-close:hover { background: var(--color-neutral-100); }
+
+.modal-body { padding: 1.5rem; }
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-default);
+}
+
+/* Form */
+.form-group { margin-bottom: 1.25rem; }
+.form-label { display: block; font-size: 0.875rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.375rem; }
+.form-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-default);
+  font-size: 0.875rem;
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  background: var(--surface-primary);
+  transition: border-color var(--duration-fast) var(--ease-default);
+}
+
+.form-input:focus { outline: none; border-color: var(--color-primary-500); box-shadow: 0 0 0 3px var(--color-primary-100); }
+.form-input::placeholder { color: var(--text-tertiary); }
+.form-textarea { min-height: 4rem; resize: vertical; }
+.form-helper { font-size: 0.75rem; color: var(--text-tertiary); margin-top: 0.25rem; }
+
+/* Radio group */
+.radio-group { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.radio-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-default);
+  border: 1px solid var(--border-default);
+  cursor: default;
+  transition: all var(--duration-fast) var(--ease-default);
+}
+
+.radio-option:hover { border-color: var(--color-primary-300); }
+.radio-option.selected { border-color: var(--color-primary-500); background: rgba(59, 130, 246, 0.03); }
+
+.radio-circle {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  border: 2px solid var(--border-default);
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--duration-fast) var(--ease-default);
+}
+
+.radio-option.selected .radio-circle { border-color: var(--color-primary-500); }
+.radio-option.selected .radio-circle::after {
+  content: '';
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+  background: var(--color-primary-500);
+}
+
+.radio-label { font-size: 0.875rem; font-weight: 500; color: var(--text-primary); }
+.radio-desc { font-size: 0.75rem; color: var(--text-tertiary); margin-top: 0.125rem; }
+
+/* Radio inline */
+.radio-inline {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.radio-inline-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-default);
+  border: 1px solid var(--border-default);
+  cursor: default;
+  font-size: 0.875rem;
+}
+
+.radio-inline-option:hover { border-color: var(--color-primary-300); }
+.radio-inline-option.selected { border-color: var(--color-primary-500); background: rgba(59, 130, 246, 0.03); }
+
+.radio-inline-circle { width: 1rem; height: 1rem; border-radius: 50%; border: 2px solid var(--border-default); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.radio-inline-option.selected .radio-inline-circle { border-color: var(--color-primary-500); }
+.radio-inline-option.selected .radio-inline-circle::after { content: ''; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--color-primary-500); }
+
+/* Toggle */
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+.toggle-track {
+  width: 2.25rem;
+  height: 1.25rem;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-500);
+  position: relative;
+  cursor: default;
+  flex-shrink: 0;
+}
+
+.toggle-thumb {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: white;
+  position: absolute;
+  top: 0.125rem;
+  right: 0.125rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.toggle-label { font-size: 0.875rem; color: var(--text-primary); }
+.toggle-desc { font-size: 0.75rem; color: var(--text-tertiary); }
+
+/* Detail view grid */
+.detail-grid { display: flex; flex-direction: column; gap: 1.25rem; }
+
+.detail-card { margin-bottom: 0; }
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 2rem;
+}
+
+.meta-item {}
+.meta-label { font-size: 0.75rem; font-weight: 500; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.125rem; }
+.meta-value { font-size: 0.875rem; color: var(--text-primary); }
+
+/* Table */
+.table-wrapper { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  text-align: left;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-default);
+  background: var(--surface-secondary);
+}
+
+td {
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-default);
+}
+
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--color-neutral-50); }
+
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0.75rem 0;
+  font-size: 0.8125rem;
+  color: var(--text-tertiary);
+}
+
+.pagination-pages { display: flex; gap: 0.25rem; }
+
+.pagination-btn {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-default);
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  cursor: default;
+}
+
+.pagination-btn:hover { background: var(--color-neutral-100); }
+.pagination-btn.active { background: var(--color-primary-50); color: var(--color-primary-700); font-weight: 600; }
+
+/* Toast */
+.toast-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  min-width: 22rem;
+  max-width: 28rem;
+}
+
+.toast-success { background: white; border: 1px solid var(--color-success-200); border-left: 4px solid var(--color-success-500); }
+.toast-error { background: white; border: 1px solid var(--color-error-200); border-left: 4px solid var(--color-error-500); }
+
+.toast-icon { width: 1.25rem; height: 1.25rem; flex-shrink: 0; margin-top: 0.0625rem; }
+.toast-content { flex: 1; }
+.toast-title { font-weight: 600; font-size: 0.875rem; }
+.toast-text { font-size: 0.8125rem; color: var(--text-secondary); }
+.toast-close { width: 1.5rem; height: 1.5rem; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-default); color: var(--text-tertiary); cursor: default; flex-shrink: 0; }
+
+/* SVG icons inline */
+.icon { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Section label */
+.section-with-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Spinner */
+.spinner { animation: spin 1s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* Delete warning */
+.delete-warning { 
+  background: var(--color-error-50);
+  border: 1px solid var(--color-error-200);
+  border-radius: var(--radius-default);
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.delete-warning-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 0.75rem;
+}
+
+.delete-warning-list li {
+  padding: 0.375rem 0;
+  padding-left: 1.25rem;
+  position: relative;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.delete-warning-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0.25rem;
+  color: var(--color-error-500);
+}
+
+.delete-note { font-size: 0.8125rem; color: var(--text-tertiary); margin-top: 1rem; padding: 0.75rem; background: var(--surface-secondary); border-radius: var(--radius-default); }
+
+/* Credential masked */
+.credential-masked {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  letter-spacing: 0.15em;
+  color: var(--text-primary);
+}
+
+/* Scan result */
+.scan-result {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.scan-status-icon { width: 1.5rem; height: 1.5rem; flex-shrink: 0; }
+
+/* Action link */
+.action-link { color: var(--color-primary-600); font-size: 0.8125rem; cursor: default; }
+.action-link:hover { text-decoration: underline; }
+.action-link.danger { color: var(--color-error-600); }
+
+/* Page section spacing */
+.page-section { margin-bottom: 2rem; }
+
+/* Section cards container */
+.section-cards { display: flex; flex-direction: column; gap: 1rem; }
+
+/* Mobile specific overrides will be in media query */
+@media (max-width: 767px) {
+  .sidebar { display: none; }
+  .content { padding: 1rem; }
+  .filter-bar { flex-direction: column; align-items: stretch; }
+  .w-72 { width: 100%; }
+  .registry-card { flex-wrap: wrap; }
+  .registry-actions { width: 100%; justify-content: flex-end; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--border-default); }
+  .meta-grid { grid-template-columns: 1fr; }
+  .modal { margin: 0.5rem; max-width: none; border-radius: var(--radius-lg); }
+  .page-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+}
+
+/* Demo section label */
+.section-label {
+  background: var(--color-primary-100);
+  color: var(--color-primary-700);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-default);
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+.demo-section { margin-bottom: 3rem; }
+
+/* Detail view layout */
+.detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.detail-main { grid-column: 1 / -1; }
+.detail-full { grid-column: 1 / -1; }
+
+@media (min-width: 1024px) {
+  .detail-layout {
+    grid-template-columns: 1fr 1fr;
+  }
+  .detail-main { grid-column: 1 / 2; }
+  .detail-side { grid-column: 2 / 3; }
+  .detail-full { grid-column: 1 / -1; }
+}
+
+/* Scan state in card */
+.scan-state {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* disabled badge */
+.text-success { color: var(--color-success-700); }
+.text-error { color: var(--color-error-700); }
+.text-warning { color: var(--color-warning-700); }
+.text-info { color: var(--color-info-700); }
+.text-muted { color: var(--text-tertiary); }
+
+</style>
+</head>
+<body>
+
+<!-- ==================== SCREEN 1: REGISTRY LIST VIEW ==================== -->
+<div class="section-label">Screen: Registry List View — Desktop 1440×900</div>
+
+<div class="admin-layout">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-600)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      Nexus
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item"><span class="nav-icon"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span>Dashboard</div>
+      <div class="nav-item"><span class="nav-icon"><svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>Discovery</div>
+      <div class="nav-item active"><span class="nav-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></span>Admin</div>
+      <div style="margin: 0.75rem 0; border-top: 1px solid var(--border-default);"></div>
+      <div class="nav-item" style="padding-left: 1.5rem;font-size:0.8125rem;">Admin Home</div>
+      <div class="nav-item active" style="padding-left: 1.5rem;"><span class="nav-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></span>Registries</div>
+      <div class="nav-item" style="padding-left: 1.5rem;"><span class="nav-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>Teams</div>
+      <div class="nav-item" style="padding-left: 1.5rem;"><span class="nav-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>Members</div>
+      <div class="nav-item" style="padding-left: 1.5rem;"><span class="nav-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>Roles</div>
+      <div class="nav-item" style="padding-left: 1.5rem;"><span class="nav-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M21 3v6h-6"/></svg></span>Audit Log</div>
+    </nav>
+  </div>
+
+  <div class="main-area">
+    <div class="topbar">
+      <div style="font-size:0.875rem;color:var(--text-secondary);font-weight:500;">Admin</div>
+      <div style="display:flex;align-items:center;gap:0.75rem;">
+        <div class="input" style="width:16rem;">
+          <svg class="input-icon icon" viewBox="0 0 24 24" style="width:1rem;height:1rem;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input class="input-field" placeholder="Search..." value="">
+        </div>
+        <div style="width:2rem;height:2rem;border-radius:50%;background:var(--color-primary-100);color:var(--color-primary-700);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600;">AD</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+        <div>
+          <div class="breadcrumb">
+            <a>Admin</a>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+            <span>Registries</span>
+          </div>
+          <h1 class="page-title">Registries</h1>
+        </div>
+        <button class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+          Create Registry
+        </button>
+      </div>
+
+      <div class="filter-bar">
+        <div class="input w-72">
+          <svg class="input-icon icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input class="input-field" placeholder="Search registries...">
+        </div>
+        <div class="select">
+          <span>All types</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="select">
+          <span>All</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+      </div>
+
+      <!-- Registry Card 1 -->
+      <div class="card registry-card" style="cursor:default;">
+        <div class="registry-icon registry-icon-npm">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        </div>
+        <div class="registry-info">
+          <div class="registry-name">npm Private Registry</div>
+          <div class="registry-meta">
+            <span class="badge badge-info" style="font-size:0.7rem;">npm</span>
+            <span class="registry-url">https://npm.mycompany.com</span>
+          </div>
+          <div class="registry-status">
+            <span class="badge badge-success">Enabled</span>
+            <span class="text-muted">45 packages</span>
+            <span style="color:var(--text-tertiary);font-size:0.75rem;">Scanned 2h ago</span>
+          </div>
+        </div>
+        <div class="registry-actions">
+          <button class="btn btn-secondary btn-sm">Scan</button>
+          <div class="overflow-trigger">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Registry Card 2 -->
+      <div class="card registry-card" style="cursor:default;">
+        <div class="registry-icon registry-icon-pypi">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C7.58 2 4 4.69 4 8c0 2.21 1.58 4.07 4 5.08V15c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-1.93c2.42-1 4-2.86 4-5.07 0-3.31-3.58-6-8-6z"/><path d="M12 2v3"/><path d="M8 2v2"/><path d="M16 2v2"/><path d="M12 12v4"/><path d="M10 16h4"/></svg>
+        </div>
+        <div class="registry-info">
+          <div class="registry-name">Internal PyPI Mirror</div>
+          <div class="registry-meta">
+            <span class="badge badge-info" style="font-size:0.7rem;">PyPI</span>
+            <span class="registry-url">https://pypi.internal.com</span>
+          </div>
+          <div class="registry-status">
+            <span class="badge badge-success">Enabled</span>
+            <span class="text-muted">12 packages</span>
+            <span style="color:var(--text-tertiary);font-size:0.75rem;">Scanned 5d ago</span>
+          </div>
+        </div>
+        <div class="registry-actions">
+          <button class="btn btn-secondary btn-sm">Scan</button>
+          <div class="overflow-trigger">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Registry Card 3 — Disabled, Never Scanned -->
+      <div class="card registry-card" style="cursor:default;">
+        <div class="registry-icon registry-icon-maven">
+          <span style="font-size:1rem;font-weight:700;">M</span>
+        </div>
+        <div class="registry-info">
+          <div class="registry-name">Maven Central Mirror</div>
+          <div class="registry-meta">
+            <span class="badge badge-info" style="font-size:0.7rem;">Maven</span>
+            <span class="registry-url">https://maven.internal.com</span>
+          </div>
+          <div class="registry-status">
+            <span class="badge badge-neutral">Disabled</span>
+            <span class="text-muted">-- packages</span>
+            <span style="color:var(--text-tertiary);font-size:0.75rem;">Never scanned</span>
+          </div>
+        </div>
+        <div class="registry-actions">
+          <button class="btn btn-secondary btn-sm">Scan</button>
+          <div class="overflow-trigger">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Registry Card 4 — Scanning State -->
+      <div class="card registry-card scanning" style="cursor:default;">
+        <div class="registry-icon registry-icon-generic">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        </div>
+        <div class="registry-info">
+          <div class="registry-name">Generic Artifact Store</div>
+          <div class="registry-meta">
+            <span class="badge badge-info" style="font-size:0.7rem;">Generic</span>
+            <span class="registry-url">https://artifacts.internal.io/shared</span>
+          </div>
+          <div class="registry-status">
+            <span class="badge badge-success">Enabled</span>
+            <span class="scan-state">
+              <svg class="icon spinner" width="14" height="14" viewBox="0 0 24 24" style="color:var(--color-primary-500);"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+              <span style="color:var(--color-primary-600);font-size:0.75rem;">Scanning...</span>
+            </span>
+            <span style="color:var(--text-tertiary);font-size:0.75rem;">8 packages</span>
+          </div>
+        </div>
+        <div class="registry-actions">
+          <button class="btn btn-secondary btn-sm" disabled style="opacity:0.5;cursor:default;">
+            <svg class="icon spinner" width="14" height="14" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+            Scanning...
+          </button>
+          <div class="overflow-trigger">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Registry Card 5 — Scan Error State -->
+      <div class="card registry-card" style="cursor:default;">
+        <div class="registry-icon registry-icon-npm">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        </div>
+        <div class="registry-info">
+          <div class="registry-name">Legacy npm Registry</div>
+          <div class="registry-meta">
+            <span class="badge badge-info" style="font-size:0.7rem;">npm</span>
+            <span class="registry-url">https://npm-legacy.internal.co</span>
+          </div>
+          <div class="registry-status">
+            <span class="badge badge-success">Enabled</span>
+            <span class="badge badge-error" style="font-size:0.7rem;">Scan failed</span>
+            <span style="color:var(--text-tertiary);font-size:0.75rem;">1h ago</span>
+          </div>
+        </div>
+        <div class="registry-actions">
+          <button class="btn btn-secondary btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            Retry
+          </button>
+          <div class="overflow-trigger">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <span>Showing 1-5 of 8 registries</span>
+        <div class="pagination-pages">
+          <div class="pagination-btn active">1</div>
+          <div class="pagination-btn">2</div>
+          <div class="pagination-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SCREEN 2: EMPTY STATE ==================== -->
+<div class="section-label" style="margin-top:3rem;">Screen: Registry List View — Empty State</div>
+
+<div class="admin-layout" style="min-height:32rem;">
+  <div class="sidebar" style="min-height:32rem;">
+    <div class="sidebar-logo">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-600)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      Nexus
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item"><span class="nav-icon"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span>Dashboard</div>
+      <div class="nav-item active"><span class="nav-icon"><svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>Admin</div>
+    </nav>
+  </div>
+  <div class="main-area">
+    <div class="topbar">
+      <div style="font-size:0.875rem;color:var(--text-secondary);font-weight:500;">Admin</div>
+      <div style="display:flex;align-items:center;gap:0.75rem;">
+        <div style="width:2rem;height:2rem;border-radius:50%;background:var(--color-primary-100);color:var(--color-primary-700);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600;">AD</div>
+      </div>
+    </div>
+    <div class="content">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+        <div>
+          <div class="breadcrumb"><a>Admin</a><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg><span>Registries</span></div>
+          <h1 class="page-title">Registries</h1>
+        </div>
+        <button class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+          Create Registry
+        </button>
+      </div>
+
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        </div>
+        <h3 class="empty-title">No registries configured</h3>
+        <p class="empty-text">Connect your organization's private package registries to discover artifacts from npm, PyPI, Maven, and more.</p>
+        <button class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+          Create your first registry
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SCREEN 3: ERROR STATE ==================== -->
+<div class="section-label" style="margin-top:3rem;">Screen: Registry List View — Error State</div>
+
+<div class="admin-layout" style="min-height:20rem;">
+  <div class="main-area" style="border-left:1px solid var(--border-default);">
+    <div class="content">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+        <div>
+          <div class="breadcrumb"><a>Admin</a><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg><span>Registries</span></div>
+          <h1 class="page-title">Registries</h1>
+        </div>
+      </div>
+      <div class="card">
+        <div class="alert alert-error" style="border:none;background:transparent;">
+          <svg class="alert-icon icon" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div class="alert-content">
+            <div class="alert-title">Failed to load registries</div>
+            <div class="alert-text">We couldn't fetch your registry list. Please check your connection and try again.</div>
+            <div class="alert-actions">
+              <button class="btn btn-secondary btn-sm">Retry</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SCREEN 4: LOADING SKELETON ==================== -->
+<div class="section-label" style="margin-top:3rem;">Screen: Registry List View — Loading State</div>
+
+<div class="admin-layout" style="min-height:24rem;">
+  <div class="main-area" style="border-left:1px solid var(--border-default);">
+    <div class="content">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+        <div>
+          <div class="breadcrumb"><a>Admin</a><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg><span>Registries</span></div>
+          <h1 class="page-title">Registries</h1>
+        </div>
+        <div class="skeleton" style="width:8rem;height:2.25rem;border-radius:var(--radius-default);"></div>
+      </div>
+      <div class="skeleton-card card"><div class="skeleton skeleton-icon"></div><div class="skeleton-lines"><div class="skeleton skeleton-line w-3/4"></div><div class="skeleton skeleton-line-sm"></div><div class="skeleton skeleton-line" style="width:40%;height:0.75rem;"></div></div></div>
+      <div class="skeleton-card card"><div class="skeleton skeleton-icon"></div><div class="skeleton-lines"><div class="skeleton skeleton-line w-3/4"></div><div class="skeleton skeleton-line-sm"></div><div class="skeleton skeleton-line" style="width:40%;height:0.75rem;"></div></div></div>
+      <div class="skeleton-card card"><div class="skeleton skeleton-icon"></div><div class="skeleton-lines"><div class="skeleton skeleton-line w-3/4"></div><div class="skeleton skeleton-line-sm"></div><div class="skeleton skeleton-line" style="width:40%;height:0.75rem;"></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SCREEN 5: CREATE REGISTRY MODAL ==================== -->
+<div class="section-label" style="margin-top:3rem;">Screen: Create Registry Modal</div>
+
+<div style="position:relative;min-height:42rem;background:var(--surface-secondary);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;">
+  <!-- Dimmed background -->
+  <div style="padding:1.5rem 2rem;opacity:0.15;filter:blur(2px);pointer-events:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+      <h1 style="font-size:1.5rem;font-weight:700;">Registries</h1>
+      <button class="btn btn-primary">Create Registry</button>
+    </div>
+    <div class="filter-bar">
+      <div class="input w-72"><div class="input-field" style="padding:0.5rem;">Search registries...</div></div>
+    </div>
+    <div class="skeleton-card card"><div class="skeleton skeleton-icon"></div><div class="skeleton-lines"><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line-sm"></div></div></div>
+    <div class="skeleton-card card"><div class="skeleton skeleton-icon"></div><div class="skeleton-lines"><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line-sm"></div></div></div>
+  </div>
+
+  <!-- Modal overlay -->
+  <div class="modal-overlay" style="position:absolute;">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Create Registry</h2>
+        <div class="modal-close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Registry name</label>
+          <input class="form-input" placeholder="e.g., Internal npm Mirror" value="Internal npm Mirror">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Registry type</label>
+          <div class="radio-inline">
+            <div class="radio-inline-option">
+              <div class="radio-inline-circle"></div>
+              <span>npm</span>
+            </div>
+            <div class="radio-inline-option">
+              <div class="radio-inline-circle"></div>
+              <span>PyPI</span>
+            </div>
+            <div class="radio-inline-option selected">
+              <div class="radio-inline-circle"></div>
+              <span>Maven</span>
+            </div>
+            <div class="radio-inline-option">
+              <div class="radio-inline-circle"></div>
+              <span>Generic</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">URL</label>
+          <input class="form-input" placeholder="https://maven.internal.com" value="https://maven.internal.com">
+          <p class="form-helper">Required for scanning</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-input form-textarea" placeholder="Describe what this registry is used for">Internal Maven repository for shared libraries</textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Visibility</label>
+          <div class="radio-inline">
+            <div class="radio-inline-option selected">
+              <div class="radio-inline-circle"></div>
+              <span>Private</span>
+            </div>
+            <div class="radio-inline-option">
+              <div class="radio-inline-circle"></div>
+              <span>Team</span>
+            </div>
+            <div class="radio-inline-option">
+              <div class="radio-inline-circle"></div>
+              <span>Organization</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="toggle">
+          <div class="toggle-track">
+            <div class="toggle-thumb"></div>
+          </div>
+          <div>
+            <div class="toggle-label">Enable registry immediately</div>
+            <div class="toggle-desc">Disabled registries cannot be scanned</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary">Cancel</button>
+        <button class="btn btn-primary">Create registry</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SCREEN 6: DELETE CONFIRMATION MODAL ==================== -->
+<div class="section-label" style="margin-top:3rem;">Screen: Delete Confirmation Modal</div>
+
+<div style="position:relative;min-height:28rem;background:var(--surface-secondary);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;">
+  <div style="padding:1.5rem 2rem;opacity:0.15;filter:blur(2px);pointer-events:none;">
+    <div class="card registry-card">
+      <div class="registry-icon registry-icon-npm">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      </div>
+      <div class="registry-info">
+        <div class="registry-name">npm Private Registry</div>
+        <div class="registry-meta"><span class="badge badge-info" style="font-size:0.7rem;">npm</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" style="position:absolute;">
+    <div class="modal" style="max-width:28rem;">
+      <div class="modal-header">
+        <h2>Delete registry</h2>
+        <div class="modal-close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="delete-warning">
+          <div style="display:flex;align-items:flex-start;gap:0.75rem;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-error-500)" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <div>
+              <div style="font-weight:600;font-size:0.9375rem;color:var(--text-primary);margin-bottom:0.375rem;">Are you sure you want to delete "npm Private Registry"?</div>
+              <div style="font-size:0.8125rem;color:var(--text-secondary);">This will permanently remove:</div>
+            </div>
+          </div>
+          <ul class="delete-warning-list">
+            <li>The registry configuration</li>
+            <li>All stored credentials</li>
+            <li>All artifact-to-registry associations</li>
+            <li>Scan history</li>
+          </ul>
+        </div>
+        <div class="delete-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:0.375rem;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          The artifacts themselves will not be deleted.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary">Cancel</button>
+        <button class="btn btn-danger">Delete registry</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SCREEN 7: REGISTRY DETAIL VIEW ==================== -->
+<div class="section-label" style="margin-top:3rem;">Screen: Registry Detail View — Desktop 1440×900</div>
+
+<div class="admin-layout" style="min-height:48rem;">
+  <div class="sidebar" style="min-height:48rem;">
+    <div class="sidebar-logo">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-600)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      Nexus
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item"><span class="nav-icon"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span>Dashboard</div>
+      <div class="nav-item"><span class="nav-icon"><svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>Discovery</div>
+      <div class="nav-item active"><span class="nav-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></span>Admin</div>
+      <div style="margin: 0.75rem 0; border-top: 1px solid var(--border-default);"></div>
+      <div class="nav-item" style="padding-left: 1.5rem;font-size:0.8125rem;">Admin Home</div>
+      <div class="nav-item active" style="padding-left: 1.5rem;"><span class="nav-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></span>Registries</div>
+    </nav>
+  </div>
+  <div class="main-area">
+    <div class="topbar">
+      <div style="font-size:0.875rem;color:var(--text-secondary);font-weight:500;">Admin</div>
+      <div style="display:flex;align-items:center;gap:0.75rem;">
+        <div style="width:2rem;height:2rem;border-radius:50%;background:var(--color-primary-100);color:var(--color-primary-700);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600;">AD</div>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- Breadcrumb -->
+      <div class="breadcrumb">
+        <a>Admin</a>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+        <a>Registries</a>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+        <span>npm Private Registry</span>
+      </div>
+
+      <div class="detail-layout">
+        <!-- Registry Details Card -->
+        <div class="card detail-main">
+          <div class="card-header">
+            <div class="card-title">Registry Details</div>
+            <button class="btn btn-ghost btn-sm btn-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="meta-grid">
+              <div class="meta-item">
+                <div class="meta-label">Type</div>
+                <div class="meta-value" style="display:flex;align-items:center;gap:0.375rem;">
+                  <span class="badge badge-info">npm</span>
+                </div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">Status</div>
+                <div class="meta-value"><span class="badge badge-success">Enabled</span></div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">URL</div>
+                <div class="meta-value" style="word-break:break-all;">https://npm.mycompany.com</div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">Visibility</div>
+                <div class="meta-value">Private</div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">Created</div>
+                <div class="meta-value">Jul 15, 2026 by admin@example.com</div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">Updated</div>
+                <div class="meta-value">Jul 18, 2026</div>
+              </div>
+            </div>
+            <div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--border-default);">
+              <div class="meta-label" style="margin-bottom:0.25rem;">Description</div>
+              <div class="meta-value">Private npm packages for our engineering team</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Authentication Card -->
+        <div class="card detail-side">
+          <div class="card-header">
+            <div class="card-title">Authentication</div>
+            <button class="btn btn-ghost btn-sm">Set</button>
+          </div>
+          <div class="card-body">
+            <div class="meta-grid" style="grid-template-columns:1fr;">
+              <div class="meta-item">
+                <div class="meta-label">Auth type</div>
+                <div class="meta-value">Token Auth</div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">Credential</div>
+                <div class="credential-masked">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <span>●●●●●●●●</span>
+                  <span style="font-size:0.7rem;color:var(--color-success-700);font-family:var(--font-sans);letter-spacing:0;">set</span>
+                </div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">Updated</div>
+                <div class="meta-value">Jul 18, 2026</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:0.75rem;margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--border-default);">
+              <span class="action-link">Test connection</span>
+              <span class="action-link danger">Remove credentials</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scan Card -->
+        <div class="card detail-side">
+          <div class="card-header">
+            <div class="card-title">Scan</div>
+          </div>
+          <div class="card-body">
+            <div class="meta-grid" style="grid-template-columns:1fr;">
+              <div class="meta-item">
+                <div class="meta-label">Last scan</div>
+                <div class="meta-value">Jul 18, 2026 14:32</div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">Status</div>
+                <div class="meta-value" style="display:flex;align-items:center;gap:0.375rem;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-success-500)" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
+                  <span style="color:var(--color-success-700);font-weight:500;">Completed</span>
+                  <span style="color:var(--text-tertiary);font-weight:400;">— 150 packages found</span>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:1rem;">
+              <button class="btn btn-secondary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Scan now
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Artifacts Table — Full width -->
+        <div class="card detail-full">
+          <div class="card-header">
+            <div class="card-title">Artifacts (45)</div>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+              <div class="input" style="width:14rem;">
+                <svg class="input-icon icon" viewBox="0 0 24 24" style="width:1rem;height:1rem;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input class="input-field" placeholder="Search artifacts...">
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Artifact Name</th>
+                    <th>Type</th>
+                    <th>Added</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><span style="color:var(--color-primary-700);cursor:default;">@scope/package-name</span></td><td><span class="badge badge-info" style="font-size:0.7rem;">npm</span></td><td style="color:var(--text-tertiary);">2h ago</td></tr>
+                  <tr><td><span style="color:var(--color-primary-700);cursor:default;">@scope/another-pkg</span></td><td><span class="badge badge-info" style="font-size:0.7rem;">npm</span></td><td style="color:var(--text-tertiary);">2h ago</td></tr>
+                  <tr><td><span style="color:var(--color-primary-700);cursor:default;">utils-lib</span></td><td><span class="badge badge-info" style="font-size:0.7rem;">npm</span></td><td style="color:var(--text-tertiary);">3h ago</td></tr>
+                  <tr><td><span style="color:var(--color-primary-700);cursor:default;">my-python-lib</span></td><td><span class="badge badge-info" style="font-size:0.7rem;">PyPI</span></td><td style="color:var(--text-tertiary);">5d ago</td></tr>
+                  <tr><td><span style="color:var(--color-primary-700);cursor:default;">core-models</span></td><td><span class="badge badge-info" style="font-size:0.7rem;">npm</span></td><td style="color:var(--text-tertiary);">1w ago</td></tr>
+                  <tr><td><span style="color:var(--color-primary-700);cursor:default;">api-client</span></td><td><span class="badge badge-info" style="font-size:0.7rem;">npm</span></td><td style="color:var(--text-tertiary);">1w ago</td></tr>
+                  <tr><td><span style="color:var(--color-primary-700);cursor:default;">test-utils</span></td><td><span class="badge badge-info" style="font-size:0.7rem;">npm</span></td><td style="color:var(--text-tertiary);">1w ago</td></tr>
+                  <tr><td><span style="color:var(--color-primary-700);cursor:default;">shared-config</span></td><td><span class="badge badge-info" style="font-size:0.7rem;">npm</span></td><td style="color:var(--text-tertiary);">2w ago</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination">
+              <span>Showing 1-8 of 45</span>
+              <div class="pagination-pages">
+                <div class="pagination-btn active">1</div>
+                <div class="pagination-btn">2</div>
+                <div class="pagination-btn">3</div>
+                <div class="pagination-btn">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SCREEN 8: CREDENTIALS MODAL ==================== -->
+<div class="section-label" style="margin-top:3rem;">Screen: Credentials Modal</div>
+
+<div style="position:relative;min-height:38rem;background:var(--surface-secondary);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;">
+  <div style="padding:1.5rem 2rem;opacity:0.15;filter:blur(2px);pointer-events:none;">
+    <div class="card" style="padding:1rem;"><div style="font-size:0.9375rem;font-weight:600;">npm Private Registry</div></div>
+  </div>
+
+  <div class="modal-overlay" style="position:absolute;">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Registry Credentials</h2>
+        <div class="modal-close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </div>
+      </div>
+      <div class="modal-body">
+        <!-- Auth Type Radio Group -->
+        <div class="form-group">
+          <label class="form-label">Auth Type</label>
+          <div class="radio-group">
+            <div class="radio-option">
+              <div class="radio-circle"></div>
+              <div>
+                <div class="radio-label">No Auth</div>
+                <div class="radio-desc">Connect to a public registry</div>
+              </div>
+            </div>
+            <div class="radio-option">
+              <div class="radio-circle"></div>
+              <div>
+                <div class="radio-label">Basic Auth</div>
+                <div class="radio-desc">Username + password authentication</div>
+              </div>
+            </div>
+            <div class="radio-option selected">
+              <div class="radio-circle"></div>
+              <div>
+                <div class="radio-label">Token Auth</div>
+                <div class="radio-desc">Bearer token authentication</div>
+              </div>
+            </div>
+            <div class="radio-option">
+              <div class="radio-circle"></div>
+              <div>
+                <div class="radio-label">Environment Variable</div>
+                <div class="radio-desc">Secret read from env at scan time</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Conditional fields for Token Auth -->
+        <div style="background:var(--surface-secondary);border:1px solid var(--border-default);border-radius:var(--radius-default);padding:1rem;">
+          <div style="font-size:0.875rem;font-weight:600;color:var(--text-primary);margin-bottom:0.75rem;">Token Auth — Details</div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Token</label>
+            <input class="form-input" type="password" placeholder="npm-token-abc-def" value="npm-token-abc-def">
+            <p class="form-helper" style="color:var(--text-tertiary);margin-top:0.375rem;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:0.25rem;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+              Token will be encrypted at rest and never displayed again
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary">Cancel</button>
+        <button class="btn btn-primary">Save credentials</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SCREEN 9: SCAN SUCCESS TOAST ==================== -->
+<div class="section-label" style="margin-top:3rem;">Screen: Scan Success Toast</div>
+
+<div style="position:relative;min-height:10rem;background:var(--surface-secondary);border:1px solid var(--border-default);border-radius:var(--radius-lg);">
+  <div class="toast-container" style="position:relative;top:1rem;right:auto;left:1rem;">
+    <div class="toast toast-success">
+      <svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="var(--color-success-500)" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
+      <div class="toast-content">
+        <div class="toast-title">Scan completed</div>
+        <div class="toast-text">npm Private Registry — 150 packages found. Scan took 1.2s</div>
+      </div>
+      <div class="toast-close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SCREEN 10: DETAIL VIEW ARTIFACTS EMPTY ==================== -->
+<div class="section-label" style="margin-top:3rem;">Screen: Artifacts Empty State</div>
+
+<div class="card" style="max-width:48rem;">
+  <div class="card-header">
+    <div class="card-title">Artifacts (0)</div>
+  </div>
+  <div class="empty-state" style="padding:3rem 2rem;">
+    <div class="empty-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    </div>
+    <h3 class="empty-title">No artifacts yet</h3>
+    <p class="empty-text">Run a scan to discover packages from this registry.</p>
+    <button class="btn btn-secondary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Scan this registry
+    </button>
+  </div>
+</div>
+
+</body>
+</html>

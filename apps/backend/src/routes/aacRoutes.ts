@@ -7,7 +7,7 @@ import { dirname } from 'node:path'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
-const AAC_DIR = path.resolve(__dirname, '../../../docs/architecture/adr')
+const AAC_DIR = path.resolve(__dirname, '../../../../docs/architecture/adr')
 
 interface AdrDocument {
   id: string

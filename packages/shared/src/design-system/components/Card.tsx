@@ -3,11 +3,10 @@ import { cn } from '../utils';
 export type CardVariant = 'default' | 'elevated' | 'outlined';
 export type CardPadding = 'none' | 'sm' | 'md' | 'lg';
 
-export interface CardProps {
+export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: CardVariant;
   padding?: CardPadding;
   children: React.ReactNode;
-  className?: string;
 }
 
 const variantStyles: Record<CardVariant, string> = {
@@ -28,6 +27,7 @@ export function Card({
   padding = 'md',
   children,
   className,
+  ...props
 }: CardProps) {
   return (
     <div
@@ -37,6 +37,7 @@ export function Card({
         paddingStyles[padding],
         className,
       )}
+      {...props}
     >
       {children}
     </div>

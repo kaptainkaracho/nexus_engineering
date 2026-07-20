@@ -1,0 +1,119 @@
+nexus:
+  schema: test-doc/v1
+  metadata:
+    domain: repository
+    version: "1.0.0"
+    source: sprint-9-repo-scanner
+
+suites:
+  - id: repo-scanner-basic
+    name: Repository Scanner Core
+    description: Test cases for the repository scanning engine
+    cases:
+      - id: SCAN-001
+        title: Scan a valid repository with supported file types
+        type: e2e
+        priority: critical
+        traceLinks:
+          - type: verifies
+            target:
+              id: REQ-REPO-001
+              documentId: docs/requirements/repository/scanner.req.yaml
+            confidence: high
+            description: Verifies scanner can process a valid repository
+        scenario:
+          given: A repository contains TypeScript, JavaScript, and YAML files
+          when: The scanner is triggered on the repository
+          then: All supported files are parsed and metadata is extracted
+        acceptanceCriteria:
+          - All supported file types are detected
+          - File metadata is correctly extracted
+          - Scan completes without errors
+        tags:
+          - scanner
+          - happy-path
+        automated: true
+
+      - id: SCAN-002
+        title: Scan a repository with unsupported file types
+        type: unit
+        priority: high
+        traceLinks:
+          - type: verifies
+            target:
+              id: REQ-REPO-002
+              documentId: docs/requirements/repository/scanner.req.yaml
+            confidence: high
+        scenario:
+          given: A repository contains only binary files (images, compiled code)
+          when: The scanner is triggered
+          then: Unsupported files are skipped with appropriate warnings
+        acceptanceCriteria:
+          - Binary files are detected and skipped
+          - Warning messages are logged
+          - Scanner does not crash
+        tags:
+          - scanner
+          - error-handling
+        automated: true
+
+      - id: SCAN-003
+        title: Scan a large repository within time limits
+        type: performance
+        priority: high
+        scenario:
+          given: A repository contains 10,000+ files
+          when: The scanner processes the entire repository
+          then: Scan completes within 5 minutes
+        acceptanceCriteria:
+          - Scan time is under 5 minutes for 10k files
+          - Memory usage stays under 512MB
+          - Progress reporting is available
+        tags:
+          - scanner
+          - performance
+        automated: true
+
+  - id: repo-scanner-metadata
+    name: Repository Metadata Extraction
+    description: Test cases for metadata extraction from scanned files
+    cases:
+      - id: META-001
+        title: Extract file metadata from TypeScript files
+        type: unit
+        priority: critical
+        traceLinks:
+          - type: verifies
+            target:
+              id: REQ-REPO-003
+              documentId: docs/requirements/repository/scanner.req.yaml
+            confidence: high
+        scenario:
+          given: A TypeScript file with imports, exports, and types
+          when: The scanner extracts metadata
+          then: Import/export relationships and type information are captured
+        acceptanceCriteria:
+          - Import statements are parsed
+          - Export declarations are captured
+          - Type definitions are extracted
+        tags:
+          - metadata
+          - typescript
+        automated: true
+
+      - id: META-002
+        title: Extract metadata from YAML configuration files
+        type: unit
+        priority: high
+        scenario:
+          given: A YAML file with structured configuration
+          when: The scanner processes the file
+          then: Schema and configuration metadata are extracted
+        acceptanceCriteria:
+          - YAML structure is parsed
+          - Key configuration values are captured
+          - Schema version is detected when available
+        tags:
+          - metadata
+          - yaml
+        automated: true

@@ -2,6 +2,13 @@
  * API client for the Nexus Engineering backend
  */
 
+import type {
+  ArtifactRegistry,
+  RegistryProviderType,
+  RegistryCredentials,
+  RegistryArtifact,
+} from '@nexus-engineering/shared';
+
 const BASE = import.meta.env.VITE_API_URL || '';
 
 // Define the missing artefact types
@@ -378,10 +385,743 @@ export async function fetchTraceabilityGraph(): Promise<TraceabilityGraph> {
   }
 }
 
+// =========================================================
+// Multi-Repo Scanner — Trigger + Status + Per-Repo Artifacts
+// =========================================================
+
+export interface MultiRepoScanRequest {
+  repositoryPaths: string[]
+  scanMode?: 'parallel' | 'sequential'
+}
+
+export interface MultiRepoScanEntry {
+  repositoryPath: string
+  scanId: string
+  status: 'running' | 'completed' | 'failed'
+  filesFound?: number
+  artifactsDetected?: number
+  error?: string
+}
+
+export interface MultiRepoScanResponse {
+  sessionId: string
+  scans: MultiRepoScanEntry[]
+  totalFilesFound: number
+  totalArtifactsDetected: number
+  scanTimeMs: number
+  errors: Array<{ repositoryPath: string; message: string }>
+}
+
+export interface MultiRepoSession {
+  id: string
+  startedAt: string
+  completedAt?: string
+  scans: MultiRepoScanEntry[]
+  totalFilesFound: number
+  totalArtifactsDetected: number
+  scanTimeMs?: number
+  errors: Array<{ repositoryPath: string; message: string }>
+  status: 'running' | 'completed' | 'failed'
+}
+
+/** Trigger a multi-repository scan */
+export async function triggerMultiScan(
+  request: MultiRepoScanRequest,
+): Promise<MultiRepoScanResponse> {
+  const res = await fetch(`${BASE}/api/scan/multi`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(request),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  return res.json();
+}
+
+/** Poll the status of a multi-repo scan session */
+export async function fetchMultiScanStatus(sessionId: string): Promise<MultiRepoSession> {
+  const res = await fetch(`${BASE}/api/scan/multi/${encodeURIComponent(sessionId)}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  return res.json();
+}
+
+export interface ByRepositoryResponse {
+  data: DiscoveryArtifact[]
+  total: number
+  repositoryPath: string
+}
+
+/** Get artifacts filtered by repository path */
+export async function fetchArtifactsByRepository(
+  repositoryPath: string,
+): Promise<ByRepositoryResponse> {
+  const res = await fetch(
+    `${BASE}/api/artifacts/by-repository?path=${encodeURIComponent(repositoryPath)}`,
+  );
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  return res.json();
+}
+
+// =========================================================
+// Audit Log — Viewer API
+// =========================================================
+
+export interface AuditLogEntry {
+  id: string
+  timestamp: string
+  userId: string
+  userEmail: string
+  action: 'CREATE' | 'UPDATE' | 'DELETE' | 'LOGIN' | 'LOGOUT' | 'EXPORT' | 'READ' | 'ARCHIVE' | 'RESTORE'
+  resourceType: string
+  resourceId: string
+  details: string | null
+  ipAddress: string | null
+}
+
+export interface AuditLogFilter {
+  startDate?: string
+  endDate?: string
+  userId?: string
+  action?: string
+  resourceType?: string
+  orgId?: string
+  search?: string
+  limit?: number
+  offset?: number
+}
+
+export interface AuditLogResponse {
+  data: AuditLogEntry[]
+  total: number
+  limit: number
+  offset: number
+  hasMore: boolean
+}
+
+/** Fetch paginated audit logs with optional filters */
+export async function fetchAuditLogs(filter?: AuditLogFilter): Promise<AuditLogResponse> {
+  const params = new URLSearchParams();
+  if (filter) {
+    if (filter.limit != null) params.set('limit', String(filter.limit));
+    if (filter.offset != null) params.set('offset', String(filter.offset));
+    if (filter.action) params.set('action', filter.action);
+    if (filter.resourceType) params.set('resourceType', filter.resourceType);
+    if (filter.userId) params.set('userId', filter.userId);
+    if (filter.orgId) params.set('orgId', filter.orgId);
+    if (filter.startDate) params.set('startDate', filter.startDate);
+    if (filter.endDate) params.set('endDate', filter.endDate);
+    if (filter.search) params.set('search', filter.search);
+  }
+  const qs = params.toString();
+  try {
+    const res = await fetch(`${BASE}/api/audit-logs${qs ? `?${qs}` : ''}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch (err) {
+    if (err instanceof Error && err.message.startsWith('HTTP')) throw err;
+    return { data: [], total: 0, limit: filter?.limit ?? 50, offset: filter?.offset ?? 0, hasMore: false };
+  }
+}
+
+/** Export audit logs as CSV or JSON */
+export async function exportAuditLogs(format: 'csv' | 'json', filter?: AuditLogFilter): Promise<Blob | null> {
+  const params = new URLSearchParams();
+  params.set('format', format);
+  if (filter) {
+    if (filter.action) params.set('action', filter.action);
+    if (filter.resourceType) params.set('resourceType', filter.resourceType);
+    if (filter.userId) params.set('userId', filter.userId);
+    if (filter.orgId) params.set('orgId', filter.orgId);
+    if (filter.startDate) params.set('startDate', filter.startDate);
+    if (filter.endDate) params.set('endDate', filter.endDate);
+    if (filter.search) params.set('search', filter.search);
+  }
+  const qs = params.toString();
+  try {
+    const res = await fetch(`${BASE}/api/audit-logs/export?${qs}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.blob();
+  } catch {
+    return null;
+  }
+}
+
+/** Fetch a single audit log entry by ID */
+export async function fetchAuditLog(id: string): Promise<AuditLogEntry | null> {
+  try {
+    const res = await fetch(`${BASE}/api/audit-logs/${encodeURIComponent(id)}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
 function emptySummary(): RegistrySummary {
   return {
     total: 0,
     byType: { requirement: 0, architecture: 0, adr: 0, spec: 0, unknown: 0 },
     byLifecycle: { discovered: 0, parsed: 0, indexed: 0, related: 0, error: 0 },
   };
+}
+
+// =========================================================
+// Private Registry Management API
+// =========================================================
+
+export interface RegistryListResponse {
+  data: ArtifactRegistry[]
+  total: number
+}
+
+export interface RegistryCreateRequest {
+  name: string
+  description?: string
+  registryType: RegistryProviderType
+  url?: string
+  visibility: 'private' | 'team' | 'organization'
+  allowedRoles?: string[]
+}
+
+export interface RegistryUpdateRequest {
+  name?: string
+  description?: string
+  url?: string
+  visibility?: 'private' | 'team' | 'organization'
+  allowedRoles?: string[]
+  enabled?: boolean
+}
+
+export async function fetchRegistries(): Promise<RegistryListResponse> {
+  try {
+    const res = await fetch(`${BASE}/api/registries`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    const json = await res.json();
+    return { data: json.data ?? [], total: json.total ?? json.data?.length ?? 0 };
+  } catch (err) {
+    if (err instanceof Error && err.message.startsWith('HTTP')) throw err;
+    return { data: [], total: 0 };
+  }
+}
+
+export async function fetchRegistryById(id: string): Promise<ArtifactRegistry | null> {
+  try {
+    const res = await fetch(`${BASE}/api/registries/${encodeURIComponent(id)}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+export async function createRegistry(data: RegistryCreateRequest): Promise<ArtifactRegistry | null> {
+  try {
+    const res = await fetch(`${BASE}/api/registries`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+export async function updateRegistry(id: string, data: RegistryUpdateRequest): Promise<ArtifactRegistry | null> {
+  try {
+    const res = await fetch(`${BASE}/api/registries/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+export async function deleteRegistry(id: string): Promise<boolean> {
+  try {
+    const res = await fetch(`${BASE}/api/registries/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function toggleRegistry(id: string, enabled: boolean): Promise<ArtifactRegistry | null> {
+  return updateRegistry(id, { enabled });
+}
+
+export async function fetchRegistryCredentials(registryId: string): Promise<RegistryCredentials | null> {
+  try {
+    const res = await fetch(`${BASE}/api/registries/${encodeURIComponent(registryId)}/credentials`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+export async function upsertRegistryCredentials(
+  registryId: string,
+  data: { authType: string; username?: string; password?: string; token?: string; envVar?: string },
+): Promise<RegistryCredentials | null> {
+  try {
+    const res = await fetch(`${BASE}/api/registries/${encodeURIComponent(registryId)}/credentials`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+export async function deleteRegistryCredentials(registryId: string): Promise<boolean> {
+  try {
+    const res = await fetch(`${BASE}/api/registries/${encodeURIComponent(registryId)}/credentials`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function scanRegistry(registryId: string): Promise<{ success: boolean; packagesFound?: number; error?: string }> {
+  try {
+    const res = await fetch(`${BASE}/api/registries/${encodeURIComponent(registryId)}/scan`, {
+      method: 'POST',
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : 'Scan failed' };
+  }
+}
+
+export async function fetchRegistryArtifacts(registryId: string): Promise<RegistryArtifact[]> {
+  try {
+    const res = await fetch(`${BASE}/api/registries/${encodeURIComponent(registryId)}/artifacts`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    const json = await res.json();
+    return json.data ?? [];
+  } catch {
+    return [];
+  }
+}
+
+// =========================================================
+// Features as Code (FAC) — Feature Browser API
+// =========================================================
+
+export type FacStatus = 'draft' | 'approved' | 'implemented' | 'deprecated';
+
+export interface FacAcceptanceCriterion {
+  id: string;
+  given?: string;
+  when?: string;
+  then: string;
+  description?: string;
+}
+
+export interface FacUserStory {
+  id: string;
+  role: string;
+  want: string;
+  soThat?: string;
+  acceptanceCriteria: FacAcceptanceCriterion[];
+}
+
+export interface FacTraceLink {
+  type: string;
+  target: { id: string; documentId: string };
+  confidence?: 'high' | 'medium' | 'low';
+  description?: string;
+}
+
+export interface FacFeature {
+  id: string;
+  name: string;
+  description: string;
+  status?: FacStatus;
+  userStories: FacUserStory[];
+  traceLinks?: FacTraceLink[];
+  source: string;
+  documentId: string;
+}
+
+export interface FacListResponse {
+  features: FacFeature[];
+  documents: number;
+  total: number;
+}
+
+export interface FacDetailResponse {
+  feature: FacFeature;
+}
+
+export interface FacValidationResult {
+  valid: boolean;
+  schema?: string;
+  errors?: Record<string, string>;
+}
+
+/** List FAC features from the backend, optionally filtered by status/domain. */
+export async function fetchFacFeatures(params?: {
+  status?: string;
+  domain?: string;
+}): Promise<FacListResponse> {
+  const query = new URLSearchParams();
+  if (params?.status) query.set('status', params.status);
+  if (params?.domain) query.set('domain', params.domain);
+  const qs = query.toString();
+  try {
+    const res = await fetch(`${BASE}/api/fac${qs ? `?${qs}` : ''}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    const json = await res.json();
+    return {
+      features: json.features ?? [],
+      documents: json.documents ?? 0,
+      total: json.total ?? 0,
+    };
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('HTTP')) throw error;
+    return { features: [], documents: 0, total: 0 };
+  }
+}
+
+/** Fetch a single FAC feature by id. */
+export async function fetchFacFeature(id: string): Promise<FacDetailResponse | null> {
+  try {
+    const res = await fetch(`${BASE}/api/fac/${encodeURIComponent(id)}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    const json = await res.json();
+    return json.feature ? { feature: json.feature } : null;
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('HTTP')) throw error;
+    return null;
+  }
+}
+
+/** Validate a FAC feature document against the JSON schema (CI gate). */
+export async function validateFacDocument(payload: {
+  features: FacFeature[];
+  domain: string;
+}): Promise<FacValidationResult> {
+  try {
+    const res = await fetch(`${BASE}/api/fac/validate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return await res.json();
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('HTTP')) throw error;
+    return { valid: false, errors: { _network: 'Unable to reach the validation service' } };
+  }
+}
+
+// =========================================================
+// Test Acceptance Criteria (TAC) Document Viewer API
+// =========================================================
+
+export interface TacDocumentSummary {
+  id: string
+  filePath: string
+  domain: string
+  version: string
+  source: string
+  suiteCount: number
+  caseCount: number
+}
+
+export interface TacListResponse {
+  data: TacDocumentSummary[]
+  total: number
+}
+
+export type TacTraceLinkType =
+  | 'verifies'
+  | 'satisfies'
+  | 'dependsOn'
+  | 'tracesTo'
+  | 'refines'
+  | 'conflictsWith'
+
+export interface TacTraceLink {
+  type: TacTraceLinkType
+  target: { id: string; documentId: string }
+  confidence?: 'high' | 'medium' | 'low'
+  description?: string
+}
+
+export interface TacScenario {
+  given: string
+  when: string
+  then: string
+}
+
+export interface TacTestCase {
+  id: string
+  title: string
+  type: 'unit' | 'integration' | 'e2e' | 'performance' | 'security' | 'usability'
+  priority: 'low' | 'medium' | 'high' | 'critical'
+  description?: string
+  traceLinks?: TacTraceLink[]
+  scenario?: TacScenario
+  acceptanceCriteria?: string[]
+  tags?: string[]
+  automated?: boolean
+  steps?: string[]
+  expectedResult?: string
+}
+
+export interface TacSuite {
+  id: string
+  name: string
+  description?: string
+  domain?: string
+  cases: TacTestCase[]
+}
+
+export interface TacDocumentMetadata {
+  domain: string
+  version: string
+  source: string
+}
+
+export interface TacDocument {
+  nexus: {
+    schema: string
+    metadata: TacDocumentMetadata
+  }
+  suites: TacSuite[]
+}
+
+export interface TacValidationError {
+  field: string
+  message: string
+}
+
+export interface TacValidationResult {
+  valid: boolean
+  errors: Record<string, string>
+}
+
+/** List TAC documents, optionally filtered by a free-text search query */
+export async function fetchTacDocuments(query?: string): Promise<TacListResponse> {
+  const params = new URLSearchParams()
+  if (query) params.set('q', query)
+  const qs = params.toString()
+  try {
+    const res = await fetch(`${BASE}/api/tac${qs ? `?${qs}` : ''}`)
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
+    const json = await res.json()
+    return { data: json.data ?? [], total: json.total ?? json.data?.length ?? 0 }
+  } catch (err) {
+    if (err instanceof Error && err.message.startsWith('HTTP')) throw err
+    return { data: [], total: 0 }
+  }
+}
+
+/** Fetch a single TAC document by its id */
+export async function fetchTacDocument(id: string): Promise<TacDocument | null> {
+  try {
+    const res = await fetch(`${BASE}/api/tac/${encodeURIComponent(id)}`)
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
+    const json = await res.json()
+    return json.data ?? null
+  } catch {
+    return null
+  }
+}
+
+/** Fetch the JSON schema for TAC documents (used for authoring/validation) */
+export async function fetchTacSchema(): Promise<any | null> {
+  try {
+    const res = await fetch(`${BASE}/api/tac/schema`)
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
+    const json = await res.json()
+    return json.data ?? null
+  } catch {
+    return null
+  }
+}
+
+/** Validate a TAC document payload against the schema */
+export async function validateTacDocument(
+  document: Record<string, unknown>,
+): Promise<TacValidationResult> {
+  try {
+    const res = await fetch(`${BASE}/api/tac/validate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ document }),
+    })
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
+    return await res.json()
+  } catch {
+    return { valid: false, errors: { _network: 'Unable to reach the validation service' } }
+  }
+}
+
+// =========================================================
+// AI Traceability (Epic C) — Graph, Impact, Coverage, Report
+// =========================================================
+
+import type {
+  AxisCoverage,
+  CrossArtifactGap,
+  DomainCoverage,
+  CoverageAnalysisReport,
+  AffectedArtifactV2,
+  ImpactGraph as SharedImpactGraph,
+  ImpactChain,
+  TraceabilityReport,
+} from '@nexus-engineering/shared';
+
+export type ConfidenceScore = number;
+
+export interface VAxisStats {
+  axis: 'requirement' | 'feature' | 'testCase' | 'result';
+  total: number;
+  linked: number;
+  coveragePercent: number;
+}
+
+export interface TraceGraphData {
+  nodes: Array<{ id: string; type: string; title?: string; confidenceScore?: number }>;
+  edges: Array<{ sourceId: string; targetId: string; relationshipType: string; confidence: string; confidenceScore: number }>;
+  totalNodes: number;
+  totalEdges: number;
+}
+
+export interface ImpactAnalysisData {
+  scope: { artifactIds: string[]; artifactTypes?: string[] };
+  artifactId: string;
+  confidenceThreshold: number;
+  artifacts: Array<{ id: string; type: string; title: string; impactLevel: 'direct' | 'indirect' | 'transitive'; relationshipType: string; confidenceScore: number }>;
+  impactGraph: SharedImpactGraph;
+  chains: Array<ImpactChain>;
+  summary: { totalAffected: number; directCount: number; indirectCount: number; transitiveCount: number; minConfidence: number; maxConfidence: number };
+}
+
+export type TraceabilityCoverageResponse = { overallCoveragePercent: number; axes: AxisCoverage[]; crossArtifactGaps: CrossArtifactGap[]; domainCoverage: DomainCoverage[] } | { domain: string; coverage: Pick<DomainCoverage, 'totalArtifacts' | 'coveredArtifacts' | 'coveragePercent'>; overallCoveragePercent: number };
+
+export type TraceabilityReportResult = { generatedAt: string; format: 'json' | 'markdown'; content: string; coverage?: CoverageAnalysisReport; gaps?: CrossArtifactGap[]; llmAnalysis?: string };
+
+/** Fetch the AI traceability graph with confidence-scored nodes/edges */
+export async function fetchTraceGraph(): Promise<TraceGraphData> {
+  try {
+    const res = await fetch(`${BASE}/api/traceability/graph`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch {
+    return { nodes: [], edges: [], totalNodes: 0, totalEdges: 0 };
+  }
+}
+
+/** Fetch impact analysis for a specific artifact */
+export async function fetchTraceImpact(artifactId: string, options?: { confidenceThreshold?: number; artifactType?: string }): Promise<ImpactAnalysisData> {
+  const params = new URLSearchParams({ artifactId });
+  if (options?.confidenceThreshold) params.set('confidenceThreshold', String(options.confidenceThreshold));
+  if (options?.artifactType) params.set('artifactType', options.artifactType);
+  try {
+    const res = await fetch(`${BASE}/api/traceability/impact/${encodeURIComponent(artifactId)}?${params}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch {
+    return { scope: { artifactIds: [] }, artifactId, confidenceThreshold: options?.confidenceThreshold ?? 0, artifacts: [], impactGraph: { nodes: [], edges: [] }, chains: [], summary: { totalAffected: 0, directCount: 0, indirectCount: 0, transitiveCount: 0, minConfidence: 0, maxConfidence: 0 } };
+  }
+}
+
+/** Fetch full coverage analysis report */
+export async function fetchTraceCoverage(domain?: string): Promise<CoverageAnalysisReport | { domain: string; coverage: any; overallCoveragePercent: number }> {
+  const qs = domain ? `?domain=${encodeURIComponent(domain)}` : '';
+  try {
+    const res = await fetch(`${BASE}/api/traceability/coverage${qs}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch {
+    return domain ? { domain, coverage: { totalArtifacts: 0, coveredArtifacts: 0, coveragePercent: 0, axes: [], gaps: [] }, overallCoveragePercent: 0 } : { overallCoveragePercent: 0, axes: [], crossArtifactGaps: [], domainCoverage: [{ domain: '', totalArtifacts: 0, coveredArtifacts: 0, coveragePercent: 0, axes: [], gaps: [] }], summary: { totalArtifacts: 0, totalGaps: 0, highRiskCount: 0, mediumRiskCount: 0, lowRiskCount: 0 } };
+  }
+}
+
+/** Fetch a full traceability report (JSON or markdown) */
+export async function fetchTraceReport(format?: 'json' | 'markdown'): Promise<TraceabilityReport> {
+  const qs = format ? `?format=${format}` : '';
+  try {
+    const res = await fetch(`${BASE}/api/traceability/report${qs}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch {
+    return { generatedAt: new Date().toISOString(), format: format ?? 'json', content: 'Unable to load report' };
+  }
+}
+
+export type ExecutionStatus = 'passed' | 'failed' | 'skipped' | 'error' | 'flaky';
+
+/** A single test execution result returned by the TER API */
+export interface TestExecution {
+  id: string;
+  suiteId: string;
+  caseId: string;
+  status: ExecutionStatus;
+  durationMs?: number;
+  startedAt?: string;
+  finishedAt?: string;
+  retries?: number;
+  error?: { message: string; type?: string; stack?: string };
+  artifacts?: Array<{ type: string; path?: string; url?: string }>;
+  traceLinks?: Array<{
+    type: string;
+    target: { id: string; documentId: string };
+    confidence?: 'high' | 'medium' | 'low';
+  }>;
+  source?: string;
+  documentId?: string;
+}
+
+export interface TestResultsResponse {
+  executions: TestExecution[];
+  documents: number;
+  total: number;
+  status?: ExecutionStatus;
+  suiteId?: string;
+}
+
+/** Fetch test execution results (TER) from the backend. */
+export async function fetchTestResults(params?: {
+  status?: ExecutionStatus;
+  suiteId?: string;
+}): Promise<TestResultsResponse> {
+  const query = new URLSearchParams();
+  if (params?.status) query.set('status', params.status);
+  if (params?.suiteId) query.set('suiteId', params.suiteId);
+  const qs = query.toString();
+  try {
+    const res = await fetch(`${BASE}/api/results${qs ? `?${qs}` : ''}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    const json = await res.json();
+    return {
+      executions: json.executions ?? [],
+      documents: json.documents ?? 0,
+      total: json.total ?? 0,
+      ...(json.status && { status: json.status }),
+      ...(json.suiteId && { suiteId: json.suiteId }),
+    };
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('HTTP')) throw error;
+    return { executions: [], documents: 0, total: 0 };
+  }
 }

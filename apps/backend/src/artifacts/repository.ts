@@ -29,6 +29,10 @@ export interface Artifact {
   createdAt: string
   updatedAt: string
   lastParsedAt?: string
+  /** Origin registry provider type for externally-scanned artifacts (npm, pypi, maven) */
+  registryType?: string
+  /** The registry ID this artifact was scanned from */
+  registryId?: string
 }
 
 export type PatchArtifactInput = Pick<Artifact, 'lifecycle'> & {
@@ -114,6 +118,11 @@ export class ArtifactRegistry {
       return artifacts.filter((a) => a.type === 'unknown' || !Object.prototype.hasOwnProperty.call(a, 'type'))
     }
     return artifacts.filter((a) => a.type === type)
+  }
+
+  getByRepository(repositoryPath: string): Artifact[] {
+    this.ensureStorageLoaded()
+    return Array.from(this.store.values()).filter((a) => a.repositoryPath === repositoryPath)
   }
 
   getAll(): Artifact[] {

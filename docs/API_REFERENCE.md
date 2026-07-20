@@ -1,8 +1,8 @@
 # Nexus Engineering — API Reference
 
-**Version:** 1.0  
-**Base URL:** `http://localhost:3000/api`  
-**Last Updated:** 2026-07-18
+**Version:** 1.1  
+**Base URL:** `http://localhost:3001/api`  
+**Last Updated:** 2026-07-19
 
 ---
 
@@ -10,13 +10,17 @@
 
 1. [Overview](#overview)
 2. [Authentication](#authentication)
-3. [Repository Scanner API](#repository-scanner-api)
-4. [Artifact Registry API](#artifact-registry-api)
-5. [Trace Links API](#trace-links-api)
-6. [Requirements API](#requirements-api)
-7. [Graph Builder API](#graph-builder-api)
-8. [Data Models](#data-models)
-9. [Error Handling](#error-handling)
+3. [OAuth 2.0](#oauth-20)
+4. [SAML v2](#saml-v2)
+5. [Organization RBAC](#organization-rbac)
+6. [Audit Log](#audit-log)
+7. [Repository Scanner API](#repository-scanner-api)
+8. [Artifact Registry API](#artifact-registry-api)
+9. [Trace Links API](#trace-links-api)
+10. [Requirements API](#requirements-api)
+11. [Graph Builder API](#graph-builder-api)
+12. [Data Models](#data-models)
+13. [Error Handling](#error-handling)
 
 ---
 
@@ -53,9 +57,516 @@ All responses follow a consistent envelope:
 
 ## Authentication
 
-Currently, the API is unauthenticated for local development. Production deployments should implement authentication middleware.
+The API uses **JWT Bearer token authentication**. All protected endpoints require an `Authorization: Bearer <token>` header.
 
-**Future:** OAuth2 or API key authentication will be required for all endpoints.
+### Auth Flow
+
+1. **Register or log in** via `/api/auth/register`, `/api/auth/login`, OAuth, or SAML
+2. **Receive** access token (15 min expiry) + refresh token (7 day expiry)
+3. **Include** `Authorization: Bearer <access_token>` on all API requests
+4. **Refresh** tokens via `/api/auth/refresh` before expiry
+
+### Auth Endpoints
+
+#### POST /api/auth/register
+
+Create a new user account.
+
+**Request Body:**
+
+```json
+{
+  "email": "user@example.com",
+  "password": "securePassword123",
+  "displayName": "John Doe"
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `email` | string | Yes | Email address (case-insensitive, unique) |
+| `password` | string | Yes | Password (8+ characters) |
+| `displayName` | string | No | Display name |
+
+**Success Response (201):**
+
+```json
+{
+  "user": { "id": "abc123", "email": "user@example.com", "displayName": "John Doe", "roleId": "role_viewer", "roleName": "viewer", "isActive": true, "emailVerified": false, "permissions": ["requirements:read", "artifacts:read", "trace-links:read", "graph:read"] },
+  "accessToken": "eyJhbGci...",
+  "refreshToken": "a1b2c3d4..."
+}
+```
+
+**Error Responses:**
+
+| Status | Error | Description |
+|--------|-------|-------------|
+| 400 | `Email and password are required` | Missing fields |
+| 400 | `Password must be at least 8 characters` | Weak password |
+| 400 | `Invalid email format` | Bad email |
+| 409 | `Email already registered` | Duplicate email |
+
+#### POST /api/auth/login
+
+Authenticate with email and password.
+
+**Request Body:**
+
+```json
+{
+  "email": "user@example.com",
+  "password": "securePassword123"
+}
+```
+
+**Success Response (200):**
+
+```json
+{
+  "user": { "id": "abc123", "email": "user@example.com", "displayName": "John Doe", "roleId": "role_admin", "roleName": "admin", "isActive": true, "emailVerified": true, "permissions": ["admin:all", "users:read", ...] },
+  "accessToken": "eyJhbGci...",
+  "refreshToken": "a1b2c3d4..."
+}
+```
+
+**Error Responses:**
+
+| Status | Error | Description |
+|--------|-------|-------------|
+| 401 | `Invalid email or password` | Bad credentials |
+| 403 | `Account is deactivated` | User disabled |
+
+#### POST /api/auth/refresh
+
+Refresh an expired access token using a refresh token.
+
+**Request Body:**
+
+```json
+{
+  "refreshToken": "a1b2c3d4..."
+}
+```
+
+**Success Response (200):**
+
+```json
+{
+  "user": { ... },
+  "accessToken": "eyJhbGci...",
+  "refreshToken": "e5f6g7h8..."
+}
+```
+
+#### POST /api/auth/logout
+
+Logout and revoke the current refresh token. Requires authentication.
+
+**Headers:** `Authorization: Bearer <access_token>`
+
+**Request Body:**
+
+```json
+{
+  "refreshToken": "a1b2c3d4..."
+}
+```
+
+#### POST /api/auth/logout-all
+
+Logout from all active sessions. Requires authentication.
+
+**Headers:** `Authorization: Bearer <access_token>`
+
+#### GET /api/auth/me
+
+Get the currently authenticated user's profile. Requires authentication.
+
+**Headers:** `Authorization: Bearer <access_token>`
+
+#### GET /api/auth/roles
+
+List all available roles. Requires authentication.
+
+---
+
+## OAuth 2.0
+
+The API supports OAuth 2.0 login via **Google** and **GitHub** identity providers.
+
+### Configuration
+
+Set environment variables:
+
+| Variable | Provider | Description |
+|----------|----------|-------------|
+| `GOOGLE_CLIENT_ID` | Google | OAuth client ID |
+| `GOOGLE_CLIENT_SECRET` | Google | OAuth client secret |
+| `GITHUB_CLIENT_ID` | GitHub | OAuth client ID |
+| `GITHUB_CLIENT_SECRET` | GitHub | OAuth client secret |
+| `OAUTH_CALLBACK_URL` | Both | Callback base URL (default: `http://localhost:3001`) |
+
+### GET /api/auth/oauth/:provider
+
+Initiate OAuth flow. Redirect the user to the returned URL.
+
+**Path Parameters:**
+
+| Parameter | Type | Values |
+|-----------|------|--------|
+| `provider` | string | `google`, `github` |
+
+**Success Response (200):**
+
+```json
+{
+  "url": "https://accounts.google.com/o/oauth2/v2/auth?client_id=...&redirect_uri=...&response_type=code&scope=...&state=...",
+  "state": "random-state-string"
+}
+```
+
+### GET /api/auth/oauth/:provider/callback
+
+Handle OAuth callback from the identity provider. Exchange the authorization code for tokens.
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `code` | string | Yes | Authorization code from provider |
+| `state` | string | No | CSRF state parameter |
+
+**Success Response (200):**
+
+```json
+{
+  "user": { "id": "abc123", "email": "user@gmail.com", ... },
+  "accessToken": "eyJhbGci...",
+  "refreshToken": "",
+  "isNewUser": true
+}
+```
+
+**User Linking:** If the OAuth email matches an existing account, the OAuth identity is linked. If no account exists, a new one is created.
+
+---
+
+## SAML v2
+
+The API supports SAML v2 Single Sign-On for enterprise identity providers.
+
+### Configuration
+
+| Variable | Description |
+|----------|-------------|
+| `SAML_CERT` | SAML certificate (base64) |
+| `SAML_ISSUER` | SAML issuer entity ID |
+| `SAML_ENTRYPOINT` | IdP SSO URL |
+
+### GET /api/auth/saml/metadata
+
+Get the SAML v2 metadata XML for configuring the identity provider.
+
+**Success Response (200):**
+
+Content-Type: `application/xml`
+
+Returns SAML metadata XML document.
+
+### POST /api/auth/saml/callback
+
+Handle SAML callback (ACS endpoint). Accepts form-encoded SAML response.
+
+**Request Body:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `SAMLResponse` | string | Yes | Base64-encoded SAML assertion |
+| `RelayState` | string | No | Relay state from IdP |
+
+**Success Response (200):**
+
+```json
+{
+  "user": { "id": "abc123", "email": "user@company.com", ... },
+  "accessToken": "eyJhbGci...",
+  "refreshToken": "",
+  "isNewUser": false
+}
+```
+
+**Attribute Mapping:** SAML assertions can map `email`, `name`, and `role` attributes to user profile fields.
+
+---
+
+## Organization RBAC
+
+The API supports multi-tenant organizations with scoped roles and membership management.
+
+### Organization Model
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Unique identifier |
+| `name` | string | Organization name |
+| `slug` | string | URL-friendly unique slug |
+| `description` | string | Optional description |
+| `ownerId` | string | User ID of owner |
+| `settings` | object | Organization settings |
+| `createdAt` | string | ISO 8601 |
+| `updatedAt` | string | ISO 8601 |
+
+### Org Roles
+
+| Role | Permissions |
+|------|-------------|
+| `org:admin` | Full org control: update, delete, manage members, manage teams |
+| `org:member` | Read and contribute to org resources |
+| `org:viewer` | Read-only access to org resources |
+
+### Organization Endpoints
+
+All org endpoints require authentication (`Authorization: Bearer <token>`).
+
+#### POST /api/orgs
+
+Create a new organization. The creator is automatically added as `org:admin`.
+
+**Request Body:**
+
+```json
+{
+  "name": "My Team",
+  "slug": "my-team",
+  "description": "Our engineering team"
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | Display name |
+| `slug` | string | Yes | URL slug (lowercase letters, numbers, hyphens) |
+
+#### GET /api/orgs
+
+List organizations for the authenticated user.
+
+#### GET /api/orgs/:id
+
+Get a single organization by ID.
+
+#### PUT /api/orgs/:id
+
+Update organization details. Requires `org:admin` role.
+
+#### DELETE /api/orgs/:id
+
+Delete an organization. Requires `org:admin` role.
+
+### Member Management
+
+#### GET /api/orgs/:id/members
+
+List all members of an organization.
+
+#### POST /api/orgs/:id/members
+
+Add a member to an organization. Requires `org:admin`.
+
+**Request Body:**
+
+```json
+{
+  "userId": "user-id-here",
+  "role": "org:member"
+}
+```
+
+| Field | Type | Required | Values |
+|-------|------|----------|--------|
+| `userId` | string | Yes | User ID to add |
+| `role` | string | No | `org:admin`, `org:member`, `org:viewer` (default: `org:member`) |
+
+#### PUT /api/orgs/:id/members/:userId
+
+Update a member's role. Requires `org:admin`.
+
+**Request Body:**
+
+```json
+{
+  "role": "org:admin"
+}
+```
+
+#### DELETE /api/orgs/:id/members/:userId
+
+Remove a member from an organization. Requires `org:admin`.
+
+### Invite / Join / Leave
+
+#### POST /api/orgs/:id/invite
+
+Invite a user to an organization. Requires `org:admin`.
+
+#### POST /api/orgs/:id/join
+
+Join an organization (open membership).
+
+#### POST /api/orgs/:id/leave
+
+Leave an organization.
+
+### Team Management (org-scoped)
+
+#### GET /api/orgs/:orgId/teams
+
+List teams in an organization.
+
+#### POST /api/orgs/:orgId/teams
+
+Create a team. Requires `org:admin`.
+
+#### GET /api/teams/:id
+
+Get a team by ID.
+
+#### PUT /api/teams/:id
+
+Update a team. Requires `org:admin`.
+
+#### DELETE /api/teams/:id
+
+Delete a team. Requires `org:admin`.
+
+### Team Member Management
+
+#### GET /api/teams/:id/members
+
+List team members.
+
+#### POST /api/teams/:id/members
+
+Add a team member. Requires `org:admin`.
+
+| Field | Type | Required | Values |
+|-------|------|----------|--------|
+| `userId` | string | Yes | User ID |
+| `role` | string | No | `lead`, `member` |
+
+#### PUT /api/teams/:id/members/:userId
+
+Update team member role. Requires `org:admin`.
+
+#### DELETE /api/teams/:id/members/:userId
+
+Remove team member. Requires `org:admin`.
+
+---
+
+## Audit Log
+
+The API provides a structured audit trail with query, export, and retention management. All audit endpoints require `admin:all` permission.
+
+### Audit Event Schema
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Unique event ID |
+| `timestamp` | string | ISO 8601 timestamp |
+| `userId` | string | User who performed the action |
+| `userEmail` | string | Email of the acting user |
+| `action` | string | Action type (CREATE, READ, UPDATE, DELETE, LOGIN, LOGOUT, EXPORT) |
+| `resourceType` | string | Type of resource affected |
+| `resourceId` | string | ID of the affected resource |
+| `details` | string | Optional detailed description |
+| `ipAddress` | string | Client IP address |
+| `orgId` | string | Organization scope |
+
+### GET /api/audit-logs
+
+List audit log entries with filtering and pagination.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `orgId` | string | Filter by organization |
+| `action` | string | Filter by action type |
+| `from` | string | Start date (ISO 8601) |
+| `to` | string | End date (ISO 8601) |
+| `userId` | string | Filter by user |
+| `resourceType` | string | Filter by resource type |
+| `search` | string | Full-text search |
+| `page` | number | Page number (0-based) |
+| `limit` | number | Results per page (default: 50) |
+
+**Success Response (200):**
+
+```json
+{
+  "entries": [
+    {
+      "id": "a1b2c3-audit",
+      "timestamp": "2026-07-19T10:00:00.000Z",
+      "userId": "abc123",
+      "userEmail": "user@example.com",
+      "action": "CREATE",
+      "resourceType": "organization",
+      "resourceId": "org_abc123",
+      "details": null,
+      "ipAddress": "127.0.0.1",
+      "orgId": "org_abc123"
+    }
+  ],
+  "pagination": {
+    "total": 1,
+    "limit": 50,
+    "page": 0,
+    "hasMore": false
+  }
+}
+```
+
+### GET /api/audit-logs/export
+
+Export audit logs as JSON or CSV.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `format` | string | `json` or `csv` (default: `json`) |
+| `orgId` | string | Filter by organization |
+| `action` | string | Filter by action type |
+| `startDate` | string | Start date filter |
+| `endDate` | string | End date filter |
+
+### GET /api/audit-logs/:id
+
+Get a single audit log entry by ID.
+
+### GET /api/audit-logs/retention/config
+
+Get current audit log retention configuration.
+
+### PUT /api/audit-logs/retention/config
+
+Update audit log retention configuration. Requires `admin:all`.
+
+**Request Body:**
+
+```json
+{
+  "ttlDays": 90,
+  "enabled": true
+}
+```
+
+### POST /api/audit-logs/purge
+
+Manually purge old audit log entries based on retention config. Returns count of purged entries.
 
 ---
 
@@ -1134,6 +1645,14 @@ Production deployments should configure CORS for specific domains.
 ---
 
 ## Changelog
+
+### v1.1.0 (2026-07-19)
+
+- Authentication: email/password register, login, refresh, logout, roles
+- OAuth 2.0: Google and GitHub provider login
+- SAML v2: ACS endpoint, metadata endpoint, attribute mapping
+- Organization RBAC: org CRUD, member management, teams, invite/join/leave
+- Audit Log: structured events, query API, filters, CSV export, retention config
 
 ### v1.0.0 (2026-07-18)
 

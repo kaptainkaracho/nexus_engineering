@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Button, Input, Stack } from '@nexus-engineering/shared';
+import { useState, useMemo } from 'react';
+import { Alert, Button, Input, Stack } from '@nexus-engineering/shared';
 import { register, type RegisterRequest } from '../../api/auth';
 
 export interface RegisterFormProps {
@@ -31,6 +31,24 @@ function LockIcon() {
   );
 }
 
+function EyeIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+    </svg>
+  );
+}
+
+function EyeOffIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 3l18 18" />
+    </svg>
+  );
+}
+
 interface FormState extends RegisterRequest {
   confirmPassword: string;
 }
@@ -50,6 +68,23 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
   }>({});
   const [serverError, setServerError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const passwordStrength = useMemo(() => {
+    const { password } = form;
+    let score = 0;
+    if (password.length >= 8) score++;
+    if (password.length >= 12) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/[a-z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+    if (/[^A-Za-z0-9]/.test(password)) score++;
+    return Math.min(score, 4);
+  }, [form.password]);
+
+  const strengthLabel = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+  const strengthColors = ['', 'bg-error-500', 'bg-warning-500', 'bg-info-500', 'bg-success-500'];
 
   const validate = (): boolean => {
     const next: typeof errors = {};
@@ -113,12 +148,9 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
     <form onSubmit={handleSubmit} noValidate>
       <Stack gap={5}>
         {serverError && (
-          <div
-            className="rounded-lg border border-error-500/40 bg-error-50 px-4 py-3 text-sm text-error-700 dark:bg-error-950 dark:text-error-300"
-            role="alert"
-          >
+          <Alert variant="error">
             {serverError}
-          </div>
+          </Alert>
         )}
 
         <Input
@@ -147,25 +179,64 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
 
         <Input
           label="Password"
-          type="password"
+          type={showPassword ? 'text' : 'password'}
           placeholder="Create a password"
           value={form.password}
           onChange={handleChange('password')}
           error={errors.password}
-          helperText="At least 8 characters"
           leftIcon={<LockIcon />}
+          rightIcon={
+            <button
+              type="button"
+              onClick={() => setShowPassword((p) => !p)}
+              className="pointer-events-auto text-text-tertiary hover:text-text-secondary transition-colors"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+            </button>
+          }
           fullWidth
           autoComplete="new-password"
         />
 
+        {form.password.length > 0 && (
+          <div className="space-y-1.5">
+            <div className="flex gap-1">
+              {[1, 2, 3, 4].map((segment) => (
+                <div
+                  key={segment}
+                  className={`h-1.5 flex-1 rounded-full transition-colors duration-200 ${
+                    segment <= passwordStrength ? strengthColors[passwordStrength] : 'bg-neutral-200 dark:bg-neutral-700'
+                  }`}
+                />
+              ))}
+            </div>
+            <p className="text-xs text-text-tertiary">
+              {strengthLabel[passwordStrength]}{passwordStrength > 0 ? ' password' : ''}
+            </p>
+          </div>
+        )}
+
         <Input
           label="Confirm Password"
-          type="password"
+          type={showConfirmPassword ? 'text' : 'password'}
           placeholder="Repeat your password"
           value={form.confirmPassword}
           onChange={handleChange('confirmPassword')}
           error={errors.confirmPassword}
           leftIcon={<LockIcon />}
+          rightIcon={
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword((p) => !p)}
+              className="pointer-events-auto text-text-tertiary hover:text-text-secondary transition-colors"
+              aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+              tabIndex={-1}
+            >
+              {showConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
+            </button>
+          }
           fullWidth
           autoComplete="new-password"
         />

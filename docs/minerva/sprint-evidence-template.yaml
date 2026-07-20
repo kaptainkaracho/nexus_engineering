@@ -1,0 +1,101 @@
+# Sprint Evidence Template
+# Auto-populated by Minerva Paperclip Poller
+# Used for process intelligence analysis and quality scoring
+#
+# Version: 1.0.0
+# Schema: https://minerva.internal/schemas/sprint-evidence-v1
+
+sprint:
+  id: ""                          # Sprint identifier (e.g., "Sprint 12")
+  start: ""                       # ISO 8601 start timestamp
+  end: ""                         # ISO 8601 end timestamp
+  agent_roster:                   # List of agents assigned this sprint
+    - id: ""                      # Agent UUID
+      name: ""                    # Agent display name
+      role: ""                    # Agent role/title
+  total_budget: 0.0              # Budget allocated for sprint (USD)
+  total_cost: 0.0                # Total cost incurred (USD)
+  pipeline:                       # Pipeline execution metadata
+    name: ""                      # Pipeline name
+    waves: 0                      # Number of waves executed
+    runners: 0                    # Runner count constraint
+
+issues:
+  - id: ""                        # Issue identifier (e.g., "THE-229")
+    title: ""                     # Issue title
+    epic: ""                      # Parent epic identifier
+    assignee: ""                  # Agent name assigned
+    status: ""                    # Final status (done/stalled/in_progress)
+    priority: ""                  # Priority level
+
+    timestamps:
+      created: ""                 # ISO 8601 creation timestamp
+      activated: ""              # ISO 8601 activation timestamp
+      first_output: ""           # ISO 8601 first code/output timestamp
+      completed: ""              # ISO 8601 completion timestamp
+
+    status_transitions:           # Status change history
+      - from: ""
+        to: ""
+        at: ""                    # ISO 8601 transition timestamp
+        by: ""                    # Actor who triggered transition
+
+    cost:
+      total: 0.0                  # Total cost in USD
+      token_cost: 0.0            # Cost from token consumption
+      input_tokens: 0             # Total input tokens
+      output_tokens: 0            # Total output tokens
+      api_calls: 0                # Number of API calls
+
+    code_output:
+      files_created: 0            # Number of files created
+      files_modified: 0           # Number of files modified
+      lines_added: 0              # Lines of code added
+      lines_deleted: 0            # Lines of code deleted
+      commits: 0                  # Number of commits
+      repositories: []            # Repositories involved
+
+    handoffs:                     # Agent handoff events
+      - from_agent: ""
+        to_agent: ""
+        at: ""                    # ISO 8601 handoff timestamp
+        reason: ""                # Handoff reason
+
+    escalation:                   # Escalation events
+      escalated: false            # Whether escalation occurred
+      escalated_to: ""            # Escalation target (e.g., "CTO")
+      escalated_at: ""            # ISO 8601 escalation timestamp
+      reason: ""                  # Escalation reason
+      resolution: ""              # How escalation was resolved
+
+    heartbeats:                   # HEARTBEAT checkpoints
+      - number: 0                 # HB sequence number
+        timestamp: ""             # ISO 8601 heartbeat timestamp
+        status: ""                # Status at checkpoint
+        output_preview: ""        # Brief output snapshot
+
+escalation_events:                # Sprint-wide escalation log
+  - issue_id: ""
+    escalated_to: ""
+    escalated_at: ""
+    resolved_at: ""
+    reason: ""
+    resolution: ""
+    impact: ""                    # Business impact description
+
+metrics:                          # Overall sprint metrics
+  total_issues: 0                 # Total issues planned
+  completed_issues: 0             # Issues completed (status=done)
+  stalled_issues: 0               # Issues stalled
+  completion_rate: 0.0           # completed / total (percentage)
+  sprint_duration_hours: 0.0     # Total sprint duration in hours
+  avg_cycle_time_min: 0.0        # Average issue cycle time (minutes)
+  total_cost: 0.0                # Total sprint cost (USD)
+  total_tokens: 0                 # Total token consumption
+  total_lines_added: 0            # Total lines of code added
+  total_commits: 0                # Total commits
+  agent_stalls: 0                 # Count of agent stall events
+  ceo_interventions: 0            # Count of CEO interventions
+  cto_rescues: 0                  # Count of CTO rescues
+  pipeline_compliance: true       # Whether pipeline rules were followed
+  v_model_closed: true            # Whether V-Model chain was closed

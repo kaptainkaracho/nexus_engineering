@@ -11,11 +11,16 @@ import {
 } from '../auth/service'
 import { getAuthDatabase } from '../auth/database'
 import type { RegisterRequest, LoginRequest, RefreshRequest } from '@nexus-engineering/shared'
+import { auditLogRepository } from '../auditLog/repository'
+import { logAuditAction } from '../auditLog/middleware'
+import { oauthRoutes } from '../auth/oauth/routes'
+import { samlRoutes } from '../auth/saml/routes'
 
 async function register(request: FastifyRequest, reply: FastifyReply) {
   try {
     const { email, password, displayName } = request.body as RegisterRequest
     const result = await registerUser(email, password, displayName)
+    auditLogRepository.log(result.user.id, result.user.email, 'CREATE', 'user', result.user.id, 'User registered')
     return reply.status(201).send(result)
   } catch (error) {
     if (error instanceof AppError) {
@@ -30,6 +35,7 @@ async function login(request: FastifyRequest, reply: FastifyReply) {
   try {
     const { email, password } = request.body as LoginRequest
     const result = await loginUser(email, password)
+    auditLogRepository.log(result.user.id, result.user.email, 'LOGIN', 'user', result.user.id)
     return reply.send(result)
   } catch (error) {
     if (error instanceof AppError) {
@@ -44,6 +50,7 @@ async function refresh(request: FastifyRequest, reply: FastifyReply) {
   try {
     const { refreshToken } = request.body as RefreshRequest
     const result = await refreshUserTokens(refreshToken)
+    auditLogRepository.log(result.user.id, result.user.email, 'READ', 'user', result.user.id, 'Token refreshed')
     return reply.send(result)
   } catch (error) {
     if (error instanceof AppError) {
@@ -58,6 +65,7 @@ async function logout(request: FastifyRequest, reply: FastifyReply) {
   try {
     const { refreshToken } = request.body as { refreshToken: string }
     await logoutUser(refreshToken)
+    logAuditAction(request, 'LOGOUT', 'user', request.user!.sub)
     return reply.send({ message: 'Logged out successfully' })
   } catch (error) {
     request.log.error(error as Error)
@@ -99,6 +107,7 @@ export function authRoutes(server: FastifyInstance) {
   server.post('/api/auth/logout-all', { preHandler: [authenticate] }, async (request, reply) => {
     try {
       await logoutAllSessions(request.user!.sub)
+      logAuditAction(request, 'LOGOUT', 'user', request.user!.sub, 'All sessions')
       return reply.send({ message: 'All sessions logged out' })
     } catch (error) {
       request.log.error(error as Error)
@@ -107,4 +116,7 @@ export function authRoutes(server: FastifyInstance) {
   })
 
   server.get('/api/auth/roles', { preHandler: [authenticate] }, getRoles)
+
+  oauthRoutes(server)
+  samlRoutes(server)
 }

@@ -1,6 +1,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import { verify } from './jwt'
 import type { JwtPayload } from '@nexus-engineering/shared'
+import { orgRepository } from '../organizations/repository'
 
 declare module 'fastify' {
   interface FastifyRequest {
@@ -34,6 +35,7 @@ export async function authenticate(request: FastifyRequest, reply: FastifyReply)
       email: payload.email,
       role: payload.role,
       permissions: payload.permissions,
+      orgId: payload.orgId,
     }
   } catch (err) {
     const message = (err as Error).message
@@ -76,6 +78,33 @@ export function requireRole(...allowedRoles: string[]) {
   }
 }
 
+export function requireOrgRole(...allowedRoles: string[]) {
+  return async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
+    if (!request.user) {
+      reply.status(401).send({ error: 'Authentication required' })
+      return
+    }
+
+    const params = request.params as Record<string, string | undefined>
+    const orgId = params.orgId || params.id || request.user.orgId
+    if (!orgId) {
+      reply.status(400).send({ error: 'Organization ID is required' })
+      return
+    }
+
+    const member = await orgRepository.getOrganizationMember(orgId, request.user.sub)
+    if (!member) {
+      reply.status(403).send({ error: 'Not a member of this organization' })
+      return
+    }
+
+    if (!allowedRoles.includes(member.role) && !allowedRoles.some(r => member.role === r)) {
+      reply.status(403).send({ error: `Org role '${member.role}' is not allowed. Required: ${allowedRoles.join(', ')}` })
+      return
+    }
+  }
+}
+
 export async function optionalAuth(request: FastifyRequest, _reply: FastifyReply): Promise<void> {
   const authHeader = request.headers.authorization
   if (!authHeader) return
@@ -93,6 +122,7 @@ export async function optionalAuth(request: FastifyRequest, _reply: FastifyReply
       email: payload.email,
       role: payload.role,
       permissions: payload.permissions,
+      orgId: payload.orgId,
     }
   } catch {
     // Silently ignore invalid tokens for optional auth
