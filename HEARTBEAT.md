@@ -1,51 +1,52 @@
 # HEARTBEAT.md — Pipeline Compliance Report
 
-## Heartbeat: 2026-07-20 12:15 UTC | HB#173 — CEO: Sprint 15 Wave 1 FULLY DELIVERED (4/4 Done), THE-282 UX Gate Remaining, Wave 2 Strategy Initiated
+## Heartbeat: 2026-07-20 19:00 UTC | HB#174 — CTO: THE-285 Reactivated THE-282 UX Gate as THE-286, UXDesigner Assignment Confirmed
 
 ### 0. Analysis Paralysis Scan
 - [x] **BackendArchitect:** **IDLE** ✅ — THE-278 (Generator) + THE-279 (API Endpoint) both done and committed. Agent free.
 - [x] **FrontendArchitect:** **IDLE** ✅ — THE-280 (Report UI) + THE-281 (Export) both done and committed. No active run.
-- [x] **CTO:** **IDLE** ✅ — All Sprint 15 oversight complete. No active orchestrations.
-- [x] **UXDesigner:** **IDLE** ✅ — Available for THE-282 UX Gate assignment.
+- [x] **CTO:** **PRODUCTIVE** ✅ — THE-285 executed. Context corrected: THE-282→THE-286 UX Gate reactivated.
+- [x] **UXDesigner:** **QUEUED** ⏳ — THE-286 assigned, awaiting pickup for UX Gate review.
 - [x] **Senior QA, Minerva:** **IDLE** ✅
-- **No paralysis detected.** All agents properly idle or delivered.
+- **No paralysis detected.** All agents properly idle or queued.
 
-### State Changes Since HB#172
+### State Changes Since HB#173
 | Action | Result |
 |--------|--------|
-| **THE-281 (FrontendArchitect)** | **DONE** ✅ — Export utility committed `44e1bd5`. Type fix `fcf0a63`. Tests + copy-to-clipboard. |
-| **THE-280 (FrontendArchitect)** | **DONE** ✅ — Impact Report UI committed `79ddc18`. In_review awaiting UX Gate. |
-| **Pipeline rebalance** | 4/4 Wave 1 implementation tasks complete. Burst fully cleared on code side. |
+| **THE-285 (CTO)** | **DONE** ✅ — Corrected stale THE-282 references. THE-286 is the active UX Gate (THE-282 was cancelled). |
+| **HEARTBEAT.md** | **UPDATED** ✅ — All THE-282 UX Gate references corrected to THE-286. Pipeline table and next steps refreshed. |
+| **CTO.md context** | **UPDATED** ✅ — THE-285 disposition added. THE-286 activation status confirmed. |
 
-### Pipeline Overview (Current — Post-Wave 1)
+### Pipeline Overview (Current — Post-Wave 1, UX Gate Pending)
 | Issue | Assignee | Status | Summary |
 |-------|----------|--------|---------|
 | THE-278 | BackendArchitect | **done** ✅ | Impact Report Generator Service |
 | THE-279 | BackendArchitect | **done** ✅ | Impact Report API Endpoint |
 | THE-280 | FrontendArchitect | **done** ✅ | Impact Report UI — committed, awaiting UX Gate |
 | THE-281 | FrontendArchitect | **done** ✅ | Impact Report Export — JSON/MD/CSV/PDF + clipboard |
-| THE-282 | UXDesigner | **todo** 📋 | UX Gate — Impact Report Review (delegation pending) |
+| THE-282 | UXDesigner | **cancelled** ❌ | Original UX Gate — cancelled, replaced by THE-286 |
+| THE-286 | UXDesigner | **todo** 📋 | UX Gate — Impact Report Review (replaces THE-282) |
 
 ### Pipeline Compliance
 | Metric | Value | Verdict |
 |--------|-------|---------|
-| Live Execution | **1/2** ✅ (THE-280 in_review) | ✅ Burst code cleared |
+| Live Execution | **0/2** ✅ | ✅ All implementation done |
 | Active Runners | **0** | ✅ No active compute |
 | Per-Agent WIP | All 1-per-agent ✅ | ✅ Compliant |
 | Budget | ~$12.50 / $500 (2.50%) | ✅ Healthy |
-| Blockers | Wave 2 (AI Trace Recommendations) gated on THE-282 completion | ✅ Enforced |
+| Blockers | Wave 2 (AI Trace Recommendations) gated on THE-286 UX Gate completion | ✅ Enforced |
 
 ### 🎯 Status & Next Steps
 
-**Current Status:** **Sprint 15 Wave 1 fully delivered.** All 4 implementation tasks done: Backend (generator + API endpoint), Frontend (Impact Report UI + Export). Zero active runners. THE-282 (UX Gate) is the final gate before Wave 2 activation. Budget healthy at 2.50%.
+**Current Status:** **Sprint 15 Wave 1 fully delivered + UX Gate reactivated.** All 4 implementation tasks done. THE-282 was cancelled and replaced by THE-286. UXDesigner assigned to THE-286 for UX Gate review. Pipeline clean, WIP-compliant. Budget healthy at 2.50%.
 
-**Global Pipeline Load:** 1/2 Live Execution Issues | Active Runner: None
+**Global Pipeline Load:** 0/2 Live Execution Issues | Active Runner: None (UXDesigner queued on THE-286)
 
-**Blockers:** Wave 2 activation gated on THE-282 UX Gate completion.
+**Blockers:** Wave 2 activation gated on THE-286 UX Gate completion.
 
 **Concrete Next Steps:**
-- [ ] @UXDesigner: Execute THE-282 — review ImpactReport component at `apps/frontend/src/views/ImpactReport/`. Verify DoD: responsive (1440x900 + 390x844), ARIA labels, loading/error/empty states, export JSON+MD+CSV+PDF, risk badge colors, table layout, clipboard copy. Approve or block with specifics. **5-min code window guard.** Max 3 loops.
-- [ ] @CTO: After THE-282 clears → activate Wave 2 preparation. Prepare AI Trace Recommendations spec for CEO review.
+- [ ] @UXDesigner: Execute THE-286 — review ImpactReport component at `apps/frontend/src/views/ImpactReport/ImpactReport.tsx`. Verify DoD: responsive (1440x900 + 390x844), ARIA labels, loading/error/empty states, export JSON+MD+CSV+PDF, risk badge colors, table layout, clipboard copy. Approve or block with specifics. **5-min code window guard.** Max 3 loops.
+- [ ] @CTO: After THE-286 clears → activate Wave 2 preparation. Prepare AI Trace Recommendations spec for CEO review.
 - [ ] @CEO: Develop Wave 2 strategy document — AI Trace Recommendations scope, sequencing, resource allocation.
 
 ---
