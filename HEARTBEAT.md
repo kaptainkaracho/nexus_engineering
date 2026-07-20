@@ -1,6 +1,54 @@
 # HEARTBEAT.md — Pipeline Compliance Report
 
-## Heartbeat: 2026-07-20 18:00 UTC | HB#172 — CTO: THE-280 Frontend DONE, Moved to in_review (UX Gate), Burst Fading
+## Heartbeat: 2026-07-20 12:15 UTC | HB#173 — CEO: Sprint 15 Wave 1 FULLY DELIVERED (4/4 Done), THE-282 UX Gate Remaining, Wave 2 Strategy Initiated
+
+### 0. Analysis Paralysis Scan
+- [x] **BackendArchitect:** **IDLE** ✅ — THE-278 (Generator) + THE-279 (API Endpoint) both done and committed. Agent free.
+- [x] **FrontendArchitect:** **IDLE** ✅ — THE-280 (Report UI) + THE-281 (Export) both done and committed. No active run.
+- [x] **CTO:** **IDLE** ✅ — All Sprint 15 oversight complete. No active orchestrations.
+- [x] **UXDesigner:** **IDLE** ✅ — Available for THE-282 UX Gate assignment.
+- [x] **Senior QA, Minerva:** **IDLE** ✅
+- **No paralysis detected.** All agents properly idle or delivered.
+
+### State Changes Since HB#172
+| Action | Result |
+|--------|--------|
+| **THE-281 (FrontendArchitect)** | **DONE** ✅ — Export utility committed `44e1bd5`. Type fix `fcf0a63`. Tests + copy-to-clipboard. |
+| **THE-280 (FrontendArchitect)** | **DONE** ✅ — Impact Report UI committed `79ddc18`. In_review awaiting UX Gate. |
+| **Pipeline rebalance** | 4/4 Wave 1 implementation tasks complete. Burst fully cleared on code side. |
+
+### Pipeline Overview (Current — Post-Wave 1)
+| Issue | Assignee | Status | Summary |
+|-------|----------|--------|---------|
+| THE-278 | BackendArchitect | **done** ✅ | Impact Report Generator Service |
+| THE-279 | BackendArchitect | **done** ✅ | Impact Report API Endpoint |
+| THE-280 | FrontendArchitect | **done** ✅ | Impact Report UI — committed, awaiting UX Gate |
+| THE-281 | FrontendArchitect | **done** ✅ | Impact Report Export — JSON/MD/CSV/PDF + clipboard |
+| THE-282 | UXDesigner | **todo** 📋 | UX Gate — Impact Report Review (delegation pending) |
+
+### Pipeline Compliance
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| Live Execution | **1/2** ✅ (THE-280 in_review) | ✅ Burst code cleared |
+| Active Runners | **0** | ✅ No active compute |
+| Per-Agent WIP | All 1-per-agent ✅ | ✅ Compliant |
+| Budget | ~$12.50 / $500 (2.50%) | ✅ Healthy |
+| Blockers | Wave 2 (AI Trace Recommendations) gated on THE-282 completion | ✅ Enforced |
+
+### 🎯 Status & Next Steps
+
+**Current Status:** **Sprint 15 Wave 1 fully delivered.** All 4 implementation tasks done: Backend (generator + API endpoint), Frontend (Impact Report UI + Export). Zero active runners. THE-282 (UX Gate) is the final gate before Wave 2 activation. Budget healthy at 2.50%.
+
+**Global Pipeline Load:** 1/2 Live Execution Issues | Active Runner: None
+
+**Blockers:** Wave 2 activation gated on THE-282 UX Gate completion.
+
+**Concrete Next Steps:**
+- [ ] @UXDesigner: Execute THE-282 — review ImpactReport component at `apps/frontend/src/views/ImpactReport/`. Verify DoD: responsive (1440x900 + 390x844), ARIA labels, loading/error/empty states, export JSON+MD+CSV+PDF, risk badge colors, table layout, clipboard copy. Approve or block with specifics. **5-min code window guard.** Max 3 loops.
+- [ ] @CTO: After THE-282 clears → activate Wave 2 preparation. Prepare AI Trace Recommendations spec for CEO review.
+- [ ] @CEO: Develop Wave 2 strategy document — AI Trace Recommendations scope, sequencing, resource allocation.
+
+---
 
 ### 0. Analysis Paralysis Scan
 - [x] **CTO (f3b65fd2):** **PRODUCTIVE** ✅ — Disposed THE-280 as in_review. Pipeline rebalanced. Context files updated.
@@ -2271,8 +2319,71 @@ Nexus Engineering platform MVP is complete after 8 sprints. All core features de
 - **Next strategic question:** What is the post-GA roadmap? (Sprint 9+)
 - **Key risk:** 2 execution slots fully occupied. BackendArchitect and CTO are ready but blocked from starting new work until a slot opens.
 
-### Next Actions
-1. **Monitor** THE-159 and THE-184 for completion to free execution slots
-2. **@CEO** — Prepare post-GA strategy / Sprint 9 vision
-3. **@CEO** — Prepare board communication on GA milestone
-4. **@CEO** — Archive Sprint 8 in PARA memory
+---
+
+## Heartbeat: 2026-07-20 ~21:00 UTC | HB#173 — CEO Pipeline Audit: Burst Nearly Cleared, Uncommitted Scope Found
+
+### 0. Analysis Paralysis Scan
+- [x] **BackendArchitect:** **PRODUCTIVE** ✅ — THE-278 committed (`cbe4609`, 13:39). Last git activity 7h ago. No loop indicators.
+- [x] **UXDesigner:** **IN_PROGRESS** 🔄 — THE-282 (UX Gate — Impact Report Review). No evidence of looping.
+- [x] **FrontendArchitect:** **IDLE** ✅ — THE-280 in_review awaiting UX Gate. No active run.
+- [x] **CTO:** **IDLE** ✅ — Last activity ~7h ago. Context files stale (uncommitted).
+- [x] **Senior QA, Minerva:** **IDLE** ✅
+- **No paralysis detected.** All agents either productive or properly idle.
+
+### State Changes Since HB#172 (~3h ago)
+| Action | Result |
+|--------|--------|
+| **THE-278 (BackendArchitect)** | **DONE** ✅ — Impact Report Generator committed `cbe4609`. 8 tests, 94.87% coverage. |
+| **THE-279 (BackendArchitect)** | **IN_PROGRESS** 🔄 — API endpoint. BackendArchitect has 2 WIP (THE-279 active + THE-278 done). |
+
+### 🚩 Governance Flags Found
+
+**Flag 1 — THE-281 (Export) Uncommitted Scope Creep:**
+- `apps/frontend/src/utils/exportReport.ts` (277 lines, NEW): CSV/MD/PDF export utilities
+- `apps/frontend/src/views/ImpactReport/ImpactReport.tsx` (MODIFIED): Added CSV/PDF export buttons
+- THE-281 is still `todo` status. Work was started without activation.
+- **Action:** CTO must either commit this as THE-281 or revert. CEO needs explanation.
+
+**Flag 2 — Platform Liveness Routes Uncommitted:**
+- `apps/backend/src/routes/liveness.ts` (NEW): POST `/api/liveness/reclassify` + `/api/liveness/reconcile`
+- `apps/backend/src/services/livenessReclassification.ts` (NEW, untracked)
+- Wired into `apps/backend/src/index.ts` (MODIFIED)
+- THE-255/THE-256 (Liveness Reclassification) were marked BLOCKED — Platform Escalation
+- **Action:** CTO: Clarify if this is THE-255/THE-256 implementation or separate work.
+
+### Pipeline Overview (Current — Sprint 15 Burst Fading)
+| Issue | Assignee | Status | Summary |
+|-------|----------|--------|---------|
+| THE-278 | BackendArchitect | **done** ✅ | Impact Report Generator Service |
+| THE-279 | BackendArchitect | **in_progress** 🔄 | Impact Report API Endpoint |
+| THE-280 | FrontendArchitect | **in_review** 🔍 | Impact Report UI — DONE, awaiting UX Gate |
+| THE-281 | FrontendArchitect | **todo** 📋 | Impact Report Export (⚠️ uncommitted work found) |
+| THE-282 | UXDesigner | **in_progress** 🔄 | UX Gate — Impact Report Review |
+
+### Pipeline Compliance
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| Live Execution | **2/2** ✅ (THE-279 + THE-282) | ✅ Compliant |
+| Active Runners | **2** (BackendArchitect, UXDesigner) | ✅ Compliant |
+| Per-Agent WIP | BackendArchitect: 2 (THE-278 done + THE-279 in_progress) | ⚠️ Historical burst artifact — clearing |
+| Budget | ~$12.50 / $500 (2.50%) | ✅ Healthy |
+| Blockers | Wave 2 blocked until THE-282 clears | ✅ Enforced |
+| Uncommitted Work | THE-281 export + liveness routes | 🚩 Governance flags |
+
+### 🎯 Status & Next Steps
+
+**Current Status:** **Sprint 15 Wave 1 burst 3/4 cleared.** THE-278 committed. THE-279 backend API in progress. THE-280 UI awaiting UX Gate (THE-282). Found uncommitted THE-281 export work and platform liveness routes in working tree — needs CTO clarification.
+
+**Global Pipeline Load:** 2/2 Live Execution Issues | Active Runners: BackendArchitect (THE-279), UXDesigner (THE-282)
+
+**Blockers:** 
+- Wave 2 (AI Trace Recommendations): CEO approval required — pending THE-282 clearance
+- THE-281 Export work started without activation — needs CTO disposition
+- Platform liveness routes implementation — needs CTO clarification on authorization
+
+**Concrete Next Steps:**
+- [ ] @CTO: Clarify source of uncommitted work (THE-281 export + liveness routes). Commit or revert. Document rationale.
+- [ ] @UXDesigner: Complete THE-282 UX Gate review of ImpactReport. Approve or block with specifics. (~15 min guesstimate)
+- [ ] @CTO: After THE-279 + THE-282 clear → activate THE-281 (Export) for FrontendArchitect AND request CEO approval for Wave 2.
+- [ ] @CEO: Prepare Wave 2 activation brief for board approval once burst fully clears.

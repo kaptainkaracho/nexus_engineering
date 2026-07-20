@@ -48,3 +48,35 @@
 ## Next Action
 - THE-232: No further work needed (done)
 - THE-275: Wait for reviewer approval
+
+## THE-280 — Impact Report UI (Epic C)
+**Status: in_review** — Awaiting UXDesigner Quality Gate
+
+### Commits
+- `79ddc18` — ImpactReport view + index export + App routing + fetchImpactReport client method
+
+### Files Created
+- `apps/frontend/src/views/ImpactReport/ImpactReport.tsx`
+- `apps/frontend/src/views/ImpactReport/index.tsx`
+
+### Files Modified
+- `apps/frontend/src/api/client.ts` (added fetchImpactReport + emptyImpactReport)
+- `apps/frontend/src/App.tsx` (Section type, nav item, render branch)
+
+### DoD Checklist
+- [x] View component ImpactReport in apps/frontend/src/views/ImpactReport/
+- [x] Structured report: summary, affected artifacts (req/feat/test/adr), risk badge, recommendations
+- [x] App.tsx routing (new Section 'impact-report')
+- [x] Responsive (1440x900 + 390x844): grid-cols-2→4, table overflow-x-auto
+- [x] ARIA: role=alert, table caption/scope, role=list, aria-busy skeleton, aria-labels
+- [x] tsc -b clean (TypeScript: No errors found)
+- [x] ESLint: new files clean (pre-existing unused-import errors in App.tsx/client.ts untouched)
+- [x] Loading / error+retry / empty states handled
+- [x] Export to JSON + Markdown
+- [ ] UX Gate: PENDING @UXDesigner review
+
+### Blockers
+- None (backend endpoint GET /api/traceability/impact-report exists & consumed)
+
+### Next Action
+- Hand to @UXDesigner for UX Quality Gate review, then QA handoff
