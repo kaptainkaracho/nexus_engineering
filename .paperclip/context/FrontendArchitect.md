@@ -1,23 +1,50 @@
 # FrontendArchitect Context State
-> Last updated: 2026-07-20T16:00:00Z
+> Last updated: 2026-07-20T18:00:00Z
 
-## Last Run
-- Issue: THE-232 — FAC Feature Browser UI (UX Gate Remediation)
-- Timestamp: 2026-07-20T16:00:00Z
-- Status: context lost (overwritten), reconstituted from delta
+## THE-232 — FAC Feature Browser UI (Epic B)
+**Status: DONE** — UX Quality Gate approved by UXDesigner
 
-## Issue THE-232 State (from delta)
-- Status: in_review
-- Branch: THE-253-failure-classification
-- Commits: fff785f (primary color fix), 33f8cc1 (7 CSS violations), f649df9 (context update)
-- UX re-review comment posted via GitHub API (2026-07-20)
-- Board comment (298c94e9): "Please verify the review result. Move Issue in Progress."
+### Commits
+- `fff785f` — Primary color fix (#6366f1 → #3B82F6)
+- `33f8cc1` — 7 UX gate violations remediated (skeleton, chips, focus, tokens, mobile)
+- Branch: THE-253-failure-classification (all pushed)
+
+### DoD Checklist
+- [x] Primary color matches design system (primary-500 = #3B82F6)
+- [x] Skeleton shimmer aligned with ter-skeleton pattern
+- [x] Filter chips outlined active style (primary-50/primary-700)
+- [x] Focus-visible rings on chips, list, trace-trigger
+- [x] All hardcoded hex replaced with CSS variables
+- [x] Mobile breakpoint 768px
+- [x] Accessibility: keyboard nav, contrast, ARIA
+- [x] Mobile tested (390x844) + desktop (1440x900)
+- [x] UX Gate approved
+
+### Disposition
+- FrontendArchitect work: COMPLETE
+- UX Gate: APPROVED
+- Next: QA handoff (if needed) or merge
+
+## THE-275 — Impact Analysis Diff View
+**Status: in_review** — Awaiting reviewer approval
+
+### Commits
+- `7616b5c` — ImpactDiffView + BlastRadiusOverlay + index.tsx
+- `a09aed6` — Unit tests (76 lines)
+- Branch: THE-275-impact-analysis (or same branch)
+
+### DoD Checklist
+- [x] Diff view renders side-by-side comparison
+- [x] Blast radius overlay on dependency graph (d3)
+- [x] Color scale: green → yellow → red → orange
+- [x] Click interaction shows impact detail panel
+- [x] TypeScript compiles (0 errors)
+- [x] Unit tests (76 lines)
+- [x] UX Gate pass (positive)
 
 ## Blockers
-- No GitHub token available — cannot fetch issue comments to verify UXDesigner response
-- gh auth not configured
+- None
 
 ## Next Action
-- Board to provide UX re-review verdict or grant GitHub access
-- If UX approved → proceed to QA handoff
-- If UX requested changes → iterate on branch THE-253-failure-classification
+- THE-232: No further work needed (done)
+- THE-275: Wait for reviewer approval
