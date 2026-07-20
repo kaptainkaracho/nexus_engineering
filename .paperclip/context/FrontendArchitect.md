@@ -1,5 +1,5 @@
 # FrontendArchitect Context State
-> Last updated: 2026-07-20T18:45:00Z
+> Last updated: 2026-07-20T19:00:00Z
 
 ## THE-232 — FAC Feature Browser UI (Epic B)
 **Status: DONE** — UX Quality Gate approved by UXDesigner
@@ -130,14 +130,15 @@ No further work needed.
 - THE-291: CLOSED — durable progress committed
 
 ## THE-294 — NL Query UI (Frontend) (Epic D)
-**Status: in_review** — Rebuilt to spec (NLTraceQuery dir, split components, QueryHistory, fetchNLQuery). tsc clean. UX Gate waived per Sprint 17 scope.
+**Status: DONE** — Frontend complete, UX Gate waived per Sprint 17 scope (plan line 169).
 
 ### Rebuild Note (corrected off-spec `NLQuery/` work)
 The earlier `17968f6` used an ad-hoc `NLQuery/` structure, `nlQuery()` fn, `/api/nl/query` endpoint, and a custom result shape — all OFF-SPEC vs `plans/sprint-17-plan.md` (THE-294). Rebuilt to match plan exactly.
 
 ### Commits
+- `b5e7e50` — refactor(frontend): rebuild NL Query UI to spec (THE-294) [CURRENT]
 - `17968f6` — feat(frontend): add NL Query UI view, types, API client, and routing (THE-294) [superseded]
-- `THE-294-nl-query-ui` branch (pushed)
+- Branch: `THE-294-nl-query-ui` (pushed)
 
 ### Work Done (to spec)
 - Deleted off-spec `apps/frontend/src/views/NLQuery/`
@@ -171,4 +172,15 @@ The earlier `17968f6` used an ad-hoc `NLQuery/` structure, `nlQuery()` fn, `/api
 - None. Backend `/api/traceability/query` (THE-293) exists; returns `NLQueryResponse`.
 
 ### Next Action
-- Commit + push rebuild; mark done (frontend complete, UX Gate waived). Backend endpoint owned by THE-293.
+- FrontendArchitect work: COMPLETE — frontend committed as `b5e7e50`, pushed on `THE-294-nl-query-ui`
+- Backend endpoint `/api/traceability/query` (THE-293) delivered
+- Disposition: `done` — no further frontend work needed
+
+## Files Read This Session
+- .paperclip/context/FrontendArchitect.md
+
+## Files Created/Modified
+- .paperclip/context/FrontendArchitect.md (updated THE-294 status to DONE)
+
+## Next Action
+- THE-294: done — no further work needed
