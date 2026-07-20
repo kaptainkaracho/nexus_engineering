@@ -1,9 +1,11 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
-import type { ImpactScope, TraceabilityReport, DomainCoverage, RecommendationType, RecommendationSeverity } from '@nexus-engineering/shared'
+import type { ImpactScope, TraceabilityReport, DomainCoverage, RecommendationType, RecommendationSeverity, TraceGateConfig, GateMetrics, GateMode } from '@nexus-engineering/shared'
+import { evaluateGate, normalizeGateConfig, validateGateConfig } from '@nexus-engineering/shared'
 import { traverseGraph } from '../services/traceabilityService'
 import { resolveNodeRepo } from '../services/crossRepoTraversal'
 import { impactAnalyzer } from '../ai/impactAnalyzer'
 import { coverageAnalyzer } from '../ai/coverageAnalyzer'
+import { crossArtifactGapAnalyzer } from '../ai/crossArtifactGapAnalyzer'
 import { recommendationEngine } from '../ai/recommendationEngine'
 import { getLLMClient } from '../ai/llmClient'
 import { buildTraceabilityReportPrompt } from '../ai/promptTemplates'
@@ -11,6 +13,7 @@ import { existsSync } from 'fs'
 import { execFileSync } from 'child_process'
 import { getGraphDatabase } from '../graphBuilder/graphDatabase'
 import { ImpactReportGenerator } from '../services/impactReportGenerator'
+import { getGateConfig, putGateConfig } from '../services/traceGateStore'
 
 function parseList(value: unknown): string[] | undefined {
   if (value === undefined || value === null) return undefined
@@ -441,6 +444,80 @@ export async function getTraceabilityRecommendations (request: FastifyRequest, r
   }
 }
 
+/**
+ * Derive gate metrics from the live graph: overall coverage %, cross-artifact
+ * gap count, and which required trace types are absent.
+ */
+async function computeGateMetrics(config: TraceGateConfig): Promise<GateMetrics> {
+  const coverage = await coverageAnalyzer.analyzeFromGraph()
+  const gaps = crossArtifactGapAnalyzer.analyzeFromGraph()
+  const presentTypes = new Set(getGraphDatabase().getGraphNodes().map(n => String(n.type)))
+  const missingTypes = config.requireTypes.filter(t => !presentTypes.has(t))
+  return { coveragePercent: coverage.overallCoveragePercent, gapCount: gaps.length, missingTypes }
+}
+
+export async function getTraceabilityGate (request: FastifyRequest, reply: FastifyReply) {
+  try {
+    const query = request.query as {
+      coverageThreshold?: string
+      maxGaps?: string
+      requireTypes?: string | string[]
+      mode?: string
+    }
+
+    const base = getGateConfig()
+
+    const overrides: Partial<TraceGateConfig> = {}
+    if (query.coverageThreshold !== undefined) {
+      const v = Number(query.coverageThreshold)
+      if (!Number.isFinite(v)) return reply.status(400).send({ error: 'coverageThreshold must be a number' })
+      overrides.coverageThreshold = v
+    }
+    if (query.maxGaps !== undefined) {
+      const v = Number(query.maxGaps)
+      if (!Number.isFinite(v)) return reply.status(400).send({ error: 'maxGaps must be a number' })
+      overrides.maxGaps = v
+    }
+    const requireTypes = parseList(query.requireTypes)
+    if (requireTypes) overrides.requireTypes = requireTypes
+    if (query.mode === 'block' || query.mode === 'warn') overrides.mode = query.mode as GateMode
+
+    const config = normalizeGateConfig({ ...base, ...overrides })
+    const metrics = await computeGateMetrics(config)
+    const result = evaluateGate(metrics, config)
+
+    return reply.send(result)
+  } catch (error) {
+    reply.log.error(error as Error)
+    return reply.status(500).send({ error: 'Failed to evaluate trace gate' })
+  }
+}
+
+export async function getTraceabilityGateConfig (request: FastifyRequest, reply: FastifyReply) {
+  try {
+    return reply.send(getGateConfig())
+  } catch (error) {
+    reply.log.error(error as Error)
+    return reply.status(500).send({ error: 'Failed to load trace gate config' })
+  }
+}
+
+export async function putTraceabilityGateConfig (request: FastifyRequest, reply: FastifyReply) {
+  try {
+    const body = request.body as Partial<TraceGateConfig> | undefined
+    const { config, errors } = validateGateConfig(body)
+    if (errors.length > 0) {
+      return reply.status(400).send({ error: 'Invalid gate config', errors })
+    }
+
+    const saved = putGateConfig(config ?? {})
+    return reply.send(saved)
+  } catch (error) {
+    reply.log.error(error as Error)
+    return reply.status(500).send({ error: 'Failed to save trace gate config' })
+  }
+}
+
 export function traceabilityRoutes (server: FastifyInstance) {
   server.get('/api/traceability/graph', getTraceabilityGraph)
   server.get('/api/traceability/impact/:artifactId', getTraceabilityImpact)
@@ -449,4 +526,7 @@ export function traceabilityRoutes (server: FastifyInstance) {
   server.get('/api/traceability/report', getTraceabilityReport)
   server.get('/api/traceability/impact-report', getTraceabilityImpactReport)
   server.get('/api/traceability/recommendations', getTraceabilityRecommendations)
+  server.get('/api/traceability/gate', getTraceabilityGate)
+  server.get('/api/traceability/gate-config', getTraceabilityGateConfig)
+  server.put('/api/traceability/gate-config', putTraceabilityGateConfig)
 }

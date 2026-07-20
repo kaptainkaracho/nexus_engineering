@@ -181,6 +181,22 @@ export type {
 } from './results/format';
 export type { ResultsDocumentValidationResult } from './results/validator';
 
+export type {
+  GateMode,
+  TraceGateConfig,
+  GateMetrics,
+  GateViolation,
+  TraceGateResult,
+  GateConfigValidationError,
+} from './results/traceGate';
+export {
+  DEFAULT_GATE_CONFIG,
+  evaluateGate,
+  normalizeGateConfig,
+  validateGateConfig,
+  isGateMode,
+} from './results/traceGate';
+
 export type { FeatureLoadResult } from './features/format';
 export type { ResultsLoadResult } from './results/format';
 export type { TestLoadResult } from './tests/format';
