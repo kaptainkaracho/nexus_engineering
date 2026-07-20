@@ -7,6 +7,8 @@ import type {
   RegistryProviderType,
   RegistryCredentials,
   RegistryArtifact,
+  NLQueryResult,
+  NLQueryResponse,
 } from '@nexus-engineering/shared';
 
 const BASE = import.meta.env.VITE_API_URL || '';
@@ -1294,36 +1296,23 @@ export async function fetchCoverageGaps(): Promise<CrossArtifactGap[]> {
 }
 
 // =========================================================
-// Natural Language Query (Epic D)
+// Natural Language Query (Epic D / THE-294)
 // =========================================================
 
-export interface NlQueryResult {
-  id: string;
-  artifactType: string;
-  title: string;
-  description: string;
-  confidence: number;
-  source: string;
-}
-
-export interface NlQuerySuggestion {
-  id: string;
-  text: string;
-}
-
-/** Run a natural language query against the traceability data */
-export async function nlQuery(query: string): Promise<NlQueryResult[]> {
+/** Run a natural language traceability query against the backend */
+export async function fetchNLQuery(query: string): Promise<NLQueryResult | null> {
   try {
-    const res = await fetch(`${BASE}/api/nl/query`, {
+    const res = await fetch(`${BASE}/api/traceability/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query }),
     });
-    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-    const json = await res.json();
-    return json.data ?? [];
+    if (!res.ok) return null;
+    const json = (await res.json()) as NLQueryResponse;
+    if (!json.success || !json.data) return null;
+    return json.data;
   } catch (error) {
     if (error instanceof Error && error.message.startsWith('HTTP')) throw error;
-    return [];
+    return null;
   }
 }

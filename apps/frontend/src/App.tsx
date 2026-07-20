@@ -23,7 +23,7 @@ import { OrgAdmin } from './views/OrgAdmin';
 import { LandingPage } from './views/LandingPage';
 import { OnboardingFlow } from './views/OnboardingFlow';
 import { RecommendationsPanel } from './views/RecommendationsPanel';
-import { NLQuery } from './views/NLQuery';
+import { NLTraceQuery } from './views/NLTraceQuery';
 import {
   getCurrentSession,
   clearSession,
@@ -337,7 +337,7 @@ function App() {
 ) : activeSection === 'recommendations' ? (
                <RecommendationsPanel />
             ) : activeSection === 'nl-query' ? (
-               <NLQuery />
+               <NLTraceQuery />
             ) : (
            <>
              <Nav

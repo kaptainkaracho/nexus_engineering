@@ -130,37 +130,45 @@ No further work needed.
 - THE-291: CLOSED — durable progress committed
 
 ## THE-294 — NL Query UI (Frontend) (Epic D)
-**Status: in_progress** — UI view, types, API client, and routing complete; awaiting commit
+**Status: in_review** — Rebuilt to spec (NLTraceQuery dir, split components, QueryHistory, fetchNLQuery). tsc clean. UX Gate waived per Sprint 17 scope.
 
-### Work Done This Heartbeat
-- Created `apps/frontend/src/views/NLQuery/NLQuery.tsx` (216 lines):
-  - Query textarea with `⌘/Ctrl + Enter` keyboard shortcut
-  - Empty state with suggestion grid (4 suggestions)
-  - Loading skeleton, error+retry, and empty-result states
-  - Result cards with Badge, confidence %, source, description
-- Created `apps/frontend/src/views/NLQuery/index.tsx` (index export)
-- Added `NlQueryResult` + `NlQuerySuggestion` types to `apps/frontend/src/api/client.ts`
-- Added `nlQuery(query: string)` async fetch to `apps/frontend/src/api/client.ts` (POST `/api/nl/query`)
-- Registered `nl-query` route in `App.tsx`:
-  - Section type union member
-  - VALID_SECTIONS array
-  - Nav item (label: "NL Query")
-  - Conditional render branch → `<NLQuery />`
+### Rebuild Note (corrected off-spec `NLQuery/` work)
+The earlier `17968f6` used an ad-hoc `NLQuery/` structure, `nlQuery()` fn, `/api/nl/query` endpoint, and a custom result shape — all OFF-SPEC vs `plans/sprint-17-plan.md` (THE-294). Rebuilt to match plan exactly.
+
+### Commits
+- `17968f6` — feat(frontend): add NL Query UI view, types, API client, and routing (THE-294) [superseded]
+- `THE-294-nl-query-ui` branch (pushed)
+
+### Work Done (to spec)
+- Deleted off-spec `apps/frontend/src/views/NLQuery/`
+- Created `apps/frontend/src/views/NLTraceQuery/`:
+  - `index.tsx` — main view (state, layout: main + history sidebar, loading/empty/error/malformed states)
+  - `NLQueryInput.tsx` — search bar, placeholder examples, submit btn, `⌘/Ctrl+Enter`, loading state
+  - `NLQueryResults.tsx` — result cards w/ type badges (Req/Feat/Test/ADR) + inline trace links; loading/empty/error states
+  - `QueryHistory.tsx` — sidebar, last 10 queries, click to re-run
+- Updated `apps/frontend/src/api/client.ts`:
+  - Removed off-spec `NlQueryResult`/`NlQuerySuggestion`/`nlQuery`
+  - Added `fetchNLQuery(query): Promise<NLQueryResult | null>` → POST `/api/traceability/query`, parses `NLQueryResponse` wrapper
+  - Imports `NLQueryResult`, `NLQueryResponse` from `@nexus-engineering/shared`
+- Updated `apps/frontend/src/App.tsx`: import + render branch → `<NLTraceQuery />` (route `#nl-query` already registered)
 
 ### Verification
 - `tsc --noEmit` — No errors found
+- UX Gate: NOT required per Sprint 17 scope (stand down per plan line 169)
 
 ### Files Created
-- `apps/frontend/src/views/NLQuery/NLQuery.tsx`
-- `apps/frontend/src/views/NLQuery/index.tsx`
+- `apps/frontend/src/views/NLTraceQuery/index.tsx`
+- `apps/frontend/src/views/NLTraceQuery/NLQueryInput.tsx`
+- `apps/frontend/src/views/NLTraceQuery/NLQueryResults.tsx`
+- `apps/frontend/src/views/NLTraceQuery/QueryHistory.tsx`
 
 ### Files Modified
-- `apps/frontend/src/api/client.ts` (NlQueryResult, NlQuerySuggestion types + nlQuery function)
-- `apps/frontend/src/App.tsx` (Section type, VALID_SECTIONS, nav item, render branch)
+- `apps/frontend/src/api/client.ts` (fetchNLQuery + shared type imports; removed off-spec nlQuery)
+- `apps/frontend/src/App.tsx` (import + render → NLTraceQuery)
+- (Deleted) `apps/frontend/src/views/NLQuery/`
 
 ### Blockers
-- Backend `/api/nl/query` endpoint not yet implemented (frontend uses stub/mock during development)
+- None. Backend `/api/traceability/query` (THE-293) exists; returns `NLQueryResponse`.
 
 ### Next Action
-- Commit changes and push branch
-- Reassign to @BackendEngineer for `/api/nl/query` endpoint
+- Commit + push rebuild; mark done (frontend complete, UX Gate waived). Backend endpoint owned by THE-293.
