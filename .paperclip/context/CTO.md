@@ -1,5 +1,5 @@
 # CTO Context State
-> Last updated: 2026-07-19T23:35Z (THE-256 disposition: blocked → escalated to CEO)
+> Last updated: 2026-07-20T09:55Z (THE-266 productivity review complete)
 
 ## COMPLETED
 - **THE-241 (fs module fix)** — Done. `1f4ce06` ✅
@@ -74,7 +74,25 @@
 - **Disposition:** `in_review` — awaiting UXDesigner gate verdict (approve or block with specifics).
 - **Note:** Prior "stalled UXDesigner" blocker was STALE; live roster showed UXDesigner idle. Reassigned for gate review. Escalation doc `docs/THE-232-ux-gate-blocker.md` is now superseded.
 
-## Agent Roster (verified live 2026-07-19T20:28Z)
+## THE-261: R1-Fix Bundle — REASSIGNED (was misrouted to BackendArchitect)
+
+**Disposition:** `in_progress` (CTO, management-exempt) — Paperclip platform core patch (THE-255 liveness reclass + THE-256 session rotation). Target: `paperclip-platform/` repo.
+
+**Background:**
+- THE-261 was incorrectly assigned to BackendArchitect (routing error)
+- Caused 12h 55m stalled active episode on a non-productive agent
+- BackendArchitect **cleared** — no productivity issue (see THE-266 report)
+
+**THE-266 (Productivity Review):** Done ✅ — report at `reports/THE-266-productivity-review.md`
+
+## Sprint 14 Wave 2 — Plan Created
+
+**Plan:** `plans/sprint-14-plan.md`
+- Epic B: Coverage Gaps (BackendArchitect API + FrontendArchitect UI)
+- Epic D: Minerva Sprint Reports (CTO template + Minerva generation)
+- Awaiting CEO approval for issue creation and agent activation
+
+## Agent Roster (verified live 2026-07-20T09:55Z)
 | Agent | Status | Role |
 |-------|--------|------|
 | CEO | running | ceo |
