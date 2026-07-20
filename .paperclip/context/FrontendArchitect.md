@@ -42,12 +42,39 @@
 - [x] Unit tests (76 lines)
 - [x] UX Gate pass (positive)
 
+## THE-289 — Recommendations Panel + Gap Visualization UI
+**Status: in_review** — Awaiting UXDesigner Quality Gate
+
+### Commits
+- `76579c1` — feat(frontend): add Recommendations Panel + Gap Visualization UI (THE-289)
+
+### Files Created
+- `apps/frontend/src/views/RecommendationsPanel/RecommendationsPanel.tsx` (829 lines)
+- `apps/frontend/src/views/RecommendationsPanel/index.tsx`
+
+### Files Modified
+- `apps/frontend/src/App.tsx` (added `#recommendations` route + nav item)
+- `apps/frontend/src/api/client.ts` (Recommendation/CrossArtifactGap types + API methods)
+
+### DoD Checklist
+- [x] View component RecommendationsPanel in apps/frontend/src/views/RecommendationsPanel/
+- [x] Severity/category filtering with chip UI and badge counts
+- [x] Gap visualization with coverage progress bars and stats grid
+- [x] Summary stats dashboard (total, pending, accepted, high-risk, avg score, gaps, avg gap)
+- [x] Loading skeleton shimmer, error+retry, empty states (no results + no gaps)
+- [x] Accept/dismiss actions with optimistic updates and loading state
+- [x] Responsive grid layout (mobile-first: grid-cols-2→4→7)
+- [x] Full a11y: keyboard nav, ARIA roles/labels, semantic HTML
+- [x] App.tsx routing + nav item integration
+- [ ] UX Gate: PENDING @UXDesigner review
+
 ## Blockers
 - None
 
 ## Next Action
 - THE-232: No further work needed (done)
 - THE-275: Wait for reviewer approval
+- THE-289: Hand to @UXDesigner for UX Quality Gate review
 
 ## THE-280 — Impact Report UI (Epic C)
 **Status: in_review** — Awaiting UXDesigner Quality Gate

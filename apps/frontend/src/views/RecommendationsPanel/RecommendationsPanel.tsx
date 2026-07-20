@@ -530,7 +530,7 @@ function FilterChips({
             <span aria-hidden="true">{cat.icon}</span>
             {cat.label}
             {counts.category > 0 && (
-              <Badge size="xs">{counts.category}</Badge>
+              <Badge variant="info">{counts.category}</Badge>
             )}
           </button>
         ))}
@@ -548,7 +548,7 @@ function FilterChips({
             <span className={`inline-block h-2 w-2 rounded-full ${sev.color}`} aria-hidden="true" />
             {sev.label}
             {counts.severity > 0 && (
-              <Badge size="xs">{counts.severity}</Badge>
+              <Badge variant={sev.value === 'critical' ? 'critical' : sev.value === 'high' ? 'high' : sev.value === 'medium' ? 'medium' : 'low'}>{counts.severity}</Badge>
             )}
           </button>
         ))}
@@ -667,13 +667,21 @@ export function RecommendationsPanel() {
     return true;
   });
 
-  // Counts for badges
+  // Intersection counts for badges (respect active filters)
   const categoryCounts = Object.entries(CATEGORY_LABEL).reduce<Record<string, number>>((acc, [key, label]) => {
-    acc[key] = recommendations.filter((r) => r.category === key).length;
+    acc[key] = recommendations.filter((r) => {
+      if (r.category !== key) return false;
+      if (activeSeverity !== 'all' && r.severity !== activeSeverity) return false;
+      return true;
+    }).length;
     return acc;
   }, {} as Record<string, number>);
   const severityCounts = Object.entries(SEVERITY_CONFIG).reduce<Record<string, number>>((acc, [key]) => {
-    acc[key] = recommendations.filter((r) => r.severity === key).length;
+    acc[key] = recommendations.filter((r) => {
+      if (r.severity !== key) return false;
+      if (activeCategory !== 'all' && r.category !== activeCategory) return false;
+      return true;
+    }).length;
     return acc;
   }, {} as Record<string, number>);
 
