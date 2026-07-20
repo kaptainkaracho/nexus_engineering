@@ -37,7 +37,7 @@ interface BlastRadiusOverlayProps {
   onSelect: (id: string) => void;
 }
 
-function buildLevelMap(impact: ImpactAnalysisData | null): Map<string, BlastRadiusLevel> {
+export function buildLevelMap(impact: ImpactAnalysisData | null): Map<string, BlastRadiusLevel> {
   const map = new Map<string, BlastRadiusLevel>();
   if (!impact) return map;
   for (const artifact of impact.artifacts) {
