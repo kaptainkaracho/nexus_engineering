@@ -21,7 +21,7 @@
 ## Next Action
 - Push CSS fix to branch ✅ (85cf6e8)
 - Re-submit to UXDesigner for UX Quality Gate re-review
-  - NOTE: gh not authenticated — need to post comment manually or authenticate
+  - NOTE: GitHub API comment posted (2026-07-20), awaiting UXDesigner verdict
 
 ## THE-232 UX Gate Remediation Summary
 ### Fixes Applied (commit 33f8cc1)
