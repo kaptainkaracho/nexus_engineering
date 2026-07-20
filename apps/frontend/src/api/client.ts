@@ -981,7 +981,6 @@ export async function validateTacDocument(
 
 import type {
   AxisCoverage,
-  CrossArtifactGap,
   DomainCoverage,
   CoverageAnalysisReport,
   AffectedArtifactV2,

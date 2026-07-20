@@ -10,7 +10,7 @@ import {
   type RecommendationCategory,
   type RecommendationStatus,
   type CrossArtifactGap,
-} from '../api/client';
+} from '../../api/client';
 
 const SEVERITY_CONFIG: Record<RecommendationSeverity, { bg: string; text: string; ring: string; dot: string }> = {
   critical: {
@@ -422,7 +422,7 @@ function EmptyState({ title, message, actionLabel, onAction }: {
   onAction?: () => void;
 }) {
   return (
-    <Card padding="xl" className="text-center">
+    <Card padding="lg" className="text-center">
       <Stack gap={4} align="center">
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-surface-secondary dark:bg-surface-tertiary">
           <svg
