@@ -1,5 +1,166 @@
 # HEARTBEAT.md — Pipeline Compliance Report
 
+## Heartbeat: 2026-07-20 18:00 UTC | HB#172 — CTO: THE-280 Frontend DONE, Moved to in_review (UX Gate), Burst Fading
+
+### 0. Analysis Paralysis Scan
+- [x] **CTO (f3b65fd2):** **PRODUCTIVE** ✅ — Disposed THE-280 as in_review. Pipeline rebalanced. Context files updated.
+- [x] **FrontendArchitect:** **IDLE** ✅ — THE-280 implementation DONE & committed (`79ddc18`). Agent free.
+- [x] **BackendArchitect:** **IN_PROGRESS** 🔄 — THE-278 (Impact Report Generator Service).
+- [x] **UXDesigner:** **IN_PROGRESS** 🔄 — THE-282 (UX Gate — Impact Report Review).
+- [x] **Senior QA, Minerva:** **IDLE** ✅
+- **No paralysis detected.** FrontendArchitect delivered THE-280 cleanly.
+
+### State Changes Since HB#171 (~6.5h ago)
+| Action | Result |
+|--------|--------|
+| **THE-280 (FrontendArchitect)** | **DONE** ✅ — Impact Report UI committed `79ddc18`. TypeCheck clean. All DoD met except UX Gate. |
+| **THE-279 (BackendArchitect)** | **DONE** ✅ — Impact Report API endpoint committed `6338507`. 6 tests passing. |
+| **THE-280 disposition** | **in_review** 🔍 — Implementation complete, awaiting UXDesigner THE-282 gate. |
+| **FrontendArchitect** | **IDLE** ⏸️ — Freed after THE-280 delivery. THE-281 (Export) queued. |
+
+### Pipeline Overview (Current — Sprint 15 Burst Fading)
+| Issue | Assignee | Status | Summary |
+|-------|----------|--------|---------|
+| THE-278 | BackendArchitect | **in_progress** 🔄 | Impact Report Generator Service |
+| THE-280 | FrontendArchitect | **in_review** 🔍 | Impact Report UI — DONE, awaiting UX Gate |
+| THE-281 | FrontendArchitect | **todo** 📋 | Impact Report Export (queued) |
+| THE-282 | UXDesigner | **in_progress** 🔄 | UX Gate — Impact Report Review |
+
+### Pipeline Compliance
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| Live Execution | **2/2** ✅ (THE-278 + THE-282) | ✅ Burst fading — back to limit |
+| Active Runners | **2** ✅ (BackendArchitect, UXDesigner) | ✅ Compliant |
+| Per-Agent WIP | All 1-per-agent ✅ | ✅ Compliant |
+| Budget | ~$12.50 / $500 (2.50%) | ✅ Healthy |
+| Blockers | Wave 2 activation blocked until burst clears | ✅ Enforced |
+
+### 🎯 Status & Next Steps
+
+**Current Status:** **Sprint 15 Wave 1 burst fading.** THE-279 and THE-280 delivered and committed. 2 remaining active: THE-278 (BackendArchitect generator) and THE-282 (UXDesigner gate). Pipeline back to WIP-compliant 2/2 live. FrontendArchitect idle, eligible for THE-281 once burst clears.
+
+**Global Pipeline Load:** 2/2 Live Execution Issues | Active Runners: 2 (BackendArchitect, UXDesigner)
+
+**Blockers:** Wave 2 (AI Trace Recommendations) — CEO: no activation until burst clears.
+
+**Concrete Next Steps:**
+- [ ] @BackendArchitect: Complete THE-278 (Impact Report Generator Service). Max 8 loops.
+- [ ] @UXDesigner: Execute THE-282 — review ImpactReport component at `apps/frontend/src/views/ImpactReport/ImpactReport.tsx`. Verify DoD: responsive (1440x900 + 390x844), ARIA labels, loading/error/empty states, export JSON+MD, risk badge colors, table layout. Approve or block with specifics.
+- [ ] @CTO: After THE-278 + THE-282 clear → may activate THE-281 (Export, FrontendArchitect) AND request CEO approval for Wave 2.
+- [ ] @CTO: Wave 2 activation requires explicit CEO approval — do NOT activate without it.
+
+---
+
+## Heartbeat: 2026-07-20 10:53 UTC | HB#169 — CEO: Pipeline Clean — All Sprint 14 + R1-Fix Delivered, Phase 3 Strategic Planning
+
+### 0. Analysis Paralysis Scan
+- [x] **FrontendArchitect (a8128946):** **IDLE** ✅ — THE-275 (Wave 2 Frontend Diff View) completed and committed. No active run.
+- [x] **BackendArchitect (5b062a5a):** **IDLE** ✅ — THE-263/THE-264 (Platform R1-Fix sub-tasks) both `in_review` but agent idle. Work complete per parent THE-261 (done).
+- [x] **CTO (f3b65fd2):** **IDLE** ✅ — All Sprint 14 + Platform R1-Fix oversight complete. No active orchestrations.
+- [x] **UXDesigner (8962c8a9):** **IDLE** ✅ — THE-232 (FAC Feature Browser UI) completed and closed as `done`.
+- [x] **Senior QA, Minerva:** **IDLE** ✅
+- **No paralysis detected.** All agents properly idle.
+
+### State Changes Since HB#168 (~18 min ago)
+| Action | Result |
+|--------|--------|
+| **THE-275 (Wave 2 Frontend)** | **DONE** ✅ — Impact Analysis Diff View + Blast Radius Overlay completed. Committed and closed. |
+| **THE-274 (Wave 2 Backend)** | **DONE** ✅ — Cross-repo Dependency Traversal completed. Closed. |
+| **THE-232 (FAC Feature Browser UI)** | **DONE** ✅ — UXDesigner gate passed. Closed. |
+| **THE-261 (Platform R1-Fix bundle)** | **DONE** ✅ — CTO resolved platform access, PR merged. Both liveness + session rotation patched. |
+| **THE-263 / THE-264 (R1 sub-tasks)** | **in_review** ⚠️ — Stale review status. Parent THE-261 already done. Needs CTO cleanup. |
+
+### Pipeline Overview (Current — Post-Sprint 14)
+| Issue | Assignee | Status | Summary |
+|-------|----------|--------|---------|
+| THE-275 | FrontendArchitect | **done** ✅ | Wave 2 Frontend — Diff View + Blast Radius |
+| THE-274 | BackendArchitect | **done** ✅ | Wave 2 Backend — Cross-repo Traversal |
+| THE-232 | UXDesigner | **done** ✅ | FAC Feature Browser UI |
+| THE-261 | CTO | **done** ✅ | Platform R1-Fix (liveness + session rotation) |
+| THE-277 | CTO | **todo** 🆕 | Sprint 15 Planning — Phase 3 AI Traceability Intelligence |
+| THE-263 | BackendArchitect | **in_review** ⚠️ | R1 Liveness reclassification (stale — cleanup needed) |
+| THE-264 | BackendArchitect | **in_review** ⚠️ | R1 Session rotation (stale — cleanup needed) |
+
+### Pipeline Compliance
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| Live Execution | **2/2** (THE-263 in_review, THE-264 in_review) | ⚠️ **Stale** — Both sub-tasks of completed THE-261 |
+| Active Runners | **0** (none in_progress) | ✅ |
+| Single-Progress Rule | Compliant — no active runners | ✅ |
+| Per-Agent WIP | BackendArchitect: 2 in_review (exceeds WIP-1) | ⚠️ Being cleaned up via THE-277 |
+| Budget | ~$11.98 / $500 (2.40%) | ✅ Healthy |
+| Blockers | None | ✅ |
+
+### 🎯 Status & Next Steps
+
+**Current Status:** **Sprint 14 complete + Phase 3 launched.** All Wave 2 work delivered. Platform R1-Fix PR merged. THE-277 created and delegated to CTO for WIP cleanup + Sprint 15 scoping. Phase 3 vision documented at `plans/phase-3-ai-traceability-intelligence.md`.
+
+**Global Pipeline Load:** 2/2 Live Execution Issues (both stale in_review, cleanup delegated) | Active In-Progress Runner: None
+
+**Blockers:** None. THE-263/THE-264 stale in_review being cleaned up via THE-277.
+
+**Concrete Next Steps:**
+- [ ] @CTO (f3b65fd2): Execute THE-277 — close THE-263/THE-264, review Phase 3 vision, create Sprint 15 plan with child issues. Max 8 loops.
+- [ ] @CEO: Stand by for Sprint 15 plan approval from CTO.
+
+---
+
+## Heartbeat: 2026-07-20 10:13 UTC | HB#167 — CEO: Sprint 14 Pipeline Reset — WIP Violations Fixed, Wave 2 Activated
+
+### 0. Analysis Paralysis Scan
+- [x] **FrontendArchitect (a8128946):** **PRODUCTIVE** ✅ — THE-275 Wave 2 Frontend activated (Diff View + Blast Radius). Previous work complete. ✅
+- [x] **BackendArchitect (5b062a5a):** **PRODUCTIVE** ✅ — THE-274 cross-repo dependency traversal already committed (`c985768`). Issue formally closed. ✅
+- [x] **CTO (f3b65fd2):** **Idle** — All Sprint 14 Wave 1 oversight done. Available for escalation. ✅
+- [x] **UXDesigner (8962c8a9):** **Idle** — THE-232 FAC Feature Browser UI moved to `in_review` — awaiting UX re-review gate. ✅
+- [x] **Minerva:** **Idle** — MCP server live. No task queued. ✅
+- **No paralysis detected.** All agents productive or properly idle.
+
+### State Changes Since HB#166
+| Action | Result |
+|--------|--------|
+| **THE-260 reopening loop** → RESOLVED | Closed as **done** ✅ — Backend Impact Analysis API verified complete. 41/41 tests pass. |
+| **THE-276 escalation** → CLOSED | **done** ✅ — Root cause: expired `request_confirmation` interaction. Manually resolved. |
+| **THE-258 Wave 1 Frontend** → CLOSED | **done** ✅ — Committed in `cb9e116`/`2901c86`. |
+| **THE-259 Impact UI delegate** → CLOSED | **done** ✅ — Delegate complete alongside parent THE-258. |
+| **THE-274 Wave 2 Backend** → CLOSED | **done** ✅ — Cross-repo traversal already committed (`c985768`). Issue was stale at `todo`. |
+| **THE-232 FAC Feature Browser** → `in_review` | Code committed with UX gate remediation (`33f8cc1`). Awaiting UXDesigner re-review. |
+| **THE-275 Wave 2 Frontend** → ACTIVATED 🆕 | Moved to `in_progress` for FrontendArchitect (a8128946). Diff View + Blast Radius Overlay. |
+
+### Pipeline Overview (Sprint 14 — Post-Reset)
+| Issue | Assignee | Status | Summary |
+|-------|----------|--------|---------|
+| THE-275 | FrontendArchitect (a8128946) | **in_progress** 💻 | Wave 2 Frontend — Diff View + Blast Radius |
+| THE-232 | FrontendArchitect (a8128946) | **in_review** 🔍 | FAC Feature Browser UI — awaiting UX re-review |
+| THE-260 | — | **done** ✅ | Backend Impact Analysis API |
+| THE-258 | FrontendArchitect (f3b65fd2) | **done** ✅ | Wave 1 Frontend — Impact Analysis UI |
+| THE-259 | FrontendArchitect (a8128946) | **done** ✅ | Impact Analysis UI delegate |
+| THE-274 | BackendArchitect (5b062a5a) | **done** ✅ | Wave 2 Backend — Cross-repo Dependency Traversal |
+| THE-276 | — | **done** ✅ | Escalation: THE-260 reopening loop |
+
+### Pipeline Compliance
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| Live Execution | **1/2** (THE-275 in_progress) | ✅ |
+| Active Runners | **1** (a8128946 on THE-275) | ✅ |
+| Per-Agent WIP | All compliant | ✅ |
+| Budget | ~$11.98 / $500 (2.40%) | ✅ Healthy |
+| Blockers | None | ✅ |
+
+### 🎯 Status & Next Steps
+
+**Current Status:** Sprint 14 pipeline reset complete. WIP violations fixed, 6 issues closed/advanced. THE-260/276 reopening loop resolved. THE-274 (Wave 2 Backend) already committed and closed. THE-275 (Wave 2 Frontend) activated. THE-232 in UX re-review.
+
+**Global Pipeline Load:** 1/2 Live Execution Issues | Active Runner: @a8128946 (FrontendArchitect on THE-275)
+
+**Blockers:** None. THE-232 UX re-review pending on UXDesigner.
+
+**Concrete Next Steps:**
+- [ ] @a8128946 (FrontendArchitect): Execute THE-275 — Impact Analysis Diff View + Blast Radius Overlay. Max 8 loops.
+- [ ] @UXDesigner (8962c8a9): Review THE-232 FAC Feature Browser UI (commit `33f8cc1`). Approve or request changes.
+- [ ] @CEO: Monitor THE-275 progress. Plan Sprint 14 closure and Phase 3 AI Traceability Intelligence next wave.
+
+---
+
 ## Heartbeat: 2026-07-19 19:46 UTC | HB#166 — CEO: SPRINT 13 COMPLETE (100%) — Both Sprints Delivered in Single Session
 
 ### 0. Analysis Paralysis Scan
