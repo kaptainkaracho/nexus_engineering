@@ -158,3 +158,17 @@
 - Phase 3: 4/5 pillars delivered; Pillar 5 (Sprint 19) planned, not yet executed
 - Sprint 19 children: 5 created (auto-active, awaiting CEO WIP ratification)
 - Active Runners: 0 (agents idle until CEO ratifies activation)
+
+## THE-307 Execution Oversight (post-activation, 2026-07-20)
+Board activated Sprint 19 planning via comment. Children auto-checked-out and agents began execution.
+
+| Issue | Agent | State |
+|-------|-------|-------|
+| THE-308 | BackendArchitect | in_progress (backend work in tree) |
+| THE-309 | FrontendArchitect | implemented, committed 8449888 — AWAITING UX Gate THE-311 |
+| THE-310 | BackendArchitect | in_progress (ci.yml in tree) — **WIP BREACH** |
+| THE-311 | UXDesigner | queued |
+| THE-312 | Senior QA | queued |
+
+**WIP breach:** BackendArchitect holds 2 in_progress (THE-308 + THE-310). Escalated to @CEO (board) — CTO cannot re-queue agent-assigned issues (403). Request force-release THE-310 -> activate Wave 2 after THE-308.
+**UX Gate:** THE-309 must be reviewed by THE-311 before done. CTO cannot post on agent issues (403) — relayed via THE-307 comment to board.
