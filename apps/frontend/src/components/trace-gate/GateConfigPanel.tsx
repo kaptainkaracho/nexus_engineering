@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Card, Stack, Container, Badge, Input, RadioGroup } from '@nexus-engineering/shared';
 import { GateStatusBadge } from './GateStatusBadge';
 import { getGateConfig, putGateConfig, runGate } from '../../api/traceGate';
@@ -44,6 +44,24 @@ export function GateConfigPanel({ className = '' }: GateConfigPanelProps) {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [editConfig, setEditConfig] = useState<TraceGateConfig>(DEFAULT_CONFIG);
 
+  // Inline validation (THE-311 #6: error prevention before save)
+  const validationErrors = useMemo<Record<string, string>>(() => {
+    const errs: Record<string, string> = {};
+    if (
+      Number.isNaN(editConfig.coverageThreshold) ||
+      editConfig.coverageThreshold < 0 ||
+      editConfig.coverageThreshold > 100
+    ) {
+      errs.coverageThreshold = 'Must be a number between 0 and 100.';
+    }
+    if (!Number.isInteger(editConfig.maxGaps) || editConfig.maxGaps < 0) {
+      errs.maxGaps = 'Must be a whole number of 0 or more.';
+    }
+    return errs;
+  }, [editConfig.coverageThreshold, editConfig.maxGaps]);
+
+  const hasValidationErrors = Object.keys(validationErrors).length > 0;
+
   // Load current config on mount
   useEffect(() => {
     let cancelled = false;
@@ -71,6 +89,11 @@ export function GateConfigPanel({ className = '' }: GateConfigPanelProps) {
     setSaving(true);
     setError(null);
     setSuccessMsg(null);
+    if (hasValidationErrors) {
+      setError('Please fix the highlighted fields before saving.');
+      setSaving(false);
+      return;
+    }
     try {
       const saved = await putGateConfig(editConfig);
       setConfig(saved);
@@ -109,7 +132,7 @@ export function GateConfigPanel({ className = '' }: GateConfigPanelProps) {
   if (loading) {
     return (
       <Container size="lg" className={className}>
-        <Card padding="xl">
+        <Card padding="lg">
           <Stack gap={12}>
             <div className="h-6 w-48 animate-pulse rounded bg-surface-tertiary" />
             <div className="h-4 w-72 animate-pulse rounded bg-surface-tertiary" />
@@ -145,7 +168,7 @@ export function GateConfigPanel({ className = '' }: GateConfigPanelProps) {
         )}
 
         {/* Configuration Card */}
-        <Card padding="xl">
+        <Card padding="lg">
           <Stack gap={16}>
             <h3 className="text-lg font-semibold text-text-primary">Policy</h3>
 
@@ -160,10 +183,16 @@ export function GateConfigPanel({ className = '' }: GateConfigPanelProps) {
                 min={0}
                 max={100}
                 value={editConfig.coverageThreshold}
-                onChange={(e) => setEditConfig(prev => ({ ...prev, coverageThreshold: Number(e.target.value) || 0 }))}
+                onChange={(e) => setEditConfig((prev: TraceGateConfig) => ({ ...prev, coverageThreshold: Number(e.currentTarget.value) || 0 }))}
                 helperText="Minimum overall trace coverage percentage (0–100)"
+                aria-invalid={Boolean(validationErrors.coverageThreshold)}
                 fullWidth
               />
+              {validationErrors.coverageThreshold && (
+                <p className="text-xs font-medium text-error-600 dark:text-error-400" role="alert">
+                  {validationErrors.coverageThreshold}
+                </p>
+              )}
             </Stack>
 
             {/* Max Gaps */}
@@ -178,8 +207,14 @@ export function GateConfigPanel({ className = '' }: GateConfigPanelProps) {
                 value={editConfig.maxGaps}
                 onChange={(e) => setEditConfig(prev => ({ ...prev, maxGaps: Number(e.target.value) || 0 }))}
                 helperText="Maximum number of cross-artifact gaps allowed"
+                aria-invalid={Boolean(validationErrors.maxGaps)}
                 fullWidth
               />
+              {validationErrors.maxGaps && (
+                <p className="text-xs font-medium text-error-600 dark:text-error-400" role="alert">
+                  {validationErrors.maxGaps}
+                </p>
+              )}
             </Stack>
 
             {/* Required Types */}
@@ -219,20 +254,30 @@ export function GateConfigPanel({ className = '' }: GateConfigPanelProps) {
               <p className="text-sm font-medium text-text-primary">
                 Gate Mode
               </p>
+              {editConfig.mode === 'block' && (
+                <div
+                  role="alert"
+                  className="rounded-lg border border-warning-200 bg-warning-50 p-3 text-sm text-warning-700 dark:border-warning-800 dark:bg-warning-950 dark:text-warning-300"
+                >
+                  Block mode will fail CI when the policy is not met. Test your current
+                  configuration with <strong>Test Gate</strong> before saving to avoid breaking the build.
+                </div>
+              )}
               <RadioGroup
+                name="mode"
                 label="Mode"
                 value={editConfig.mode}
                 options={[
                   { value: 'warn', label: 'Warn — annotate only (non-blocking)' },
                   { value: 'block', label: 'Block — fail the CI job on gate failure' },
                 ]}
-                onChange={(e) => setEditConfig(prev => ({ ...prev, mode: e.target.value as 'block' | 'warn' }))}
+                onChange={(value) => setEditConfig(prev => ({ ...prev, mode: value }))}
               />
             </Stack>
 
             {/* Action buttons */}
             <Stack direction="row" gap={3} className="pt-2">
-              <Button variant="primary" onClick={handleSave} disabled={saving}>
+              <Button variant="primary" onClick={handleSave} disabled={saving || hasValidationErrors}>
                 {saving ? 'Saving...' : 'Save Configuration'}
               </Button>
               <Button variant="secondary" onClick={handleTestGate} disabled={testing}>
@@ -277,7 +322,7 @@ export function GateConfigPanel({ className = '' }: GateConfigPanelProps) {
 
         {/* Gate Test Result */}
         {result && (
-          <Card padding="xl">
+          <Card padding="lg">
             <Stack gap={12}>
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-text-primary">Gate Evaluation Result</h3>
