@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Card, Stack, Container, Button } from '@nexus-engineering/shared';
 import { fetchImpactReport } from '../../api/client';
 import type { ImpactReport as ImpactReportData, ImpactReportArtifact, RiskLevel } from '@nexus-engineering/shared';
+import { downloadBlob, toCsv, toMarkdownImproved, printAsPdf, getExportFilename } from '../../utils/exportReport';
 
 const RISK_BADGE: Record<RiskLevel, { label: string; className: string }> = {
   critical: 'bg-error-100 text-error-700 dark:bg-error-950 dark:text-error-300 ring-1 ring-error-300',
@@ -47,18 +48,22 @@ export function ImpactReport({ file }: { file?: string }) {
   }, [load]);
 
   const handleExport = useCallback(
-    (format: 'json' | 'markdown') => {
+    async (format: 'json' | 'markdown' | 'csv' | 'pdf') => {
       if (!report) return;
-      const blob =
-        format === 'json'
-          ? new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' })
-          : new Blob([toMarkdown(report)], { type: 'text/markdown' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `impact-report.${format === 'json' ? 'json' : 'md'}`;
-      a.click();
-      URL.revokeObjectURL(url);
+      if (format === 'pdf') {
+        printAsPdf(report);
+        return;
+      }
+      const filename = getExportFilename(format);
+      let blob: Blob;
+      if (format === 'json') {
+        blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+      } else if (format === 'csv') {
+        blob = new Blob([toCsv(report)], { type: 'text/csv' });
+      } else {
+        blob = new Blob([toMarkdownImproved(report)], { type: 'text/markdown' });
+      }
+      downloadBlob(blob, filename);
     },
     [report],
   );
@@ -75,12 +80,18 @@ export function ImpactReport({ file }: { file?: string }) {
             </p>
           </div>
           {report && (
-            <div className="flex shrink-0 gap-2">
+            <div className="flex shrink-0 flex-wrap gap-2">
+              <Button variant="secondary" size="sm" onClick={() => handleExport('json')}>
+                Export JSON
+              </Button>
               <Button variant="secondary" size="sm" onClick={() => handleExport('markdown')}>
                 Export MD
               </Button>
-              <Button variant="secondary" size="sm" onClick={() => handleExport('json')}>
-                Export JSON
+              <Button variant="secondary" size="sm" onClick={() => handleExport('csv')}>
+                Export CSV
+              </Button>
+              <Button variant="secondary" size="sm" onClick={() => handleExport('pdf')}>
+                Export PDF
               </Button>
             </div>
           )}
@@ -306,47 +317,6 @@ function ReportSkeleton() {
       <div className="h-40 animate-pulse rounded-xl bg-surface-tertiary" />
     </Stack>
   );
-}
-
-function toMarkdown(report: ImpactReportData): string {
-  const lines: string[] = [];
-  lines.push(`# Impact Report`);
-  lines.push('');
-  lines.push(`**Risk level:** ${report.riskLevel.toUpperCase()}`);
-  lines.push(`**Generated:** ${report.metadata.generatedAt}`);
-  lines.push('');
-  lines.push('## Summary');
-  lines.push('');
-  lines.push(`- Total affected: ${report.summary.totalAffected}`);
-  lines.push(`- Direct / Indirect / Transitive: ${report.summary.directCount} / ${report.summary.indirectCount} / ${report.summary.transitiveCount}`);
-  lines.push(`- Requirements: ${report.summary.requirementCount}, Features: ${report.summary.featureCount}, Tests: ${report.summary.testCount}, ADRs: ${report.summary.adrCount}`);
-  lines.push('');
-  const groups: Array<[string, ImpactReportArtifact[]]> = [
-    ['Requirements', report.affectedRequirements],
-    ['Features', report.affectedFeatures],
-    ['Tests', report.affectedTests],
-    ['Architecture Decisions', report.affectedAdrs],
-  ];
-  for (const [title, items] of groups) {
-    lines.push(`## ${title}`);
-    lines.push('');
-    if (items.length === 0) {
-      lines.push('_None affected._');
-    } else {
-      for (const a of items) {
-        lines.push(`- **${a.title}** (${a.id}) — ${a.impactLevel}, ${a.confidence} (${Math.round(a.confidenceScore * 100)}%)`);
-      }
-    }
-    lines.push('');
-  }
-  if (report.recommendations.length > 0) {
-    lines.push('## Recommendations');
-    lines.push('');
-    for (const r of report.recommendations) {
-      lines.push(`- [${r.severity.toUpperCase()}] ${r.message} (${r.category})`);
-    }
-  }
-  return lines.join('\n');
 }
 
 export default ImpactReport;
