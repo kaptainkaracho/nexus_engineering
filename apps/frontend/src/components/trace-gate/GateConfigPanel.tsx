@@ -25,7 +25,7 @@ function formatViolationMessage(v: GateViolation): string {
     return `${v.message} (actual: ${v.actual}, expected: ${v.expected})`;
   }
   if (Array.isArray(v.actual)) {
-    return `${v.message} (actual: [${v.actual.join(', ')}], expected: [${v.expected as string[]?.join(', ')}])`;
+    return `${v.message} (actual: [${v.actual.join(', ')}], expected: [${(v.expected as string[]).join(', ')}])`;
   }
   return v.message;
 }
