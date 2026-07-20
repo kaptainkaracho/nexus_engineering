@@ -1,9 +1,10 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
-import type { ImpactScope, TraceabilityReport, DomainCoverage } from '@nexus-engineering/shared'
+import type { ImpactScope, TraceabilityReport, DomainCoverage, RecommendationType, RecommendationSeverity } from '@nexus-engineering/shared'
 import { traverseGraph } from '../services/traceabilityService'
 import { resolveNodeRepo } from '../services/crossRepoTraversal'
 import { impactAnalyzer } from '../ai/impactAnalyzer'
 import { coverageAnalyzer } from '../ai/coverageAnalyzer'
+import { recommendationEngine } from '../ai/recommendationEngine'
 import { getLLMClient } from '../ai/llmClient'
 import { buildTraceabilityReportPrompt } from '../ai/promptTemplates'
 import { existsSync } from 'fs'
@@ -409,6 +410,37 @@ function countCommits(base: string, branch: string): number {
   }
 }
 
+export async function getTraceabilityRecommendations (request: FastifyRequest, reply: FastifyReply) {
+  try {
+    const query = request.query as {
+      severity?: string | string[]
+      type?: string | string[]
+      limit?: string
+      minConfidence?: string
+    }
+
+    const severity = parseList(query.severity) as RecommendationSeverity[] | undefined
+    const type = parseList(query.type) as RecommendationType[] | undefined
+    const limit = query.limit ? Number(query.limit) : undefined
+    const minConfidence = query.minConfidence ? Number(query.minConfidence) : undefined
+
+    if (query.limit && (isNaN(limit!) || limit! < 0)) {
+      return reply.status(400).send({ error: 'Invalid limit parameter. Must be a non-negative number.' })
+    }
+    if (query.minConfidence && (isNaN(minConfidence!) || minConfidence! < 0 || minConfidence! > 1)) {
+      return reply.status(400).send({ error: 'Invalid minConfidence parameter. Must be between 0 and 1.' })
+    }
+
+    const recommendations = await recommendationEngine.generateFromGraph()
+    const response = recommendationEngine.query(recommendations, { severity, type, limit, minConfidence })
+
+    return reply.send({ ...response, data: response.recommendations })
+  } catch (error) {
+    reply.log.error(error as Error)
+    return reply.status(500).send({ error: 'Failed to generate traceability recommendations' })
+  }
+}
+
 export function traceabilityRoutes (server: FastifyInstance) {
   server.get('/api/traceability/graph', getTraceabilityGraph)
   server.get('/api/traceability/impact/:artifactId', getTraceabilityImpact)
@@ -416,4 +448,5 @@ export function traceabilityRoutes (server: FastifyInstance) {
   server.get('/api/traceability/coverage', getTraceabilityCoverage)
   server.get('/api/traceability/report', getTraceabilityReport)
   server.get('/api/traceability/impact-report', getTraceabilityImpactReport)
+  server.get('/api/traceability/recommendations', getTraceabilityRecommendations)
 }

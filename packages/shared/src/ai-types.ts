@@ -260,7 +260,70 @@ export interface TraceabilityReport {
   llmAnalysis?: string
 }
 
+import type { TraceLink } from './types'
+
 export interface StructuredLLMResponse {
   analysisType: string
   [key: string]: unknown
+}
+
+// ---------------------------------------------------------------------------
+// Coverage Gap Analyzer + Recommendation Engine (THE-288)
+// ---------------------------------------------------------------------------
+
+export type RecommendationType =
+  | 'addTestCoverage'
+  | 'linkRequirementToFeature'
+  | 'linkAdrToImplementation'
+  | 'verifyStaleTraceLink'
+  | 'removeOrphan'
+
+export type RecommendationSeverity = 'high' | 'medium' | 'low'
+
+/**
+ * A confidence-scored auto-fix suggestion for a single gap. `confidence` is the
+ * engine's certainty (0..1) that applying `suggestedLink` (or `action`) will
+ * resolve the underlying gap.
+ */
+export interface AutoFixSuggestion {
+  action: string
+  suggestedLink?: {
+    sourceId: string
+    targetId: string
+    relationshipType: TraceLink['relationshipType']
+    confidence: TraceLink['confidence']
+  }
+  confidence: number
+}
+
+export interface TraceRecommendation {
+  id: string
+  type: RecommendationType
+  severity: RecommendationSeverity
+  title: string
+  description: string
+  targetIds: string[]
+  /** Engine certainty (0..1) that this recommendation is valid. */
+  confidence: number
+  autoFix: AutoFixSuggestion
+  rationale: string
+}
+
+export interface RecommendationQuery {
+  severity?: RecommendationSeverity[]
+  type?: RecommendationType[]
+  limit?: number
+  minConfidence?: number
+}
+
+export interface RecommendationResponse {
+  total: number
+  filtered: number
+  recommendations: TraceRecommendation[]
+  summary: {
+    high: number
+    medium: number
+    low: number
+  }
+  generatedAt: string
 }

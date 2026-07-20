@@ -96,4 +96,47 @@ describe('Traceability Graph Query API', () => {
     expect(body.format).toBe('json')
     expect(body.coverage).toBeDefined()
   })
+
+  it('GET /api/traceability/recommendations returns confidence-scored recommendations', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/traceability/recommendations' })
+    expect(res.statusCode).toBe(200)
+    const body = res.json()
+    expect(Array.isArray(body.recommendations)).toBe(true)
+    expect(body.total).toBeGreaterThan(0)
+    for (const r of body.recommendations) {
+      expect(r.id).toBeDefined()
+      expect(r.type).toBeDefined()
+      expect(r.severity).toMatch(/high|medium|low/)
+      expect(r.confidence).toBeGreaterThanOrEqual(0)
+      expect(r.confidence).toBeLessThanOrEqual(1)
+      expect(r.autoFix).toBeDefined()
+      expect(r.autoFix.confidence).toBeGreaterThanOrEqual(0)
+    }
+  })
+
+  it('GET /api/traceability/recommendations?severity=high filters by severity', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/traceability/recommendations?severity=high' })
+    expect(res.statusCode).toBe(200)
+    const body = res.json()
+    expect(body.recommendations.every((r: any) => r.severity === 'high')).toBe(true)
+  })
+
+  it('GET /api/traceability/recommendations?type=addTestCoverage filters by type', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/traceability/recommendations?type=addTestCoverage' })
+    expect(res.statusCode).toBe(200)
+    const body = res.json()
+    expect(body.recommendations.every((r: any) => r.type === 'addTestCoverage')).toBe(true)
+  })
+
+  it('GET /api/traceability/recommendations?limit=1 limits results', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/traceability/recommendations?limit=1' })
+    expect(res.statusCode).toBe(200)
+    const body = res.json()
+    expect(body.recommendations.length).toBe(1)
+  })
+
+  it('GET /api/traceability/recommendations?limit=invalid returns 400', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/traceability/recommendations?limit=-1' })
+    expect(res.statusCode).toBe(400)
+  })
 })

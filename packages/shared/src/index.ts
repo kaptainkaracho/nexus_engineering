@@ -142,6 +142,12 @@ export type {
   ImpactReportMetadata,
   ImpactReport,
   ImpactReportInput,
+  RecommendationType,
+  RecommendationSeverity,
+  AutoFixSuggestion,
+  TraceRecommendation,
+  RecommendationQuery,
+  RecommendationResponse,
 } from './ai-types';
 
 export { V_MODEL_AXES, CONFIDENCE_SCORE } from './ai-types';
