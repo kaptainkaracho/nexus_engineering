@@ -1,5 +1,5 @@
 # FrontendArchitect Context State
-> Last updated: 2026-07-20T18:30:00Z
+> Last updated: 2026-07-20T18:35:00Z
 
 ## THE-232 — FAC Feature Browser UI (Epic B)
 **Status: DONE** — UX Quality Gate approved by UXDesigner
@@ -48,12 +48,14 @@
 ### Commits
 - `76579c1` — feat(frontend): add Recommendations Panel + Gap Visualization UI (THE-289)
 - `1ad7374` — fix(frontend): fix Badge variant prop and filter intersection counts (THE-289)
+- `244fc4e` — fix(frontend): replace amber-* tokens with warning-* tokens (THE-289)
 
 ### UX Gate Fixes Applied
 - Removed unsupported `size` prop from Badge component usage (lines 533, 551)
 - Added `variant` prop to severity badges (mapped: critical→critical, high→high, medium→medium, low→low)
 - Used `variant="info"` for category badges
 - Filter badge counts now compute intersection counts (respect active category + severity filters)
+- Replaced all `amber-*` tokens with `warning-*` tokens (design system violation — amber does not exist)
 - `tsc -b` clean: No errors
 
 ### Files Created
@@ -103,3 +105,25 @@
 
 ### Next Action
 - Hand to @UXDesigner for UX Quality Gate review, then QA handoff
+
+## THE-291 — Fix TypeScript Errors in Recommendations Panel
+**Status: DONE** — No TypeScript errors found.
+
+### Verification
+- `tsc -b` — No errors found
+- `tsc --noEmit --project apps/frontend/tsconfig.json` — No errors found
+- ESLint on `apps/frontend/src/views/RecommendationsPanel/` — clean
+
+### Assessment
+All TypeScript issues that THE-291 targeted were already resolved in THE-289 fix commits:
+- `1ad7374`: Fixed Badge variant prop usage and filter intersection counts
+- `244fc4e`: Replaced amber-* tokens with warning-* tokens
+
+No further work needed.
+
+### Files Read This Session
+- apps/frontend/src/views/RecommendationsPanel/RecommendationsPanel.tsx
+- apps/frontend/src/api/client.ts (grep)
+
+### Disposition
+- FrontendArchitect work: COMPLETE (no errors to fix)
