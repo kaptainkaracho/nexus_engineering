@@ -20,10 +20,10 @@ const SEVERITY_CONFIG: Record<RecommendationSeverity, { bg: string; text: string
     dot: 'bg-error-500 dark:bg-error-400',
   },
   high: {
-    bg: 'bg-amber-100 dark:bg-amber-950',
-    text: 'text-amber-700 dark:text-amber-300',
-    ring: 'ring-amber-300 dark:ring-amber-800',
-    dot: 'bg-amber-500 dark:bg-amber-400',
+    bg: 'bg-warning-100 dark:bg-warning-950',
+    text: 'text-warning-700 dark:text-warning-300',
+    ring: 'ring-warning-300 dark:ring-warning-800',
+    dot: 'bg-warning-500 dark:bg-warning-400',
   },
   medium: {
     bg: 'bg-info-100 dark:bg-info-950',

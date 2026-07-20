@@ -1,5 +1,5 @@
 # FrontendArchitect Context State
-> Last updated: 2026-07-20T18:00:00Z
+> Last updated: 2026-07-20T18:30:00Z
 
 ## THE-232 — FAC Feature Browser UI (Epic B)
 **Status: DONE** — UX Quality Gate approved by UXDesigner
@@ -43,10 +43,18 @@
 - [x] UX Gate pass (positive)
 
 ## THE-289 — Recommendations Panel + Gap Visualization UI
-**Status: in_review** — Awaiting UXDesigner Quality Gate
+**Status: in_review** — Awaiting 2nd UXDesigner Quality Gate (changes applied)
 
 ### Commits
 - `76579c1` — feat(frontend): add Recommendations Panel + Gap Visualization UI (THE-289)
+- `1ad7374` — fix(frontend): fix Badge variant prop and filter intersection counts (THE-289)
+
+### UX Gate Fixes Applied
+- Removed unsupported `size` prop from Badge component usage (lines 533, 551)
+- Added `variant` prop to severity badges (mapped: critical→critical, high→high, medium→medium, low→low)
+- Used `variant="info"` for category badges
+- Filter badge counts now compute intersection counts (respect active category + severity filters)
+- `tsc -b` clean: No errors
 
 ### Files Created
 - `apps/frontend/src/views/RecommendationsPanel/RecommendationsPanel.tsx` (829 lines)
@@ -56,25 +64,13 @@
 - `apps/frontend/src/App.tsx` (added `#recommendations` route + nav item)
 - `apps/frontend/src/api/client.ts` (Recommendation/CrossArtifactGap types + API methods)
 
-### DoD Checklist
-- [x] View component RecommendationsPanel in apps/frontend/src/views/RecommendationsPanel/
-- [x] Severity/category filtering with chip UI and badge counts
-- [x] Gap visualization with coverage progress bars and stats grid
-- [x] Summary stats dashboard (total, pending, accepted, high-risk, avg score, gaps, avg gap)
-- [x] Loading skeleton shimmer, error+retry, empty states (no results + no gaps)
-- [x] Accept/dismiss actions with optimistic updates and loading state
-- [x] Responsive grid layout (mobile-first: grid-cols-2→4→7)
-- [x] Full a11y: keyboard nav, ARIA roles/labels, semantic HTML
-- [x] App.tsx routing + nav item integration
-- [ ] UX Gate: PENDING @UXDesigner review
-
 ## Blockers
 - None
 
 ## Next Action
 - THE-232: No further work needed (done)
 - THE-275: Wait for reviewer approval
-- THE-289: Hand to @UXDesigner for UX Quality Gate review
+- THE-289: Reassign to @UXDesigner for 2nd UX Quality Gate pass — fixes applied, tsc -b clean
 
 ## THE-280 — Impact Report UI (Epic C)
 **Status: in_review** — Awaiting UXDesigner Quality Gate
