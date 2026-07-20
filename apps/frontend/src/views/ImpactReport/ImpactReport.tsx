@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Card, Stack, Container, Button } from '@nexus-engineering/shared';
 import { fetchImpactReport } from '../../api/client';
 import type { ImpactReport as ImpactReportData, ImpactReportArtifact, RiskLevel } from '@nexus-engineering/shared';
-import { downloadBlob, toCsv, toMarkdownImproved, printAsPdf, getExportFilename } from '../../utils/exportReport';
+import { downloadBlob, toCsv, toMarkdownImproved, printAsPdf, getExportFilename, copyToClipboard } from '../../utils/exportReport';
 
 const RISK_BADGE: Record<RiskLevel, { label: string; className: string }> = {
   critical: 'bg-error-100 text-error-700 dark:bg-error-950 dark:text-error-300 ring-1 ring-error-300',
@@ -29,6 +29,7 @@ export function ImpactReport({ file }: { file?: string }) {
   const [report, setReport] = useState<ImpactReportData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -68,6 +69,15 @@ export function ImpactReport({ file }: { file?: string }) {
     [report],
   );
 
+  const handleCopyMarkdown = useCallback(async () => {
+    if (!report) return;
+    const ok = await copyToClipboard(toMarkdownImproved(report));
+    if (ok) {
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    }
+  }, [report]);
+
   return (
     <Container size="lg">
       <Stack gap={6}>
@@ -86,6 +96,14 @@ export function ImpactReport({ file }: { file?: string }) {
               </Button>
               <Button variant="secondary" size="sm" onClick={() => handleExport('markdown')}>
                 Export MD
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => void handleCopyMarkdown()}
+                aria-label={copied ? 'Markdown copied to clipboard' : 'Copy markdown report to clipboard'}
+              >
+                {copied ? 'Copied ✓' : 'Copy MD'}
               </Button>
               <Button variant="secondary" size="sm" onClick={() => handleExport('csv')}>
                 Export CSV
