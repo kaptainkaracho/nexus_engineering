@@ -135,6 +135,13 @@ export type {
   ImpactAnalysisV2,
   TraceabilityReport,
   StructuredLLMResponse,
+  RiskLevel,
+  ImpactReportArtifact,
+  ImpactReportRecommendation,
+  ImpactReportSummary,
+  ImpactReportMetadata,
+  ImpactReport,
+  ImpactReportInput,
 } from './ai-types';
 
 export { V_MODEL_AXES, CONFIDENCE_SCORE } from './ai-types';

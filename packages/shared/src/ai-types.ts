@@ -189,6 +189,67 @@ export interface ImpactAnalysisV2 {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Impact Report Generator (THE-278) — structured, human-readable impact report
+// ---------------------------------------------------------------------------
+
+export type RiskLevel = 'critical' | 'high' | 'medium' | 'low'
+
+export interface ImpactReportArtifact {
+  id: string
+  type: string
+  title: string
+  impactLevel: 'direct' | 'indirect' | 'transitive'
+  relationshipType: string
+  confidence: string
+  confidenceScore: number
+  path: string[]
+}
+
+export interface ImpactReportRecommendation {
+  id: string
+  severity: RiskLevel
+  category: 'test' | 'review' | 'architecture' | 'requirements' | 'coverage'
+  message: string
+}
+
+export interface ImpactReportSummary {
+  totalAffected: number
+  directCount: number
+  indirectCount: number
+  transitiveCount: number
+  requirementCount: number
+  featureCount: number
+  testCount: number
+  adrCount: number
+  minConfidence: number
+  maxConfidence: number
+}
+
+export interface ImpactReportMetadata {
+  changedFiles: string[]
+  resolvedArtifactIds: string[]
+  changeDescription?: string
+  generatedAt: string
+}
+
+export interface ImpactReport {
+  summary: ImpactReportSummary
+  affectedRequirements: ImpactReportArtifact[]
+  affectedFeatures: ImpactReportArtifact[]
+  affectedTests: ImpactReportArtifact[]
+  affectedAdrs: ImpactReportArtifact[]
+  riskLevel: RiskLevel
+  recommendations: ImpactReportRecommendation[]
+  metadata: ImpactReportMetadata
+}
+
+export interface ImpactReportInput {
+  fileChanges: string[]
+  artifactIds?: string[]
+  changeDescription?: string
+}
+
 // LLM structured outputs + reports
 export interface TraceabilityReport {
   generatedAt: string
