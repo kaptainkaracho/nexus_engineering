@@ -83,7 +83,7 @@ interface DashboardData {
 function EmptyState() {
   return (
     <Container size="lg">
-      <Stack gap={6} align="center" style={{ paddingTop: 80 }}>
+      <Stack gap={6} align="center" className="pt-20">
         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-tertiary">
           <svg
             className="h-8 w-8 text-text-tertiary"
@@ -130,7 +130,7 @@ function LoadingState() {
 function ErrorState({ onRetry }: { onRetry: () => void }) {
   return (
     <Container size="lg">
-      <Stack gap={6} align="center" style={{ paddingTop: 80 }}>
+      <Stack gap={6} align="center" className="pt-20">
         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-error-100 dark:bg-error-950">
           <svg
             className="h-8 w-8 text-error-600 dark:text-error-400"
