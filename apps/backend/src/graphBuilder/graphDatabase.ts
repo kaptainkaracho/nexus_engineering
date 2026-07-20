@@ -296,6 +296,12 @@ export class GraphDatabase {
   close() {
     this.db.close()
   }
+
+  /** Remove all graph data. Intended for test isolation. */
+  clear() {
+    this.db.exec('DELETE FROM graph_edges')
+    this.db.exec('DELETE FROM graph_nodes')
+  }
 }
 
 let databaseInstance: GraphDatabase | null = null

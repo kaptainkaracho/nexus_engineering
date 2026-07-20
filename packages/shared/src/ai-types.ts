@@ -268,6 +268,69 @@ export interface StructuredLLMResponse {
 }
 
 // ---------------------------------------------------------------------------
+// NL Query Parser + API (THE-293) — natural-language trace queries
+// ---------------------------------------------------------------------------
+
+export type NLQueryIntent =
+  | 'requirement_query'
+  | 'feature_query'
+  | 'test_query'
+  | 'impact_query'
+  | 'adr_query'
+
+export interface NLQueryEntityFilters {
+  /** Extracted module/domain name (e.g. "auth", "RBAC"). */
+  module?: string
+  /** Extracted artifact type hint. */
+  artifactType?: string
+  /** Extracted status keyword: 'untested' | 'linked' | 'orphan' | 'stale'. */
+  status?: string
+  /** Extracted source file path for impact queries (e.g. "login.ts"). */
+  file?: string
+}
+
+export interface ParsedNLQuery {
+  intent: NLQueryIntent
+  entityFilters: NLQueryEntityFilters
+  rawQuery: string
+}
+
+export interface NLQueryTraceLink {
+  targetId: string
+  targetType: string
+  relationshipType: string
+  confidence: string
+}
+
+export interface NLQueryResultItem {
+  id: string
+  type: string
+  title?: string
+  name?: string
+  traceLinks?: NLQueryTraceLink[]
+}
+
+export interface NLQueryResult {
+  query: ParsedNLQuery
+  results: NLQueryResultItem[]
+  totalResults: number
+  metadata: {
+    parsedIntent: NLQueryIntent
+    executionTimeMs: number
+  }
+}
+
+export interface NLQueryRequest {
+  query: string
+}
+
+export interface NLQueryResponse {
+  success: boolean
+  data?: NLQueryResult
+  error?: string
+}
+
+// ---------------------------------------------------------------------------
 // Coverage Gap Analyzer + Recommendation Engine (THE-288)
 // ---------------------------------------------------------------------------
 
