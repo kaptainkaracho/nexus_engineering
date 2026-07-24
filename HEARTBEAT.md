@@ -1,5 +1,22 @@
 # HEARTBEAT.md — Pipeline Compliance Report
 
+## Heartbeat: 2026-07-25 | HB#257 — THE-345 DONE: v0.1.0 Released
+
+### CTO Closure — THE-345
+
+| Artifact | Status | Detail |
+|----------|--------|--------|
+| Tag v0.1.0 | ✅ Pushed | `9353d81` on origin |
+| Main branch | ✅ Pushed | `d40c061` |
+| Tests | ✅ 372/373 | 1 pre-existing (THE-469) |
+| E2E | ✅ 120/120 | THE-331 QA: PASS |
+| Release branch | ✅ Merged | `release/v0.1.0` → `main` |
+| RELEASE_NOTES | ✅ Published | Known issues documented |
+
+**Disposition: DONE.** v0.1.0 is live on GitHub. Sprint 20 complete.
+
+---
+
 ## Heartbeat: 2026-07-25 01:40 UTC | HB#256 — THE-331 DONE: QA Sign-Off Complete, Release Gate Green
 
 ### 0. Analysis Paralysis Scan
