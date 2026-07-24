@@ -3,6 +3,7 @@ import fastify from 'fastify'
 import { mkdtempSync, writeFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { registerErrorHandler } from '../lib/errorHandler'
 import { featuresRoutes } from './features'
 
 const SAMPLE = `nexus:
@@ -45,6 +46,7 @@ describe('features API', () => {
     process.env.FAC_DIR = dir
     writeFileSync(join(dir, 'checkout.feature.yaml'), SAMPLE)
     app = fastify()
+    registerErrorHandler(app)
     featuresRoutes(app)
     await app.ready()
   })
