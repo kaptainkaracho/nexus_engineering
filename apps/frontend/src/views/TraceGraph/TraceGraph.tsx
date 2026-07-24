@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, Stack, Container } from '@nexus-engineering/shared';
+import { Card, Stack, Container, Badge } from '@nexus-engineering/shared';
 
 interface TraceNode {
   id: string;
@@ -104,19 +104,40 @@ const MOCK_DATA: MockTraceGraph = {
   },
 };
 
-const TYPE_COLORS: Record<string, { bg: string; text: string; border: string; dot: string }> = {
-  requirement: { bg: 'bg-blue-50 dark:bg-blue-950', text: 'text-blue-700 dark:text-blue-300', border: 'border-blue-200 dark:border-blue-800', dot: 'bg-blue-500' },
-  feature: { bg: 'bg-purple-50 dark:bg-purple-950', text: 'text-purple-700 dark:text-purple-300', border: 'border-purple-200 dark:border-purple-800', dot: 'bg-purple-500' },
-  architecture: { bg: 'bg-amber-50 dark:bg-amber-950', text: 'text-amber-700 dark:text-amber-300', border: 'border-amber-200 dark:border-amber-800', dot: 'bg-amber-500' },
-  testCase: { bg: 'bg-green-50 dark:bg-green-950', text: 'text-green-700 dark:text-green-300', border: 'border-green-200 dark:border-green-800', dot: 'bg-green-500' },
-  result: { bg: 'bg-gray-50 dark:bg-gray-950', text: 'text-gray-700 dark:text-gray-300', border: 'border-gray-200 dark:border-gray-800', dot: 'bg-gray-500' },
-};
+function typeColorMap(type: string): { bg: string; text: string; border: string; dot: string } {
+  const map: Record<string, { bg: string; text: string; border: string; dot: string }> = {
+    requirement:  { bg: 'bg-primary-50 dark:bg-primary-950', text: 'text-primary-700 dark:text-primary-300', border: 'border-primary-200 dark:border-primary-800', dot: 'bg-primary-500' },
+    feature:      { bg: 'bg-secondary-50 dark:bg-secondary-950', text: 'text-secondary-700 dark:text-secondary-300', border: 'border-secondary-200 dark:border-secondary-800', dot: 'bg-secondary-500' },
+    architecture: { bg: 'bg-warning-50 dark:bg-warning-950', text: 'text-warning-700 dark:text-warning-300', border: 'border-warning-200 dark:border-warning-800', dot: 'bg-warning-500' },
+    testCase:     { bg: 'bg-success-50 dark:bg-success-950', text: 'text-success-700 dark:text-success-300', border: 'border-success-200 dark:border-success-800', dot: 'bg-success-500' },
+    result:       { bg: 'bg-neutral-50 dark:bg-neutral-950', text: 'text-neutral-700 dark:text-neutral-300', border: 'border-neutral-200 dark:border-neutral-800', dot: 'bg-neutral-500' },
+  };
+  return map[type] ?? map.result;
+}
 
-const CONFIDENCE_COLORS: Record<string, string> = {
-  high: 'text-green-600 dark:text-green-400',
-  medium: 'text-yellow-600 dark:text-yellow-400',
-  low: 'text-red-600 dark:text-red-400',
-};
+function confidenceBadgeVariant(score: number): string {
+  if (score >= 0.9) return 'success';
+  if (score >= 0.7) return 'warning';
+  return 'critical';
+}
+
+function confidenceTextColor(score: number): string {
+  if (score >= 0.9) return 'text-success-600 dark:text-success-400';
+  if (score >= 0.7) return 'text-warning-600 dark:text-warning-400';
+  return 'text-error-600 dark:text-error-400';
+}
+
+function coverageTextColor(pct: number): string {
+  if (pct >= 80) return 'text-success-600 dark:text-success-400';
+  if (pct >= 50) return 'text-warning-600 dark:text-warning-400';
+  return 'text-error-600 dark:text-error-400';
+}
+
+function coverageBarColor(pct: number): string {
+  if (pct >= 80) return 'bg-success-500 dark:bg-success-400';
+  if (pct >= 50) return 'bg-warning-500 dark:bg-warning-400';
+  return 'bg-error-500 dark:bg-error-400';
+}
 
 export function TraceGraph() {
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
@@ -134,6 +155,9 @@ export function TraceGraph() {
       : [selectedNode!]
   );
 
+  const overallPct = data.coverage.overallCoveragePercent;
+  const typeColors = typeColorMap(selected?.type ?? 'result');
+
   return (
     <Container size="lg">
       <Stack gap={6}>
@@ -144,11 +168,11 @@ export function TraceGraph() {
           </p>
         </div>
 
-        <Grid3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card padding="lg">
             <p className="text-sm font-medium text-text-tertiary uppercase tracking-wide">Overall Coverage</p>
-            <p className={`mt-2 text-3xl font-bold ${data.coverage.overallCoveragePercent >= 80 ? 'text-green-600 dark:text-green-400' : data.coverage.overallCoveragePercent >= 50 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`}>
-              {data.coverage.overallCoveragePercent}%
+            <p className={`mt-2 text-3xl font-bold ${coverageTextColor(overallPct)}`}>
+              {overallPct}%
             </p>
             <p className="mt-1 text-xs text-text-tertiary">
               {data.coverage.summary.totalArtifacts} artifacts analyzed
@@ -157,7 +181,7 @@ export function TraceGraph() {
 
           <Card padding="lg">
             <p className="text-sm font-medium text-text-tertiary uppercase tracking-wide">High Risk Gaps</p>
-            <p className="mt-2 text-3xl font-bold text-red-600 dark:text-red-400">
+            <p className="mt-2 text-3xl font-bold text-error-600 dark:text-error-400">
               {data.coverage.summary.highRiskCount}
             </p>
             <p className="mt-1 text-xs text-text-tertiary">
@@ -167,14 +191,14 @@ export function TraceGraph() {
 
           <Card padding="lg">
             <p className="text-sm font-medium text-text-tertiary uppercase tracking-wide">Direct Links</p>
-            <p className="mt-2 text-3xl font-bold text-blue-600 dark:text-blue-400">
+            <p className="mt-2 text-3xl font-bold text-primary-600 dark:text-primary-400">
               {data.edges.length}
             </p>
             <p className="mt-1 text-xs text-text-tertiary">
               traceability relationships
             </p>
           </Card>
-        </Grid3>
+        </div>
 
         <Stack gap={6}>
           <Card padding="lg">
@@ -185,7 +209,7 @@ export function TraceGraph() {
                   <span className="w-28 text-sm font-medium text-text-secondary capitalize">{axis.axis}</span>
                   <div className="flex-1 h-3 bg-surface-tertiary rounded-full overflow-hidden">
                     <div
-                      className={`h-full rounded-full ${axis.coveragePercent >= 80 ? 'bg-green-500' : axis.coveragePercent >= 50 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                      className={`h-full rounded-full transition-all duration-700 ${coverageBarColor(axis.coveragePercent)}`}
                       style={{ width: `${axis.coveragePercent}%` }}
                     />
                   </div>
@@ -203,7 +227,7 @@ export function TraceGraph() {
               <h3 className="text-base font-semibold text-text-primary mb-4">Nodes ({data.nodes.length})</h3>
               <Stack gap={2}>
                 {data.nodes.map(node => {
-                  const colors = TYPE_COLORS[node.type] || TYPE_COLORS.result;
+                  const colors = typeColorMap(node.type);
                   const isSelected = selectedNode === node.id;
                   const isConnected = selectedNode !== null && connectedNodeIds.has(node.id);
                   return (
@@ -231,9 +255,9 @@ export function TraceGraph() {
                       <div className="flex items-center justify-between mt-1">
                         <span className="text-xs text-text-tertiary capitalize">{node.type}</span>
                         {node.confidenceScore !== undefined && (
-                          <span className={`text-xs font-medium ${CONFIDENCE_COLORS[node.confidenceScore >= 0.9 ? 'high' : node.confidenceScore >= 0.7 ? 'medium' : 'low']}`}>
+                          <Badge variant={confidenceBadgeVariant(node.confidenceScore)}>
                             {Math.round(node.confidenceScore * 100)}%
-                          </span>
+                          </Badge>
                         )}
                       </div>
                     </button>
@@ -252,18 +276,18 @@ export function TraceGraph() {
                     connectedEdges.map((edge, i) => {
                       const source = nodeMap.get(edge.sourceId);
                       const target = nodeMap.get(edge.targetId);
-                      const edgeColors = CONFIDENCE_COLORS[edge.confidence] || 'text-text-tertiary';
+                      const edgeColors = typeColorMap(source?.type ?? 'result');
                       return (
                         <div key={i} className="flex items-center gap-2 py-2 border-b border-border last:border-b-0">
-                          <span className={`text-xs font-mono px-2 py-1 rounded ${TYPE_COLORS[source?.type || 'result'].bg} ${TYPE_COLORS[source?.type || 'result'].text}`}>
+                          <span className={`text-xs font-mono px-2 py-1 rounded ${edgeColors.bg} ${edgeColors.text}`}>
                             {source?.title || source?.id}
                           </span>
                           <span className="flex-1 text-center">
-                            <span className={`text-xs font-medium ${edgeColors}`}>
+                            <span className={`text-xs font-medium ${confidenceTextColor(edge.confidenceScore)}`}>
                               {edge.relationshipType} ({Math.round(edge.confidenceScore * 100)}%)
                             </span>
                           </span>
-                          <span className={`text-xs font-mono px-2 py-1 rounded ${TYPE_COLORS[target?.type || 'result'].bg} ${TYPE_COLORS[target?.type || 'result'].text}`}>
+                          <span className={`text-xs font-mono px-2 py-1 rounded ${typeColorMap(target?.type ?? 'result').bg} ${typeColorMap(target?.type ?? 'result').text}`}>
                             {target?.title || target?.id}
                           </span>
                         </div>
@@ -287,18 +311,18 @@ export function TraceGraph() {
 
           <Card variant="outlined" padding="lg">
             <h3 className="text-base font-semibold text-text-primary mb-4">Domain Breakdown</h3>
-            <Grid3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {data.coverage.domainCoverage.map(domain => (
                 <div key={domain.domain} className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-text-secondary capitalize">{domain.domain}</span>
-                    <span className={`text-sm font-bold ${domain.coveragePercent >= 80 ? 'text-green-600 dark:text-green-400' : domain.coveragePercent >= 50 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`}>
+                    <span className={`text-sm font-bold ${coverageTextColor(domain.coveragePercent)}`}>
                       {domain.coveragePercent}%
                     </span>
                   </div>
                   <div className="h-2 bg-surface-tertiary rounded-full overflow-hidden">
                     <div
-                      className={`h-full rounded-full ${domain.coveragePercent >= 80 ? 'bg-green-500' : domain.coveragePercent >= 50 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                      className={`h-full rounded-full transition-all duration-700 ${coverageBarColor(domain.coveragePercent)}`}
                       style={{ width: `${domain.coveragePercent}%` }}
                     />
                   </div>
@@ -307,19 +331,11 @@ export function TraceGraph() {
                   </p>
                 </div>
               ))}
-            </Grid3>
+            </div>
           </Card>
         </Stack>
       </Stack>
     </Container>
-  );
-}
-
-function Grid3({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {children}
-    </div>
   );
 }
 

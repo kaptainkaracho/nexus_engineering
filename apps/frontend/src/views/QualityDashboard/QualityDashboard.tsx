@@ -21,28 +21,28 @@ function formatScore(score: number): string {
   return `${Math.round(score * 100)}%`;
 }
 
-function healthColor(pct: number): string {
-  if (pct >= 80) return 'text-success-600 dark:text-success-400';
-  if (pct >= 50) return 'text-warning-600 dark:text-warning-400';
-  return 'text-error-600 dark:text-error-400';
-}
-
-function healthBg(pct: number): string {
-  if (pct >= 80) return 'bg-success-100 dark:bg-success-950';
-  if (pct >= 50) return 'bg-warning-100 dark:bg-warning-950';
-  return 'bg-error-100 dark:bg-error-950';
-}
-
-function healthLabel(pct: number): string {
-  if (pct >= 80) return 'Healthy';
-  if (pct >= 50) return 'Needs Attention';
-  return 'Critical';
+function coverageBadgeVariant(pct: number): string {
+  if (pct >= 80) return 'success';
+  if (pct >= 50) return 'warning';
+  return 'critical';
 }
 
 function coverageBarColor(pct: number): string {
   if (pct >= 80) return 'bg-success-500 dark:bg-success-400';
   if (pct >= 50) return 'bg-warning-500 dark:bg-warning-400';
   return 'bg-error-500 dark:bg-error-400';
+}
+
+function healthColor(pct: number): string {
+  if (pct >= 80) return 'text-success-600 dark:text-success-400';
+  if (pct >= 50) return 'text-warning-600 dark:text-warning-400';
+  return 'text-error-600 dark:text-error-400';
+}
+
+function healthLabel(pct: number): string {
+  if (pct >= 80) return 'Healthy';
+  if (pct >= 50) return 'Needs Attention';
+  return 'Critical';
 }
 
 function gapSeverityBadge(severity: string): string {
@@ -177,7 +177,7 @@ function HealthOverview({ report }: { report: CoverageAnalysisReport }) {
         <h3 className="text-base font-semibold text-text-primary">Health Overview</h3>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
           {metrics.map((m) => (
-            <div key={m.label} className={`${healthBg(overallPct)} rounded-xl p-4 ring-1 ring-inset ring-border/50 dark:ring-border/30`}>
+            <div key={m.label} className={`${overallPct >= 80 ? 'bg-success-50 dark:bg-success-950' : overallPct >= 50 ? 'bg-warning-50 dark:bg-warning-950' : 'bg-error-50 dark:bg-error-950'} rounded-xl p-4 ring-1 ring-inset ring-border/50 dark:ring-border/30`}>
               <div className="flex items-center gap-2">
                 <span className="text-lg">{m.icon}</span>
                 <p className="text-xs font-medium uppercase tracking-wide text-text-tertiary">{m.label}</p>
@@ -284,7 +284,7 @@ function DomainBreakdown({ domains }: { domains: DomainCoverage[] }) {
               >
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-text-primary">{domain.domain || 'Unnamed'}</span>
-                  <Badge variant={pct >= 80 ? 'success' : pct >= 50 ? 'warning' : 'critical'}>
+                  <Badge variant={coverageBadgeVariant(pct)}>
                     {formatScore(pct)}
                   </Badge>
                 </div>
@@ -308,7 +308,7 @@ function DomainBreakdown({ domains }: { domains: DomainCoverage[] }) {
                     <p className="text-xs font-medium uppercase tracking-wide text-text-tertiary">Axes</p>
                     <div className="mt-1.5 flex flex-wrap gap-1.5">
                       {domain.axes.map((a) => (
-                        <Badge key={a.axis} variant={a.coveragePercent >= 0.8 ? 'success' : a.coveragePercent >= 0.5 ? 'warning' : 'critical'}>
+                        <Badge key={a.axis} variant={coverageBadgeVariant(a.coveragePercent * 100)}>
                           {AXIS_LABELS[a.axis] ?? a.axis}: {formatScore(a.coveragePercent)}
                         </Badge>
                       ))}

@@ -1,21 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Card, Stack, Container, Button } from '@nexus-engineering/shared';
+import { Card, Stack, Container, Button, Badge } from '@nexus-engineering/shared';
 import { fetchImpactReport } from '../../api/client';
 import type { ImpactReport as ImpactReportData, ImpactReportArtifact, RiskLevel } from '@nexus-engineering/shared';
 import { downloadBlob, toCsv, toMarkdownImproved, printAsPdf, getExportFilename, copyToClipboard } from '../../utils/exportReport';
-
-const RISK_BADGE: Record<RiskLevel, string> = {
-  critical: 'bg-error-100 text-error-700 dark:bg-error-950 dark:text-error-300 ring-1 ring-error-300',
-  high: 'bg-error-50 text-error-700 dark:bg-error-950 dark:text-error-300 ring-1 ring-error-200',
-  medium: 'bg-warning-50 text-warning-700 dark:bg-warning-950 dark:text-warning-300 ring-1 ring-warning-200',
-  low: 'bg-success-50 text-success-700 dark:bg-success-950 dark:text-success-300 ring-1 ring-success-200',
-};
-
-const IMPACT_BADGE: Record<ImpactReportArtifact['impactLevel'], string> = {
-  direct: 'bg-error-100 text-error-700 dark:bg-error-950 dark:text-error-300',
-  indirect: 'bg-warning-100 text-warning-700 dark:bg-warning-950 dark:text-warning-300',
-  transitive: 'bg-info-100 text-info-700 dark:bg-info-950 dark:text-info-300',
-};
 
 const CATEGORY_LABEL: Record<string, string> = {
   test: 'Test',
@@ -24,6 +11,29 @@ const CATEGORY_LABEL: Record<string, string> = {
   requirements: 'Requirements',
   coverage: 'Coverage',
 };
+
+function riskBadgeVariant(level: RiskLevel): string {
+  switch (level) {
+    case 'critical':
+    case 'high':
+      return 'critical';
+    case 'medium':
+      return 'warning';
+    case 'low':
+      return 'success';
+  }
+}
+
+function impactBadgeVariant(impact: ImpactReportArtifact['impactLevel']): string {
+  switch (impact) {
+    case 'direct':
+      return 'critical';
+    case 'indirect':
+      return 'warning';
+    case 'transitive':
+      return 'info';
+  }
+}
 
 export function ImpactReport({ file }: { file?: string }) {
   const [report, setReport] = useState<ImpactReportData | null>(null);
@@ -203,15 +213,11 @@ function ReportBody({ report }: { report: ImpactReportData }) {
 }
 
 function RiskBadge({ level }: { level: RiskLevel }) {
-  const className = RISK_BADGE[level];
   const label = level.charAt(0).toUpperCase() + level.slice(1);
   return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold uppercase tracking-wide ${className}`}
-    >
-      <span className="h-2 w-2 rounded-full bg-current" aria-hidden="true" />
+    <Badge variant={riskBadgeVariant(level)}>
       {label} risk
-    </span>
+    </Badge>
   );
 }
 
@@ -275,11 +281,9 @@ function ArtifactGroup({
                   </td>
                   <td className="px-2 py-3 text-sm capitalize text-text-secondary">{a.type}</td>
                   <td className="px-2 py-3">
-                    <span
-                      className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${IMPACT_BADGE[a.impactLevel]}`}
-                    >
+                    <Badge variant={impactBadgeVariant(a.impactLevel)}>
                       {a.impactLevel.charAt(0).toUpperCase() + a.impactLevel.slice(1)}
-                    </span>
+                    </Badge>
                   </td>
                   <td className="px-2 py-3 text-sm text-text-secondary">
                     {a.confidence} · {Math.round(a.confidenceScore * 100)}%
@@ -309,9 +313,9 @@ function RecommendationsList({
             key={rec.id}
             className="flex items-start gap-3 rounded-lg border border-border bg-surface-secondary px-4 py-3"
           >
-            <span className={`mt-0.5 shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase ${RISK_BADGE[rec.severity]}`}>
+            <Badge variant={riskBadgeVariant(rec.severity)}>
               {rec.severity}
-            </span>
+            </Badge>
             <div>
               <p className="text-sm font-medium text-text-primary">{rec.message}</p>
               <p className="text-xs text-text-tertiary">{CATEGORY_LABEL[rec.category] ?? rec.category}</p>

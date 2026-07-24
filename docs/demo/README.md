@@ -1,6 +1,6 @@
 # Nexus Engineering — Demo Project
 
-**Last Updated:** 2026-07-19
+**Last Updated:** 2026-07-24
 
 ---
 
@@ -33,12 +33,22 @@ This directory contains a pre-built demo project that showcases Nexus Engineerin
 - **Audit Log** — event capture, query/export, retention policies
 - **Traceability** — full trace chain from requirements → ADRs → features → test results
 
+## Demo Script
+
+For a complete walkthrough guide, see [DEMO_SCRIPT.md](./DEMO_SCRIPT.md).
+
+The demo script includes:
+- 15-20 minute guided tour of all features
+- Key talking points for each section
+- Troubleshooting tips
+- Value proposition summary
+
 ## Import
 
 To load this demo data into the Nexus system:
 
 ```bash
-node scripts/import-demo.js
+node scripts/import-demo.cjs
 ```
 
 Or scan the demo directory via the API:

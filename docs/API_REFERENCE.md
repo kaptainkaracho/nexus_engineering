@@ -1,8 +1,8 @@
 # Nexus Engineering — API Reference
 
-**Version:** 1.1  
+**Version:** 1.2  
 **Base URL:** `http://localhost:3001/api`  
-**Last Updated:** 2026-07-19
+**Last Updated:** 2026-07-24
 
 ---
 
@@ -1645,6 +1645,12 @@ Production deployments should configure CORS for specific domains.
 ---
 
 ## Changelog
+
+### v1.2.0 (2026-07-24)
+
+- Documentation refresh for Sprint 20 GTM readiness
+- Updated demo scenario and walkthrough script
+- Verified all endpoints working with demo data
 
 ### v1.1.0 (2026-07-19)
 

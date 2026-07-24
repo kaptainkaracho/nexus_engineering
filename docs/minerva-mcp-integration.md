@@ -8,7 +8,7 @@ Once configured, every OpenCode agent can call Minerva's 11 process-intelligence
 
 - Server: `Minerva MCP Server` v0.21.0, reachable at `http://localhost:8002/mcp`
 - Transport: Streamable HTTP (OpenCode `type: "remote"`)
-- Tenant: `the_software_company`
+- Tenant: `paperclip_company`
 - Tools exposed: **11** (verified `2026-07-19` via `opencode mcp list` → `minerva connected`)
 - Auth: API-key bearer token + `X-Tenant-Id` header (no OAuth)
 
@@ -27,7 +27,7 @@ active session config). The secret is referenced via an env var, never hardcoded
       "oauth": false,
       "enabled": true,
       "headers": {
-        "X-Tenant-Id": "the_software_company",
+        "X-Tenant-Id": "paperclip_company",
         "Authorization": "Bearer {env:MINERVA_API_KEY}"
       }
     }

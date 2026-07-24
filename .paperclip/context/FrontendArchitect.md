@@ -1,46 +1,41 @@
 # FrontendArchitect Context State
-> Last updated: 2026-07-24T18:00:00Z
+> Last updated: 2026-07-24T19:05:00Z
 
-## THE-309 — Trace Gate Config UI (Sprint 19 Pillar 5)
-**Status: DONE — UX Gate (THE-311) approved; all improvement items remediated**
+## Last Run
+- Issue: THE-326
+- Timestamp: 2026-07-24T19:05:00Z
+- Status: Wave 1a complete — 3 files fixed, 100+ lines changed
 
-### Commits (branch: THE-307-sprint-19-planning)
-- `8449888` — feat(frontend): add Trace Gate Config UI (THE-309)
-- `a33f415` — fix(frontend): THE-309 fix invalid type-cast syntax in GateConfigPanel
-- `d6be9b4` — feat(frontend): THE-309 address THE-311 UX pre-review (block-mode warning + inline validation)
-- `c29ba12` — fix(frontend): THE-309 use design system Alert and Badge components (UX Gate improvement items)
+### Commits
+- (pending commit of 3 view files)
 
-## THE-303 — Trace Quality Dashboard UI (Frontend)
-**Status: in_review — UX Quality Gate pending (interaction c47d972b)**
+### Wave 1a Fixes Applied
+1. **ImpactReport.tsx** — Removed RISK_BADGE/IMPACT_BADGE custom color maps; replaced with design system Badge component via riskBadgeVariant/impactBadgeVariant mapping functions
+2. **QualityDashboard.tsx** — Removed healthBg function; added coverageBadgeVariant; standardized all Badge variants and progress bar colors
+3. **TraceGraph.tsx** — Replaced TYPE_COLORS (non-standard blue/purple/amber/green/gray) with typeColorMap using design system primary/secondary/warning/success/neutral tokens; replaced CONFIDENCE_COLORS with confidenceBadgeVariant/confidenceTextColor; replaced custom Grid3 with standard grid
 
-## THE-289 — Recommendations Panel + Gap Visualization UI
-**Status: in_review — Awaiting 2nd UXDesigner Quality Gate (changes applied)**
-
-## THE-275 — Impact Analysis Diff View
-**Status: in_review — Awaiting reviewer approval**
-
-## THE-232 — FAC Feature Browser UI (Epic B)
-**Status: DONE — UX Quality Gate approved**
-
-## THE-294 — NL Query UI (Frontend)
-**Status: DONE — Frontend complete, UX Gate waived per Sprint 17 scope**
-
-## THE-280 — Impact Report UI (Epic C)
-**Status: in_review — Awaiting UXDesigner Quality Gate**
-
-## THE-291 — Fix TypeScript Errors in Recommendations Panel
-**Status: DONE — No TypeScript errors found**
+### Metrics
+- Custom color maps eliminated: 3 (RISK_BADGE, IMPACT_BADGE, TYPE_COLORS)
+- Inline style width usage retained (necessary for progress bars)
+- Badge variants standardized across all 3 files
+- Diff: +100/-80 lines across 3 files
 
 ## Files Read This Session
-- .paperclip/context/FrontendArchitect.md
-- apps/frontend/src/components/trace-gate/GateConfigPanel.tsx
-- apps/frontend/src/components/trace-gate/GateStatusBadge.tsx
-- apps/frontend/src/components/trace-gate/index.tsx
-- apps/frontend/src/api/traceGate.ts
-- packages/shared/src/design-system/components/Alert.tsx
+- packages/shared/src/design-system/index.ts
+- packages/shared/src/design-system/tokens/colors.ts
 - packages/shared/src/design-system/components/Badge.tsx
+- packages/shared/src/design-system/components/Alert.tsx
+- apps/frontend/src/views/ImpactReport/ImpactReport.tsx
+- apps/frontend/src/views/QualityDashboard/QualityDashboard.tsx
+- apps/frontend/src/views/TraceGraph/TraceGraph.tsx
 
 ## Files Created/Modified This Session
-- apps/frontend/src/components/trace-gate/GateConfigPanel.tsx (modified — Alert component usage)
-- apps/frontend/src/components/trace-gate/GateStatusBadge.tsx (modified — Badge component usage)
+- apps/frontend/src/views/ImpactReport/ImpactReport.tsx (modified — Badge standardization)
+- apps/frontend/src/views/QualityDashboard/QualityDashboard.tsx (modified — color standardization)
+- apps/frontend/src/views/TraceGraph/TraceGraph.tsx (modified — color token standardization)
 - .paperclip/context/FrontendArchitect.md (updated)
+
+## Next Action
+- Commit fixes
+- Audit remaining 21 views for inline style violations
+- Verify dark mode consistency

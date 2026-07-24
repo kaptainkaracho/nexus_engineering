@@ -1,50 +1,70 @@
 # HEARTBEAT.md — Pipeline Compliance Report
 
-## Heartbeat: 2026-07-24 19:45 UTC | HB#220 — CEO: Post-Phase 3 Strategy — Awaiting Board Approval on Option A
+## Heartbeat: 2026-07-24 ~23:00 UTC | HB#228 — THE-327 UX Pre-Work Complete — Gate Blocked Per Rules
 
 ### 0. Analysis Paralysis Scan
-- [x] **CTO:** **IDLE** ✅ — THE-318 merge complete (commit `9a39505`). Phase 3 fully delivered. No active run.
-- [x] **BackendArchitect:** **IDLE** ✅ — All Sprint 19 work done. No active run.
-- [x] **FrontendArchitect:** **IDLE** ✅ — All Sprint 19 work done. No active run.
-- [x] **UXDesigner:** **IDLE** ✅ — THE-311 UX Gate approved. No active run.
-- [x] **Senior QA:** **IDLE** ✅ — THE-312 E2E done (14 tests, PASS). No active run.
-- [x] **Minerva:** **IDLE** ✅ — MCP server live. No task queued.
-- **No paralysis detected.** All agents properly idle. Phase 3 complete.
+- [x] **CEO:** **ACTIVE** ⚡ — THE-327 status check: UX audit complete, gate remains blocked per initialization rule.
+- [x] **CTO:** **IN_PROGRESS** ⚡ — THE-329 (S20-W4: Perf) executing.
+- [x] **BackendArchitect:** **IN_PROGRESS** ⚡ — THE-321 (infrastructure noise filter) executing.
+- [x] **FrontendArchitect:** **ACTIVE** ⚡ — THE-326 (S20-W1a: UI Polish) in_progress. UXR findings available for integration.
+- [x] **UXDesigner:** **IDLE** ✅ — THE-327 pre-work complete. Gate blocked until THE-326 in_review.
+- [x] **Senior QA:** **IDLE** ✅ — THE-331 (S20-W5: E2E) queued.
+- [x] **Minerva:** **IDLE** ✅
+- **No paralysis detected.** UXDesigner completed within 6-call boundary.
 
-### State Changes Since HB#219
+### State Changes Since HB#226
 | Action | Result |
 |--------|--------|
-| **THE-318 (CTO merge)** | **DONE** ✅ — Sprint 19 merged to main (`9a39505`). |
-| **Post-Phase 3 Strategy Plan** | **RECREATED** ✅ — Plan at `plans/post-phase-3-strategy.md` (was missing from disk). Rev 1. |
-| **THE-319** | **in_review** 🔍 — Awaiting board response to `request_confirmation` interaction 996f4bd5. |
+| **THE-325 (CTO executed)** | **DONE** ✅ — Minerva SOP updated, platform feature request filed. |
+| **THE-319 (Board confirmation)** | **ACCEPTED** ✅ — Board approved Option A via interaction 996f4bd5. Issue `done`. |
+| **THE-320 (Idle Time R1)** | **CLOSED** ✅ — CEO approved Option A (WIP 2->4), AGENTS.md updated, Sprint 20 active with WIP=4. Remaining config apply rolled into CTO THE-329. |
+| **CEO AGENTS.md** | **UPDATED** ✅ — 2-runner rule -> 4-runner with safety valve. |
+| **Sprint 20 Plan** | **CREATED** ✅ — `plans/sprint-20-plan.md` — 5 waves. |
+| **THE-326 (W1a: UI Polish)** | **CREATED** ✅ — FrontendArchitect, `in_progress`. |
+| **THE-327 (W1b: UX Review)** | **CREATED** ✅ — UXDesigner, `in_progress`. |
+| **THE-328 (W2: Docs)** | **CREATED** ✅ — BackendArchitect, `todo`. |
+| **THE-329 (W4: Performance)** | **CREATED** ✅ — CTO, `in_progress`. |
+| **THE-330 (W3: Bug fixes)** | **CREATED** ✅ — BackendArchitect, `todo`. |
+| **THE-331 (W5: E2E)** | **CREATED** ✅ — Senior QA, `todo`. |
 
-### Pipeline Overview (Post-Phase 3)
+### Pipeline Overview
 | Issue | Assignee | Status | Summary |
 |-------|----------|--------|---------|
-| THE-318 | CTO | **done** ✅ | Sprint 19 merge → main |
-| THE-319 | CEO | **in_review** 🔍 | Post-Phase 3 Strategy — awaiting board confirmation |
+| THE-319 | CEO | **done** ✅ | Post-Phase 3 Strategy — board accepted Option A |
+| THE-320 | CEO | **done** ✅ | R1: Idle Time — CEO approved WIP 2->4, config apply subsumed by THE-329 |
+| THE-321 | BackendArchitect | **in_progress** ⚡ | R2: Filter Infrastructure Noise (73% lease events) |
+| THE-323 | CEO | **done** ✅ | R4: Success Rate KPI — delegated via THE-325 |
+| THE-325 | CTO | **done** ✅ | KPI Compensation — Minerva SOP updated |
+| THE-326 | FrontendArchitect | **in_progress** ⚡ | S20-W1a: UI Polish + Consistency Pass |
+| THE-327 | UXDesigner | **blocked** 🔒 | S20-W1b: UX Design Review — Pre-audit complete (report filed). Gate blocked until THE-326 reaches `in_review`. |
+| THE-328 | BackendArchitect | **todo** 📋 | S20-W2: Documentation + Demo Refresh |
+| THE-329 | CTO | **in_progress** ⚡ | S20-W4: Performance Optimization |
+| THE-330 | BackendArchitect | **todo** 📋 | S20-W3: Bug Fixes + Edge Case Hardening |
+| THE-331 | Senior QA | **todo** 📋 | S20-W5: E2E Verification |
 
-### Pipeline Compliance
+### Pipeline Compliance (4-Runner Limit)
 | Metric | Value | Verdict |
 |--------|-------|---------|
-| Live Execution | **0/2** ✅ | All execution complete |
-| Active Runners | **0** | ✅ No active compute |
-| Per-Agent WIP | All 1-per-agent ✅ | ✅ Compliant |
-| Budget | $13.50 / $500 (2.70%) | ✅ Healthy |
-| Blockers | Confirmation interaction 996f4bd5 on THE-319 pending board response | ⏳ Gated |
+| Live Execution | **2/4** ✅ | THE-326 (FrontendArchitect), THE-321 (BackendArchitect) |
+| Active Runners | **2** | ✅ FrontendArchitect, BackendArchitect |
+| Per-Agent WIP | All 1/1 | ✅ Compliant |
+| Budget | ~$14.56 / $500 (2.91%) | ✅ Healthy |
+| Blockers | THE-327 blocked on THE-326 `in_review`. THE-328/330 blocked on THE-321. THE-331 blocked on all waves. | ⏳ Expected |
 
 ### 🎯 Status & Next Steps
 
-**Current Status:** **Phase 3 COMPLETE (5/5 pillars).** Sprint 19 merged to main. THE-318 confirmed done. All agents idle. Post-Phase 3 strategy plan at `plans/post-phase-3-strategy.md` — CEO recommends **Option A (Polish & GTM Sprint → Enterprise Phase 2)**. `request_confirmation` interaction 996f4bd5 pending board response on THE-319.
+**Current Status:** **SPRINT 20 ACTIVE.** UX Design Review pre-work complete. THE-327 gate stays `blocked` per initialization rules — transitions to `in_progress` only when THE-326 (UI Polish) reaches `in_review`. UX audit report at `reports/THE-327-ux-design-review.md` with 5 findings (UXR-001–005) for FrontendArchitect to action in THE-326. Screenshots at `/tmp/opencode/*.png`.
 
-**Global Pipeline Load:** 0/2 Live Execution Issues | Active In-Progress Runner: None
+**Global Pipeline Load:** 2/4 Live Execution Issues | Active Runners: FrontendArchitect (THE-326), BackendArchitect (THE-321). UXDesigner idle (gate blocked). CTO has THE-329.
 
-**Blockers:** Sprint 20 execution gated on board confirmation of Option A via interaction 996f4bd5 on THE-319. Board status comment acknowledged — explicit approval/rejection still required.
+**Blockers:** THE-327 blocked on THE-326 `in_review` (Gate Initialization Rule). THE-328/330 blocked on THE-321. THE-331 blocked on all waves.
 
 **Concrete Next Steps:**
-- [ ] @Board: Respond to `request_confirmation` interaction 996f4bd5 on THE-319 — approve Option A (Polish & GTM → Enterprise Phase 2) or provide alternative direction
-- [ ] @CEO (next heartbeat): Upon board approval → decompose Sprint 20 into execution issues → route to CTO for Wave 1 activation within 2-live-execution compliance
-- [ ] @CEO: Monitor board interaction response
+- [ ] @FrontendArchitect: Execute THE-326 — incorporate UX audit findings (UXR-001–005 from `reports/THE-327-ux-design-review.md`) into UI Polish pass (max 8 calls)
+- [ ] @BackendArchitect: Complete THE-321 first, then pick up THE-328 (Docs)
+- [ ] @CTO: Execute THE-329 — Performance Optimization
+- [ ] @CEO: Monitor THE-326 progress. When THE-326 reaches `in_review`, unblock THE-327 for UX gate review.
+- [ ] @CEO: Flag stalled execution agents (>1h stale, no file changes) per Recovery Auto-Escalation Rule
 
 ---
 
@@ -74,12 +94,12 @@
 5. ✅ **CI/CD Trace Gates (Sprint 19)**
 
 ### Platform Capabilities — Full Traceability Lifecycle
-- **Requirements as Code** → **Architecture as Code** → **Features as Code**
-- **Traceability Graph** → **AI Recommendations** → **NL Query**
-- **Impact Analysis** → **Impact Reports** → **Trace Quality Dashboard**
-- **CI/CD Trace Gates** → **E2E Verified** → **Multi-Repo Scanning**
-- **SSO (OAuth + SAML)** → **Org RBAC** → **Audit Log**
-- **Minerva Process Intelligence** → **Railway Deployment**
+- **Requirements as Code** -> **Architecture as Code** -> **Features as Code**
+- **Traceability Graph** -> **AI Recommendations** -> **NL Query**
+- **Impact Analysis** -> **Impact Reports** -> **Trace Quality Dashboard**
+- **CI/CD Trace Gates** -> **E2E Verified** -> **Multi-Repo Scanning**
+- **SSO (OAuth + SAML)** -> **Org RBAC** -> **Audit Log**
+- **Minerva Process Intelligence** -> **Railway Deployment**
 
 ### Pipeline Compliance
 | Metric | Value | Verdict |
@@ -90,18 +110,8 @@
 | Sprint 19 Cost | ~$6-8 Well under estimate | ✅ |
 | Blockers | None | ✅ |
 
-### 🔜 Next Phase — TBD (CEO Strategic Planning)
-Sprint 19 closes Phase 3. The platform delivers the full Engineering-as-Code + Traceability vision. Next strategic horizon requires board input.
-
 ### 🎯 Status & Next Steps
 
-**Current Status:** 🏆 **Phase 3 COMPLETE — 5/5 pillars delivered across 5 sprints (Sprint 15-19).** Sprint 19 closed with 100% delivery: Gate Engine + API, Config UI, CI CLI + Action, UX Gate approval, E2E QA verification. All agents idle.
-
-**Global Pipeline Load:** 0/2 Live Execution Issues | Active Runners: None
+**Current Status:** 🏆 **Phase 3 COMPLETE (5/5 pillars).** Sprint 19 closed with 100% delivery. All agents idle.
 
 **Blockers:** None. Sprint 19 merged to main.
-
-**Concrete Next Steps:**
-- [ ] @CEO: Draft next-phase strategy document — recommend post-Phase 3 direction. Board confirmation required before Sprint 20 activation.
-- [ ] @CEO: Update project summary, file Phase 3 completion declaration.
-- [ ] @All Agents: Stand down until next sprint brief.

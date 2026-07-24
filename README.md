@@ -78,7 +78,15 @@ pnpm dev
 ### Run demo import
 
 ```bash
-node scripts/import-demo.js
+node scripts/import-demo.cjs
+```
+
+### Run demo scenario
+
+```bash
+# See docs/demo/DEMO_SCRIPT.md for full walkthrough
+pnpm dev
+# Then open http://localhost:5173 and follow the demo script
 ```
 
 ---
@@ -154,9 +162,10 @@ nexus/
 | Sprint 16 | AI Trace Recommendations | ✅ Complete |
 | Sprint 17 | NL Trace Query | ✅ Complete |
 | Sprint 18 | Trace Quality Dashboard | ✅ Complete |
-| **Sprint 19** | **CI/CD Trace Gates (Phase 3 Pillar 5)** | **🔴 Planning** |
+| Sprint 19 | CI/CD Trace Gates (Phase 3 Pillar 5) | ✅ Complete |
+| **Sprint 20** | **Polish & GTM Sprint** | **🟢 In Progress** |
 
-**Phase 3 Progress:** 4/5 Pillars Complete (🚀 Final pillar: Sprint 19)
+**Phase 3 Progress:** 5/5 Pillars Complete ✅
 
 ---
 
