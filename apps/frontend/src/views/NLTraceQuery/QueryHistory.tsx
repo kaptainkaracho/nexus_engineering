@@ -8,7 +8,7 @@ interface QueryHistoryProps {
 export function QueryHistory({ history, onSelect }: QueryHistoryProps) {
   if (history.length === 0) {
     return (
-      <Stack gap={2} align="center" style={{ padding: '16px 0' }}>
+      <Stack gap={2} align="center" className="py-4">
         <p className="text-sm text-text-tertiary">No recent queries</p>
       </Stack>
     );

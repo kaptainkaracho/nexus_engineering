@@ -71,8 +71,8 @@ function LoadingState() {
 
 function EmptyState() {
   return (
-    <Stack gap={2} align="center" style={{ padding: '48px 0' }}>
-      <div style={{ fontSize: '28px', lineHeight: 1 }}>🔍</div>
+    <Stack gap={2} align="center" className="py-12">
+      <div className="text-[28px] leading-none">🔍</div>
       <p className="text-base font-semibold text-text-primary">No results</p>
       <p className="text-sm text-text-secondary">Try rephrasing your question or broadening the scope.</p>
     </Stack>
@@ -81,8 +81,8 @@ function EmptyState() {
 
 function ErrorState({ message }: { message: string }) {
   return (
-    <Stack gap={2} align="center" style={{ padding: '32px 0' }}>
-      <div style={{ fontSize: '28px', lineHeight: 1 }}>⚠️</div>
+    <Stack gap={2} align="center" className="py-8">
+      <div className="text-[28px] leading-none">⚠️</div>
       <p className="text-base font-semibold text-text-primary">Query failed</p>
       <p className="text-sm text-text-secondary">{message}</p>
     </Stack>

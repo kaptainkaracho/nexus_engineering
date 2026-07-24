@@ -190,9 +190,23 @@ type Fixtures = {
   api: ApiController;
   pageErrors: Error[];
   consoleErrors: string[];
+  auth: void;
 };
 
 export const test = base.extend<Fixtures>({
+  auth: [
+    async ({ page }, use) => {
+      await page.addInitScript(() => {
+        sessionStorage.setItem('auth_session', JSON.stringify({
+          user: { id: 'e2e-user', email: 'test@nexus.dev', name: 'E2E Test', role: 'user', createdAt: '2025-01-01T00:00:00Z' },
+          token: 'e2e-token',
+          expiresAt: new Date(Date.now() + 86_400_000).toISOString(),
+        }));
+      });
+      await use();
+    },
+    { auto: true },
+  ],
   api: [
     async ({ page }, use) => {
       const controller = new ApiController(page);

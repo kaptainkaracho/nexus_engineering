@@ -52,6 +52,13 @@ const CATEGORY_ICON: Record<RecommendationCategory, string> = {
   architecture: '🏗️',
 };
 
+const SEVERITY_CONFIG: Record<RecommendationSeverity, string> = {
+  critical: 'Critical',
+  high: 'High',
+  medium: 'Medium',
+  low: 'Low',
+};
+
 const STATUS_LABEL: Record<RecommendationStatus, string> = {
   pending: 'Pending',
   accepted: 'Accepted',

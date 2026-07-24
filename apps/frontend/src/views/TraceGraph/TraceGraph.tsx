@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, Stack, Container, Badge } from '@nexus-engineering/shared';
+import { Badge, Card, Stack, Container } from '@nexus-engineering/shared';
 
 interface TraceNode {
   id: string;
@@ -104,15 +104,22 @@ const MOCK_DATA: MockTraceGraph = {
   },
 };
 
+const TYPE_TOKEN: Record<string, string> = {
+  requirement: 'primary',
+  feature: 'secondary',
+  architecture: 'warning',
+  testCase: 'success',
+  result: 'neutral',
+};
+
 function typeColorMap(type: string): { bg: string; text: string; border: string; dot: string } {
-  const map: Record<string, { bg: string; text: string; border: string; dot: string }> = {
-    requirement:  { bg: 'bg-primary-50 dark:bg-primary-950', text: 'text-primary-700 dark:text-primary-300', border: 'border-primary-200 dark:border-primary-800', dot: 'bg-primary-500' },
-    feature:      { bg: 'bg-secondary-50 dark:bg-secondary-950', text: 'text-secondary-700 dark:text-secondary-300', border: 'border-secondary-200 dark:border-secondary-800', dot: 'bg-secondary-500' },
-    architecture: { bg: 'bg-warning-50 dark:bg-warning-950', text: 'text-warning-700 dark:text-warning-300', border: 'border-warning-200 dark:border-warning-800', dot: 'bg-warning-500' },
-    testCase:     { bg: 'bg-success-50 dark:bg-success-950', text: 'text-success-700 dark:text-success-300', border: 'border-success-200 dark:border-success-800', dot: 'bg-success-500' },
-    result:       { bg: 'bg-neutral-50 dark:bg-neutral-950', text: 'text-neutral-700 dark:text-neutral-300', border: 'border-neutral-200 dark:border-neutral-800', dot: 'bg-neutral-500' },
+  const token = TYPE_TOKEN[type] ?? 'neutral';
+  return {
+    bg: `bg-${token}-50 dark:bg-${token}-950`,
+    text: `text-${token}-700 dark:text-${token}-300`,
+    border: `border-${token}-200 dark:border-${token}-800`,
+    dot: `bg-${token}-500`,
   };
-  return map[type] ?? map.result;
 }
 
 function confidenceBadgeVariant(score: number): string {
@@ -156,7 +163,6 @@ export function TraceGraph() {
   );
 
   const overallPct = data.coverage.overallCoveragePercent;
-  const typeColors = typeColorMap(selected?.type ?? 'result');
 
   return (
     <Container size="lg">

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Card, Input, Stack } from '@nexus-engineering/shared';
+import { Badge, Card, Input, Stack } from '@nexus-engineering/shared';
 import type { ArtifactType, DiscoveryArtifact } from '../../api/client';
 
 const TYPE_LABELS: Record<string, string> = {
@@ -10,12 +10,12 @@ const TYPE_LABELS: Record<string, string> = {
   unknown: 'Unknown',
 };
 
-const TYPE_COLORS: Record<string, string> = {
-  requirement: 'bg-primary-500/10 text-primary-700 dark:bg-primary-950 dark:text-primary-300',
-  architecture: 'bg-secondary-500/10 text-secondary-700 dark:bg-secondary-950 dark:text-secondary-300',
-  adr: 'bg-warning-500/10 text-warning-700 dark:bg-warning-950 dark:text-warning-300',
-  spec: 'bg-info-500/10 text-info-700',
-  unknown: 'bg-neutral-500/10 text-neutral-600 dark:bg-neutral-950 dark:text-neutral-400',
+const TYPE_BADGE_VARIANTS: Record<string, string> = {
+  requirement: 'implemented',
+  architecture: 'proposed',
+  adr: 'high',
+  spec: 'info',
+  unknown: 'low',
 };
 
 const LIFECYCLE_LABELS: Record<string, string> = {
@@ -26,12 +26,12 @@ const LIFECYCLE_LABELS: Record<string, string> = {
   error: 'Error',
 };
 
-const LIFECYCLE_COLORS: Record<string, string> = {
-  discovered: 'bg-neutral-500/10 text-neutral-600',
-  parsed: 'bg-info-500/10 text-info-700',
-  indexed: 'bg-success-500/10 text-success-700',
-  related: 'bg-primary-500/10 text-primary-700',
-  error: 'bg-error-500/10 text-error-700',
+const LIFECYCLE_BADGE_VARIANTS: Record<string, string> = {
+  discovered: 'draft',
+  parsed: 'ready',
+  indexed: 'approved',
+  related: 'automated',
+  error: 'critical',
 };
 
 interface RepoArtifactListProps {
@@ -168,13 +168,9 @@ export function RepoArtifactList({
                 role="listitem"
                 className="flex items-center gap-3 rounded-md px-3 py-2 transition-colors hover:bg-surface-secondary"
               >
-                <span
-                  className={`inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                    TYPE_COLORS[artifact.type] ?? TYPE_COLORS.unknown
-                  }`}
-                >
+                <Badge variant={TYPE_BADGE_VARIANTS[artifact.type] ?? TYPE_BADGE_VARIANTS.unknown}>
                   {TYPE_LABELS[artifact.type] ?? artifact.type}
-                </span>
+                </Badge>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-medium text-text-primary">
                     {artifact.fileName ?? artifact.filePath.split('/').pop() ?? artifact.id}
@@ -184,20 +180,13 @@ export function RepoArtifactList({
                   </span>
                 </span>
                 {artifact.errors.length > 0 && (
-                  <span
-                    className="inline-flex shrink-0 items-center rounded-full bg-error-500/10 px-2 py-0.5 text-xs font-medium text-error-700"
-                    title={`${artifact.errors.length} error(s)`}
-                  >
+                  <Badge variant="critical" title={`${artifact.errors.length} error(s)`}>
                     {artifact.errors.length} err
-                  </span>
+                  </Badge>
                 )}
-                <span
-                  className={`inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                    LIFECYCLE_COLORS[artifact.lifecycle] ?? 'bg-neutral-500/10 text-neutral-600'
-                  }`}
-                >
+                <Badge variant={LIFECYCLE_BADGE_VARIANTS[artifact.lifecycle] ?? 'draft'}>
                   {LIFECYCLE_LABELS[artifact.lifecycle] ?? artifact.lifecycle}
-                </span>
+                </Badge>
               </div>
             ))
           )}
