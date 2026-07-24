@@ -12,29 +12,29 @@ export const DEFAULT_BPMN_DB_PATH = process.env.BPMN_DB_PATH
 
 export interface BpmnIngestionEventRow {
   id: string
-  ingestion_run_id: string
-  case_id: string
+  ingestionRunId: string
+  caseId: string
   activity: string
-  recovery_type: string | null
-  classification_confidence: number
-  classification_reason: string
-  raw_payload: string
-  received_at: string
+  recoveryType: string | null
+  classificationConfidence: number
+  classificationReason: string
+  rawPayload: string
+  receivedAt: string
 }
 
 export interface BpmnIngestionRunRow {
   id: string
   status: 'pending' | 'processing' | 'completed' | 'failed'
-  runs_fetched: number
-  runs_classified: number
-  recovery_events: number
-  rework_events: number
-  intervention_events: number
-  events_pushed: number
-  minerva_run_id: string | null
-  error_message: string | null
-  started_at: string
-  completed_at: string | null
+  runsFetched: number
+  runsClassified: number
+  recoveryEvents: number
+  reworkEvents: number
+  interventionEvents: number
+  eventsPushed: number
+  minervaRunId: string | null
+  errorMessage: string | null
+  startedAt: string
+  completedAt: string | null
 }
 
 // ---------------------------------------------------------------------------
@@ -137,8 +137,22 @@ export class BpmnIngestionDatabase {
   findRunById(id: string): BpmnIngestionRunRow | undefined {
     const row = this.db.prepare(
       'SELECT * FROM bpmn_ingestion_runs WHERE id = ?',
-    ).get(id) as BpmnIngestionRunRow | undefined
-    return row
+    ).get(id) as Record<string, unknown> | undefined
+    if (!row) return undefined
+    return {
+      id: row.id as string,
+      status: row.status as BpmnIngestionRunRow['status'],
+      runsFetched: (row.runs_fetched as number) ?? 0,
+      runsClassified: (row.runs_classified as number) ?? 0,
+      recoveryEvents: (row.recovery_events as number) ?? 0,
+      reworkEvents: (row.rework_events as number) ?? 0,
+      interventionEvents: (row.intervention_events as number) ?? 0,
+      eventsPushed: (row.events_pushed as number) ?? 0,
+      minervaRunId: (row.minerva_run_id as string | null) ?? null,
+      errorMessage: (row.error_message as string | null) ?? null,
+      startedAt: row.started_at as string,
+      completedAt: (row.completed_at as string | null) ?? null,
+    }
   }
 
   updateRunStatus(id: string, status: BpmnIngestionRunRow['status']): void {
@@ -209,9 +223,23 @@ export class BpmnIngestionDatabase {
   }
 
   listRecentRuns(limit: number = 20): BpmnIngestionRunRow[] {
-    return this.db.prepare(
+    const rows = this.db.prepare(
       'SELECT * FROM bpmn_ingestion_runs ORDER BY started_at DESC LIMIT ?',
-    ).all(limit) as BpmnIngestionRunRow[]
+    ).all(limit) as Record<string, unknown>[]
+    return rows.map(row => ({
+      id: row.id as string,
+      status: row.status as BpmnIngestionRunRow['status'],
+      runsFetched: (row.runs_fetched as number) ?? 0,
+      runsClassified: (row.runs_classified as number) ?? 0,
+      recoveryEvents: (row.recovery_events as number) ?? 0,
+      reworkEvents: (row.rework_events as number) ?? 0,
+      interventionEvents: (row.intervention_events as number) ?? 0,
+      eventsPushed: (row.events_pushed as number) ?? 0,
+      minervaRunId: (row.minerva_run_id as string | null) ?? null,
+      errorMessage: (row.error_message as string | null) ?? null,
+      startedAt: row.started_at as string,
+      completedAt: (row.completed_at as string | null) ?? null,
+    }))
   }
 
   // ---------------------------------------------------------------------------
@@ -247,7 +275,17 @@ export class BpmnIngestionDatabase {
       event.rawPayload,
       now,
     )
-    return { ...event, received_at: now } as BpmnIngestionEventRow
+    return {
+      id: event.id,
+      ingestionRunId: event.ingestionRunId,
+      caseId: event.caseId,
+      activity: event.activity,
+      recoveryType: event.recoveryType,
+      classificationConfidence: event.classificationConfidence,
+      classificationReason: event.classificationReason,
+      rawPayload: event.rawPayload,
+      receivedAt: now,
+    }
   }
 
   insertEventsBatch(events: Array<{
@@ -281,15 +319,37 @@ export class BpmnIngestionDatabase {
   }
 
   getEventsByRun(runId: string): BpmnIngestionEventRow[] {
-    return this.db.prepare(
+    const rows = this.db.prepare(
       'SELECT * FROM bpmn_ingestion_events WHERE ingestion_run_id = ? ORDER BY received_at',
-    ).all(runId) as BpmnIngestionEventRow[]
+    ).all(runId) as Record<string, unknown>[]
+    return rows.map(row => ({
+      id: row.id as string,
+      ingestionRunId: row.ingestion_run_id as string,
+      caseId: row.case_id as string,
+      activity: row.activity as string,
+      recoveryType: (row.recovery_type as string | null) ?? null,
+      classificationConfidence: (row.classification_confidence as number) ?? 0,
+      classificationReason: row.classification_reason as string,
+      rawPayload: row.raw_payload as string,
+      receivedAt: row.received_at as string,
+    }))
   }
 
   getEventsByRecoveryType(runId: string, recoveryType: string): BpmnIngestionEventRow[] {
-    return this.db.prepare(
+    const rows = this.db.prepare(
       'SELECT * FROM bpmn_ingestion_events WHERE ingestion_run_id = ? AND recovery_type = ? ORDER BY received_at',
-    ).all(runId, recoveryType) as BpmnIngestionEventRow[]
+    ).all(runId, recoveryType) as Record<string, unknown>[]
+    return rows.map(row => ({
+      id: row.id as string,
+      ingestionRunId: row.ingestion_run_id as string,
+      caseId: row.case_id as string,
+      activity: row.activity as string,
+      recoveryType: (row.recovery_type as string | null) ?? null,
+      classificationConfidence: (row.classification_confidence as number) ?? 0,
+      classificationReason: row.classification_reason as string,
+      rawPayload: row.raw_payload as string,
+      receivedAt: row.received_at as string,
+    }))
   }
 
   getEventCount(runId: string): number {

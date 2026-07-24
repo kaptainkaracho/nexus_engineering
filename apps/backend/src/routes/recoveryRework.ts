@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import type { ProcessRun, ClassificationOptions } from '../services/recoveryReworkClassifier'
 import { classifyRuns, toMinervaEvents } from '../services/recoveryReworkClassifier'
 import { AppError } from '../lib/errorHandler'
-import { ingestRecoveryRework, getIngestionHistory, getIngestionRun, getIngestionEvents } from '../minerva/ingestRecoveryRework'
+import { ingestRecoveryRework, getIngestionHistory as getIngestionHistoryAPI, getIngestionRun as getIngestionRunAPI, getIngestionEvents } from '../minerva/ingestRecoveryRework'
 
 interface ClassifyBody {
   runs?: unknown
@@ -69,13 +69,13 @@ export async function postIngestRecoveryRework(request: FastifyRequest, reply: F
 
 export async function getIngestionHistory(request: FastifyRequest, reply: FastifyReply) {
   const limit = Math.min(Number(request.query.limit) || 20, 100)
-  const runs = getIngestionHistory(limit)
+  const runs = getIngestionHistoryAPI(limit)
   return reply.send({ runs, total: runs.length })
 }
 
 export async function getIngestionRun(request: FastifyRequest, reply: FastifyReply) {
   const runId = String((request.params as { runId: string }).runId)
-  const run = getIngestionRun(runId)
+  const run = getIngestionRunAPI(runId)
 
   if (!run) {
     throw new AppError(404, `Ingestion run ${runId} not found.`, { param: 'runId' })

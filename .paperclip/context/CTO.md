@@ -1,5 +1,5 @@
 # CTO Context State
-> Last updated: 2026-07-24T18:30Z (Sprint 19 Complete, Phase 3 DONE)
+> Last updated: 2026-07-25T00:45Z (HB#246 — CEO Sprint 20 Closure + Phase 4 Activation)
 
 ## COMPLETED
 - **THE-241 (fs module fix)** — Done. `1f4ce06` ✅
@@ -24,6 +24,19 @@
 **Blocker:** No Paperclip platform repo access. No agent in this company can modify Paperclip core from the Nexus repo.
 
 **Escalated to @CEO** — see `docs/THE-255-cto-disposition.md` for three options (Platform Feature Request / Direct Platform PR / Abandon). Recommending Option B (Direct Platform PR, ~1-2h implementation).
+
+## THE-336: S20-W4 Performance Optimization — page load <2s [SUPERSEDED]
+
+**Status:** `done` (superseded by THE-329 — 2026-07-24 board confirmation)
+**Board Comment:** "Issue superseded. THE-329 (CTO) completed Performance Optimization. Granular frontend perf work active on THE-338 (UXDesigner). Backend perf on THE-339 (backlog). No override needed."
+**CEO Decision:** `docs/THE-336-escalation.md` (Option B CTO activation rendered moot)
+
+### Resolution
+THE-336 was created as a CEO override because THE-329 was believed stalled. Board confirmed THE-329 (CTO) **did complete** the Performance Optimization. THE-336 is a duplicate. CEO HB#238 Option B activation was based on stale data.
+
+### Active Perf Work (per Board)
+- **THE-338** (Frontend Perf) — UXDesigner, granular work active
+- **THE-339** (Backend Perf) — backlog
 
 ## THE-256: R1-Fix Session Rotation — BLOCKED (Platform Escalation)
 
@@ -195,10 +208,97 @@
 
 **Verdict:** HIGH PRODUCTIVITY. BackendArchitect delivered 7 commits in ~27 min. Report at `reports/THE-333-productivity-review-THE-330.md`. See HEARTBEAT.md HB#232 for full pipeline update.
 
+## THE-329: Performance Optimization — DONE ✅
+
+**Status:** `done` — Board confirmed THE-329 completed Performance Optimization. Page load <2s target achieved.
+
+**Note:** THE-336 was created as a CEO override under the mistaken belief that THE-329 was stalled. Board corrected: THE-329 delivered. THE-336 superseded.
+
+**Active downstream perf work (per board):**
+- **THE-338** (Frontend Perf) — UXDesigner, granular work active
+- **THE-339** (Backend Perf) — backlog
+
+## THE-330: S20-W3 Bug Fixes — DISPOSITION
+
+**Status:** `in_progress` → **ready for `in_review`** ✅
+**Blockers:** THE-326 (in_review), THE-327 (done), THE-328 (done) — **ALL RESOLVED**
+**Work done:** 18/18 routes hardened with AppError pattern. BackendArchitect delivered 7+ commits.
+
+### Working Tree State (HB#243 audit)
+- **8 uncommitted backend files:** auth.ts, liveness.ts, organizations.ts, registryRoutes.ts, requirements.ts, scanRoutes.ts, traceability.ts, index.ts — contain AppError try/catch removal residuals
+- **6 uncommitted frontend files:** NLQueryResults.tsx, TraceGraph.tsx, RepoArtifactList.tsx, RecommendationsPanel.tsx, QueryHistory.tsx, fixtures.ts — contain THE-338/326 style refactoring residuals
+- **3 context/config files:** CTO.md, FrontendArchitect.md, CONTRIBUTING.md, HEARTBEAT.md — already handled
+
+### Delegation
+- **@BackendArchitect:** Commit 8 backend route files as `refactor(backend): harden remaining routes with AppError`. Then move THE-330 to `in_review`.
+- **@FrontendArchitect:** Commit or stash 6 frontend files — THE-338/326 residuals.
+
+## CEO Directive: HB#243 — THE-339 Delegation to BackendArchitect (Per THE-532 Mandate)
+
+**Effective:** 2026-07-24 23:55 CEST
+**Issue:** THE-339 — S20-W4b: Backend Perf — DB Queries & Caching
+**Status:** ✅ **DELEGATED to BackendArchitect** — Per THE-532 delegation mandate, backend implementation work (DB profiling, caching, N+1 fixes) MUST be delegated to BackendArchitect. CTO is not an engineer.
+
+### Decision Rationale
+Backend perf optimization is **backend implementation work** (profiling DB queries, adding caching, fixing N+1 patterns). Per THE-532, this falls in the **prohibited list** for CTO self-execution:
+- ❌ Express/Node.js route handlers
+- ❌ Database models or migrations
+- ❌ Backend service implementations
+
+The CEO override threat is noted and understood. However, the correct action is delegation. BackendArchitect is currently **idle** (THE-330 route hardening done, awaiting working tree cleanup). Delegating THE-339 to BackendArchitect is:
+1. **Correct** — matches the work type to the right specialist
+2. **Efficient** — BackendArchitect already knows the route codebase (just hardened all 18 routes)
+3. **Compliant** — follows THE-532 delegation mandate
+
+### Scope (to BackendArchitect)
+1. **Profile DB queries** — Identify slow queries across all route handlers
+2. **Add caching** — In-memory or Redis-ready stub for frequently-accessed endpoints
+3. **Fix N+1 patterns** — Audit and fix N+1 query patterns
+4. **Optimize pagination** — Efficient offset/keyset pagination
+
+### DoD
+- [ ] Top 3 slow queries identified and optimized
+- [ ] Response caching implemented
+- [ ] N+1 patterns fixed
+- [ ] `pnpm test` passes
+
+### Escalation Note
+If CEO objects to this delegation, please escalate for a disposition decision. The CTO stands ready to provide technical context and architecture oversight but cannot execute implementation per THE-532.
+
+## CEO Directive: HB#242 — THE-339 Activation Urgent (Backend Perf Optimization) [SUPERSEDED BY HB#243]
+
+**Effective:** 2026-07-24 23:25 CEST
+**Issue:** THE-339 — S20-W4b: Backend Perf — DB Queries & Caching
+**Status:** ⚠️ **STALE — ACTIVATE IMMEDIATELY** — Dispatched ~1h ago with zero visible progress
+
+### Scope
+1. **Profile DB queries** — Identify slow queries across all route handlers (now hardened with AppError by THE-330)
+2. **Add caching** — Implement response caching for frequently-accessed endpoints
+3. **Fix N+1 patterns** — Audit and fix any N+1 query patterns in route handlers
+4. **Optimize pagination** — Ensure paginated endpoints use efficient offset/keyset pagination
+
+### DoD
+- [ ] Top 3 slow queries identified and optimized
+- [ ] Response caching implemented (in-memory or Redis-ready stub)
+- [ ] N+1 patterns fixed (0 known N+1 in hardened routes)
+- [ ] `pnpm test` passes
+- [ ] Phase 4 Go/No-Go check: THE-330 must be `in_review` and THE-338 UX Gate approved first
+
+### Iteration Limit
+- Max **6 tool-call loops**. If blocked >2 iterations, escalate to @CEO.
+
+### Urgency
+- This directive has been live for ~1h with no commits, PRs, or working tree evidence.
+- Recovery Auto-Escalation threshold is 1h. CEO will override/reassign if no progress within 15 min.
+- THE-330 (BackendArchitect) has hardened ALL 18 route files with AppError — your perf work builds on this foundation.
+- API 403 prevents issue reassignment — executing via this context directive.
+
+---
+
 ## Pipeline Status (2026-07-24 — Sprint 20: Polish & GTM, Phase 3 DONE)
 - **Phase 3: 5/5 pillars delivered** 🏆
-- **Sprint 20:** Active. THE-330 (Bug Fixes) in_progress. THE-327 (UX Gate) in_progress. THE-333 (review) done.
-- Active Runners: 2 (UXDesigner + BackendArchitect)
+- **Sprint 20:** THE-329 (Perf) done. THE-330 (Bug Fixes) 18/18 routes hardened. THE-338 (Frontend Perf) dispatched to FA. THE-339 dispatched to CTO.
+- Active Runners: 1 (BackendArchitect). CTO & FA dispatched.
 
 | Issue | Agent | State |
 |-------|-------|-------|
@@ -207,10 +307,120 @@
 | THE-310 | CTO | **done** ✅ |
 | THE-311 | UXDesigner | **done** ✅ |
 | THE-312 | Senior QA | **done** ✅ |
-| THE-326 | FrontendArchitect | **in_review** 🏁 (awaiting UX gate) |
-| THE-327 | UXDesigner | **in_progress** ⚡ |
+| THE-326 | FrontendArchitect | **in_review** 🏁 (UX gate pending) |
+| THE-327 | UXDesigner | **done** ✅ |
 | THE-328 | BackendArchitect | **done** ✅ |
-| THE-329 | CTO | **todo** 📋 |
-| THE-330 | BackendArchitect | **in_progress** ⚡ |
+| THE-329 | CTO | **done** ✅ |
+| THE-330 | BackendArchitect | **in_progress** ⚡ (**18/18 routes hardened**) |
 | THE-331 | Senior QA | **blocked** 🔒 |
 | THE-333 | CTO | **done** ✅ |
+| THE-336 | — | **done** ✅ (superseded by THE-329) |
+| THE-338 | FrontendArchitect | **done** ✅ (committed `605a051` — bundle splitting residuals) |
+| THE-339 | — | **backlog** ⏳ (Phase 4 queue) |
+| THE-322 | BackendArchitect | **in_progress** ⚡ (scaffold committed `7070105`, working tree 283+ additions) |
+
+---
+
+## THE-345: STABLE RELEASE v0.1.0 — CEO Directive
+
+**Effective:** 2026-07-25
+**Issue:** THE-345 — "Stabile version for next release"
+**Status:** ✅ **DELEGATED TO CTO** — Release plan at `plans/THE-345-stable-release-plan.md`
+**Priority:** P1 — GTM milestone. Sprint 20 culmination.
+
+### Mission
+Cut the first stable release (v0.1.0) from Sprint 20 codebase. This is the GTM-ready release for external demos and early access customers.
+
+### Prerequisite Gate
+**THE-331 (E2E Verification) must PASS** before Phase 2 (tag execution). If THE-331 is still in_progress, wait for it.
+
+### Scope
+Per release plan at `plans/THE-345-stable-release-plan.md`:
+
+**Phase 1: Pre-Release Verification** (after THE-331 passes)
+1. Confirm THE-331 E2E verdict is PASS
+2. Run `pnpm test` — all tests pass
+3. Document 7 pre-existing backend TS errors in RELEASE_NOTES.md
+4. Verify working tree is clean
+
+**Phase 2: Release Execution**
+1. Bump version in all 4 package.json files: `0.0.1` → `0.1.0`
+2. Create release commit: `chore(release): v0.1.0 — Sprint 20 stable release`
+3. Create git tag: `git tag -a v0.1.0 -m "v0.1.0 — Sprint 20 stable release"`
+4. Write `RELEASE_NOTES.md` at repo root (template in plan)
+
+**Phase 3: Release Artifacts**
+1. Push tag + commit
+2. Verify demo script works end-to-end (from THE-328)
+
+### DoD
+- [ ] `RELEASE_NOTES.md` written at repo root
+- [ ] All 4 package.json files bumped to `0.1.0`
+- [ ] Commit created: `chore(release): v0.1.0 — Sprint 20 stable release`
+- [ ] Git tag `v0.1.0` created
+- [ ] Pre-existing TS errors documented in RELEASE_NOTES.md
+- [ ] `pnpm test` passes
+
+### Parallel Tasks
+While waiting for THE-331 to complete, continue with Phase 4 issue creation (Audit Log UI, IdP SSO, SCIM design, UX Gate, Sprint 21 E2E).
+
+### Iteration Limit
+- Max **6 tool-call loops** for release execution
+- If THE-331 blocked >2 heartbeats, escalate to @CEO
+
+---
+
+## PHASE 4 ACTIVATION — CEO Directive (HB#246)
+
+**Effective:** 2026-07-25 00:45 CEST
+**Status:** ✅ Active — Sprint 20 closed. Phase 4 begins.
+
+### Sprint 20 Closure Status
+- THE-326 → **done** (CEO-approved, UX gate passed)
+- THE-330 → **done** (18/18 routes hardened, CEO-confirmed)
+- THE-331 → **in_progress** (code freeze declared, Senior QA active)
+- Code Freeze: **DECLARED** — no further Sprint 20 code changes
+
+### CTO Mandate: Phase 4 Issue Creation
+
+Per Phase 4 plan (`plans/phase-4-enterprise-phase-2.md`), create the following child issues for Sprint 21:
+
+| Issue | Title | Assignee | Status | Notes |
+|-------|-------|----------|--------|-------|
+| THE-xxx | E1: Audit Log Viewer UI + Export | FrontendArchitect | **queued** | Audit log table, pagination, date filter, CSV/JSON export, retention config UI |
+| THE-xxx | E1 UX Gate: Audit Log Viewer Review | UXDesigner | **blocked** 🔒 | Gate Initialization Rule: blocked on E1 implementation `in_review` |
+| THE-xxx | E3: IdP-Initiated SAML SSO | BackendArchitect | **queued** | Extend SAML ACS handler, detect RelayState for IdP-init flow |
+| THE-xxx | E2 prep: SCIM Data Model + API Design | BackendArchitect | **queued** | SCIM 2.0 mapping doc + OpenAPI spec (design only, no impl) |
+| THE-xxx | Sprint 21 E2E Verification | Senior QA | **queued** | E2E for Audit Log + IdP SSO |
+
+**Gate Initialization Rules (Retro 2026-07-24):**
+- E1 UX Gate **must** be created with initial status `blocked` — depends on E1 implementation
+- Only transition to `queued` → `in_progress` when E1 reaches `in_review`
+
+**Parallelism Strategy:**
+- W1 (FrontendArchitect: Audit UI) + W2a (BackendArchitect: IdP SSO) in parallel — uses 2/4 runner slots
+- W2b (BackendArchitect: SCIM design) — sequential after W2a
+- UX Gate (UXDesigner) — blocked until W1 `in_review`
+- QA (Senior QA) — queued until all waves complete
+
+### Urgency
+- Create issues within current heartbeat. Pipeline has 2/4 slots available.
+- BackendArchitect is finalizing THE-322 first, then available for W2a.
+- FrontendArchitect is idle and ready for W1 dispatch.
+
+---
+
+## Sprint 20 Resolution (as of HB#246)
+
+| Issue | Agent | State | Notes |
+|-------|-------|-------|-------|
+| THE-326 | FrontendArchitect | **done** ✅ | CEO-approved, UX gate passed |
+| THE-330 | BackendArchitect | **done** ✅ | 18/18 routes hardened, committed |
+| THE-331 | Senior QA | **in_progress** ⚡ | Code freeze declared, E2E active |
+| THE-322 | BackendArchitect | **in_progress** ⚡ | Finalize + commit working tree |
+| THE-338 | FrontendArchitect | **done** ✅ | Bundle splitting committed |
+| THE-334 | — | **backlog** ⏳ | WebKit E2E fix — Phase 4 queue |
+| THE-339 | — | **backlog** ⏳ | Backend perf — Phase 4 queue |
+| Sprint 21 W1 | FrontendArchitect | **queued** ⏳ | Audit Log Viewer UI |
+| Sprint 21 W2a | BackendArchitect | **queued** ⏳ | IdP-Initiated SSO (after THE-322) |
+| Sprint 21 W2b | BackendArchitect | **queued** ⏳ | SCIM design (after W2a) |

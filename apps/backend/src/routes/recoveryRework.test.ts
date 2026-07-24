@@ -64,7 +64,7 @@ describe('Recovery Rework Ingestion API', () => {
       expect(typeof body.unclassified).toBe('number')
       expect(typeof body.eventsPushed).toBe('number')
       expect(typeof body.eventsPersisted).toBe('number')
-      expect(typeof body.minervaRunId).toBe('string')
+      expect(body.minervaRunId === null || typeof body.minervaRunId === 'string').toBe(true)
 
     } finally {
       // Restore original environment

@@ -34,7 +34,16 @@ Thank you for your interest in contributing to Nexus Engineering! This document 
    pnpm install
    ```
 
-3. Start development servers:
+3. Install E2E browser dependencies (WebKit requires system libraries):
+   ```bash
+   # Install system dependencies for WebKit (requires sudo)
+   sudo bash scripts/setup-e2e.sh
+   # OR manually:
+   sudo npx playwright install-deps
+   cd apps/frontend && pnpm exec playwright install --with-deps chromium firefox webkit
+   ```
+
+4. Start development servers:
    ```bash
    # Start all services in parallel
    pnpm dev
@@ -238,6 +247,21 @@ pnpm --filter @nexus-engineering/frontend test
 # Run tests in watch mode
 pnpm --filter @nexus-engineering/frontend test -- --watch
 ```
+
+### E2E Tests (Playwright)
+
+```bash
+# Run all E2E tests across browsers
+pnpm --filter @nexus-engineering/frontend test:e2e
+
+# Run specific browser only
+pnpm --filter @nexus-engineering/frontend test:e2e --project=webkit
+
+# Open the Playwright UI for debugging
+pnpm --filter @nexus-engineering/frontend test:e2e:ui
+```
+
+> **WebKit requirement**: WebKit tests require system libraries (`libevent-2.1-7t64`, `libavif16`, `libmanette-0.2-0`, `libwoff1`). Install them with `sudo bash scripts/setup-e2e.sh`. CI runs this automatically via `playwright install --with-deps`.
 
 ### Test Coverage
 
