@@ -14,6 +14,7 @@ import { execFileSync } from 'child_process'
 import { getGraphDatabase } from '../graphBuilder/graphDatabase'
 import { ImpactReportGenerator } from '../services/impactReportGenerator'
 import { getGateConfig, putGateConfig } from '../services/traceGateStore'
+import { AppError } from '../lib/errorHandler'
 
 function parseList(value: unknown): string[] | undefined {
   if (value === undefined || value === null) return undefined
@@ -25,59 +26,54 @@ function parseList(value: unknown): string[] | undefined {
 }
 
 export async function getTraceabilityGraph (request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const query = request.query as { depth?: string; filter?: string | string[]; relationships?: string | string[] }
-    const depth = query.depth ? Number(query.depth) : undefined
-    const filter = parseList(query.filter)
-    const relationships = parseList(query.relationships)
+  const query = request.query as { depth?: string; filter?: string | string[]; relationships?: string | string[] }
+  const depth = query.depth ? Number(query.depth) : undefined
+  const filter = parseList(query.filter)
+  const relationships = parseList(query.relationships)
 
-    const graph = traverseGraph({ depth, filter, relationshipTypes: relationships })
-    return reply.send(graph)
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to traverse traceability graph' })
-  }
+  const graph = traverseGraph({ depth, filter, relationshipTypes: relationships })
+  return reply.send(graph)
 }
 
 export async function getTraceabilityImpact (request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { artifactId } = request.params as { artifactId: string }
-    if (!artifactId) {
-      return reply.status(400).send({ error: 'Artifact ID is required' })
-    }
+  const { artifactId } = request.params as { artifactId: string }
 
-    const query = request.query as { confidenceThreshold?: string; artifactType?: string }
-    const confidenceThreshold = query.confidenceThreshold ? Number(query.confidenceThreshold) : 0
+  if (!artifactId) {
+    throw new AppError(400, 'Artifact ID is required', { param: 'artifactId' })
+  }
 
-    const scope: ImpactScope = {
-      artifactIds: [artifactId],
-      artifactTypes: query.artifactType ? [query.artifactType] : undefined,
-    }
+  const query = request.query as { confidenceThreshold?: string; artifactType?: string }
+  const confidenceThreshold = query.confidenceThreshold ? Number(query.confidenceThreshold) : 0
 
-    const analysis = await impactAnalyzer.analyzeV2(scope)
+  const scope: ImpactScope = {
+    artifactIds: [artifactId],
+    artifactTypes: query.artifactType ? [query.artifactType] : undefined,
+  }
 
-    const filteredArtifacts = analysis.artifacts.filter(a => a.confidenceScore >= confidenceThreshold)
-    const filteredNodeIds = new Set(filteredArtifacts.map(a => a.id))
-    const filteredGraph = {
-      nodes: analysis.impactGraph.nodes.filter(n => n.id === artifactId || filteredNodeIds.has(n.id)),
-      edges: analysis.impactGraph.edges.filter(e => filteredNodeIds.has(e.sourceId) && filteredNodeIds.has(e.targetId)),
-    }
+  const analysis = await impactAnalyzer.analyzeV2(scope)
 
-    return reply.send({
-      scope: analysis.scope,
-      artifactId,
-      confidenceThreshold,
-      artifacts: filteredArtifacts,
-      impactGraph: filteredGraph,
-      chains: analysis.chains.filter(c => c.confidenceScore >= confidenceThreshold),
-      summary: {
-        ...analysis.summary,
-        totalAffected: filteredArtifacts.length,
-        directCount: filteredArtifacts.filter(a => a.impactLevel === 'direct').length,
-        indirectCount: filteredArtifacts.filter(a => a.impactLevel === 'indirect').length,
-        transitiveCount: filteredArtifacts.filter(a => a.impactLevel === 'transitive').length,
-      },
-    })
+  const filteredArtifacts = analysis.artifacts.filter(a => a.confidenceScore >= confidenceThreshold)
+  const filteredNodeIds = new Set(filteredArtifacts.map(a => a.id))
+  const filteredGraph = {
+    nodes: analysis.impactGraph.nodes.filter(n => n.id === artifactId || filteredNodeIds.has(n.id)),
+    edges: analysis.impactGraph.edges.filter(e => filteredNodeIds.has(e.sourceId) && filteredNodeIds.has(e.targetId)),
+  }
+
+  return reply.send({
+    scope: analysis.scope,
+    artifactId,
+    confidenceThreshold,
+    artifacts: filteredArtifacts,
+    impactGraph: filteredGraph,
+    chains: analysis.chains.filter(c => c.confidenceScore >= confidenceThreshold),
+    summary: {
+      ...analysis.summary,
+      totalAffected: filteredArtifacts.length,
+      directCount: filteredArtifacts.filter(a => a.impactLevel === 'direct').length,
+      indirectCount: filteredArtifacts.filter(a => a.impactLevel === 'indirect').length,
+      transitiveCount: filteredArtifacts.filter(a => a.impactLevel === 'transitive').length,
+    },
+  })
   } catch (error) {
     reply.log.error(error as Error)
     return reply.status(500).send({ error: 'Failed to analyze traceability impact' })
@@ -85,78 +81,72 @@ export async function getTraceabilityImpact (request: FastifyRequest, reply: Fas
 }
 
 export async function getTraceabilityCoverage (request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const query = request.query as { domain?: string }
-    const report = await coverageAnalyzer.analyzeFromGraph()
+  const query = request.query as { domain?: string }
+  const report = await coverageAnalyzer.analyzeFromGraph()
 
-    if (query.domain) {
-      const domain: DomainCoverage | undefined = report.domainCoverage.find(d => d.domain === query.domain)
-      if (!domain) {
-        return reply.status(404).send({ error: `Domain "${query.domain}" not found`, available: report.domainCoverage.map(d => d.domain) })
-      }
-      return reply.send({ domain: query.domain, coverage: domain, overallCoveragePercent: report.overallCoveragePercent })
+  if (query.domain) {
+    const domain: DomainCoverage | undefined = report.domainCoverage.find(d => d.domain === query.domain)
+    if (!domain) {
+      throw new AppError(404, `Domain "${query.domain}" not found`, { available: report.domainCoverage.map(d => d.domain) })
     }
-
-    return reply.send(report)
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to compute traceability coverage' })
+    return reply.send({ domain: query.domain, coverage: domain, overallCoveragePercent: report.overallCoveragePercent })
   }
+
+  return reply.send(report)
 }
 
 export async function getTraceabilityDependencies (request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const query = request.query as {
-      artifactId?: string
-      depth?: string
-      direction?: string
-      relationshipTypes?: string
-      includeMetadata?: string
-      repoUrl?: string
+  const query = request.query as {
+    artifactId?: string
+    depth?: string
+    direction?: string
+    relationshipTypes?: string
+    includeMetadata?: string
+    repoUrl?: string
+  }
+
+  const { artifactId, depth, direction, relationshipTypes, includeMetadata, repoUrl } = query
+  const repos = repoUrl ? String(repoUrl).split(',').map(s => s.trim()).filter(Boolean) : undefined
+
+  // Validate depth parameter
+  const parsedDepth = depth ? Number(depth) : undefined
+  if (depth && (isNaN(parsedDepth) || parsedDepth < 0 || parsedDepth > 100)) {
+    throw new AppError(400, 'Invalid depth parameter. Must be a number between 0 and 100.', { param: 'depth', min: 0, max: 100 })
+  }
+
+  // Validate direction parameter
+  const validDirections = ['both', 'upstream', 'downstream'] as const
+  const parsedDirection = (direction as typeof validDirections[number]) ?? 'both'
+  if (!validDirections.includes(parsedDirection)) {
+    throw new AppError(400, `Invalid direction parameter. Must be one of: ${validDirections.join(', ')}`, { param: 'direction', allowed: validDirections })
+  }
+
+  // Validate artifactId if provided
+  if (artifactId) {
+    const db = getGraphDatabase()
+    const node = db.getNode(artifactId)
+    if (!node) {
+      throw new AppError(404, `Artifact "${artifactId}" not found`, { resourceId: artifactId })
     }
+  }
 
-    const { artifactId, depth, direction, relationshipTypes, includeMetadata, repoUrl } = query
-    const repos = repoUrl ? String(repoUrl).split(',').map(s => s.trim()).filter(Boolean) : undefined
+  const relTypes = relationshipTypes ? String(relationshipTypes).split(',').map(s => s.trim()).filter(Boolean) : undefined
 
-    // Validate depth parameter
-    const parsedDepth = depth ? Number(depth) : undefined
-    if (depth && (isNaN(parsedDepth) || parsedDepth < 0 || parsedDepth > 100)) {
-      return reply.status(400).send({ error: 'Invalid depth parameter. Must be a number between 0 and 100.' })
-    }
+  // Build traversal options
+  const traversalOptions: Parameters<typeof traverseGraph>[0] = {
+    depth: parsedDepth,
+    relationshipTypes: relTypes,
+  }
 
-    // Validate direction parameter
-    const validDirections = ['both', 'upstream', 'downstream'] as const
-    const parsedDirection = (direction as typeof validDirections[number]) ?? 'both'
-    if (!validDirections.includes(parsedDirection)) {
-      return reply.status(400).send({ error: `Invalid direction parameter. Must be one of: ${validDirections.join(', ')}` })
-    }
+  // If artifactId specified, seed from that specific node
+  if (artifactId) {
+    traversalOptions.seedIds = [artifactId]
+  }
 
-    // Validate artifactId if provided
-    if (artifactId) {
-      const db = getGraphDatabase()
-      const node = db.getNode(artifactId)
-      if (!node) {
-        return reply.status(404).send({ error: `Artifact "${artifactId}" not found`, availableArtifacts: db.getGraphNodes().map(n => ({ id: n.id, type: n.type, title: n.title || n.name })) })
-      }
-    }
+  const result = traverseGraph(traversalOptions)
 
-    const relTypes = relationshipTypes ? String(relationshipTypes).split(',').map(s => s.trim()).filter(Boolean) : undefined
-
-    // Build traversal options
-    const traversalOptions: Parameters<typeof traverseGraph>[0] = {
-      depth: parsedDepth,
-      relationshipTypes: relTypes,
-    }
-
-    // If artifactId specified, seed from that specific node
-    if (artifactId) {
-      traversalOptions.seedIds = [artifactId]
-    }
-
-    const result = traverseGraph(traversalOptions)
-
-    // If direction is specified, filter edges accordingly
-    let filteredEdges = result.edges
+  // If direction is specified, filter edges accordingly
+  let filteredEdges = result.edges
     if (direction === 'downstream' || direction === 'upstream') {
       // For direction filtering, we need to identify upstream vs downstream nodes
       // from the original seed (artifactId or all nodes if no seed)
