@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Card, Stack, Container, Badge, Input, RadioGroup } from '@nexus-engineering/shared';
+import { Alert, Badge, Button, Card, Container, Input, RadioGroup, Stack } from '@nexus-engineering/shared';
 import { GateStatusBadge } from './GateStatusBadge';
 import { getGateConfig, putGateConfig, runGate } from '../../api/traceGate';
 import type { TraceGateConfig, TraceGateResult, GateViolation } from '@nexus-engineering/shared';
@@ -157,14 +157,14 @@ export function GateConfigPanel({ className = '' }: GateConfigPanelProps) {
 
         {/* Alert messages */}
         {successMsg && (
-          <div className="rounded-lg border border-success-200 bg-success-50 p-3 text-sm text-success-700 dark:border-success-800 dark:bg-success-950 dark:text-success-300" role="alert">
+          <Alert variant="success" className="rounded-lg p-3">
             {successMsg}
-          </div>
+          </Alert>
         )}
         {error && (
-          <div className="rounded-lg border border-error-200 bg-error-50 p-3 text-sm text-error-700 dark:border-error-800 dark:bg-error-950 dark:text-error-300" role="alert">
+          <Alert variant="error" className="rounded-lg p-3">
             {error}
-          </div>
+          </Alert>
         )}
 
         {/* Configuration Card */}
@@ -255,13 +255,10 @@ export function GateConfigPanel({ className = '' }: GateConfigPanelProps) {
                 Gate Mode
               </p>
               {editConfig.mode === 'block' && (
-                <div
-                  role="alert"
-                  className="rounded-lg border border-warning-200 bg-warning-50 p-3 text-sm text-warning-700 dark:border-warning-800 dark:bg-warning-950 dark:text-warning-300"
-                >
+                <Alert variant="warning" className="rounded-lg p-3">
                   Block mode will fail CI when the policy is not met. Test your current
                   configuration with <strong>Test Gate</strong> before saving to avoid breaking the build.
-                </div>
+                </Alert>
               )}
               <RadioGroup
                 name="mode"
