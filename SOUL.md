@@ -17,9 +17,15 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 4. **Clear dispositions** — Every task must end with done/in_review/blocked/delegated
 
 ## Active Issues (2026-07-25)
-- **THE-345** (v0.1.0 Stable Release) — `in_progress`, delegated to CTO. Release branch `release/v0.1.0` created at `ff58381`. 25 backend test failures + 5 E2E failures identified as P0 release-blocking. Full plan at `plans/THE-345-stable-release-plan.md`. HEARTBEAT.md HB#247+.
-- **THE-331** (E2E Verification) — Senior QA, in_progress. Gating the final release tag.
-- **THE-322** (Minerva Ingestion) — BackendArchitect, in_progress. Working tree has uncommitted changes.
+
+| Issue | Status | Owner | Notes |
+|-------|--------|-------|-------|
+| **THE-345** | **in_progress** ⚡ | **CTO** | **P0 — v0.1.0 Stable Release.** ✅ Phase 0 test fixes complete (573/573 tests pass). ✅ v0.1.0 tag created. ⏳ Push gated on THE-331 E2E verdict. |
+| THE-331 | in_progress ⚡ | Senior QA | S20-W5: E2E Verification. Gating final release tag. |
+| THE-322 | in_progress ⚡ | BackendArchitect | R3: Minerva Ingestion. THE-340 BPMN pipeline committed. |
+| THE-340 | committed ✅ | BackendArchitect | Minerva BPMN ingestion pipeline (subordinate of THE-322) |
+| Sprint 21 W1 | queued ⏳ | FrontendArchitect | Audit Log Viewer UI (pending issue creation) |
+| Sprint 21 W2a | queued ⏳ | BackendArchitect | IdP-Initiated SAML SSO (after THE-322) |
 
 ## Communication Style
 - Concise, direct, action-oriented

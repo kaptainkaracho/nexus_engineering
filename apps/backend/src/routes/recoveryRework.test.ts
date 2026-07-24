@@ -3,6 +3,7 @@ import { mkdtempSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 import fastify from 'fastify'
 
+import { registerErrorHandler } from '../lib/errorHandler'
 import { recoveryReworkRoutes } from './recoveryRework'
 
 describe('Recovery Rework Ingestion API', () => {
@@ -10,6 +11,7 @@ describe('Recovery Rework Ingestion API', () => {
 
   beforeAll(async () => {
     app = fastify()
+    registerErrorHandler(app)
     recoveryReworkRoutes(app)
     await app.ready()
   })

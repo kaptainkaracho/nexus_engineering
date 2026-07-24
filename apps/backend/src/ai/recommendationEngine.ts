@@ -9,6 +9,7 @@ import type {
 import type { GraphNodeRow, GraphEdgeRow } from '../graphBuilder/graphDatabase'
 import { getGraphDatabase } from '../graphBuilder/graphDatabase'
 import { customAlphabet } from 'nanoid'
+import { graphCache } from '../lib/graphCache'
 
 const nanoid = customAlphabet('1234567890abcdef', 10)
 
@@ -227,6 +228,9 @@ export class RecommendationEngine {
   }
 
   async generateFromGraph(): Promise<TraceRecommendation[]> {
+    const cached = graphCache.get<TraceRecommendation[]>('recommendations:')
+    if (cached) return cached
+
     const db = getGraphDatabase()
     const graph: GraphInput = {
       nodes: db.getGraphNodes().map(n => ({ id: n.id, type: n.type, title: n.title, name: n.name })),
@@ -237,7 +241,9 @@ export class RecommendationEngine {
         confidence: e.confidence,
       })),
     }
-    return this.analyze(graph)
+    const result = await this.analyze(graph)
+    graphCache.set('recommendations:', result, 30_000)
+    return result
   }
 
   private make(input: {

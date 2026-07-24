@@ -8,6 +8,7 @@ import type {
 import { V_MODEL_AXES } from '@nexus-engineering/shared'
 import type { GraphNodeRow, GraphEdgeRow } from '../graphBuilder/graphDatabase'
 import { getGraphDatabase } from '../graphBuilder/graphDatabase'
+import { graphCache } from '../lib/graphCache'
 
 export interface GraphNodeLite {
   id: string
@@ -59,8 +60,13 @@ const SEVERITY_RANK: Record<CrossArtifactGap['severity'], number> = {
  */
 export class CoverageAnalyzer {
   async analyzeFromGraph(): Promise<CoverageAnalysisReport> {
+    const cached = graphCache.get<CoverageAnalysisReport>('coverage:')
+    if (cached) return cached
+
     const db = getGraphDatabase()
-    return this.analyze(db.getGraphNodes(), db.getGraphEdges())
+    const result = this.analyze(db.getGraphNodes(), db.getGraphEdges())
+    graphCache.set('coverage:', result, 30_000)
+    return result
   }
 
   analyze(

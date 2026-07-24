@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
+import { AppError } from '../lib/errorHandler'
 import {
   listTacDocuments,
   getTacDocument,
@@ -117,19 +118,18 @@ describe('tacRoutes handlers', () => {
     })
 
     it('returns 400 when id is missing', async () => {
-      const reply = mockReply() as ReturnType<typeof mockReply> & { getBody: () => any; getStatus: () => number }
-      await getTacDocument(makeRequest({ params: {} }) as any, reply as any)
-
-      expect(reply.getStatus()).toBe(400)
-      expect(reply.getBody()).toHaveProperty('error')
+      const promise = getTacDocument(makeRequest({ params: {} }) as any, {} as any)
+      await expect(promise).rejects.toThrow(AppError)
+      await expect(promise).rejects.toMatchObject({ statusCode: 400, message: 'Document ID is required' })
     })
 
     it('returns 404 for unknown id', async () => {
-      const reply = mockReply() as ReturnType<typeof mockReply> & { getBody: () => any; getStatus: () => number }
-      await getTacDocument(makeRequest({ params: { id: 'nonexistent/doc' } }) as any, reply as any)
-
-      expect(reply.getStatus()).toBe(404)
-      expect(reply.getBody()).toHaveProperty('error')
+      const promise = getTacDocument(
+        makeRequest({ params: { id: 'nonexistent/doc' } }) as any,
+        {} as any,
+      )
+      await expect(promise).rejects.toThrow(AppError)
+      await expect(promise).rejects.toMatchObject({ statusCode: 404, message: /not found/i })
     })
   })
 
@@ -143,11 +143,9 @@ describe('tacRoutes handlers', () => {
     })
 
     it('returns 400 when document is missing', async () => {
-      const reply = mockReply() as ReturnType<typeof mockReply> & { getBody: () => any; getStatus: () => number }
-      await validateTacDocument(makeRequest({ body: {} }) as any, reply as any)
-
-      expect(reply.getStatus()).toBe(400)
-      expect(reply.getBody()).toHaveProperty('error')
+      const promise = validateTacDocument(makeRequest({ body: {} }) as any, {} as any)
+      await expect(promise).rejects.toThrow(AppError)
+      await expect(promise).rejects.toMatchObject({ statusCode: 400, message: /document is required/i })
     })
 
     it('returns errors for an invalid document', async () => {

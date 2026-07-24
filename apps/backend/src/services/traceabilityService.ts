@@ -1,5 +1,6 @@
 import type { GraphNodeRow, GraphEdgeRow } from '../graphBuilder/graphDatabase'
 import { getGraphDatabase } from '../graphBuilder/graphDatabase'
+import { graphCache } from '../lib/graphCache'
 
 export interface GraphTraversalOptions {
   depth?: number
@@ -28,6 +29,10 @@ export interface TraversedGraph {
  * - `relationshipTypes` optionally restricts which edges are traversed.
  */
 export function traverseGraph(options: GraphTraversalOptions = {}): TraversedGraph {
+  const cacheKey = `traverse:depth=${options.depth ?? 3}:types=${(options.filter ?? []).join(',')}:rels=${(options.relationshipTypes ?? []).join(',')}`
+  const cached = graphCache.get<TraversedGraph>(cacheKey)
+  if (cached) return cached
+
   const db = getGraphDatabase()
   const allNodes = db.getGraphNodes()
   const allEdges = db.getGraphEdges()
@@ -89,7 +94,7 @@ export function traverseGraph(options: GraphTraversalOptions = {}): TraversedGra
   const nodeIdSet = new Set(nodes.map(n => n.id))
   const finalEdges = allEdges.filter(e => visitedEdges.has(e) && nodeIdSet.has(e.source_id) && nodeIdSet.has(e.target_id))
 
-  return {
+  const result: TraversedGraph = {
     nodes,
     edges: finalEdges,
     depth,
@@ -100,4 +105,7 @@ export function traverseGraph(options: GraphTraversalOptions = {}): TraversedGra
     totalNodes: nodes.length,
     totalEdges: finalEdges.length,
   }
+
+  graphCache.set(cacheKey, result, 30_000)
+  return result
 }

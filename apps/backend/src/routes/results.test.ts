@@ -3,6 +3,7 @@ import fastify from 'fastify'
 import { mkdtempSync, writeFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { registerErrorHandler } from '../lib/errorHandler'
 import { resultsRoutes } from './results'
 
 const SAMPLE = `nexus:
@@ -35,6 +36,7 @@ describe('results API', () => {
     process.env.TER_DIR = dir
     writeFileSync(join(dir, 'run.ter.yaml'), SAMPLE)
     app = fastify()
+    registerErrorHandler(app)
     resultsRoutes(app)
     await app.ready()
   })

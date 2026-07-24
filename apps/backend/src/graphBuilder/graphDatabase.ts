@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3'
 import type { TraceLink } from '@nexus-engineering/shared'
 import type { ParsedDocument, ParsedTraceLink } from '../parsers/repositoryParser'
+import { graphCache } from '../lib/graphCache'
 
 export interface GraphNodeRow {
   id: string
@@ -65,6 +66,9 @@ export class GraphDatabase {
     this.db.exec(`CREATE INDEX IF NOT EXISTS idx_graph_edges_confidence ON graph_edges (confidence)`)
     this.db.exec(`CREATE INDEX IF NOT EXISTS idx_graph_nodes_type ON graph_nodes (type)`)
 
+    this.db.exec(`CREATE INDEX IF NOT EXISTS idx_graph_edges_src_rel ON graph_edges (source_id, relationship_type)`)
+    this.db.exec(`CREATE INDEX IF NOT EXISTS idx_graph_edges_tgt_rel ON graph_edges (target_id, relationship_type)`)
+
     this.initialized = true
   }
 
@@ -96,6 +100,10 @@ export class GraphDatabase {
       `)
       stmt.run(node.id, node.type, node.title ?? null, node.name ?? null)
     }
+    graphCache.invalidatePrefix('graph:')
+    graphCache.invalidatePrefix('coverage:')
+    graphCache.invalidatePrefix('impact:')
+    graphCache.invalidatePrefix('traverse:')
   }
 
   upsertNodes(nodes: Array<{ id: string; type: string; title?: string; name?: string }>) {
@@ -128,6 +136,12 @@ export class GraphDatabase {
       VALUES (?, ?, ?, ?, ?, ?)
     `)
     stmt.run(edgeId, edge.sourceId, edge.targetId, edge.relationshipType, edge.confidence, edge.description ?? null)
+
+    graphCache.invalidatePrefix('graph:')
+    graphCache.invalidatePrefix('coverage:')
+    graphCache.invalidatePrefix('impact:')
+    graphCache.invalidatePrefix('traverse:')
+    graphCache.invalidatePrefix('recommendations:')
 
     return edgeId
   }

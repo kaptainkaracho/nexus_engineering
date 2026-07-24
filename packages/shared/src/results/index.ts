@@ -1,5 +1,6 @@
 export { resultsDocSchema } from './schema';
 export { validateExecutions, validateResultsDocument } from './validator';
+export { ResultsLoader, ValidatedResultsLoader, resultsLoader, validatedResultsLoader } from './loader';
 
 export type {
   ResultsNexusMetadata,

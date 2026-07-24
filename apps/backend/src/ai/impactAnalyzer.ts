@@ -15,6 +15,7 @@ import { getGraphDatabase } from '../graphBuilder/graphDatabase'
 import { getLLMClient } from './llmClient'
 import { buildImpactBriefingPrompt } from './promptTemplates'
 import { parseStructuredLLM } from './llmResponseParser'
+import { graphCache } from '../lib/graphCache'
 
 const LEVEL_DECAY: Record<AffectedArtifact['impactLevel'], number> = {
   direct: 1.0,
@@ -63,6 +64,10 @@ export class ImpactAnalyzer {
    * graph-ready structure for downstream visualization.
    */
   async analyzeV2(scope: ImpactScope): Promise<ImpactAnalysisV2> {
+    const cacheKey = `impact:${scope.artifactId}:${scope.impactType}:${scope.direction}`
+    const cached = graphCache.get<ImpactAnalysisV2>(cacheKey)
+    if (cached) return cached
+
     const db = getGraphDatabase()
     const allNodes = db.getGraphNodes()
     const allEdges = db.getGraphEdges()
@@ -83,7 +88,7 @@ export class ImpactAnalyzer {
     const minConfidence = scores.length ? Math.min(...scores) : 0
     const maxConfidence = scores.length ? Math.max(...scores) : 0
 
-    return {
+    const result: ImpactAnalysisV2 = {
       scope,
       artifacts: affected,
       impactGraph,
@@ -97,6 +102,9 @@ export class ImpactAnalyzer {
         maxConfidence,
       },
     }
+
+    graphCache.set(cacheKey, result, 30_000)
+    return result
   }
 
   async analyzeWithLLM(scope: ImpactScope): Promise<ImpactAnalysis> {
