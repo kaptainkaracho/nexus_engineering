@@ -13,6 +13,7 @@ export {
   Badge,
   Alert,
   RadioGroup,
+  RouteLoadingSkeleton,
 } from './design-system';
 
 export type {
@@ -30,6 +31,7 @@ export type {
   AlertVariant,
   RadioOption,
   RadioGroupProps,
+  RouteLoadingSkeletonProps,
 } from './design-system';
 
 export type {

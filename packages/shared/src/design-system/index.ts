@@ -1,6 +1,6 @@
 export { colors, typography, spacing } from './tokens';
 export { cn } from './utils';
-export { Button, Input, Card, Container, Stack, Grid, Nav, Badge, Alert, RadioGroup } from './components';
+export { Button, Input, Card, Container, Stack, Grid, Nav, Badge, Alert, RadioGroup, RouteLoadingSkeleton } from './components';
 export type {
   ButtonProps,
   InputProps,
@@ -16,4 +16,5 @@ export type {
   AlertVariant,
   RadioOption,
   RadioGroupProps,
+  RouteLoadingSkeletonProps,
 } from './components';
