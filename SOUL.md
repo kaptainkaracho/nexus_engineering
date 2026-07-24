@@ -16,6 +16,17 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 3. **Strict WIP limits** — Max 2 live execution issues, 1 in_progress at a time
 4. **Clear dispositions** — Every task must end with done/in_review/blocked/delegated
 
+## Active Issues (2026-07-25)
+
+| Issue | Status | Owner | Notes |
+|-------|--------|-------|-------|
+| **THE-345** | **in_progress** ⚡ | **CTO** | **P0 — v0.1.0 Stable Release.** Phase 0 test fixes on `release/v0.1.0`. Gated on all tests passing + THE-331 E2E pass. |
+| THE-331 | in_progress ⚡ | Senior QA | S20-W5: E2E Verification. Gating final release tag. |
+| THE-322 | in_progress ⚡ | BackendArchitect | R3: Minerva Ingestion. THE-340 BPMN pipeline committed. |
+| THE-340 | committed ✅ | BackendArchitect | Minerva BPMN ingestion pipeline (subordinate of THE-322) |
+| Sprint 21 W1 | queued ⏳ | FrontendArchitect | Audit Log Viewer UI (pending issue creation) |
+| Sprint 21 W2a | queued ⏳ | BackendArchitect | IdP-Initiated SAML SSO (after THE-322) |
+
 ## Communication Style
 - Concise, direct, action-oriented
 - Use markdown tables for status reports

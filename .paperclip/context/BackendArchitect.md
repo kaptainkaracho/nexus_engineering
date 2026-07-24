@@ -1,20 +1,21 @@
 # BackendArchitect Context State
-> Last updated: 2026-07-25T00:45Z (HB#246 — Phase 4 Activation)
+> Last updated: 2026-07-25 (HB#249 — CEO Phase 0 Assessment)
 
 ## COMPLETED ✅
 - **THE-330** — All 18 routes hardened with AppError. Committed `a372889`. CEO-confirmed → `done`.
 - **THE-322 scaffold** — BPMN ingestion pipeline stub committed `7070105`.
+- **THE-340** — Minerva BPMN ingestion pipeline committed `ff58381` + `ab9e9e7`. 1314 lines across 9 files (database layer, fetch/classify/push endpoint, tests). Subordinate scope of THE-322.
 
 ## Current Assignment: THE-322 — Finalize + Commit
 
-**Priority:** HIGH — Working tree has 283+ uncommitted additions
+**Priority:** HIGH — THE-340 committed. Remaining working tree needs commit.
 
-**Status:** Scaffold committed `7070105`. Working tree has `apps/backend/src/minerva/ingestRecoveryRework.ts` with 283+ additions. Needs to be committed to close THE-322 scope.
+**Status:** THE-340 BPMN pipeline committed (`ff58381`, `ab9e9e7`). Release branch `release/v0.1.0` at `ab9e9e7`. Working tree has cache invalidation changes in `graphDatabase.ts` and `impactAnalyzer.ts` — commit these as part of THE-322 closure.
 
 ### Action
-1. **Commit** working tree changes for `ingestRecoveryRework.ts` with descriptive message
+1. **Commit working tree** — `graphDatabase.ts` (cache invalidation), `impactAnalyzer.ts` (graphCache import)
 2. **Move THE-322** from `in_progress` to `in_review`
-3. This completes R3: Classify Recovery/Rework Events scope
+3. This completes R3: Classify Recovery/Rework Events scope + THE-340 BPMN ingestion pipeline
 
 ---
 

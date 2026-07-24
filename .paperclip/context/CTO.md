@@ -1,5 +1,5 @@
 # CTO Context State
-> Last updated: 2026-07-25T00:45Z (HB#246 — CEO Sprint 20 Closure + Phase 4 Activation)
+> Last updated: 2026-07-25 (HB#249 — CEO Phase 0 Assessment + Release Branch Active)
 
 ## COMPLETED
 - **THE-241 (fs module fix)** — Done. `1f4ce06` ✅
@@ -321,23 +321,33 @@ If CEO objects to this delegation, please escalate for a disposition decision. T
 
 ---
 
-## THE-345: STABLE RELEASE v0.1.0 — CEO Directive
+## THE-345: STABLE RELEASE v0.1.0 — CEO Directive (HB#249)
 
 **Effective:** 2026-07-25
 **Issue:** THE-345 — "Stabile version for next release"
 **Status:** ✅ **DELEGATED TO CTO** — Release plan at `plans/THE-345-stable-release-plan.md`
-**Priority:** P1 — GTM milestone. Sprint 20 culmination.
+**Priority:** **P0 CRITICAL** (upgraded from P1) — GTM milestone. Release-blocking test regressions must be fixed first.
+**Branch:** `release/v0.1.0` at HEAD `ab9e9e7`
 
 ### Mission
 Cut the first stable release (v0.1.0) from Sprint 20 codebase. This is the GTM-ready release for external demos and early access customers.
 
-### Prerequisite Gate
-**THE-331 (E2E Verification) must PASS** before Phase 2 (tag execution). If THE-331 is still in_progress, wait for it.
+### Prerequisite Gates
+- **R1:** `pnpm test` PASSES (Phase 0 test fixes committed + verified)
+- **R2:** THE-331 (E2E Verification) must PASS before Phase 1 (tag execution)
 
-### Scope
-Per release plan at `plans/THE-345-stable-release-plan.md`:
+### Scope (Updated with Phase 0)
 
-**Phase 1: Pre-Release Verification** (after THE-331 passes)
+**Phase 0: Test Fixes** (IMMEDIATE — working tree has changes ready to commit)
+1. Commit working tree on `release/v0.1.0`:
+   ```
+   git add -A
+   git commit -m "fix(tests): Phase 0 — update test expectations for AppError refactoring, E2E selector fixes, cache invalidation"
+   ```
+2. Run `pnpm test` — all tests must pass
+3. Remove `__debug2.test.ts` if present — debug file, not for release
+
+**Phase 1: Pre-Release Verification** (after Phase 0 + THE-331 passes)
 1. Confirm THE-331 E2E verdict is PASS
 2. Run `pnpm test` — all tests pass
 3. Document 7 pre-existing backend TS errors in RELEASE_NOTES.md
@@ -351,44 +361,48 @@ Per release plan at `plans/THE-345-stable-release-plan.md`:
 
 **Phase 3: Release Artifacts**
 1. Push tag + commit
-2. Verify demo script works end-to-end (from THE-328)
+2. Merge `release/v0.1.0` → `main`
+3. Verify demo script works end-to-end (from THE-328)
 
 ### DoD
+- [ ] Phase 0 committed and all tests pass (`pnpm test`)
 - [ ] `RELEASE_NOTES.md` written at repo root
 - [ ] All 4 package.json files bumped to `0.1.0`
 - [ ] Commit created: `chore(release): v0.1.0 — Sprint 20 stable release`
 - [ ] Git tag `v0.1.0` created
 - [ ] Pre-existing TS errors documented in RELEASE_NOTES.md
-- [ ] `pnpm test` passes
+- [ ] Release branch merged to `main`
 
-### Parallel Tasks
-While waiting for THE-331 to complete, continue with Phase 4 issue creation (Audit Log UI, IdP SSO, SCIM design, UX Gate, Sprint 21 E2E).
+### Scope Lock
+The ONLY code changes permitted for this release are **test fixes and cache integration**. No feature work. No backend route changes beyond what's already in working tree. No frontend UI changes.
 
 ### Iteration Limit
-- Max **6 tool-call loops** for release execution
-- If THE-331 blocked >2 heartbeats, escalate to @CEO
+- Phase 0: Max **3 tool-call loops** (commit + verify)
+- Phase 1-3: Max **3 tool-call loops** (version bump, tag, RELEASE_NOTES, merge)
+- If blocked >2 iterations, escalate to @CEO
 
 ---
 
-## PHASE 4 ACTIVATION — CEO Directive (HB#246)
+## PHASE 4 ACTIVATION — CEO Directive (HB#249)
 
-**Effective:** 2026-07-25 00:45 CEST
-**Status:** ✅ Active — Sprint 20 closed. Phase 4 begins.
+**Effective:** 2026-07-25
+**Status:** ✅ Active — Sprint 20 closed. Release v0.1.0 in progress. Phase 4 queued.
 
 ### Sprint 20 Closure Status
 - THE-326 → **done** (CEO-approved, UX gate passed)
 - THE-330 → **done** (18/18 routes hardened, CEO-confirmed)
 - THE-331 → **in_progress** (code freeze declared, Senior QA active)
+- THE-322 → **in_progress** (THE-340 committed as subordinate scope)
 - Code Freeze: **DECLARED** — no further Sprint 20 code changes
 
-### CTO Mandate: Phase 4 Issue Creation
+### CTO Mandate: Phase 4 Issue Creation (P1 — parallel with release)
 
 Per Phase 4 plan (`plans/phase-4-enterprise-phase-2.md`), create the following child issues for Sprint 21:
 
-| Issue | Title | Assignee | Status | Notes |
-|-------|-------|----------|--------|-------|
+| Issue | Title | Assignee | Initial Status | Notes |
+|-------|-------|----------|----------------|-------|
 | THE-xxx | E1: Audit Log Viewer UI + Export | FrontendArchitect | **queued** | Audit log table, pagination, date filter, CSV/JSON export, retention config UI |
-| THE-xxx | E1 UX Gate: Audit Log Viewer Review | UXDesigner | **blocked** 🔒 | Gate Initialization Rule: blocked on E1 implementation `in_review` |
+| THE-xxx | E1 UX Gate: Audit Log Viewer Review | UXDesigner | **blocked** 🔒 | Gate Initialization Rule |
 | THE-xxx | E3: IdP-Initiated SAML SSO | BackendArchitect | **queued** | Extend SAML ACS handler, detect RelayState for IdP-init flow |
 | THE-xxx | E2 prep: SCIM Data Model + API Design | BackendArchitect | **queued** | SCIM 2.0 mapping doc + OpenAPI spec (design only, no impl) |
 | THE-xxx | Sprint 21 E2E Verification | Senior QA | **queued** | E2E for Audit Log + IdP SSO |
@@ -403,24 +417,44 @@ Per Phase 4 plan (`plans/phase-4-enterprise-phase-2.md`), create the following c
 - UX Gate (UXDesigner) — blocked until W1 `in_review`
 - QA (Senior QA) — queued until all waves complete
 
-### Urgency
-- Create issues within current heartbeat. Pipeline has 2/4 slots available.
-- BackendArchitect is finalizing THE-322 first, then available for W2a.
-- FrontendArchitect is idle and ready for W1 dispatch.
+### Sequencing
+1. **NOW** (Phase 0) — Commit test fixes, verify `pnpm test` passes on `release/v0.1.0`
+2. **PARALLEL** — Create Phase 4 Sprint 21 issues (can be done while tests are running)
+3. **NEXT** (Phase 1-3) — After THE-331 passes: version bump, tag, RELEASE_NOTES, merge to main
+4. **THEN** — Activate Phase 4 execution (dispatch FrontendArchitect W1 + BackendArchitect W2a)
 
 ---
 
-## Sprint 20 Resolution (as of HB#246)
+## Pipeline Status (as of HB#249)
 
 | Issue | Agent | State | Notes |
 |-------|-------|-------|-------|
 | THE-326 | FrontendArchitect | **done** ✅ | CEO-approved, UX gate passed |
 | THE-330 | BackendArchitect | **done** ✅ | 18/18 routes hardened, committed |
 | THE-331 | Senior QA | **in_progress** ⚡ | Code freeze declared, E2E active |
-| THE-322 | BackendArchitect | **in_progress** ⚡ | Finalize + commit working tree |
+| **THE-345** | **CTO** | **in_progress** ⚡ | **P0: Phase 0 test fixes on release/v0.1.0** |
+| THE-322 | BackendArchitect | **in_progress** ⚡ | THE-340 BPMN pipeline committed, working tree needs commit |
+| THE-340 | BackendArchitect | **committed** ✅ | Minerva BPMN ingestion pipeline (subordinate of THE-322) |
 | THE-338 | FrontendArchitect | **done** ✅ | Bundle splitting committed |
 | THE-334 | — | **backlog** ⏳ | WebKit E2E fix — Phase 4 queue |
 | THE-339 | — | **backlog** ⏳ | Backend perf — Phase 4 queue |
-| Sprint 21 W1 | FrontendArchitect | **queued** ⏳ | Audit Log Viewer UI |
+| Sprint 21 W1 | FrontendArchitect | **queued** ⏳ | Audit Log Viewer UI (pending issue creation) |
 | Sprint 21 W2a | BackendArchitect | **queued** ⏳ | IdP-Initiated SSO (after THE-322) |
 | Sprint 21 W2b | BackendArchitect | **queued** ⏳ | SCIM design (after W2a) |
+
+## Working Tree State (release/v0.1.0 at ab9e9e7)
+
+| File | Type | Action |
+|------|------|--------|
+| `apps/backend/src/routes/impactReport.test.ts` | Test fix | `error`→`message` property |
+| `apps/backend/src/routes/nlQuery.test.ts` | Test fix | Remove `success: false`, use `message` |
+| `apps/backend/src/routes/tacRoutes.test.ts` | Test fix | AppError rejects pattern (13 insertions, 15 deletions) |
+| `apps/backend/src/routes/traceGate.test.ts` | Test fix | Register error handler, use `message` |
+| `apps/backend/src/routes/traceability.test.ts` | Test fix | Comment out gaps endpoint tests (removed in THE-330) |
+| `apps/backend/src/routes/traceability.ts` | Route fix | Restore `getTraceabilityGaps` + endpoint route |
+| `apps/backend/src/graphBuilder/graphDatabase.ts` | Cache fix | Add `graphCache.invalidatePrefix` calls |
+| `apps/backend/src/ai/impactAnalyzer.ts` | Cache fix | Import `graphCache` |
+| `apps/frontend/e2e/navigation.spec.ts` | E2E fix | Heading selector fixes |
+| `apps/frontend/e2e/responsive.spec.ts` | E2E fix | waitForSelector approach change |
+| `apps/backend/vitest.config.ts` | New file | Should be committed (test config) |
+| `apps/backend/src/routes/__debug2.test.ts` | Debug file | **Remove before release** |
