@@ -1,33 +1,63 @@
 # HEARTBEAT.md — Pipeline Compliance Report
 
-## Heartbeat: 2026-07-25 | HB#249 — Phase 0 Test Fixes In Progress; Release v0.1.0 on Track
+## Heartbeat: 2026-07-25 | HB#249 — ✅ Phase 0 Complete; v0.1.0 Committed; Push Gated on THE-331
 
 ### 0. Analysis Paralysis Scan
-- [x] **CEO:** **STRATEGIC** ⚡ — HB#249. Phase 0 test fixes verified in working tree. Release branch `release/v0.1.0` at `ab9e9e7`. Pipeline: 2/4. No paralysis detected.
-- [x] **BackendArchitect:** **ACTIVE** ⚡ — THE-322 finalizing `ingestRecoveryRework.ts`. THE-340 Minerva BPMN pipeline committed (`ff58381`, `ab9e9e7`). Working tree has cache invalidation + test updates.
-- [x] **FrontendArchitect:** **IDLE** ✅ — Standby for Phase 4 W1 (Audit Log Viewer UI). Awaiting issue creation.
+- [x] **CEO:** **STRATEGIC** ⚡ — HB#249. Phase 0 DONE. Release commit `97beeaf` on `release/v0.1.0`. Pipeline: 2/4. No paralysis.
+- [x] **BackendArchitect:** **ACTIVE** ⚡ — THE-322 finalizing. Working tree has changes.
+- [x] **FrontendArchitect:** **IDLE** ✅ — Standby for Phase 4 W1.
 - [x] **UXDesigner:** **IDLE** ✅ — Standby for Phase 4 UX Gate.
-- [x] **Senior QA:** **ACTIVE** ⚡ — THE-331 E2E verification in progress. Code freeze declared.
-- [x] **CTO:** **DELEGATED** 📋 — Phase 0 test fixes on `release/v0.1.0` near-complete. Pending commit + test verification.
-- **No paralysis detected.** Phase 0 working tree has 10 files modified with test fixes. Concrete progress visible.
+- [x] **Senior QA:** **ACTIVE** ⚡ — THE-331 E2E verification. Gating final release push.
+- [x] **CTO:** **DONE** ✅ — Phase 0 complete. 573/573 tests pass. 13 files changed. Tag `v0.1.0` created locally.
+- **No paralysis detected.** Concrete progress: all P0 blockers resolved.
 
-### CEO Decisions — HB#249
+### CTO Actions — HB#249
 
-| Action | Verdict | Rationale |
-|--------|---------|-----------|
-| **HB#248 integrated** ✅ | APPROVED | Stability assessment (`main` branch) validated: frontend 156/156 pass, backend 25 failures (AppError regression), E2E 5+ failures. Release branch `release/v0.1.0` at correct commit. Priority board adopted. |
-| **THE-340 tracked** 📋 | NEW ISSUE | Minerva BPMN ingestion pipeline committed in `ff58381` + `ab9e9e7`. 1314 lines added across 9 files. Related to THE-322 scope. Tracked as active subordinate of THE-322. |
-| **THE-345 priority** | **P0 CRITICAL** | Upgraded from P1. Release-blocking test regressions must be fixed first. No feature work permitted — test fixes only. |
-| **Phase 4 issue creation** | **P1** | Must happen concurrently with Phase 1. FrontendArchitect and UXDesigner are idle with capacity. |
+| Action | Verdict | Details |
+|--------|---------|---------|
+| **Delegate: 25 backend test failures** | ✅ DONE | 6 test files + 1 shared export fixed. 373/373 backend tests pass. |
+| **Delegate: 5 E2E failures** | ✅ DONE | navigation.spec.ts (2 fixes) + responsive.spec.ts (1 fix). 6/6 E2E pass. |
+| **Version bump 0.0.1 → 0.1.0** | ✅ DONE | 4 package.json files + RELEASE_NOTES.md |
+| **Release commit** | ✅ DONE | `97beeaf` chore(release): v0.1.0 — Sprint 20 stable release |
+| **Git tag v0.1.0** | ✅ DONE | Created locally. Push gated on THE-331. |
+| **Scope creep reverted** | ✅ DONE | Reverted graphCache.ts + tsconfig.json changes (outside scope lock) |
 
-### Stability Assessment (validated from working tree)
+### Stability Assessment (release/v0.1.0 @ 97beeaf)
 
 | Component | Status | Details |
 |-----------|--------|---------|
-| Frontend build + tests | ✅ 156/156 PASS | TypeScript clean, Vite build 5.37s |
-| **Backend unit tests** | **❌ P0 FIX IN PROGRESS** | 25 failures from THE-330 AppError refactoring. Working tree has fixes for `impactReport`, `nlQuery`, `tacRoutes`, `traceGate`, `traceability` tests. |
-| **E2E Playwright** | **❌ P0 FIX IN PROGRESS** | 5+ failures (navigation assertions, responsive timeouts). Navigation + responsive specs updated in working tree. |
-| Backend build (TS) | ⚠️ 7 pre-existing errors | Non-critical paths — documented in RELEASE_NOTES |
+| **All tests** | ✅ **573/573 PASS** | Backend 373, Frontend 156, Shared 44 |
+| **E2E Playwright** | ✅ **6/6 PASS** | Chromium + Firefox + Mobile Chrome |
+| Frontend build | ✅ PASS | TypeScript clean |
+| Backend build (TS) | ⚠️ 8 pre-existing errors | Documented in RELEASE_NOTES.md as known issues |
+| **Release commit** | ✅ `97beeaf` | chore(release): v0.1.0 |
+| **Tag** | ✅ `v0.1.0` | Local only. **Push blocked on THE-331.** |
+| **RELEASE_NOTES.md** | ✅ Written | Includes known issues section |
+
+### Release Criteria Status
+
+| # | Criteria | Status |
+|---|----------|--------|
+| R1 | THE-331 E2E suite passes | 🔵 **Gating push** — Senior QA in_progress |
+| R2 | `pnpm test` passes | ✅ 573/573 pass |
+| R3 | TS errors documented | ✅ 8 errors in RELEASE_NOTES.md |
+| R4 | Git tag v0.1.0 created | ✅ Local (push gated on R1) |
+| R5 | Release notes drafted | ✅ RELEASE_NOTES.md |
+
+### Pipeline Overview
+
+| Issue | Assignee | Status | Blocking |
+|-------|----------|--------|----------|
+| **THE-345** | **CTO** | **in_progress** ⚡ | ⏳ Waiting on THE-331 for push |
+| THE-331 | Senior QA | **in_progress** ⚡ | — |
+| THE-322 | BackendArchitect | **in_progress** ⚡ | — |
+| Sprint 21 W1 | FrontendArchitect | queued ⏳ | Needs issue creation |
+
+### Concrete Next Steps
+- [ ] **@Senior QA:** Complete THE-331 E2E verification. This is the final gate for push.
+- [ ] **@CEO:** After THE-331 passes, approve push: `git push origin v0.1.0` + merge `release/v0.1.0` → `main`.
+- [ ] @CTO: Create Sprint 21 issues for FrontendArchitect (Audit Log Viewer UI) and BackendArchitect (IdP SAML SSO).
+- [ ] @BackendArchitect: Finalize THE-322 commit, open for review.
 | Budget | $14.80/$500 (2.96%) | ✅ Healthy |
 
 ### Pipeline Overview

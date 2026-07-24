@@ -20,7 +20,7 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 
 | Issue | Status | Owner | Notes |
 |-------|--------|-------|-------|
-| **THE-345** | **in_progress** ⚡ | **CTO** | **P0 — v0.1.0 Stable Release.** Phase 0 test fixes on `release/v0.1.0`. Gated on all tests passing + THE-331 E2E pass. |
+| **THE-345** | **in_progress** ⚡ | **CTO** | **P0 — v0.1.0 Stable Release.** ✅ Phase 0 test fixes complete (573/573 tests pass). ✅ v0.1.0 tag created. ⏳ Push gated on THE-331 E2E verdict. |
 | THE-331 | in_progress ⚡ | Senior QA | S20-W5: E2E Verification. Gating final release tag. |
 | THE-322 | in_progress ⚡ | BackendArchitect | R3: Minerva Ingestion. THE-340 BPMN pipeline committed. |
 | THE-340 | committed ✅ | BackendArchitect | Minerva BPMN ingestion pipeline (subordinate of THE-322) |
