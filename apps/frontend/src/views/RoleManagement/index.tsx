@@ -32,6 +32,9 @@ export function RoleManagement() {
           </p>
         </Stack>
 
+        <Stack gap={2}>
+          <h2 className="text-xl font-bold text-text-primary">Roles</h2>
+        </Stack>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {roles.map((role) => (
             <Card key={role.name} padding="lg">

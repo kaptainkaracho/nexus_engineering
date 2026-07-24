@@ -268,7 +268,7 @@ function App() {
                 B
               </div>
               <div>
-                <h1 className="text-lg font-bold text-text-primary">The Bike App</h1>
+                <p className="text-lg font-bold text-text-primary">The Bike App</p>
                 <p className="text-sm text-text-tertiary">Design System v0.1</p>
               </div>
             </div>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Card, Input, Stack } from '@nexus-engineering/shared';
+import { Button, Card, Input, Stack, colors } from '@nexus-engineering/shared';
 import type { RegistrySummary } from '../../api/client';
 import {
   LIFECYCLE_LABEL,
@@ -22,12 +22,23 @@ interface ScanOverviewProps {
 }
 
 const TYPE_COLORS: Record<string, string> = {
-  requirement: '#0EA5E9',
-  architecture: '#F59E0B',
-  adr: '#6366F1',
-  spec: '#14B8A6',
-  unknown: '#64748B',
+  requirement: 'info',
+  architecture: 'warning',
+  adr: 'primary',
+  spec: 'secondary',
+  unknown: 'neutral',
 };
+
+function typeToHex(token: string): string {
+  const tokenMap: Record<string, string> = {
+    info: colors.info[500],
+    warning: colors.warning[500],
+    primary: colors.primary[500],
+    secondary: colors.secondary[500],
+    neutral: colors.neutral[500],
+  };
+  return tokenMap[token] ?? colors.neutral[500];
+}
 
 function StatCard({
   label,
@@ -74,7 +85,7 @@ export function ScanOverview({
     <section aria-labelledby="scan-overview-heading">
       <h2
         id="scan-overview-heading"
-        className="mb-4 text-sm font-medium uppercase tracking-wide text-text-tertiary"
+        className="mb-4 text-xl font-bold text-text-primary"
       >
         Scan Overview
       </h2>
@@ -95,7 +106,7 @@ export function ScanOverview({
           label="Errors"
           value={errorCount}
           sub="artifacts need attention"
-          accent={errorCount > 0 ? '#DC2626' : undefined}
+          accent={errorCount > 0 ? 'var(--color-error-600)' : undefined}
         />
       </div>
 
@@ -159,7 +170,7 @@ export function ScanOverview({
                   className="dash-typebar__segment"
                   style={{
                     width: `${(summary.byType[t] / segmentSum) * 100}%`,
-                    background: TYPE_COLORS[t],
+                    background: typeToHex(TYPE_COLORS[t]),
                   }}
                 />
               ) : null,
@@ -170,7 +181,7 @@ export function ScanOverview({
               <li key={t} className="flex items-center gap-2 text-sm">
                 <span
                   className="h-2.5 w-2.5 shrink-0 rounded-full"
-                  style={{ background: TYPE_COLORS[t] }}
+                  style={{ background: typeToHex(TYPE_COLORS[t]) }}
                   aria-hidden="true"
                 />
                 <span className="text-text-secondary">{TYPE_LABEL[t]}</span>

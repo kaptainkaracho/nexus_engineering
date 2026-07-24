@@ -139,6 +139,9 @@ export function RepositoryFileTree({ initialExpandedIds }: RepositoryFileTreePro
 
   return (
     <div className="flex h-full flex-col gap-4">
+      {/* Page title */}
+      <h2 className="text-xl font-bold text-text-primary">Repository</h2>
+
       {/* File tree panel */}
       <div className={cn(
         'overflow-y-auto rounded-xl border border-border bg-surface-primary',
@@ -146,12 +149,12 @@ export function RepositoryFileTree({ initialExpandedIds }: RepositoryFileTreePro
         'lg:w-[45%]',
       )}>
         <div className="flex items-center justify-between border-b border-border px-3 py-2">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">Files</h3>
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">Files</h2>
           <span className="text-xs text-text-tertiary">{rootChildrenCount} root item{rootChildrenCount !== 1 ? 's' : ''}</span>
         </div>
         {loading && <div className="p-4 text-center text-sm text-text-tertiary">Loading repository...</div>}
         {error && (
-          <div className="p-4 text-center text-sm text-red-600">
+          <div className="p-4 text-center text-sm text-error-600 dark:text-error-400">
             Error: {error}
             <button type="button" onClick={() => window.location.reload()} className="ml-2 underline">Retry</button>
           </div>
