@@ -4,6 +4,7 @@ import * as fs from 'fs'
 import { fileURLToPath } from 'node:url'
 import { dirname } from 'node:path'
 import { validatedRequirementsLoader, type LoadResult } from '@nexus-engineering/shared/requirements/loader'
+import { AppError } from '../lib/errorHandler'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -149,27 +150,22 @@ export async function listRequirements (_: FastifyRequest, reply: FastifyReply) 
  * Get single requirement by ID
  */
 export async function getRequirement (request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { id } = request.params as { id: string }
-    
-    if (!id) {
-      return reply.status(400).send({ error: 'Requirement ID is required' })
-    }
+  const { id } = request.params as { id: string }
 
-    const reqDir = path.join(__dirname, '../../packages/shared/requirements')
-    const filePaths = await validatedRequirementsLoader.findRequirementFiles(reqDir)
-    for (const fp of filePaths) {
-      const doc = await validatedRequirementsLoader.loadRequirementFile(fp)
-      if ((doc as any)?.requirements?.some((r: any) => r.id === id)) {
-        return reply.send({ requirement: { ...(doc as any), id } })
-      }
-    }
-
-    return reply.status(404).send({ error: 'Requirement not found' })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to get requirement' })
+  if (!id) {
+    throw new AppError(400, 'Requirement ID is required', { param: 'id' })
   }
+
+  const reqDir = path.join(__dirname, '../../packages/shared/requirements')
+  const filePaths = await validatedRequirementsLoader.findRequirementFiles(reqDir)
+  for (const fp of filePaths) {
+    const doc = await validatedRequirementsLoader.loadRequirementFile(fp)
+    if ((doc as any)?.requirements?.some((r: any) => r.id === id)) {
+      return reply.send({ requirement: { ...(doc as any), id } })
+    }
+  }
+
+  throw new AppError(404, 'Requirement not found', { resourceId: id })
 }
 
 /**

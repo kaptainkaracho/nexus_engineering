@@ -11,6 +11,7 @@ import { multiRepoRoutes } from './routes/multiRepoRoutes'
 import { authRoutes } from './routes/auth'
 import { registerAuthHooks } from './auth/middleware'
 import { registerAuditLogHook } from './auditLog/middleware'
+import { registerErrorHandler } from './lib/errorHandler'
 import { racRoutes } from './routes/racRoutes'
 import { aacRoutes } from './routes/aacRoutes'
 import { organizationsRoutes } from './routes/organizations'
@@ -54,6 +55,9 @@ server.get('/health', async () => {
 
 const start = async () => {
   try {
+    // Register error handler (must be before routes)
+    registerErrorHandler(server)
+
     // Register auth hooks
     registerAuthHooks(server)
     registerAuditLogHook(server)
