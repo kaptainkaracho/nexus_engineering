@@ -115,34 +115,29 @@ function mapArtefacts(documents: LoadResult[]): {
  * List all loaded requirement documents mapped to frontend artefacts
  */
 export async function listRequirements (_: FastifyRequest, reply: FastifyReply) {
+  const reqDir = path.join(__dirname, '../../packages/shared/requirements')
+  let filePaths: string[]
   try {
-    const reqDir = path.join(__dirname, '../../packages/shared/requirements')
-    let filePaths: string[]
-    try {
-      filePaths = await validatedRequirementsLoader.findRequirementFiles(reqDir)
-    } catch {
-      return reply.send({ artefacts: [], errors: [] })
-    }
-
-    if (!filePaths.length) return reply.send({ artefacts: [], errors: [] })
-
-    const allDocs: any[] = []
-    for (const fp of filePaths) {
-      try {
-        const doc = await validatedRequirementsLoader.loadRequirementFile(fp)
-        if ((doc as any)?.requirements) allDocs.push(doc)
-      } catch { /* skip bad files */ }
-    }
-
-    // Wrap in LoadResult format expected by mapArtefacts
-    const loadResults: LoadResult[] = allDocs.map((doc) => ({ document: doc, errors: new Map(), violations: [] }))
-    const artefacts = mapArtefacts(loadResults)
-
-    return reply.send({ ...artefacts, total: artefacts.requirements.length })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to list requirements', artefacts: [], errors: [] })
+    filePaths = await validatedRequirementsLoader.findRequirementFiles(reqDir)
+  } catch {
+    return reply.send({ artefacts: [], errors: [] })
   }
+
+  if (!filePaths.length) return reply.send({ artefacts: [], errors: [] })
+
+  const allDocs: any[] = []
+  for (const fp of filePaths) {
+    try {
+      const doc = await validatedRequirementsLoader.loadRequirementFile(fp)
+      if ((doc as any)?.requirements) allDocs.push(doc)
+    } catch { /* skip bad files */ }
+  }
+
+  // Wrap in LoadResult format expected by mapArtefacts
+  const loadResults: LoadResult[] = allDocs.map((doc) => ({ document: doc, errors: new Map(), violations: [] }))
+  const artefacts = mapArtefacts(loadResults)
+
+  return reply.send({ ...artefacts, total: artefacts.requirements.length })
 }
 
 /**
@@ -173,30 +168,25 @@ export async function getRequirement (request: FastifyRequest, reply: FastifyRep
  * Filter requirements by domain
  */
 export async function getRequirementsByDomain (request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { domain } = request.params as { domain: string }
-    
-    if (!domain) {
-      return reply.status(400).send({ error: 'Domain is required' })
-    }
+  const { domain } = request.params as { domain: string }
 
-    const reqDir = path.join(__dirname, '../../packages/shared/requirements')
-    const filePaths = await validatedRequirementsLoader.findRequirementFiles(reqDir)
-    const matchingDocs: LoadResult[] = []
-
-    for (const fp of filePaths) {
-      const doc = await validatedRequirementsLoader.loadRequirementFile(fp)
-      if ((doc as any)?.nexus?.metadata?.domain === domain || (doc as any)?.nexus?.metadata?.documentId?.toLowerCase().includes(domain.toLowerCase())) {
-        matchingDocs.push({ document: doc, errors: new Map() })
-      }
-    }
-
-    const artefacts = mapArtefacts(matchingDocs)
-    return reply.send({ ...artefacts, domain, total: artefacts.requirements.length })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to filter requirements by domain' })
+  if (!domain) {
+    throw new AppError(400, 'Domain is required', { param: 'domain' })
   }
+
+  const reqDir = path.join(__dirname, '../../packages/shared/requirements')
+  const filePaths = await validatedRequirementsLoader.findRequirementFiles(reqDir)
+  const matchingDocs: LoadResult[] = []
+
+  for (const fp of filePaths) {
+    const doc = await validatedRequirementsLoader.loadRequirementFile(fp)
+    if ((doc as any)?.nexus?.metadata?.domain === domain || (doc as any)?.nexus?.metadata?.documentId?.toLowerCase().includes(domain.toLowerCase())) {
+      matchingDocs.push({ document: doc, errors: new Map() })
+    }
+  }
+
+  const artefacts = mapArtefacts(matchingDocs)
+  return reply.send({ ...artefacts, domain, total: artefacts.requirements.length })
 }
 
 /**
@@ -204,33 +194,28 @@ export async function getRequirementsByDomain (request: FastifyRequest, reply: F
  * Trigger rescan of repository path (returns LoadResult)
  */
 export async function scanRequirements (request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { repositoryPath } = request.body as { repositoryPath: string }
-    
-    if (!repositoryPath) {
-      return reply.status(400).send({ error: 'repositoryPath is required' })
-    }
+  const { repositoryPath } = request.body as { repositoryPath: string }
 
-    let results: LoadResult[]
-    try {
-      results = await validatedRequirementsLoader.loadAllWithTraceValidation(repositoryPath)
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Scan failed'
-      // Return partial results rather than failing entirely
-      return reply.send({ documents: [], errors: new Map([['scan', [message]]]), message })
-    }
-
-    const artefacts = mapArtefacts(results)
-    return reply.send({ 
-      ...artefacts, 
-      total: artefacts.requirements.length,
-      scanned: results.length,
-      message: `Scanned ${results.length} requirement files`
-    })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to scan requirements' })
+  if (!repositoryPath) {
+    throw new AppError(400, 'repositoryPath is required', { param: 'repositoryPath' })
   }
+
+  let results: LoadResult[]
+  try {
+    results = await validatedRequirementsLoader.loadAllWithTraceValidation(repositoryPath)
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Scan failed'
+    // Return partial results rather than failing entirely
+    return reply.send({ documents: [], errors: new Map([['scan', [message]]]), message })
+  }
+
+  const artefacts = mapArtefacts(results)
+  return reply.send({ 
+    ...artefacts, 
+    total: artefacts.requirements.length,
+    scanned: results.length,
+    message: `Scanned ${results.length} requirement files`
+  })
 }
 
 /**

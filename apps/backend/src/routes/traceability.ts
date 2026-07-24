@@ -74,10 +74,6 @@ export async function getTraceabilityImpact (request: FastifyRequest, reply: Fas
       transitiveCount: filteredArtifacts.filter(a => a.impactLevel === 'transitive').length,
     },
   })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to analyze traceability impact' })
-  }
 }
 
 export async function getTraceabilityCoverage (request: FastifyRequest, reply: FastifyReply) {
@@ -229,57 +225,48 @@ export async function getTraceabilityDependencies (request: FastifyRequest, repl
       }
     }
 
-    return reply.send(response)
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to compute dependency graph' })
-  }
+  return reply.send(response)
 }
 
 export async function getTraceabilityReport (request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const query = request.query as { format?: string }
-    const format = (query.format === 'json' ? 'json' : 'markdown') as 'markdown' | 'json'
+  const query = request.query as { format?: string }
+  const format = (query.format === 'json' ? 'json' : 'markdown') as 'markdown' | 'json'
 
-    const report = await coverageAnalyzer.analyzeFromGraph()
-    const llmClient = getLLMClient()
+  const report = await coverageAnalyzer.analyzeFromGraph()
+  const llmClient = getLLMClient()
 
-    let llmAnalysis: string | undefined
+  let llmAnalysis: string | undefined
 
-    if (llmClient.isConfigured()) {
-      try {
-        const messages = buildTraceabilityReportPrompt({
-          axes: report.axes,
-          crossArtifactGaps: report.crossArtifactGaps,
-          domainCoverage: report.domainCoverage,
-          overallCoveragePercent: report.overallCoveragePercent,
-        })
-        const response = await llmClient.complete({ messages })
-        llmAnalysis = response.content
-      } catch {
-        llmAnalysis = undefined
-      }
+  if (llmClient.isConfigured()) {
+    try {
+      const messages = buildTraceabilityReportPrompt({
+        axes: report.axes,
+        crossArtifactGaps: report.crossArtifactGaps,
+        domainCoverage: report.domainCoverage,
+        overallCoveragePercent: report.overallCoveragePercent,
+      })
+      const response = await llmClient.complete({ messages })
+      llmAnalysis = response.content
+    } catch {
+      llmAnalysis = undefined
     }
-
-    const content = llmAnalysis ?? nativeMarkdownReport(report)
-
-    const payload: TraceabilityReport = {
-      generatedAt: new Date().toISOString(),
-      format,
-      content,
-      coverage: report,
-      gaps: report.crossArtifactGaps,
-      llmAnalysis,
-    }
-
-    if (format === 'json') {
-      return reply.send(payload)
-    }
-    return reply.type('text/markdown').send(content)
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to generate traceability report' })
   }
+
+  const content = llmAnalysis ?? nativeMarkdownReport(report)
+
+  const payload: TraceabilityReport = {
+    generatedAt: new Date().toISOString(),
+    format,
+    content,
+    coverage: report,
+    gaps: report.crossArtifactGaps,
+    llmAnalysis,
+  }
+
+  if (format === 'json') {
+    return reply.send(payload)
+  }
+  return reply.type('text/markdown').send(content)
 }
 
 function nativeMarkdownReport(report: Awaited<ReturnType<typeof coverageAnalyzer.analyzeFromGraph>>): string {
@@ -323,40 +310,35 @@ function nativeMarkdownReport(report: Awaited<ReturnType<typeof coverageAnalyzer
 }
 
 export async function getTraceabilityImpactReport (request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const query = request.query as { file?: string; branch?: string; base?: string }
+  const query = request.query as { file?: string; branch?: string; base?: string }
 
-    const file = query.file
-    if (!file) {
-      return reply.status(400).send({ error: 'file query parameter is required' })
-    }
-
-    const branch = query.branch || 'main'
-    const base = query.base || 'HEAD~1'
-
-    // 404 for a file that does not exist on disk.
-    if (!existsSync(file)) {
-      return reply.status(404).send({ error: `File "${file}" not found`, file })
-    }
-
-    // Resolve the changed file to traceable artifact ids deterministically so
-    // the report is produced regardless of how the underlying generator resolves
-    // files. The generator still receives the file change for its own analysis.
-    const resolvedIds = resolveFileToArtifactIds(file)
-    const generator = new ImpactReportGenerator()
-    const report = await generator.generate({ fileChanges: [file], artifactIds: resolvedIds })
-
-    const commitCount = countCommits(base, branch)
-
-    return reply.send({
-      report,
-      generatedAt: new Date().toISOString(),
-      metadata: { file, branch, base, commitCount },
-    })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to generate impact report' })
+  const file = query.file
+  if (!file) {
+    throw new AppError(400, 'file query parameter is required', { param: 'file' })
   }
+
+  const branch = query.branch || 'main'
+  const base = query.base || 'HEAD~1'
+
+  // 404 for a file that does not exist on disk.
+  if (!existsSync(file)) {
+    throw new AppError(404, `File "${file}" not found`, { file })
+  }
+
+  // Resolve the changed file to traceable artifact ids deterministically so
+  // the report is produced regardless of how the underlying generator resolves
+  // files. The generator still receives the file change for its own analysis.
+  const resolvedIds = resolveFileToArtifactIds(file)
+  const generator = new ImpactReportGenerator()
+  const report = await generator.generate({ fileChanges: [file], artifactIds: resolvedIds })
+
+  const commitCount = countCommits(base, branch)
+
+  return reply.send({
+    report,
+    generatedAt: new Date().toISOString(),
+    metadata: { file, branch, base, commitCount },
+  })
 }
 
 /**
@@ -404,34 +386,29 @@ function countCommits(base: string, branch: string): number {
 }
 
 export async function getTraceabilityRecommendations (request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const query = request.query as {
-      severity?: string | string[]
-      type?: string | string[]
-      limit?: string
-      minConfidence?: string
-    }
-
-    const severity = parseList(query.severity) as RecommendationSeverity[] | undefined
-    const type = parseList(query.type) as RecommendationType[] | undefined
-    const limit = query.limit ? Number(query.limit) : undefined
-    const minConfidence = query.minConfidence ? Number(query.minConfidence) : undefined
-
-    if (query.limit && (isNaN(limit!) || limit! < 0)) {
-      return reply.status(400).send({ error: 'Invalid limit parameter. Must be a non-negative number.' })
-    }
-    if (query.minConfidence && (isNaN(minConfidence!) || minConfidence! < 0 || minConfidence! > 1)) {
-      return reply.status(400).send({ error: 'Invalid minConfidence parameter. Must be between 0 and 1.' })
-    }
-
-    const recommendations = await recommendationEngine.generateFromGraph()
-    const response = recommendationEngine.query(recommendations, { severity, type, limit, minConfidence })
-
-    return reply.send({ ...response, data: response.recommendations })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to generate traceability recommendations' })
+  const query = request.query as {
+    severity?: string | string[]
+    type?: string | string[]
+    limit?: string
+    minConfidence?: string
   }
+
+  const severity = parseList(query.severity) as RecommendationSeverity[] | undefined
+  const type = parseList(query.type) as RecommendationType[] | undefined
+  const limit = query.limit ? Number(query.limit) : undefined
+  const minConfidence = query.minConfidence ? Number(query.minConfidence) : undefined
+
+  if (query.limit && (isNaN(limit!) || limit! < 0)) {
+    throw new AppError(400, 'Invalid limit parameter. Must be a non-negative number.', { param: 'limit', value: limit })
+  }
+  if (query.minConfidence && (isNaN(minConfidence!) || minConfidence! < 0 || minConfidence! > 1)) {
+    throw new AppError(400, 'Invalid minConfidence parameter. Must be between 0 and 1.', { param: 'minConfidence', value: minConfidence })
+  }
+
+  const recommendations = await recommendationEngine.generateFromGraph()
+  const response = recommendationEngine.query(recommendations, { severity, type, limit, minConfidence })
+
+  return reply.send({ ...response, data: response.recommendations })
 }
 
 /**
@@ -447,65 +424,50 @@ async function computeGateMetrics(config: TraceGateConfig): Promise<GateMetrics>
 }
 
 export async function getTraceabilityGate (request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const query = request.query as {
-      coverageThreshold?: string
-      maxGaps?: string
-      requireTypes?: string | string[]
-      mode?: string
-    }
-
-    const base = getGateConfig()
-
-    const overrides: Partial<TraceGateConfig> = {}
-    if (query.coverageThreshold !== undefined) {
-      const v = Number(query.coverageThreshold)
-      if (!Number.isFinite(v)) return reply.status(400).send({ error: 'coverageThreshold must be a number' })
-      overrides.coverageThreshold = v
-    }
-    if (query.maxGaps !== undefined) {
-      const v = Number(query.maxGaps)
-      if (!Number.isFinite(v)) return reply.status(400).send({ error: 'maxGaps must be a number' })
-      overrides.maxGaps = v
-    }
-    const requireTypes = parseList(query.requireTypes)
-    if (requireTypes) overrides.requireTypes = requireTypes
-    if (query.mode === 'block' || query.mode === 'warn') overrides.mode = query.mode as GateMode
-
-    const config = normalizeGateConfig({ ...base, ...overrides })
-    const metrics = await computeGateMetrics(config)
-    const result = evaluateGate(metrics, config)
-
-    return reply.send(result)
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to evaluate trace gate' })
+  const query = request.query as {
+    coverageThreshold?: string
+    maxGaps?: string
+    requireTypes?: string | string[]
+    mode?: string
   }
+
+  const base = getGateConfig()
+
+  const overrides: Partial<TraceGateConfig> = {}
+  if (query.coverageThreshold !== undefined) {
+    const v = Number(query.coverageThreshold)
+    if (!Number.isFinite(v)) throw new AppError(400, 'coverageThreshold must be a number', { param: 'coverageThreshold', value: query.coverageThreshold })
+    overrides.coverageThreshold = v
+  }
+  if (query.maxGaps !== undefined) {
+    const v = Number(query.maxGaps)
+    if (!Number.isFinite(v)) throw new AppError(400, 'maxGaps must be a number', { param: 'maxGaps', value: query.maxGaps })
+    overrides.maxGaps = v
+  }
+  const requireTypes = parseList(query.requireTypes)
+  if (requireTypes) overrides.requireTypes = requireTypes
+  if (query.mode === 'block' || query.mode === 'warn') overrides.mode = query.mode as GateMode
+
+  const config = normalizeGateConfig({ ...base, ...overrides })
+  const metrics = await computeGateMetrics(config)
+  const result = evaluateGate(metrics, config)
+
+  return reply.send(result)
 }
 
 export async function getTraceabilityGateConfig (request: FastifyRequest, reply: FastifyReply) {
-  try {
-    return reply.send(getGateConfig())
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to load trace gate config' })
-  }
+  return reply.send(getGateConfig())
 }
 
 export async function putTraceabilityGateConfig (request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const body = request.body as Partial<TraceGateConfig> | undefined
-    const { config, errors } = validateGateConfig(body)
-    if (errors.length > 0) {
-      return reply.status(400).send({ error: 'Invalid gate config', errors })
-    }
-
-    const saved = putGateConfig(config ?? {})
-    return reply.send(saved)
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to save trace gate config' })
+  const body = request.body as Partial<TraceGateConfig> | undefined
+  const { config, errors } = validateGateConfig(body)
+  if (errors.length > 0) {
+    throw new AppError(400, 'Invalid gate config', { errors })
   }
+
+  const saved = putGateConfig(config ?? {})
+  return reply.send(saved)
 }
 
 export function traceabilityRoutes (server: FastifyInstance) {

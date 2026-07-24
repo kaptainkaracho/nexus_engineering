@@ -182,23 +182,16 @@ function buildRepositoryTree(fileMetadata: any[]): { root: any, nodesByPath: Rec
  * Lightweight tree-only response for initial UI mount
  */
 export async function scanTree (request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { repositoryPath } = request.query as { repositoryPath: string }
-    
-    if (!repositoryPath) {
-      return reply.status(400).send({ 
-        error: 'repositoryPath query parameter is required' 
-      })
-    }
-
-    const scanner = new RepositoryScanner()
-    const result = await scanner.scan(repositoryPath)
-
-    return reply.send(buildRepositoryTree(result.fileMetadata))
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to generate repository tree' })
+  const { repositoryPath } = request.query as { repositoryPath: string }
+  
+  if (!repositoryPath) {
+    throw new AppError(400, 'repositoryPath query parameter is required', { param: 'repositoryPath' })
   }
+
+  const scanner = new RepositoryScanner()
+  const result = await scanner.scan(repositoryPath)
+
+  return reply.send(buildRepositoryTree(result.fileMetadata))
 }
 
 /**
@@ -206,37 +199,32 @@ export async function scanTree (request: FastifyRequest, reply: FastifyReply) {
  * Stream files matching patterns (for lazy loading)
  */
 export async function streamFilesByPattern (request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { patterns, rootPath } = request.body as { patterns: string[], rootPath: string }
-    
-    if (!patterns || !patterns.length) {
-      return reply.status(400).send({ error: 'patterns array is required' })
-    }
-
-    if (!rootPath) {
-      return reply.status(400).send({ error: 'rootPath is required' })
-    }
-
-    const scanner = new RepositoryScanner()
-    const fileStream = scanner.streamFiles(patterns, rootPath)
-
-    // Set headers for streaming response
-    reply.raw.writeHead(200, {
-      'Content-Type': 'application/json',
-      'Transfer-Encoding': 'chunked'
-    })
-
-    for await (const fileEntry of fileStream) {
-      reply.raw.write(JSON.stringify(fileEntry))
-      reply.raw.write('\\n')
-    }
-
-    reply.raw.end()
-    return reply
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to stream files' })
+  const { patterns, rootPath } = request.body as { patterns: string[], rootPath: string }
+  
+  if (!patterns || !patterns.length) {
+    throw new AppError(400, 'patterns array is required', { param: 'patterns' })
   }
+
+  if (!rootPath) {
+    throw new AppError(400, 'rootPath is required', { param: 'rootPath' })
+  }
+
+  const scanner = new RepositoryScanner()
+  const fileStream = scanner.streamFiles(patterns, rootPath)
+
+  // Set headers for streaming response
+  reply.raw.writeHead(200, {
+    'Content-Type': 'application/json',
+    'Transfer-Encoding': 'chunked'
+  })
+
+  for await (const fileEntry of fileStream) {
+    reply.raw.write(JSON.stringify(fileEntry))
+    reply.raw.write('\\n')
+  }
+
+  reply.raw.end()
+  return reply
 }
 
 /**

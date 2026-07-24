@@ -118,341 +118,267 @@ export async function listOrganizationMembers(request: FastifyRequest, reply: Fa
 }
 
 export async function addOrganizationMember(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { id } = request.params as { id: string }
-    const body = request.body as { userId: string; role?: 'org:admin' | 'org:member' | 'org:viewer' }
+  const { id } = request.params as { id: string }
+  const body = request.body as { userId: string; role?: 'org:admin' | 'org:member' | 'org:viewer' }
 
-    if (!id || !body.userId) {
-      return reply.status(400).send({ error: 'Organization ID and user ID are required' })
-    }
-
-    const organization = await orgRepository.getOrganization(id)
-    if (!organization) {
-      return reply.status(404).send({ error: 'Organization not found' })
-    }
-
-    const existing = await orgRepository.getOrganizationMember(id, body.userId)
-    if (existing) {
-      return reply.status(409).send({ error: 'User is already a member of this organization' })
-    }
-
-    const member = await orgRepository.addOrganizationMember(id, body.userId, body.role || 'org:member')
-    logAuditAction(request, 'CREATE', 'organizationMember', `${id}:${body.userId}`)
-    return reply.status(201).send(member)
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to add organization member' })
+  if (!id || !body.userId) {
+    throw new AppError(400, 'Organization ID and user ID are required', { param: 'id, userId' })
   }
+
+  const organization = await orgRepository.getOrganization(id)
+  if (!organization) {
+    throw new AppError(404, 'Organization not found', { resourceId: id })
+  }
+
+  const existing = await orgRepository.getOrganizationMember(id, body.userId)
+  if (existing) {
+    throw new AppError(409, 'User is already a member of this organization', { userId: body.userId, orgId: id })
+  }
+
+  const member = await orgRepository.addOrganizationMember(id, body.userId, body.role || 'org:member')
+  logAuditAction(request, 'CREATE', 'organizationMember', `${id}:${body.userId}`)
+  return reply.status(201).send(member)
 }
 
 export async function updateOrganizationMember(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { id, userId } = request.params as { id: string; userId: string }
-    const body = request.body as { role: string }
+  const { id, userId } = request.params as { id: string; userId: string }
+  const body = request.body as { role: string }
 
-    if (!id || !userId || !body.role) {
-      return reply.status(400).send({ error: 'Organization ID, user ID, and role are required' })
-    }
-
-    if (!['org:admin', 'org:member', 'org:viewer'].includes(body.role)) {
-      return reply.status(400).send({ error: 'Role must be "org:admin", "org:member", or "org:viewer"' })
-    }
-
-    const updated = await orgRepository.updateOrganizationMemberRole(id, userId, body.role)
-    if (!updated) {
-      return reply.status(404).send({ error: 'Organization member not found' })
-    }
-
-    logAuditAction(request, 'UPDATE', 'organizationMember', `${id}:${userId}`, `role=${body.role}`)
-    return reply.send(updated)
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to update organization member' })
+  if (!id || !userId || !body.role) {
+    throw new AppError(400, 'Organization ID, user ID, and role are required', { param: 'id, userId, role' })
   }
+
+  if (!['org:admin', 'org:member', 'org:viewer'].includes(body.role)) {
+    throw new AppError(400, 'Role must be "org:admin", "org:member", or "org:viewer"', { param: 'role', received: body.role })
+  }
+
+  const updated = await orgRepository.updateOrganizationMemberRole(id, userId, body.role)
+  if (!updated) {
+    throw new AppError(404, 'Organization member not found', { resourceId: `${id}:${userId}` })
+  }
+
+  logAuditAction(request, 'UPDATE', 'organizationMember', `${id}:${userId}`, `role=${body.role}`)
+  return reply.send(updated)
 }
 
 export async function removeOrganizationMember(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { id, userId } = request.params as { id: string; userId: string }
+  const { id, userId } = request.params as { id: string; userId: string }
 
-    if (!id || !userId) {
-      return reply.status(400).send({ error: 'Organization ID and user ID are required' })
-    }
-
-    const success = await orgRepository.removeOrganizationMember(id, userId)
-    if (!success) {
-      return reply.status(404).send({ error: 'Organization member not found' })
-    }
-
-    logAuditAction(request, 'DELETE', 'organizationMember', `${id}:${userId}`)
-    return reply.send({ message: 'Member removed from organization successfully' })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to remove organization member' })
+  if (!id || !userId) {
+    throw new AppError(400, 'Organization ID and user ID are required', { param: 'id, userId' })
   }
+
+  const success = await orgRepository.removeOrganizationMember(id, userId)
+  if (!success) {
+    throw new AppError(404, 'Organization member not found', { resourceId: `${id}:${userId}` })
+  }
+
+  logAuditAction(request, 'DELETE', 'organizationMember', `${id}:${userId}`)
+  return reply.send({ message: 'Member removed from organization successfully' })
 }
 
 // --- Invite / Join / Leave ---
 
 export async function inviteMember(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { id } = request.params as { id: string }
-    const body = request.body as { userId: string; role?: 'org:admin' | 'org:member' | 'org:viewer' }
+  const { id } = request.params as { id: string }
+  const body = request.body as { userId: string; role?: 'org:admin' | 'org:member' | 'org:viewer' }
 
-    if (!id || !body.userId) {
-      return reply.status(400).send({ error: 'Organization ID and user ID are required' })
-    }
-
-    const member = await orgRepository.inviteMember(id, body.userId, body.role)
-    logAuditAction(request, 'CREATE', 'invite', `${id}:${body.userId}`)
-    return reply.status(201).send(member)
-  } catch (error) {
-    const msg = (error as Error).message
-    if (msg.includes('already a member')) {
-      return reply.status(409).send({ error: msg })
-    }
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to invite member' })
+  if (!id || !body.userId) {
+    throw new AppError(400, 'Organization ID and user ID are required', { param: 'id, userId' })
   }
+
+  const existing = await orgRepository.getOrganizationMember(id, body.userId)
+  if (existing) {
+    throw new AppError(409, 'User is already a member of this organization', { userId: body.userId, orgId: id })
+  }
+
+  const member = await orgRepository.inviteMember(id, body.userId, body.role)
+  logAuditAction(request, 'CREATE', 'invite', `${id}:${body.userId}`)
+  return reply.status(201).send(member)
 }
 
 export async function joinOrganization(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { id } = request.params as { id: string }
-    if (!id) {
-      return reply.status(400).send({ error: 'Organization ID is required' })
-    }
-
-    const member = await orgRepository.joinOrganization(id, request.user!.sub)
-    logAuditAction(request, 'CREATE', 'join', `${id}:${request.user!.sub}`)
-    return reply.status(201).send(member)
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to join organization' })
+  const { id } = request.params as { id: string }
+  if (!id) {
+    throw new AppError(400, 'Organization ID is required', { param: 'id' })
   }
+
+  const member = await orgRepository.joinOrganization(id, request.user!.sub)
+  logAuditAction(request, 'CREATE', 'join', `${id}:${request.user!.sub}`)
+  return reply.status(201).send(member)
 }
 
 export async function leaveOrganization(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { id } = request.params as { id: string }
-    if (!id) {
-      return reply.status(400).send({ error: 'Organization ID is required' })
-    }
-
-    await orgRepository.leaveOrganization(id, request.user!.sub)
-    logAuditAction(request, 'DELETE', 'leave', `${id}:${request.user!.sub}`)
-    return reply.send({ message: 'Left organization successfully' })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to leave organization' })
+  const { id } = request.params as { id: string }
+  if (!id) {
+    throw new AppError(400, 'Organization ID is required', { param: 'id' })
   }
+
+  await orgRepository.leaveOrganization(id, request.user!.sub)
+  logAuditAction(request, 'DELETE', 'leave', `${id}:${request.user!.sub}`)
+  return reply.send({ message: 'Left organization successfully' })
 }
 
 // --- Team Handlers ---
 
 export async function listTeams(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { orgId } = request.params as { orgId: string }
+  const { orgId } = request.params as { orgId: string }
 
-    if (!orgId) {
-      return reply.status(400).send({ error: 'Organization ID is required' })
-    }
-
-    const organization = await orgRepository.getOrganization(orgId)
-    if (!organization) {
-      return reply.status(404).send({ error: 'Organization not found' })
-    }
-
-    const teams = await orgRepository.listTeamsByOrganization(orgId)
-    return reply.send({ teams, total: teams.length })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to list teams' })
+  if (!orgId) {
+    throw new AppError(400, 'Organization ID is required', { param: 'orgId' })
   }
+
+  const organization = await orgRepository.getOrganization(orgId)
+  if (!organization) {
+    throw new AppError(404, 'Organization not found', { resourceId: orgId })
+  }
+
+  const teams = await orgRepository.listTeamsByOrganization(orgId)
+  return reply.send({ teams, total: teams.length })
 }
 
 export async function getTeam(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { id } = request.params as { id: string }
+  const { id } = request.params as { id: string }
 
-    if (!id) {
-      return reply.status(400).send({ error: 'Team ID is required' })
-    }
-
-    const team = await orgRepository.getTeam(id)
-    if (!team) {
-      return reply.status(404).send({ error: 'Team not found' })
-    }
-
-    return reply.send(team)
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to get team' })
+  if (!id) {
+    throw new AppError(400, 'Team ID is required', { param: 'id' })
   }
+
+  const team = await orgRepository.getTeam(id)
+  if (!team) {
+    throw new AppError(404, 'Team not found', { resourceId: id })
+  }
+
+  return reply.send(team)
 }
 
 export async function createTeam(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { orgId } = request.params as { orgId: string }
-    const body = request.body as Partial<Team>
+  const { orgId } = request.params as { orgId: string }
+  const body = request.body as Partial<Team>
 
-    if (!orgId || !body.name) {
-      return reply.status(400).send({ error: 'Organization ID and team name are required' })
-    }
-
-    const organization = await orgRepository.getOrganization(orgId)
-    if (!organization) {
-      return reply.status(404).send({ error: 'Organization not found' })
-    }
-
-    const team = await orgRepository.createTeam(orgId, body)
-    logAuditAction(request, 'CREATE', 'team', team.id, `orgId=${orgId}`)
-    return reply.status(201).send(team)
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to create team' })
+  if (!orgId || !body.name) {
+    throw new AppError(400, 'Organization ID and team name are required', { param: 'orgId, name' })
   }
+
+  const organization = await orgRepository.getOrganization(orgId)
+  if (!organization) {
+    throw new AppError(404, 'Organization not found', { resourceId: orgId })
+  }
+
+  const team = await orgRepository.createTeam(orgId, body)
+  logAuditAction(request, 'CREATE', 'team', team.id, `orgId=${orgId}`)
+  return reply.status(201).send(team)
 }
 
 export async function updateTeam(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { id } = request.params as { id: string }
-    const updates = request.body as Partial<Team>
+  const { id } = request.params as { id: string }
+  const updates = request.body as Partial<Team>
 
-    if (!id) {
-      return reply.status(400).send({ error: 'Team ID is required' })
-    }
-
-    const updated = await orgRepository.updateTeam(id, updates)
-    if (!updated) {
-      return reply.status(404).send({ error: 'Team not found' })
-    }
-
-    logAuditAction(request, 'UPDATE', 'team', id, JSON.stringify(Object.keys(updates)))
-    return reply.send(updated)
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to update team' })
+  if (!id) {
+    throw new AppError(400, 'Team ID is required', { param: 'id' })
   }
+
+  const updated = await orgRepository.updateTeam(id, updates)
+  if (!updated) {
+    throw new AppError(404, 'Team not found', { resourceId: id })
+  }
+
+  logAuditAction(request, 'UPDATE', 'team', id, JSON.stringify(Object.keys(updates)))
+  return reply.send(updated)
 }
 
 export async function deleteTeam(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { id } = request.params as { id: string }
+  const { id } = request.params as { id: string }
 
-    if (!id) {
-      return reply.status(400).send({ error: 'Team ID is required' })
-    }
-
-    const success = await orgRepository.deleteTeam(id)
-    if (!success) {
-      return reply.status(404).send({ error: 'Team not found' })
-    }
-
-    logAuditAction(request, 'DELETE', 'team', id)
-    return reply.send({ message: `Team ${id} deleted successfully` })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to delete team' })
+  if (!id) {
+    throw new AppError(400, 'Team ID is required', { param: 'id' })
   }
+
+  const success = await orgRepository.deleteTeam(id)
+  if (!success) {
+    throw new AppError(404, 'Team not found', { resourceId: id })
+  }
+
+  logAuditAction(request, 'DELETE', 'team', id)
+  return reply.send({ message: `Team ${id} deleted successfully` })
 }
 
 // --- Team Member Handlers ---
 
 export async function listTeamMembers(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { id } = request.params as { id: string }
+  const { id } = request.params as { id: string }
 
-    if (!id) {
-      return reply.status(400).send({ error: 'Team ID is required' })
-    }
-
-    const team = await orgRepository.getTeam(id)
-    if (!team) {
-      return reply.status(404).send({ error: 'Team not found' })
-    }
-
-    const members = await orgRepository.listTeamMembers(id)
-    return reply.send({ members, total: members.length })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to list team members' })
+  if (!id) {
+    throw new AppError(400, 'Team ID is required', { param: 'id' })
   }
+
+  const team = await orgRepository.getTeam(id)
+  if (!team) {
+    throw new AppError(404, 'Team not found', { resourceId: id })
+  }
+
+  const members = await orgRepository.listTeamMembers(id)
+  return reply.send({ members, total: members.length })
 }
 
 export async function addTeamMember(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { id } = request.params as { id: string }
-    const body = request.body as { userId: string; role?: 'lead' | 'member' }
+  const { id } = request.params as { id: string }
+  const body = request.body as { userId: string; role?: 'lead' | 'member' }
 
-    if (!id || !body.userId) {
-      return reply.status(400).send({ error: 'Team ID and user ID are required' })
-    }
-
-    const team = await orgRepository.getTeam(id)
-    if (!team) {
-      return reply.status(404).send({ error: 'Team not found' })
-    }
-
-    const existing = await orgRepository.getTeamMember(id, body.userId)
-    if (existing) {
-      return reply.status(409).send({ error: 'User is already a member of this team' })
-    }
-
-    const member = await orgRepository.addTeamMember(id, body.userId, body.role || 'member')
-    logAuditAction(request, 'CREATE', 'teamMember', `${id}:${body.userId}`)
-    return reply.status(201).send(member)
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to add team member' })
+  if (!id || !body.userId) {
+    throw new AppError(400, 'Team ID and user ID are required', { param: 'id, userId' })
   }
+
+  const team = await orgRepository.getTeam(id)
+  if (!team) {
+    throw new AppError(404, 'Team not found', { resourceId: id })
+  }
+
+  const existing = await orgRepository.getTeamMember(id, body.userId)
+  if (existing) {
+    throw new AppError(409, 'User is already a member of this team', { userId: body.userId, teamId: id })
+  }
+
+  const member = await orgRepository.addTeamMember(id, body.userId, body.role || 'member')
+  logAuditAction(request, 'CREATE', 'teamMember', `${id}:${body.userId}`)
+  return reply.status(201).send(member)
 }
 
 export async function updateTeamMember(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { id, userId } = request.params as { id: string; userId: string }
-    const body = request.body as { role: string }
+  const { id, userId } = request.params as { id: string; userId: string }
+  const body = request.body as { role: string }
 
-    if (!id || !userId || !body.role) {
-      return reply.status(400).send({ error: 'Team ID, user ID, and role are required' })
-    }
-
-    if (!['lead', 'member'].includes(body.role)) {
-      return reply.status(400).send({ error: 'Role must be "lead" or "member"' })
-    }
-
-    const updated = await orgRepository.updateTeamMemberRole(id, userId, body.role)
-    if (!updated) {
-      return reply.status(404).send({ error: 'Team member not found' })
-    }
-
-    logAuditAction(request, 'UPDATE', 'teamMember', `${id}:${userId}`, `role=${body.role}`)
-    return reply.send(updated)
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to update team member' })
+  if (!id || !userId || !body.role) {
+    throw new AppError(400, 'Team ID, user ID, and role are required', { param: 'id, userId, role' })
   }
+
+  if (!['lead', 'member'].includes(body.role)) {
+    throw new AppError(400, 'Role must be "lead" or "member"', { param: 'role', received: body.role })
+  }
+
+  const updated = await orgRepository.updateTeamMemberRole(id, userId, body.role)
+  if (!updated) {
+    throw new AppError(404, 'Team member not found', { resourceId: `${id}:${userId}` })
+  }
+
+  logAuditAction(request, 'UPDATE', 'teamMember', `${id}:${userId}`, `role=${body.role}`)
+  return reply.send(updated)
 }
 
 export async function removeTeamMember(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { id, userId } = request.params as { id: string; userId: string }
+  const { id, userId } = request.params as { id: string; userId: string }
 
-    if (!id || !userId) {
-      return reply.status(400).send({ error: 'Team ID and user ID are required' })
-    }
-
-    const success = await orgRepository.removeTeamMember(id, userId)
-    if (!success) {
-      return reply.status(404).send({ error: 'Team member not found' })
-    }
-
-    logAuditAction(request, 'DELETE', 'teamMember', `${id}:${userId}`)
-    return reply.send({ message: 'Member removed from team successfully' })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to remove team member' })
+  if (!id || !userId) {
+    throw new AppError(400, 'Team ID and user ID are required', { param: 'id, userId' })
   }
+
+  const success = await orgRepository.removeTeamMember(id, userId)
+  if (!success) {
+    throw new AppError(404, 'Team member not found', { resourceId: `${id}:${userId}` })
+  }
+
+  logAuditAction(request, 'DELETE', 'teamMember', `${id}:${userId}`)
+  return reply.send({ message: 'Member removed from team successfully' })
 }
 
 // --- Route Registration ---
