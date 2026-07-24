@@ -1,0 +1,17 @@
+title: Artifacts are stored in an S3-compatible object store keyed by content hash
+status: accepted
+context: |
+  Build artifacts can be large and numerous. Storing them in the primary
+  relational database would bloat it and slow down metadata queries. We also
+  need content-addressable deduplication to avoid paying for identical blobs.
+decision: |
+  Store artifact bytes in an S3-compatible object store under a key derived
+  from the sha256 content hash (e.g. sha256/<hash>). Store only lightweight
+  metadata (name, version, build id, repo, hash) in Postgres. Verify the
+  hash on upload and reject mismatches.
+consequences:
+  - Identical artifacts are deduplicated automatically by content hash
+  - Postgres stays small and fast for metadata queries
+  - A lifecycle policy must transition old objects to cheaper storage tiers
+  - Downloads require either tenant authorization or signed expiring URLs
+superseded_by: null

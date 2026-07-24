@@ -102,11 +102,9 @@ class ApiController {
         body: JSON.stringify({ scanId: 'scan-1', status: 'completed', filesFound: 0 }),
       });
     }
-    return route.fulfill({
-      status: 404,
-      contentType: 'application/json',
-      body: JSON.stringify({ error: 'not mocked' }),
-    });
+    // Fall through to any more-specific page.route handlers registered later,
+    // or to the actual network if none match.
+    return route.fallback();
   }
 
   registry(response: Partial<RegistryResponse> = {}): void {
@@ -146,6 +144,46 @@ class ApiController {
       }),
     );
   }
+
+  gateConfig(config: TraceGateConfigData): void {
+    this.handlers.set('/api/traceability/gate-config', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(config),
+      }),
+    );
+  }
+
+  gateConfigError(status = 500): void {
+    this.handlers.set('/api/traceability/gate-config', (route) =>
+      route.fulfill({
+        status,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'gate config error' }),
+      }),
+    );
+  }
+
+  gateResult(result: TraceGateResultData): void {
+    this.handlers.set('/api/traceability/gate', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(result),
+      }),
+    );
+  }
+
+  gateResultError(status = 500): void {
+    this.handlers.set('/api/traceability/gate', (route) =>
+      route.fulfill({
+        status,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'gate evaluation error' }),
+      }),
+    );
+  }
 }
 
 type Fixtures = {
@@ -178,6 +216,39 @@ export const test = base.extend<Fixtures>({
   },
 });
 
+// ── Trace Gate types (mirrored from @nexus-engineering/shared) ──────────────
+
+export type GateMode = 'warn' | 'block';
+
+export interface TraceGateConfigData {
+  coverageThreshold: number;
+  maxGaps: number;
+  requireTypes: string[];
+  mode: GateMode;
+}
+
+export interface GateViolationData {
+  rule: string;
+  message: string;
+  actual: number | string[];
+  expected: number | string[];
+}
+
+export interface GateMetricsData {
+  coveragePercent: number;
+  gapCount: number;
+  missingTypes: string[];
+}
+
+export interface TraceGateResultData {
+  pass: boolean;
+  mode: GateMode;
+  metrics: GateMetricsData;
+  config: TraceGateConfigData;
+  violations: GateViolationData[];
+  evaluatedAt: string;
+}
+
 export { expect };
 
 /** Build a DiscoveryArtifact with sensible defaults for tests. */
@@ -202,4 +273,39 @@ export function makeArtifact(overrides: Partial<DiscoveryArtifact> = {}): Discov
 /** Build a RegistrySummary with sensible defaults for tests. */
 export function makeSummary(overrides: Partial<RegistrySummary> = {}): RegistrySummary {
   return { ...emptySummary(), ...overrides };
+}
+
+/** Default gate config matching DEFAULT_GATE_CONFIG in @nexus-engineering/shared. */
+export function makeGateConfig(overrides: Partial<TraceGateConfigData> = {}): TraceGateConfigData {
+  return {
+    coverageThreshold: 80,
+    maxGaps: 0,
+    requireTypes: [],
+    mode: 'warn',
+    ...overrides,
+  };
+}
+
+/** Build a passing gate result with sensible defaults. */
+export function makeGateResult(overrides: Partial<TraceGateResultData> = {}): TraceGateResultData {
+  return {
+    pass: true,
+    mode: 'warn',
+    metrics: { coveragePercent: 95, gapCount: 0, missingTypes: [] },
+    config: makeGateConfig(),
+    violations: [],
+    evaluatedAt: new Date().toISOString(),
+    ...overrides,
+  };
+}
+
+/** Build a gate violation object. */
+export function makeGateViolation(overrides: Partial<GateViolationData> = {}): GateViolationData {
+  return {
+    rule: 'coverageThreshold',
+    message: 'Coverage 45% is below threshold 80%',
+    actual: 45,
+    expected: 80,
+    ...overrides,
+  };
 }

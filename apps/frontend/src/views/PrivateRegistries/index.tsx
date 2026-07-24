@@ -502,8 +502,11 @@ export function PrivateRegistries() {
 
                     <div className="mt-3 flex items-center justify-between gap-2">
                       <div className="flex items-center gap-3 text-xs text-text-tertiary">
-                        <span>-- packages</span>
-                        <span>{formatRelative(null)}</span>
+                        <span>
+                          {registry.artifactCount ?? 0}{' '}
+                          {registry.artifactCount === 1 ? 'package' : 'packages'}
+                        </span>
+                        <span>Created {formatRelative(registry.createdAt)}</span>
                       </div>
                       <Button
                         variant="secondary"

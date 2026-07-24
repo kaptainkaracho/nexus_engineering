@@ -7,6 +7,8 @@ import type {
   RegistryProviderType,
   RegistryCredentials,
   RegistryArtifact,
+  NLQueryResult,
+  NLQueryResponse,
 } from '@nexus-engineering/shared';
 
 const BASE = import.meta.env.VITE_API_URL || '';
@@ -483,6 +485,7 @@ export interface AuditLogFilter {
   userId?: string
   action?: string
   resourceType?: string
+  orgId?: string
   search?: string
   limit?: number
   offset?: number
@@ -505,6 +508,7 @@ export async function fetchAuditLogs(filter?: AuditLogFilter): Promise<AuditLogR
     if (filter.action) params.set('action', filter.action);
     if (filter.resourceType) params.set('resourceType', filter.resourceType);
     if (filter.userId) params.set('userId', filter.userId);
+    if (filter.orgId) params.set('orgId', filter.orgId);
     if (filter.startDate) params.set('startDate', filter.startDate);
     if (filter.endDate) params.set('endDate', filter.endDate);
     if (filter.search) params.set('search', filter.search);
@@ -528,6 +532,7 @@ export async function exportAuditLogs(format: 'csv' | 'json', filter?: AuditLogF
     if (filter.action) params.set('action', filter.action);
     if (filter.resourceType) params.set('resourceType', filter.resourceType);
     if (filter.userId) params.set('userId', filter.userId);
+    if (filter.orgId) params.set('orgId', filter.orgId);
     if (filter.startDate) params.set('startDate', filter.startDate);
     if (filter.endDate) params.set('endDate', filter.endDate);
     if (filter.search) params.set('search', filter.search);
@@ -713,5 +718,601 @@ export async function fetchRegistryArtifacts(registryId: string): Promise<Regist
     return json.data ?? [];
   } catch {
     return [];
+  }
+}
+
+// =========================================================
+// Features as Code (FAC) — Feature Browser API
+// =========================================================
+
+export type FacStatus = 'draft' | 'approved' | 'implemented' | 'deprecated';
+
+export interface FacAcceptanceCriterion {
+  id: string;
+  given?: string;
+  when?: string;
+  then: string;
+  description?: string;
+}
+
+export interface FacUserStory {
+  id: string;
+  role: string;
+  want: string;
+  soThat?: string;
+  acceptanceCriteria: FacAcceptanceCriterion[];
+}
+
+export interface FacTraceLink {
+  type: string;
+  target: { id: string; documentId: string };
+  confidence?: 'high' | 'medium' | 'low';
+  description?: string;
+}
+
+export interface FacFeature {
+  id: string;
+  name: string;
+  description: string;
+  status?: FacStatus;
+  userStories: FacUserStory[];
+  traceLinks?: FacTraceLink[];
+  source: string;
+  documentId: string;
+}
+
+export interface FacListResponse {
+  features: FacFeature[];
+  documents: number;
+  total: number;
+}
+
+export interface FacDetailResponse {
+  feature: FacFeature;
+}
+
+export interface FacValidationResult {
+  valid: boolean;
+  schema?: string;
+  errors?: Record<string, string>;
+}
+
+/** List FAC features from the backend, optionally filtered by status/domain. */
+export async function fetchFacFeatures(params?: {
+  status?: string;
+  domain?: string;
+}): Promise<FacListResponse> {
+  const query = new URLSearchParams();
+  if (params?.status) query.set('status', params.status);
+  if (params?.domain) query.set('domain', params.domain);
+  const qs = query.toString();
+  try {
+    const res = await fetch(`${BASE}/api/fac${qs ? `?${qs}` : ''}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    const json = await res.json();
+    return {
+      features: json.features ?? [],
+      documents: json.documents ?? 0,
+      total: json.total ?? 0,
+    };
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('HTTP')) throw error;
+    return { features: [], documents: 0, total: 0 };
+  }
+}
+
+/** Fetch a single FAC feature by id. */
+export async function fetchFacFeature(id: string): Promise<FacDetailResponse | null> {
+  try {
+    const res = await fetch(`${BASE}/api/fac/${encodeURIComponent(id)}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    const json = await res.json();
+    return json.feature ? { feature: json.feature } : null;
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('HTTP')) throw error;
+    return null;
+  }
+}
+
+/** Validate a FAC feature document against the JSON schema (CI gate). */
+export async function validateFacDocument(payload: {
+  features: FacFeature[];
+  domain: string;
+}): Promise<FacValidationResult> {
+  try {
+    const res = await fetch(`${BASE}/api/fac/validate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return await res.json();
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('HTTP')) throw error;
+    return { valid: false, errors: { _network: 'Unable to reach the validation service' } };
+  }
+}
+
+// =========================================================
+// Test Acceptance Criteria (TAC) Document Viewer API
+// =========================================================
+
+export interface TacDocumentSummary {
+  id: string
+  filePath: string
+  domain: string
+  version: string
+  source: string
+  suiteCount: number
+  caseCount: number
+}
+
+export interface TacListResponse {
+  data: TacDocumentSummary[]
+  total: number
+}
+
+export type TacTraceLinkType =
+  | 'verifies'
+  | 'satisfies'
+  | 'dependsOn'
+  | 'tracesTo'
+  | 'refines'
+  | 'conflictsWith'
+
+export interface TacTraceLink {
+  type: TacTraceLinkType
+  target: { id: string; documentId: string }
+  confidence?: 'high' | 'medium' | 'low'
+  description?: string
+}
+
+export interface TacScenario {
+  given: string
+  when: string
+  then: string
+}
+
+export interface TacTestCase {
+  id: string
+  title: string
+  type: 'unit' | 'integration' | 'e2e' | 'performance' | 'security' | 'usability'
+  priority: 'low' | 'medium' | 'high' | 'critical'
+  description?: string
+  traceLinks?: TacTraceLink[]
+  scenario?: TacScenario
+  acceptanceCriteria?: string[]
+  tags?: string[]
+  automated?: boolean
+  steps?: string[]
+  expectedResult?: string
+}
+
+export interface TacSuite {
+  id: string
+  name: string
+  description?: string
+  domain?: string
+  cases: TacTestCase[]
+}
+
+export interface TacDocumentMetadata {
+  domain: string
+  version: string
+  source: string
+}
+
+export interface TacDocument {
+  nexus: {
+    schema: string
+    metadata: TacDocumentMetadata
+  }
+  suites: TacSuite[]
+}
+
+export interface TacValidationError {
+  field: string
+  message: string
+}
+
+export interface TacValidationResult {
+  valid: boolean
+  errors: Record<string, string>
+}
+
+/** List TAC documents, optionally filtered by a free-text search query */
+export async function fetchTacDocuments(query?: string): Promise<TacListResponse> {
+  const params = new URLSearchParams()
+  if (query) params.set('q', query)
+  const qs = params.toString()
+  try {
+    const res = await fetch(`${BASE}/api/tac${qs ? `?${qs}` : ''}`)
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
+    const json = await res.json()
+    return { data: json.data ?? [], total: json.total ?? json.data?.length ?? 0 }
+  } catch (err) {
+    if (err instanceof Error && err.message.startsWith('HTTP')) throw err
+    return { data: [], total: 0 }
+  }
+}
+
+/** Fetch a single TAC document by its id */
+export async function fetchTacDocument(id: string): Promise<TacDocument | null> {
+  try {
+    const res = await fetch(`${BASE}/api/tac/${encodeURIComponent(id)}`)
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
+    const json = await res.json()
+    return json.data ?? null
+  } catch {
+    return null
+  }
+}
+
+/** Fetch the JSON schema for TAC documents (used for authoring/validation) */
+export async function fetchTacSchema(): Promise<any | null> {
+  try {
+    const res = await fetch(`${BASE}/api/tac/schema`)
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
+    const json = await res.json()
+    return json.data ?? null
+  } catch {
+    return null
+  }
+}
+
+/** Validate a TAC document payload against the schema */
+export async function validateTacDocument(
+  document: Record<string, unknown>,
+): Promise<TacValidationResult> {
+  try {
+    const res = await fetch(`${BASE}/api/tac/validate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ document }),
+    })
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
+    return await res.json()
+  } catch {
+    return { valid: false, errors: { _network: 'Unable to reach the validation service' } }
+  }
+}
+
+// =========================================================
+// AI Traceability (Epic C) — Graph, Impact, Coverage, Report
+// =========================================================
+
+import type {
+  AxisCoverage,
+  DomainCoverage,
+  CoverageAnalysisReport,
+  AffectedArtifactV2,
+  ImpactGraph as SharedImpactGraph,
+  ImpactChain,
+  TraceabilityReport,
+  ImpactReport,
+} from '@nexus-engineering/shared';
+
+export type ConfidenceScore = number;
+
+export interface VAxisStats {
+  axis: 'requirement' | 'feature' | 'testCase' | 'result';
+  total: number;
+  linked: number;
+  coveragePercent: number;
+}
+
+export interface TraceGraphData {
+  nodes: Array<{ id: string; type: string; title?: string; confidenceScore?: number }>;
+  edges: Array<{ sourceId: string; targetId: string; relationshipType: string; confidence: string; confidenceScore: number }>;
+  totalNodes: number;
+  totalEdges: number;
+}
+
+export interface ImpactAnalysisData {
+  scope: { artifactIds: string[]; artifactTypes?: string[] };
+  artifactId: string;
+  confidenceThreshold: number;
+  artifacts: Array<{ id: string; type: string; title: string; impactLevel: 'direct' | 'indirect' | 'transitive'; relationshipType: string; confidenceScore: number }>;
+  impactGraph: SharedImpactGraph;
+  chains: Array<ImpactChain>;
+  summary: { totalAffected: number; directCount: number; indirectCount: number; transitiveCount: number; minConfidence: number; maxConfidence: number };
+}
+
+export type TraceabilityCoverageResponse = { overallCoveragePercent: number; axes: AxisCoverage[]; crossArtifactGaps: CrossArtifactGap[]; domainCoverage: DomainCoverage[] } | { domain: string; coverage: Pick<DomainCoverage, 'totalArtifacts' | 'coveredArtifacts' | 'coveragePercent'>; overallCoveragePercent: number };
+
+export type TraceabilityReportResult = { generatedAt: string; format: 'json' | 'markdown'; content: string; coverage?: CoverageAnalysisReport; gaps?: CrossArtifactGap[]; llmAnalysis?: string };
+
+/** Fetch the AI traceability graph with confidence-scored nodes/edges */
+export async function fetchTraceGraph(): Promise<TraceGraphData> {
+  try {
+    const res = await fetch(`${BASE}/api/traceability/graph`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch {
+    return { nodes: [], edges: [], totalNodes: 0, totalEdges: 0 };
+  }
+}
+
+/** Fetch impact analysis for a specific artifact */
+export async function fetchTraceImpact(artifactId: string, options?: { confidenceThreshold?: number; artifactType?: string }): Promise<ImpactAnalysisData> {
+  const params = new URLSearchParams({ artifactId });
+  if (options?.confidenceThreshold) params.set('confidenceThreshold', String(options.confidenceThreshold));
+  if (options?.artifactType) params.set('artifactType', options.artifactType);
+  try {
+    const res = await fetch(`${BASE}/api/traceability/impact/${encodeURIComponent(artifactId)}?${params}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch {
+    return { scope: { artifactIds: [] }, artifactId, confidenceThreshold: options?.confidenceThreshold ?? 0, artifacts: [], impactGraph: { nodes: [], edges: [] }, chains: [], summary: { totalAffected: 0, directCount: 0, indirectCount: 0, transitiveCount: 0, minConfidence: 0, maxConfidence: 0 } };
+  }
+}
+
+/** Fetch full coverage analysis report */
+export async function fetchTraceCoverage(domain?: string): Promise<CoverageAnalysisReport | { domain: string; coverage: any; overallCoveragePercent: number }> {
+  const qs = domain ? `?domain=${encodeURIComponent(domain)}` : '';
+  try {
+    const res = await fetch(`${BASE}/api/traceability/coverage${qs}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch {
+    return domain ? { domain, coverage: { totalArtifacts: 0, coveredArtifacts: 0, coveragePercent: 0, axes: [], gaps: [] }, overallCoveragePercent: 0 } : { overallCoveragePercent: 0, axes: [], crossArtifactGaps: [], domainCoverage: [{ domain: '', totalArtifacts: 0, coveredArtifacts: 0, coveragePercent: 0, axes: [], gaps: [] }], summary: { totalArtifacts: 0, totalGaps: 0, highRiskCount: 0, mediumRiskCount: 0, lowRiskCount: 0 } };
+  }
+}
+
+/** Fetch a full traceability report (JSON or markdown) */
+export async function fetchTraceReport(format?: 'json' | 'markdown'): Promise<TraceabilityReport> {
+  const qs = format ? `?format=${format}` : '';
+  try {
+    const res = await fetch(`${BASE}/api/traceability/report${qs}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch {
+    return { generatedAt: new Date().toISOString(), format: format ?? 'json', content: 'Unable to load report' };
+  }
+}
+
+/** Fetch the auto-generated impact report for recent repository changes */
+export async function fetchImpactReport(params?: {
+  file?: string;
+  branch?: string;
+  base?: string;
+}): Promise<ImpactReport> {
+  const query = new URLSearchParams();
+  if (params?.file) query.set('file', params.file);
+  if (params?.branch) query.set('branch', params.branch);
+  if (params?.base) query.set('base', params.base);
+  const qs = query.toString();
+  try {
+    const res = await fetch(`${BASE}/api/traceability/impact-report${qs ? `?${qs}` : ''}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } catch (err) {
+    if (err instanceof Error && err.message.startsWith('HTTP')) throw err;
+    return emptyImpactReport();
+  }
+}
+
+function emptyImpactReport(): ImpactReport {
+  return {
+    summary: {
+      totalAffected: 0,
+      directCount: 0,
+      indirectCount: 0,
+      transitiveCount: 0,
+      requirementCount: 0,
+      featureCount: 0,
+      testCount: 0,
+      adrCount: 0,
+      minConfidence: 0,
+      maxConfidence: 0,
+    },
+    affectedRequirements: [],
+    affectedFeatures: [],
+    affectedTests: [],
+    affectedAdrs: [],
+    riskLevel: 'low',
+    recommendations: [],
+    metadata: { changedFiles: [], resolvedArtifactIds: [], generatedAt: new Date().toISOString() },
+  };
+}
+
+export type ExecutionStatus = 'passed' | 'failed' | 'skipped' | 'error' | 'flaky';
+
+/** A single test execution result returned by the TER API */
+export interface TestExecution {
+  id: string;
+  suiteId: string;
+  caseId: string;
+  status: ExecutionStatus;
+  durationMs?: number;
+  startedAt?: string;
+  finishedAt?: string;
+  retries?: number;
+  error?: { message: string; type?: string; stack?: string };
+  artifacts?: Array<{ type: string; path?: string; url?: string }>;
+  traceLinks?: Array<{
+    type: string;
+    target: { id: string; documentId: string };
+    confidence?: 'high' | 'medium' | 'low';
+  }>;
+  source?: string;
+  documentId?: string;
+}
+
+export interface TestResultsResponse {
+  executions: TestExecution[];
+  documents: number;
+  total: number;
+  status?: ExecutionStatus;
+  suiteId?: string;
+}
+
+/** Fetch test execution results (TER) from the backend. */
+export async function fetchTestResults(params?: {
+  status?: ExecutionStatus;
+  suiteId?: string;
+}): Promise<TestResultsResponse> {
+  const query = new URLSearchParams();
+  if (params?.status) query.set('status', params.status);
+  if (params?.suiteId) query.set('suiteId', params.suiteId);
+  const qs = query.toString();
+  try {
+    const res = await fetch(`${BASE}/api/results${qs ? `?${qs}` : ''}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    const json = await res.json();
+    return {
+      executions: json.executions ?? [],
+      documents: json.documents ?? 0,
+      total: json.total ?? 0,
+      ...(json.status && { status: json.status }),
+      ...(json.suiteId && { suiteId: json.suiteId }),
+    };
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('HTTP')) throw error;
+    return { executions: [], documents: 0, total: 0 };
+  }
+}
+
+// =========================================================
+// AI Trace Recommendations (Wave 2)
+// =========================================================
+
+export type RecommendationSeverity = 'critical' | 'high' | 'medium' | 'low';
+export type RecommendationCategory = 'coverage' | 'trace' | 'test' | 'requirements' | 'architecture';
+export type RecommendationStatus = 'pending' | 'accepted' | 'dismissed';
+
+export interface Recommendation {
+  id: string;
+  sourceArtifact: { id: string; type: string; title: string };
+  targetArtifact: { id: string; type: string; title: string };
+  matchScore: number;
+  confidence: TraceConfidence;
+  description: string;
+  category: RecommendationCategory;
+  severity: RecommendationSeverity;
+  status: RecommendationStatus;
+}
+
+export interface RecommendationBatchEntry {
+  artifactId: string;
+  artifactType: string;
+  artifactTitle: string;
+  recommendations: Recommendation[];
+}
+
+export interface RecommendationBatchResponse {
+  sessionId: string;
+  entries: RecommendationBatchEntry[];
+  totalRecommendations: number;
+  byCategory: Record<RecommendationCategory, number>;
+  bySeverity: Record<RecommendationSeverity, number>;
+  generatedAt: string;
+}
+
+export interface RecommendationAcceptRequest {
+  reason?: string;
+}
+
+export interface RecommendationAcceptResponse {
+  success: boolean;
+  traceLink?: { id: string; sourceId: string; targetId: string; relationshipType: string };
+}
+
+export interface CrossArtifactGap {
+  sourceType: string;
+  targetType: string;
+  totalPairs: number;
+  coveredPairs: number;
+  gapPercent: number;
+  sampleGaps: Array<{ sourceId: string; targetId: string }>;
+}
+
+/** Fetch AI trace recommendations for a specific artifact */
+export async function fetchRecommendations(
+  artifactId: string,
+  options?: { threshold?: number; topN?: number },
+): Promise<Recommendation[]> {
+  const params = new URLSearchParams({ artifactId });
+  if (options?.threshold) params.set('threshold', String(options.threshold));
+  if (options?.topN) params.set('topN', String(options.topN));
+  const qs = params.toString();
+  try {
+    const res = await fetch(`${BASE}/api/traceability/recommendations?${qs}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    const json = await res.json();
+    return json.data ?? [];
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('HTTP')) throw error;
+    return [];
+  }
+}
+
+/** Run batch recommendations for a file/module/directory */
+export async function triggerRecommendationBatch(
+  target: { type: string; path: string },
+): Promise<RecommendationBatchResponse> {
+  const res = await fetch(`${BASE}/api/traceability/recommendations/batch`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(target),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  return res.json();
+}
+
+/** Accept a recommendation (creates a trace link) */
+export async function acceptRecommendation(
+  id: string,
+  data?: RecommendationAcceptRequest,
+): Promise<RecommendationAcceptResponse> {
+  const res = await fetch(`${BASE}/api/traceability/recommendations/${encodeURIComponent(id)}/accept`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: data ? JSON.stringify(data) : undefined,
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  return res.json();
+}
+
+/** Dismiss a recommendation */
+export async function dismissRecommendation(id: string): Promise<boolean> {
+  const res = await fetch(`${BASE}/api/traceability/recommendations/${encodeURIComponent(id)}/dismiss`, {
+    method: 'POST',
+  });
+  return res.ok;
+}
+
+/** Fetch cross-artifact coverage gaps */
+export async function fetchCoverageGaps(): Promise<CrossArtifactGap[]> {
+  try {
+    const res = await fetch(`${BASE}/api/traceability/gaps`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    const json = await res.json();
+    return json.data ?? [];
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('HTTP')) throw error;
+    return [];
+  }
+}
+
+// =========================================================
+// Natural Language Query (Epic D / THE-294)
+// =========================================================
+
+/** Run a natural language traceability query against the backend */
+export async function fetchNLQuery(query: string): Promise<NLQueryResult | null> {
+  try {
+    const res = await fetch(`${BASE}/api/traceability/query`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query }),
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as NLQueryResponse;
+    if (!json.success || !json.data) return null;
+    return json.data;
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('HTTP')) throw error;
+    return null;
   }
 }

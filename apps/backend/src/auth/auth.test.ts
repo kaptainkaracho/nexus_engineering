@@ -174,3 +174,224 @@ describe('AuthService', () => {
     expect(user).toBeNull()
   })
 })
+
+describe('OAuthService', () => {
+  const ORIGINAL_ENV = process.env
+
+  beforeEach(() => {
+    process.env = { ...ORIGINAL_ENV }
+    process.env.GOOGLE_CLIENT_ID = 'test-google-client-id'
+    process.env.GOOGLE_CLIENT_SECRET = 'test-google-client-secret'
+    process.env.GITHUB_CLIENT_ID = 'test-github-client-id'
+    process.env.GITHUB_CLIENT_SECRET = 'test-github-client-secret'
+    process.env.OAUTH_CALLBACK_URL = 'http://localhost:3001'
+  })
+
+  afterEach(() => {
+    process.env = ORIGINAL_ENV
+  })
+
+  it('generates authorization URL for Google', async () => {
+    const { getAuthorizationUrl } = await import('./oauth/service')
+    const result = getAuthorizationUrl('google')
+    expect(result.url).toContain('https://accounts.google.com/o/oauth2/v2/auth')
+    expect(result.url).toContain('client_id=test-google-client-id')
+    expect(result.url).toContain('redirect_uri=http%3A%2F%2Flocalhost%3A3001%2Fapi%2Fauth%2Foauth%2Fgoogle%2Fcallback')
+    expect(result.state).toBeTruthy()
+  })
+
+  it('generates authorization URL for GitHub', async () => {
+    const { getAuthorizationUrl } = await import('./oauth/service')
+    const result = getAuthorizationUrl('github')
+    expect(result.url).toContain('https://github.com/login/oauth/authorize')
+    expect(result.url).toContain('client_id=test-github-client-id')
+    expect(result.state).toBeTruthy()
+  })
+
+  it('throws for unsupported provider', async () => {
+    const { getAuthorizationUrl } = await import('./oauth/service')
+    expect(() => getAuthorizationUrl('twitter')).toThrow(AppError)
+  })
+
+  it('throws for unconfigured provider', async () => {
+    process.env.GOOGLE_CLIENT_ID = ''
+    const { getAuthorizationUrl } = await import('./oauth/service')
+    expect(() => getAuthorizationUrl('google')).toThrow(AppError)
+  })
+
+  it('registers OAuth account in database', async () => {
+    const db = freshDb()
+    const { getAuthDatabase } = await import('./database')
+    const authDb = getAuthDatabase()
+
+    const user = authDb.createUser({
+      id: 'oauth-user-1',
+      email: 'oauth@example.com',
+      passwordHash: 'hash',
+      displayName: 'OAuth User',
+      roleId: 'role_viewer',
+    })
+
+    const account = authDb.createOAuthAccount({
+      id: 'oa-1',
+      provider: 'google',
+      providerUserId: 'google-123',
+      userId: user.id,
+      email: 'oauth@example.com',
+      displayName: 'OAuth User',
+      avatarUrl: 'https://example.com/avatar.png',
+    })
+
+    expect(account.provider).toBe('google')
+    expect(account.provider_user_id).toBe('google-123')
+    expect(account.user_id).toBe(user.id)
+
+    const found = authDb.findOAuthAccount('google', 'google-123')
+    expect(found).toBeDefined()
+    expect(found!.user_id).toBe(user.id)
+  })
+
+  it('links OAuth account to existing user by email', async () => {
+    const { handleOAuthCallback } = await import('./oauth/service')
+    const db = getAuthDatabase()
+    await registerUser('existing@example.com', 'password123', 'Existing')
+
+    const originalFetch = globalThis.fetch
+    globalThis.fetch = async (url: string, options?: any) => {
+      if (url.includes('oauth2.googleapis.com/token') || url.includes('github.com/login/oauth/access_token')) {
+        return new Response(JSON.stringify({ access_token: 'mock-access-token' }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }) as any
+      }
+      if (url.includes('googleapis.com') || url.includes('api.github.com/user/emails')) {
+        if (url.includes('/user/emails')) {
+          return new Response(JSON.stringify([{ email: 'existing@example.com', primary: true, verified: true }]), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          }) as any
+        }
+        return new Response(JSON.stringify({ id: 'google-456', email: 'existing@example.com', name: 'Existing' }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }) as any
+      }
+      if (url.includes('api.github.com/user')) {
+        return new Response(JSON.stringify({ id: 789, email: 'existing@example.com', name: 'Existing' }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }) as any
+      }
+      return originalFetch(url, options)
+    }
+
+    const result = await handleOAuthCallback('google', 'mock-code')
+    expect(result.user.email).toBe('existing@example.com')
+    expect(result.isNewUser).toBe(false)
+
+    const account = getAuthDatabase().findOAuthAccount('google', 'google-456')
+    expect(account).toBeDefined()
+    expect(account!.user_id).toBe(result.user.id)
+
+    globalThis.fetch = originalFetch
+  })
+})
+
+describe('SAMLService', () => {
+  const ORIGINAL_ENV = process.env
+
+  beforeEach(() => {
+    process.env = { ...ORIGINAL_ENV }
+    process.env.SAML_SP_ENTITY_ID = 'nexus-engineering'
+    process.env.SAML_ACS_URL = 'http://localhost:3001/api/auth/saml/callback'
+    process.env.SAML_ATTR_MAPPING = JSON.stringify({ email: 'email', displayName: 'displayName', role: 'role' })
+  })
+
+  afterEach(() => {
+    process.env = ORIGINAL_ENV
+  })
+
+  it('generates valid SAML metadata XML', async () => {
+    const { generateMetadataXml } = await import('./saml/service')
+    const xml = generateMetadataXml()
+    expect(xml).toContain('<?xml version="1.0"?>')
+    expect(xml).toContain('md:EntityDescriptor')
+    expect(xml).toContain('entityID="nexus-engineering"')
+    expect(xml).toContain('urn:oasis:names:tc:SAML:2.0:protocol')
+    expect(xml).toContain('http://localhost:3001/api/auth/saml/callback')
+  })
+
+  it('parses SAML response and extracts attributes', async () => {
+    const { handleSamlCallback } = await import('./saml/service')
+
+    const samlXml = `<?xml version="1.0"?>
+<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
+  <saml:Assertion>
+    <saml:Subject>
+      <saml:NameID>john@example.com</saml:NameID>
+    </saml:Subject>
+    <saml:AttributeStatement>
+      <saml:Attribute Name="email">
+        <saml:AttributeValue>john@example.com</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="displayName">
+        <saml:AttributeValue>John Doe</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="role">
+        <saml:AttributeValue>developer</saml:AttributeValue>
+      </saml:Attribute>
+    </saml:AttributeStatement>
+  </saml:Assertion>
+</samlp:Response>`
+
+    const samlResponse = Buffer.from(samlXml).toString('base64')
+
+    const result = await handleSamlCallback(samlResponse)
+    expect(result.user.email).toBe('john@example.com')
+    expect(result.isNewUser).toBe(true)
+    expect(result.accessToken).toBeTruthy()
+  })
+
+  it('links SAML user to existing account by email', async () => {
+    const { handleSamlCallback } = await import('./saml/service')
+    await registerUser('saml-existing@example.com', 'password123', 'Existing SAML')
+
+    const samlXml = `<?xml version="1.0"?>
+<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
+  <saml:Assertion>
+    <saml:Subject>
+      <saml:NameID>saml-existing@example.com</saml:NameID>
+    </saml:Subject>
+    <saml:AttributeStatement>
+      <saml:Attribute Name="email">
+        <saml:AttributeValue>saml-existing@example.com</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="displayName">
+        <saml:AttributeValue>Existing SAML</saml:AttributeValue>
+      </saml:Attribute>
+    </saml:AttributeStatement>
+  </saml:Assertion>
+</samlp:Response>`
+
+    const samlResponse = Buffer.from(samlXml).toString('base64')
+    const result = await handleSamlCallback(samlResponse)
+    expect(result.user.email).toBe('saml-existing@example.com')
+    expect(result.isNewUser).toBe(false)
+  })
+
+  it('rejects SAML response without email', async () => {
+    const { handleSamlCallback } = await import('./saml/service')
+
+    const samlXml = `<?xml version="1.0"?>
+<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
+  <saml:Assertion>
+    <saml:Subject>
+      <saml:NameID></saml:NameID>
+    </saml:Subject>
+  </saml:Assertion>
+</samlp:Response>`
+
+    const samlResponse = Buffer.from(samlXml).toString('base64')
+    await expect(handleSamlCallback(samlResponse)).rejects.toThrow(AppError)
+  })
+})

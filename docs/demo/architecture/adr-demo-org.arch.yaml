@@ -1,0 +1,35 @@
+title: Multi-tenant data isolation via org-scoped queries
+status: accepted
+context: |
+  Nexus supports multiple organizations sharing the same database.
+  Each user belongs to one or more organizations with org-scoped roles.
+  Data from different organizations must be strictly isolated.
+decision: |
+  Enforce multi-tenancy at the application layer:
+  1. All database queries include an orgId WHERE clause derived from JWT claims
+  2. API middleware extracts orgId from the authenticated JWT and scopes all queries
+  3. Cross-org access is denied at the repository layer with 403 responses
+  4. Organization CRUD and membership management are exposed via /api/orgs
+  The orgId is embedded in the JWT at login time and checked on every request.
+consequences:
+  - Simple deployment topology (single database, no per-tenant sharding)
+  - All queries must explicitly include orgId (forgetting it is a security bug)
+  - Org admin can manage members and roles without support interaction
+  - Data export/import is scoped per organization
+superseded_by: null
+traceLinks:
+  - type: satisfies
+    target:
+      id: DEMO-REQ-ORG-001
+      documentId: DEMO-ORG
+    confidence: high
+  - type: satisfies
+    target:
+      id: DEMO-REQ-ORG-002
+      documentId: DEMO-ORG
+    confidence: high
+  - type: satisfies
+    target:
+      id: DEMO-REQ-ORG-003
+      documentId: DEMO-ORG
+    confidence: high

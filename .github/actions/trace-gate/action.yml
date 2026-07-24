@@ -1,0 +1,45 @@
+name: 'Trace Gate'
+description: 'Runs the Nexus traceability gate against a running backend and fails the job only in block mode (warn mode annotates).'
+author: 'The Bike App — Backend Architecture'
+
+inputs:
+  api-url:
+    description: 'Backend base URL to evaluate the gate against (e.g. the preview environment URL).'
+    required: false
+    default: 'http://localhost:3000'
+  mode:
+    description: 'Gate mode forwarded to the CLI/backend: "block" fails the job on a failing verdict, "warn" annotates only. Leave empty to use the server-configured mode.'
+    required: false
+    default: ''
+  warn-only:
+    description: 'Force warn mode so the job never fails (useful for non-blocking annotations).'
+    required: false
+    default: 'false'
+  config:
+    description: 'Path to an offline policy override file (.nexus/trace-gate.json).'
+    required: false
+    default: ''
+  timeout:
+    description: 'Request timeout in milliseconds.'
+    required: false
+    default: '15000'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Run trace gate
+      shell: bash
+      env:
+        NEXUS_API_URL: ${{ inputs.api-url }}
+      run: |
+        ARGS=()
+        if [ "${{ inputs.warn-only }}" = "true" ]; then ARGS+=("--warn-only"); fi
+        if [ -n "${{ inputs.mode }}" ]; then ARGS+=("--mode" "${{ inputs.mode }}"); fi
+        if [ -n "${{ inputs.config }}" ]; then ARGS+=("--config" "${{ inputs.config }}"); fi
+        ARGS+=("--timeout" "${{ inputs.timeout }}")
+        node scripts/trace-gate.mjs --api-url "${{ inputs.api-url }}" "${ARGS[@]}"

@@ -80,7 +80,7 @@ export class OrgRepository {
 
   // --- Organization Members ---
 
-  async addOrganizationMember(organizationId: string, userId: string, role: 'admin' | 'member' = 'member'): Promise<OrganizationMember> {
+  async addOrganizationMember(organizationId: string, userId: string, role: 'org:admin' | 'org:member' | 'org:viewer' = 'org:member'): Promise<OrganizationMember> {
     const now = new Date().toISOString()
     const member: OrganizationMember = {
       id: `orgmem_${nanoid()}`,
@@ -101,12 +101,40 @@ export class OrgRepository {
     return getOrgStore().listOrganizationMembers(organizationId)
   }
 
+  async listOrganizationMembersByUser(userId: string): Promise<OrganizationMember[]> {
+    return getOrgStore().listOrganizationMembersByUser(userId)
+  }
+
   async updateOrganizationMemberRole(organizationId: string, userId: string, role: string): Promise<OrganizationMember | undefined> {
     return getOrgStore().updateOrganizationMember(organizationId, userId, role)
   }
 
   async removeOrganizationMember(organizationId: string, userId: string): Promise<boolean> {
     return getOrgStore().deleteOrganizationMember(organizationId, userId)
+  }
+
+  async inviteMember(organizationId: string, userId: string, role: 'org:admin' | 'org:member' | 'org:viewer' = 'org:member'): Promise<OrganizationMember> {
+    const existing = await this.getOrganizationMember(organizationId, userId)
+    if (existing) {
+      throw new Error('User is already a member of this organization')
+    }
+    return this.addOrganizationMember(organizationId, userId, role)
+  }
+
+  async joinOrganization(organizationId: string, userId: string): Promise<OrganizationMember> {
+    return this.addOrganizationMember(organizationId, userId, 'org:member')
+  }
+
+  async leaveOrganization(organizationId: string, userId: string): Promise<boolean> {
+    const org = await this.getOrganization(organizationId)
+    if (org && org.ownerId === userId) {
+      const count = getOrgStore().countOrganizationMembers(organizationId)
+      if (count <= 1) {
+        await this.deleteOrganization(organizationId)
+        return true
+      }
+    }
+    return this.removeOrganizationMember(organizationId, userId)
   }
 
   // --- Team Members ---

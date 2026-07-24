@@ -10,11 +10,18 @@ import { scanRoutes } from './routes/scanRoutes'
 import { multiRepoRoutes } from './routes/multiRepoRoutes'
 import { authRoutes } from './routes/auth'
 import { registerAuthHooks } from './auth/middleware'
+import { registerAuditLogHook } from './auditLog/middleware'
 import { racRoutes } from './routes/racRoutes'
 import { aacRoutes } from './routes/aacRoutes'
 import { organizationsRoutes } from './routes/organizations'
 import { registryRoutes } from './routes/registryRoutes'
 import { auditLogRoutes } from './routes/auditLogRoutes'
+import { tacRoutes } from './routes/tacRoutes'
+import { resultsRoutes } from './routes/results'
+import { featuresRoutes } from './routes/features'
+import { traceabilityRoutes } from './routes/traceability'
+import { nlQueryRoutes } from './routes/nlQuery'
+import { livenessRoutes } from './routes/liveness'
 
 const server = fastify({ logger: true })
 
@@ -49,6 +56,7 @@ const start = async () => {
   try {
     // Register auth hooks
     registerAuthHooks(server)
+    registerAuditLogHook(server)
 
     // Register API routes
     authRoutes(server)
@@ -63,6 +71,12 @@ const start = async () => {
     registryRoutes(server)
     multiRepoRoutes(server)
     auditLogRoutes(server)
+    tacRoutes(server)
+    resultsRoutes(server)
+    featuresRoutes(server)
+    traceabilityRoutes(server)
+    nlQueryRoutes(server)
+    livenessRoutes(server)
 
     // SPA fallback: serve index.html for any non-API GET route in production.
     if (process.env.NODE_ENV === 'production' && existsSync(frontendDist)) {

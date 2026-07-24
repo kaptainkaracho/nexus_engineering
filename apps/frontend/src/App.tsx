@@ -12,6 +12,20 @@ import { AdminDashboard } from './views/AdminDashboard';
 import { RoleManagement } from './views/RoleManagement';
 import { AuditLogViewer } from './views/AuditLogViewer';
 import { PrivateRegistries } from './views/PrivateRegistries';
+import { TacViewer } from './views/TacViewer';
+import { TestResultsDashboard } from './views/TestResultsDashboard';
+import { FeatureBrowser } from './views/FeatureBrowser';
+import { TraceGraph } from './views/TraceGraph';
+import { ImpactAnalysis } from './views/ImpactAnalysis';
+import { ImpactReport } from './views/ImpactReport';
+import { SSOSettings } from './views/SSOSettings';
+import { OrgAdmin } from './views/OrgAdmin';
+import { LandingPage } from './views/LandingPage';
+import { OnboardingFlow } from './views/OnboardingFlow';
+import { RecommendationsPanel } from './views/RecommendationsPanel';
+import { NLTraceQuery } from './views/NLTraceQuery';
+import { QualityDashboard } from './views/QualityDashboard';
+import { GateConfigPanel } from './components/trace-gate';
 import {
   getCurrentSession,
   clearSession,
@@ -33,7 +47,21 @@ type Section =
   | 'admin'
   | 'roles'
   | 'audit-log'
-  | 'registries';
+  | 'registries'
+  | 'tac'
+  | 'test-results'
+  | 'features'
+  | 'trace-graph'
+  | 'impact-analysis'
+  | 'impact-report'
+  | 'recommendations'
+  | 'nl-query'
+  | 'quality-dashboard'
+  | 'trace-gate'
+  | 'sso'
+  | 'org'
+  | 'landing'
+  | 'onboarding';
 
 const VALID_SECTIONS: Section[] = [
   'overview',
@@ -47,9 +75,23 @@ const VALID_SECTIONS: Section[] = [
   'graph',
   'templates',
   'admin',
+  'sso',
+  'org',
   'roles',
   'audit-log',
   'registries',
+  'tac',
+  'test-results',
+  'features',
+  'trace-graph',
+  'impact-analysis',
+  'impact-report',
+  'recommendations',
+  'nl-query',
+  'quality-dashboard',
+  'trace-gate',
+  'landing',
+  'onboarding',
 ];
 
 interface RouteState {
@@ -57,12 +99,26 @@ interface RouteState {
   artifact: string | null;
 }
 
+const ADMIN_SUB_ROUTES: Record<string, Section> = {
+  sso: 'sso',
+  org: 'org',
+  audit: 'audit-log',
+};
+
 function parseHash(hash: string): RouteState {
   const raw = hash.replace(/^#/, '');
   const [sectionPart, queryPart] = raw.split('?');
-  const section = (VALID_SECTIONS.includes(sectionPart as Section)
-    ? sectionPart
-    : 'overview') as Section;
+  const parts = sectionPart.split('/');
+  const top = parts[0];
+  const sub = parts[1];
+  let section: Section;
+  if (top === 'admin' && sub && ADMIN_SUB_ROUTES[sub]) {
+    section = ADMIN_SUB_ROUTES[sub];
+  } else if (VALID_SECTIONS.includes(top as Section)) {
+    section = top as Section;
+  } else {
+    section = 'overview';
+  }
   const artifact = queryPart ? new URLSearchParams(queryPart).get('artifact') : null;
   return { section, artifact };
 }
@@ -168,10 +224,22 @@ function App() {
     ...(isUserAdmin
       ? [
           { label: 'Organizations', href: '#admin', active: activeSection === 'admin' },
+          { label: 'SSO Settings', href: '#admin/sso', active: activeSection === 'sso' },
+          { label: 'Org Admin', href: '#admin/org', active: activeSection === 'org' },
           { label: 'Roles', href: '#roles', active: activeSection === 'roles' },
           { label: 'Registries', href: '#registries', active: activeSection === 'registries' },
+          { label: 'TAC', href: '#tac', active: activeSection === 'tac' },
+    { label: 'Test Results', href: '#test-results', active: activeSection === 'test-results' },
         ]
       : []),
+    { label: 'Features', href: '#features', active: activeSection === 'features' },
+    { label: 'Trace Graph', href: '#trace-graph', active: activeSection === 'trace-graph' },
+    { label: 'Impact Analysis', href: '#impact-analysis', active: activeSection === 'impact-analysis' },
+    { label: 'Impact Report', href: '#impact-report', active: activeSection === 'impact-report' },
+    { label: 'Recommendations', href: '#recommendations', active: activeSection === 'recommendations' },
+    { label: 'NL Query', href: '#nl-query', active: activeSection === 'nl-query' },
+    { label: 'Quality Dashboard', href: '#quality-dashboard', active: activeSection === 'quality-dashboard' },
+    { label: 'Trace Gate', href: '#trace-gate', active: activeSection === 'trace-gate' },
   ];
 
   if (!authReady) {
@@ -179,7 +247,15 @@ function App() {
   }
 
   if (!user) {
-    return <AuthPage onAuthenticated={handleAuthenticated} resetToken={resetToken} />;
+    const hash = window.location.hash.replace(/^#/, '');
+    if (hash === 'login' || hash === 'register' || hash.startsWith('reset-password') || hash.startsWith('forgot-password') || hash.startsWith('auth/')) {
+      return <AuthPage onAuthenticated={handleAuthenticated} resetToken={resetToken} />;
+    }
+    return <LandingPage />;
+  }
+
+  if (activeSection === 'onboarding') {
+    return <OnboardingFlow />;
   }
 
   return (
@@ -242,11 +318,39 @@ function App() {
             <ProtectedLayout allowedRoles={['admin']}>
               <RoleManagement />
             </ProtectedLayout>
-          ) : activeSection === 'registries' ? (
+           ) : activeSection === 'registries' ? (
             <ProtectedLayout allowedRoles={['admin']}>
               <PrivateRegistries />
             </ProtectedLayout>
-          ) : (
+          ) : activeSection === 'tac' ? (
+            <TacViewer />
+          ) : activeSection === 'test-results' ? (
+            <TestResultsDashboard />
+          ) : activeSection === 'features' ? (
+            <FeatureBrowser />
+           ) : activeSection === 'sso' ? (
+            <ProtectedLayout allowedRoles={['admin']}>
+              <SSOSettings />
+            </ProtectedLayout>
+          ) : activeSection === 'org' ? (
+            <ProtectedLayout allowedRoles={['admin']}>
+              <OrgAdmin />
+            </ProtectedLayout>
+            ) : activeSection === 'trace-graph' ? (
+              <TraceGraph />
+            ) : activeSection === 'impact-analysis' ? (
+              <ImpactAnalysis />
+            ) : activeSection === 'impact-report' ? (
+              <ImpactReport />
+) : activeSection === 'recommendations' ? (
+               <RecommendationsPanel />
+            ) : activeSection === 'nl-query' ? (
+               <NLTraceQuery />
+            ) : activeSection === 'quality-dashboard' ? (
+               <QualityDashboard />
+            ) : activeSection === 'trace-gate' ? (
+               <GateConfigPanel />
+            ) : (
            <>
              <Nav
                items={navItems.map((item) => ({

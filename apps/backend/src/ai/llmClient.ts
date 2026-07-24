@@ -1,4 +1,5 @@
 import { LLMConfig, LLMMessage, LLMCompletionRequest, LLMCompletionResponse } from '@nexus-engineering/shared'
+import { getLLMCache, LLMCache } from './llmCache'
 
 const DEFAULT_MAX_TOKENS = 2048
 const DEFAULT_TEMPERATURE = 0.3
@@ -31,6 +32,31 @@ export class LLMClient {
     }
 
     return this.callLLM(request)
+  }
+
+  /**
+   * Cached completion. Returns a memoized response if an identical request was
+   * seen within the TTL window, otherwise performs the call and stores it.
+   */
+  async completeCached(
+    request: LLMCompletionRequest,
+    cache?: LLMCache,
+    ttlMs?: number
+  ): Promise<LLMCompletionResponse> {
+    const cacheLayer = cache ?? getLLMCache()
+
+    if (!this.isConfigured()) {
+      return this.mockCompletion(request)
+    }
+
+    const cached = cacheLayer.get(request)
+    if (cached) {
+      return { ...cached, model: `${cached.model} (cached)` }
+    }
+
+    const response = await this.callLLM(request)
+    cacheLayer.set(request, response, ttlMs)
+    return response
   }
 
   private async callLLM(request: LLMCompletionRequest): Promise<LLMCompletionResponse> {

@@ -1,0 +1,188 @@
+nexus:
+  schema: test-doc/v1
+  metadata:
+    domain: artifact
+    version: "1.0.0"
+    source: sprint-9-artifact-registry
+
+suites:
+  - id: artifact-upload
+    name: Artifact Upload and Storage
+    description: Test cases for artifact upload, storage, and integrity verification
+    cases:
+      - id: UPL-001
+        title: Upload a valid artifact with correct hash
+        type: e2e
+        priority: critical
+        traceLinks:
+          - type: verifies
+            target:
+              id: REQ-ART-001
+              documentId: docs/requirements/artifact/registry.req.yaml
+            confidence: high
+            description: Verifies artifact upload with integrity check
+        scenario:
+          given: A user has a valid build artifact (10MB zip file)
+          when: They upload the artifact with correct SHA256 hash
+          then: Artifact is stored and indexed with the provided hash
+        acceptanceCriteria:
+          - Artifact is stored successfully
+          - SHA256 hash is recorded in metadata
+          - Artifact is deduplicated if hash matches existing
+          - Upload confirmation is returned
+        tags:
+          - artifact
+          - upload
+          - happy-path
+        automated: true
+
+      - id: UPL-002
+        title: Upload artifact with hash mismatch
+        type: e2e
+        priority: high
+        traceLinks:
+          - type: verifies
+            target:
+              id: REQ-ART-001
+              documentId: docs/requirements/artifact/registry.req.yaml
+            confidence: high
+        scenario:
+          given: A user attempts to upload an artifact
+          when: The provided hash does not match the file content
+          then: Upload is rejected with hash mismatch error
+        acceptanceCriteria:
+          - Upload fails with clear error message
+          - Artifact is not stored
+          - Error is logged for audit
+        tags:
+          - artifact
+          - upload
+          - error
+        automated: true
+
+      - id: UPL-003
+        title: Upload artifact exceeding size limit
+        type: unit
+        priority: high
+        scenario:
+          given: A user has a 500MB artifact file
+          when: They attempt to upload to the registry
+          then: Upload is rejected with file size exceeded error
+        acceptanceCriteria:
+          - Size validation occurs before upload
+          - Clear error message indicates max allowed size
+          - No partial files are stored
+        tags:
+          - artifact
+          - upload
+          - validation
+        automated: true
+
+  - id: artifact-download
+    name: Artifact Download and Retrieval
+    description: Test cases for artifact download, authorization, and signed URLs
+    cases:
+      - id: DWN-001
+        title: Download a private artifact with proper authorization
+        type: e2e
+        priority: critical
+        traceLinks:
+          - type: verifies
+            target:
+              id: REQ-ART-003
+              documentId: docs/requirements/artifact/registry.req.yaml
+            confidence: high
+        scenario:
+          given: A user has read access to a private artifact
+          when: They request a download
+          then: A signed URL with 5-minute expiry is generated
+        acceptanceCriteria:
+          - Signed URL is generated with correct expiry
+          - URL is valid for the specific artifact
+          - Access is logged for audit
+        tags:
+          - artifact
+          - download
+          - security
+        automated: true
+
+      - id: DWN-002
+        title: Download artifact without authorization
+        type: e2e
+        priority: high
+        scenario:
+          given: A user without read access attempts to download
+          when: They request a private artifact
+          then: Access is denied with 403 error
+        acceptanceCriteria:
+          - Request returns 403 Forbidden
+          - No artifact data is leaked
+          - Failed attempt is logged
+        tags:
+          - artifact
+          - download
+          - authorization
+        automated: true
+
+      - id: DWN-003
+        title: Download expired signed URL
+        type: unit
+        priority: medium
+        scenario:
+          given: A signed download URL was generated 6 minutes ago
+          when: A user attempts to download using that URL
+          then: Request fails with URL expired error
+        acceptanceCriteria:
+          - Expired URL is rejected
+          - Clear error indicates URL expiration
+          - User can request a fresh URL
+        tags:
+          - artifact
+          - download
+          - security
+        automated: true
+
+  - id: artifact-versioning
+    name: Artifact Versioning and Immutability
+    description: Test cases for artifact version management and immutability enforcement
+    cases:
+      - id: VER-001
+        title: Publish artifact with semantic version
+        type: unit
+        priority: high
+        traceLinks:
+          - type: verifies
+            target:
+              id: REQ-ART-002
+              documentId: docs/requirements/artifact/registry.req.yaml
+            confidence: high
+        scenario:
+          given: An artifact named "api-server" version "1.2.3"
+          when: It is published to the registry
+          then: Artifact is addressable as "api-server@1.2.3"
+        acceptanceCriteria:
+          - Artifact is indexed by name@version
+          - Version is validated as semantic versioning
+          - Metadata is stored with version info
+        tags:
+          - artifact
+          - versioning
+        automated: true
+
+      - id: VER-002
+        title: Attempt to overwrite existing immutable version
+        type: unit
+        priority: high
+        scenario:
+          given: An artifact "api-server@1.0.0" already exists
+          when: A user attempts to publish a new artifact with same name and version
+          then: Request is rejected with version conflict error
+        acceptanceCriteria:
+          - Existing artifact is not modified
+          - Error indicates version already exists
+          - User can publish with a new version number
+        tags:
+          - artifact
+          - versioning
+          - immutability
+        automated: true

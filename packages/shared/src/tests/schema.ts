@@ -24,7 +24,6 @@ export const testDocSchema: any = {
     suites: {
       type: 'array',
       items: {
-        $schema: 'http://json-schema.org/draft-07/schema#',
         type: 'object',
         properties: {
           id: { type: 'string' },
@@ -34,7 +33,6 @@ export const testDocSchema: any = {
           cases: {
             type: 'array',
             items: {
-              $schema: 'http://json-schema.org/draft-07/schema#',
               type: 'object',
               properties: {
                 id: { type: 'string' },
@@ -51,7 +49,6 @@ export const testDocSchema: any = {
                 traceLinks: {
                   type: 'array',
                   items: {
-                    $schema: 'http://json-schema.org/draft-07/schema#',
                     type: 'object',
                     properties: {
                       type: {
@@ -102,8 +99,8 @@ export const testDocSchema: any = {
               required: ['id', 'title', 'type', 'priority'],
             },
           },
-          required: ['id', 'name', 'cases'],
         },
+        required: ['id', 'name', 'cases'],
       },
     },
   },

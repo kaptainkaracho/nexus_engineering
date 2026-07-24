@@ -104,11 +104,11 @@ describe('OrgDatabase', () => {
       createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
     })
     db.insertOrganizationMember({
-      id: 'mem-1', organizationId: 'org-1', userId: 'user-1', role: 'admin',
+      id: 'mem-1', organizationId: 'org-1', userId: 'user-1', role: 'org:admin',
       joinedAt: new Date().toISOString(),
     })
     db.insertOrganizationMember({
-      id: 'mem-2', organizationId: 'org-2', userId: 'user-1', role: 'member',
+      id: 'mem-2', organizationId: 'org-2', userId: 'user-1', role: 'org:member',
       joinedAt: new Date().toISOString(),
     })
     const orgs = db.listOrganizationsForUser('user-1')
@@ -159,7 +159,7 @@ describe('OrgDatabase', () => {
       createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
     })
     db.insertOrganizationMember({
-      id: 'mem-1', organizationId: 'org-1', userId: 'user-1', role: 'admin',
+      id: 'mem-1', organizationId: 'org-1', userId: 'user-1', role: 'org:admin',
       joinedAt: new Date().toISOString(),
     })
     db.deleteOrganization('org-1')
@@ -251,15 +251,15 @@ describe('OrgRepository', () => {
 
   it('manages organization members', async () => {
     const org = await orgRepository.createOrganization({ name: 'Org', slug: 'org', ownerId: 'user-1' })
-    const member = await orgRepository.addOrganizationMember(org.id, 'user-2', 'member')
-    expect(member.role).toBe('member')
+    const member = await orgRepository.addOrganizationMember(org.id, 'user-2', 'org:member')
+    expect(member.role).toBe('org:member')
     expect(member.organizationId).toBe(org.id)
 
     const members = await orgRepository.listOrganizationMembers(org.id)
     expect(members.length).toBe(1)
 
-    const updated = await orgRepository.updateOrganizationMemberRole(org.id, 'user-2', 'admin')
-    expect(updated?.role).toBe('admin')
+    const updated = await orgRepository.updateOrganizationMemberRole(org.id, 'user-2', 'org:admin')
+    expect(updated?.role).toBe('org:admin')
 
     expect(await orgRepository.removeOrganizationMember(org.id, 'user-2')).toBe(true)
     expect(await orgRepository.listOrganizationMembers(org.id)).toHaveLength(0)

@@ -1,0 +1,74 @@
+nexus:
+  schema: req-doc/v1
+  metadata:
+    domain: Authentication
+    version: 1.0.0
+    source: examples/tac-samples/requirements/auth.req.yaml
+    documentId: TAC-DEMO-AUTH
+    author: BackendArchitect
+    createdAt: "2026-07-19"
+    updatedAt: "2026-07-19"
+
+requirements:
+  - id: REQ-AUTH-001
+    type: functional
+    title: Email and Password Login
+    description: |
+      The system MUST authenticate users via email and password.
+      Emails are case-insensitive. Passwords MUST be hashed with a
+      slow, salted KDF (Argon2id). Failed attempts MUST be rate limited.
+    priority: critical
+    status: approved
+    tags:
+      - auth
+      - security
+    acceptanceCriteria:
+      - "Given a registered user, when valid credentials are supplied, then a JWT session is issued"
+      - "Given a user, when invalid credentials are supplied, then a generic error is returned and the attempt is logged"
+      - "Given a user, when 5 failed attempts occur within 15 minutes, then the account is temporarily locked"
+    dependencies: []
+    relatedIssues:
+      - THE-219
+    notes: |
+      Rate limiting state lives in Redis with a sliding window.
+
+  - id: REQ-AUTH-002
+    type: functional
+    title: Session Refresh and Revocation
+    description: |
+      Access tokens MUST expire in 15 minutes. Refresh tokens MUST be
+      revocable server-side and rotate on each use. Revoked tokens MUST
+      be rejected even before expiry.
+    priority: high
+    status: approved
+    tags:
+      - auth
+      - security
+    acceptanceCriteria:
+      - "Given a valid refresh token, when used, then a new access token is issued and the refresh token rotates"
+      - "Given a revoked refresh token, when reused, then access is denied and all sessions for the user are terminated"
+    dependencies:
+      - REQ-AUTH-001
+    relatedIssues: []
+    notes: |
+      Revocation list is enforced by the shared auth gateway.
+
+  - id: REQ-AUTH-003
+    type: non-functional
+    title: Password Strength Policy
+    description: |
+      Passwords MUST be at least 12 characters and pass a breached-password
+      check against a local bloom filter of known leaks.
+    priority: medium
+    status: proposed
+    tags:
+      - auth
+      - security
+    acceptanceCriteria:
+      - "Given a password under 12 characters, when submitted, then it is rejected"
+      - "Given a known-breached password, when submitted, then it is rejected with a specific error"
+    dependencies:
+      - REQ-AUTH-001
+    relatedIssues: []
+    notes: |
+      Breach filter is refreshed nightly from the shared security feed.

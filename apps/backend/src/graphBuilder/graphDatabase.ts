@@ -4,7 +4,7 @@ import type { ParsedDocument, ParsedTraceLink } from '../parsers/repositoryParse
 
 export interface GraphNodeRow {
   id: string
-  type: 'requirement' | 'architectureModel' | 'softwareComponent' | 'testCase'
+  type: 'requirement' | 'architectureModel' | 'softwareComponent' | 'testCase' | 'feature' | 'result'
   title?: string
   name?: string
   created_at: string
@@ -38,7 +38,7 @@ export class GraphDatabase {
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS graph_nodes (
         id TEXT PRIMARY KEY,
-        type TEXT NOT NULL CHECK(type IN ('requirement', 'architectureModel', 'softwareComponent', 'testCase')),
+        type TEXT NOT NULL CHECK(type IN ('requirement', 'architectureModel', 'softwareComponent', 'testCase', 'feature', 'result')),
         title TEXT,
         name TEXT,
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -283,11 +283,11 @@ export class GraphDatabase {
     this.upsertNodes(uniqueNodes)
   }
 
-  private docTypeToGraphNodeType(docType: string, detectedType?: string): 'requirement' | 'architectureModel' | 'softwareComponent' | 'testCase' {
+  private docTypeToGraphNodeType(docType: string, detectedType?: string): 'requirement' | 'architectureModel' | 'softwareComponent' | 'testCase' | 'feature' | 'result' {
     if (docType === 'Json') return 'requirement'
     if (detectedType) {
-      for (const key of ['requirement', 'architectureModel', 'softwareComponent', 'testCase']) {
-        if (key === detectedType) return key as 'requirement' | 'architectureModel' | 'softwareComponent' | 'testCase'
+      for (const key of ['requirement', 'architectureModel', 'softwareComponent', 'testCase', 'feature', 'result']) {
+        if (key === detectedType) return key as 'requirement' | 'architectureModel' | 'softwareComponent' | 'testCase' | 'feature' | 'result'
       }
     }
     return 'requirement'
@@ -295,6 +295,12 @@ export class GraphDatabase {
 
   close() {
     this.db.close()
+  }
+
+  /** Remove all graph data. Intended for test isolation. */
+  clear() {
+    this.db.exec('DELETE FROM graph_edges')
+    this.db.exec('DELETE FROM graph_nodes')
   }
 }
 

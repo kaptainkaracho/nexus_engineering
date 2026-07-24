@@ -1,0 +1,18 @@
+title: Authentication uses JWT access tokens with rotating refresh tokens
+status: accepted
+context: |
+  The Bike App backend needs a stateless, horizontally-scalable auth model
+  that works across multiple services (auth, audit-log, artifact-registry)
+  without a shared session store. Session affinity is undesirable in our
+  containerized deployment.
+decision: |
+  Issue short-lived JWT access tokens (15 minutes) signed with RS256 and
+  enforce revocation via a server-side refresh-token registry that rotates
+  on every use. Access tokens are validated locally via the public key;
+  revocation is checked only at refresh time.
+consequences:
+  - Services can validate tokens without a network call on the hot path
+  - Revocation has up to a 15-minute window for access tokens
+  - A refresh-token store (Redis) is required and must be highly available
+  - Shared public key distribution must be automated via the auth gateway
+superseded_by: null

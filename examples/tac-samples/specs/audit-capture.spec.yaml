@@ -1,0 +1,24 @@
+title: Audit Log Capture Specification
+version: 1.0.0
+status: active
+requirements:
+  - id: SPEC-AUDIT-CAP-001
+    title: Every mutation emits exactly one immutable event
+    priority: P0
+    status: implemented
+    references:
+      - type: req
+        id: REQ-AUDIT-001
+      - type: arch
+        id: adr-002-audit-log-storage
+      - type: test
+        id: TC-AUDIT-EMIT
+  - id: SPEC-AUDIT-CAP-002
+    title: Audit writes are durable before response
+    priority: P1
+    status: approved
+    references:
+      - type: req
+        id: REQ-AUDIT-003
+      - type: test
+        id: TC-AUDIT-DURABILITY

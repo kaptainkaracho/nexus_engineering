@@ -361,11 +361,22 @@ export class OrgDatabase {
     return rows.map(row => this.mapRowToOrganizationMember(row))
   }
 
+  listOrganizationMembersByUser(userId: string): OrganizationMember[] {
+    const rows = this.db.prepare(
+      'SELECT * FROM organization_members WHERE user_id = ? ORDER BY joined_at'
+    ).all(userId) as OrganizationMemberRow[]
+    return rows.map(row => this.mapRowToOrganizationMember(row))
+  }
+
+  findOrganizationInvite(organizationId: string, userId: string): OrganizationMember | undefined {
+    return this.findOrganizationMember(organizationId, userId)
+  }
+
   updateOrganizationMember(organizationId: string, userId: string, role: string): OrganizationMember | undefined {
     const existing = this.findOrganizationMember(organizationId, userId)
     if (!existing) return undefined
     this.db.prepare('UPDATE organization_members SET role = ? WHERE organization_id = ? AND user_id = ?').run(role, organizationId, userId)
-    return { ...existing, role: role as 'admin' | 'member' }
+    return { ...existing, role: role as 'org:admin' | 'org:member' | 'org:viewer' }
   }
 
   deleteOrganizationMember(organizationId: string, userId: string): boolean {
@@ -373,6 +384,20 @@ export class OrgDatabase {
       'DELETE FROM organization_members WHERE organization_id = ? AND user_id = ?'
     ).run(organizationId, userId)
     return result.changes > 0
+  }
+
+  countOrganizationMembers(organizationId: string): number {
+    const row = this.db.prepare(
+      'SELECT COUNT(*) as count FROM organization_members WHERE organization_id = ?'
+    ).get(organizationId) as any
+    return row.count
+  }
+
+  isOrganizationOwner(userId: string, organizationId: string): boolean {
+    const row = this.db.prepare(
+      'SELECT owner_id FROM organizations WHERE id = ?'
+    ).get(organizationId) as any
+    return row?.owner_id === userId
   }
 
   // --- Team Members ---
@@ -590,7 +615,7 @@ export class OrgDatabase {
       id: row.id,
       organizationId: row.organization_id,
       userId: row.user_id,
-      role: row.role as 'admin' | 'member',
+      role: row.role as 'org:admin' | 'org:member' | 'org:viewer',
       joinedAt: row.joined_at,
     }
   }

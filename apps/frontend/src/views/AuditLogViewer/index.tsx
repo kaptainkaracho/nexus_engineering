@@ -70,6 +70,7 @@ export function AuditLogViewer() {
   const [searchText, setSearchText] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [orgFilter, setOrgFilter] = useState('');
   const [exporting, setExporting] = useState<'csv' | 'json' | null>(null);
 
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
@@ -108,9 +109,10 @@ export function AuditLogViewer() {
       search: searchText || undefined,
       startDate: startDate || undefined,
       endDate: endDate || undefined,
+      orgId: orgFilter || undefined,
     });
     setExpandedRow(null);
-  }, [actionFilter, resourceTypeFilter, searchText, startDate, endDate]);
+  }, [actionFilter, resourceTypeFilter, searchText, startDate, endDate, orgFilter]);
 
   const handleResetFilters = useCallback(() => {
     setActionFilter('');
@@ -118,6 +120,7 @@ export function AuditLogViewer() {
     setSearchText('');
     setStartDate('');
     setEndDate('');
+    setOrgFilter('');
     setFilter(emptyFilter());
     setExpandedRow(null);
   }, []);
@@ -138,6 +141,7 @@ export function AuditLogViewer() {
         const blob = await exportAuditLogs(format, {
           action: actionFilter || undefined,
           resourceType: resourceTypeFilter || undefined,
+          orgId: orgFilter || undefined,
           search: searchText || undefined,
           startDate: startDate || undefined,
           endDate: endDate || undefined,
@@ -154,7 +158,7 @@ export function AuditLogViewer() {
         setExporting(null);
       }
     },
-    [actionFilter, resourceTypeFilter, searchText, startDate, endDate],
+    [actionFilter, resourceTypeFilter, searchText, startDate, endDate, orgFilter],
   );
 
   const handleKeyDown = useCallback(
@@ -164,7 +168,7 @@ export function AuditLogViewer() {
     [handleApplyFilters],
   );
 
-  const isDefaultFilter = !actionFilter && !resourceTypeFilter && !searchText && !startDate && !endDate;
+  const isDefaultFilter = !actionFilter && !resourceTypeFilter && !searchText && !startDate && !endDate && !orgFilter;
 
   return (
     <Container size="lg">
@@ -242,6 +246,20 @@ export function AuditLogViewer() {
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:gap-4">
+              <div className="flex-1">
+                <label htmlFor="audit-org-filter" className="mb-1 block text-xs font-medium text-text-tertiary uppercase tracking-wide">
+                  Org ID
+                </label>
+                <input
+                  id="audit-org-filter"
+                  type="text"
+                  value={orgFilter}
+                  onChange={(e) => setOrgFilter(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Filter by org…"
+                  className="w-full rounded-lg border border-border bg-surface-primary px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                />
+              </div>
               <div className="flex-[2]">
                 <label htmlFor="audit-search" className="mb-1 block text-xs font-medium text-text-tertiary uppercase tracking-wide">
                   Search
@@ -331,24 +349,24 @@ export function AuditLogViewer() {
                     </h3>
                     <div className="flex items-center gap-1">
                       <span className="text-xs text-text-tertiary">Export</span>
-                      <button
-                        type="button"
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         disabled={exporting === 'csv'}
                         onClick={() => handleExport('csv')}
-                        className="inline-flex items-center rounded-md border border-border px-2 py-1 text-xs font-medium text-text-secondary hover:bg-surface-tertiary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Export as CSV"
                       >
                         {exporting === 'csv' ? 'Exporting…' : 'CSV'}
-                      </button>
-                      <button
-                        type="button"
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         disabled={exporting === 'json'}
                         onClick={() => handleExport('json')}
-                        className="inline-flex items-center rounded-md border border-border px-2 py-1 text-xs font-medium text-text-secondary hover:bg-surface-tertiary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Export as JSON"
                       >
                         {exporting === 'json' ? 'Exporting…' : 'JSON'}
-                      </button>
+                      </Button>
                     </div>
                   </div>
                   <span className="text-xs text-text-tertiary shrink-0">
@@ -360,6 +378,9 @@ export function AuditLogViewer() {
                   <table className="w-full text-left text-sm" aria-label="Audit log entries">
                     <thead>
                       <tr className="border-b border-border text-xs uppercase tracking-wide text-text-tertiary">
+                        <th className="w-10 p-3" scope="col">
+                          <span className="sr-only">Toggle details</span>
+                        </th>
                         <th className="p-3 font-semibold" scope="col">Timestamp</th>
                         <th className="p-3 font-semibold" scope="col">User</th>
                         <th className="p-3 font-semibold" scope="col">Action</th>
@@ -372,20 +393,22 @@ export function AuditLogViewer() {
                       {logs.map((entry) => (
                         <tr
                           key={entry.id}
-                          className={`border-b border-border transition-colors hover:bg-surface-secondary/50 cursor-pointer ${
+                          className={`border-b border-border transition-colors hover:bg-surface-secondary/50 ${
                             expandedRow === entry.id ? 'bg-primary-500/5' : ''
                           }`}
-                          onClick={() => setExpandedRow(expandedRow === entry.id ? null : entry.id)}
-                          tabIndex={0}
-                          role="button"
-                          aria-expanded={expandedRow === entry.id}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              setExpandedRow(expandedRow === entry.id ? null : entry.id);
-                            }
-                          }}
                         >
+                          <td className="p-3">
+                            <button
+                              type="button"
+                              className="inline-flex items-center justify-center rounded p-1 text-text-tertiary hover:text-text-primary hover:bg-surface-tertiary transition-colors"
+                              onClick={() => setExpandedRow(expandedRow === entry.id ? null : entry.id)}
+                              aria-expanded={expandedRow === entry.id}
+                              aria-label={`${expandedRow === entry.id ? 'Collapse' : 'Expand'} details for ${entry.userEmail}`}
+                              aria-controls={expandedRow === entry.id ? 'audit-entry-details' : undefined}
+                            >
+                              {expandedRow === entry.id ? '▼' : '▶'}
+                            </button>
+                          </td>
                           <td className="p-3 text-text-primary whitespace-nowrap" title={formatTimestampFull(entry.timestamp)}>
                             {formatTimestamp(entry.timestamp)}
                           </td>
@@ -447,7 +470,7 @@ export function AuditLogViewer() {
             </Card>
 
             {expandedRow && (
-              <Card variant="outlined" padding="md" role="region" aria-label="Entry details">
+              <Card variant="outlined" padding="md" role="region" aria-label="Entry details" id="audit-entry-details">
                 {(() => {
                   const entry = logs.find((l) => l.id === expandedRow);
                   if (!entry) return null;

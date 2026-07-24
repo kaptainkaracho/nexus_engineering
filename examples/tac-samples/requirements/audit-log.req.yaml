@@ -1,0 +1,72 @@
+nexus:
+  schema: req-doc/v1
+  metadata:
+    domain: Audit Log
+    version: 1.0.0
+    source: examples/tac-samples/requirements/audit-log.req.yaml
+    documentId: TAC-DEMO-AUDIT
+    author: BackendArchitect
+    createdAt: "2026-07-19"
+    updatedAt: "2026-07-19"
+
+requirements:
+  - id: REQ-AUDIT-001
+    type: functional
+    title: Immutable Audit Event Capture
+    description: |
+      Every mutating API request MUST emit an audit event containing
+      actor, action, target, source IP, and timestamp. Events MUST be
+      append-only and tamper-evident.
+    priority: critical
+    status: approved
+    tags:
+      - audit
+      - security
+      - compliance
+    acceptanceCriteria:
+      - "Given any write request, when handled, then exactly one audit event is persisted"
+      - "Given a persisted audit event, when an update is attempted, then it is rejected"
+    dependencies: []
+    relatedIssues:
+      - THE-219
+    notes: |
+      Tamper-evidence uses a per-partition hash chain.
+
+  - id: REQ-AUDIT-002
+    type: functional
+    title: Audit Log Retention and Query
+    description: |
+      Audit events MUST be retained for 7 years and MUST be queryable by
+      actor, action, target, and time range with pagination.
+    priority: high
+    status: approved
+    tags:
+      - audit
+      - compliance
+    acceptanceCriteria:
+      - "Given events spanning 3 years, when queried by actor and date range, then results are paginated and complete"
+      - "Given a retention policy, when an event exceeds 7 years, then it is archived to cold storage"
+    dependencies:
+      - REQ-AUDIT-001
+    relatedIssues: []
+    notes: |
+      Hot index covers 90 days; older data is cold-stored.
+
+  - id: REQ-AUDIT-003
+    type: non-functional
+    title: Audit Write Durability
+    description: |
+      Audit writes MUST be durably committed before the corresponding
+      API response is returned to the caller (synchronous, at-least-once).
+    priority: high
+    status: proposed
+    tags:
+      - audit
+      - reliability
+    acceptanceCriteria:
+      - "Given a successful API write, when queried, then its audit event is immediately visible"
+    dependencies:
+      - REQ-AUDIT-001
+    relatedIssues: []
+    notes: |
+      A write-ahead buffer protects against transient store outages.
