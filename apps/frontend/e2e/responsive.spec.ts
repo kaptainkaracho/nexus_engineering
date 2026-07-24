@@ -11,7 +11,8 @@ test.describe('Responsive layout', () => {
       api.registry();
       api.graph();
       await page.goto('/#' + section);
-      await page.getByRole('heading', { level: 1 }).first().waitFor();
+      await page.locator('header').waitFor();
+      await page.getByRole('heading').first().waitFor();
 
       const overflow = await page.evaluate(() => {
         return document.documentElement.scrollWidth - document.documentElement.clientWidth;

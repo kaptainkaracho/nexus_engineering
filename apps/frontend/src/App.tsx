@@ -352,7 +352,28 @@ function App() {
   ];
 
   if (!authReady) {
-    return null;
+    return (
+      <div className="min-h-screen bg-surface-secondary">
+        <header className="border-b border-border bg-surface-primary">
+          <Container size="lg">
+            <div className="flex items-center justify-between py-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-500 text-sm font-bold text-text-inverse">
+                  B
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-text-primary">The Bike App</p>
+                  <p className="text-sm text-text-tertiary">Design System v0.1</p>
+                </div>
+              </div>
+            </div>
+          </Container>
+        </header>
+        <Container size="lg">
+          <p className="py-8 text-center text-text-tertiary">Loading...</p>
+        </Container>
+      </div>
+    );
   }
 
   if (!user) {

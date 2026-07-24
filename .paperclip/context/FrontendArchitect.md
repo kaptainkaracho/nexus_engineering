@@ -1,59 +1,31 @@
 # FrontendArchitect Context State
-> Last updated: 2026-07-25 (HB#249 — CEO Phase 0 Assessment)
+> Last updated: 2026-07-25T01:00Z
 
 ## Last Run
-- Issue: THE-338 (DONE ✅)
-- Timestamp: 2026-07-25T00:35Z
-- Status: Board synchronized, issue closed
+- Issue: THE-341 — Fix E2E navigation and responsive overflow regressions
+- Timestamp: 2026-07-25T01:00Z
+- Status: Chromium + Firefox E2E passing (120 tests), webkit gated on system deps
 
-## Completed Work
-- **THE-338** — Bundle splitting committed in `0320bbe` + `605a051`
-- Bundle: 69.4 KB gzip, Chunks: 31→19 (39% reduction), TSC clean, UX approved
-- **THE-326** — CEO-approved → `done`. UI Polish complete.
+## Files Modified This Session
+- apps/frontend/src/App.tsx (line 354: return loading shell instead of null)
+- apps/frontend/e2e/navigation.spec.ts (line 8: "The Bike App" is a <p> not heading; line 18: level 3→2)
+- apps/frontend/e2e/responsive.spec.ts (line 14: wait for header not desktop nav)
 
-## Next Assignment: Phase 4 Sprint 21 — Wave 1: Audit Log Viewer UI
-
-**Priority:** P1 (Phase 4)
-**Status:** **queued** ⏳ — awaiting issue creation by CTO
-
-### Scope: E1 — Audit Log Viewer UI + Export
-1. **Audit Log Table** — Paginated table with columns: timestamp, user, action, resource, IP
-2. **Date Range Filter** — Date picker for filtering audit log entries
-3. **Export** — CSV and JSON export of filtered audit log
-4. **Retention Config UI** — Simple retention period setting (days) with save button
-
-### Technical Notes
-- Existing API: `GET /api/audit-log` with pagination (`?page&limit`), date filtering (`?startDate&endDate`), export (`?format=csv|json`)
-- See existing `AuditLogViewer.tsx` component at `apps/frontend/src/components/admin/`
-- Wire into Admin panel navigation
-
-### DoD
-- [ ] Audit log table functional with pagination
-- [ ] Date range filter working
-- [ ] CSV/JSON export produces valid files
-- [ ] Retention config UI saves correctly
-- [ ] UX Gate approval required (The-xxx UX Gate issue — initially `blocked`)
-- [ ] TypeScript/ build clean (`pnpm typecheck && pnpm build`)
-- [ ] `pnpm test` passes
-
-### UX Gate Requirement
-- A UX Gate issue will be created with initial status `blocked`
-- Transition UX Gate to `in_progress` only when this issue reaches `in_review`
-- Do NOT merge/mark done without UX Gate approval
-
-### Sequence
-1. Review existing `AuditLogViewer.tsx` and `GET /api/audit-log` API
-2. Implement per scope above
-3. Create `in_review` → UX Gate transitions to `in_progress`
-4. Address UX feedback → UX Gate approves → mark `done`
+## Root Causes Fixed
+1. App returned null while authReady=false → E2E heading not found
+2. "Files" heading level 3→2 (THE-326 changed it to h2)
+3. Responsive test waited for level:1 heading (doesn't exist on overview/forms/cards/repo)
+4. "The Bike App" queried as heading but is <p> after THE-326
+5. Desktop nav hidden on mobile 375px, causing waitFor timeout
 
 ## Sprint 20 Resolution
-- THE-326 → **done** ✅ (CEO-approved)
-- THE-327 → **done** ✅ (UX gate)
-- THE-330 → **done** ✅ (Backend routes hardened)
-- THE-331 → **in_progress** ⚡ (Senior QA E2E)
-- THE-338 → **done** ✅ (Bundle splitting)
-- THE-322 → **in_progress** ⚡ (BackendArchitect finalizing)
+- THE-326 → done (CEO-approved)
+- THE-327 → done (UX gate)
+- THE-330 → done (Backend routes hardened)
+- THE-331 → in_progress (Senior QA E2E)
+- THE-338 → done (Bundle splitting)
+- THE-341 → done (E2E regression fixes)
+- THE-322 → in_progress (BackendArchitect finalizing)
 
 ## Next Action
-- Awaiting CTO issue creation for Phase 4 Sprint 21 Wave 1 (Audit Log Viewer UI)
+- Commit THE-341 fixes and mark issue done

@@ -5,7 +5,7 @@ const SHOWCASE_SECTIONS = ['overview', 'buttons', 'forms', 'cards', 'artefacts']
 test.describe('Navigation', () => {
   test('app header is always present on load', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByRole('heading', { name: 'The Bike App' })).toBeVisible();
+    await expect(page.getByText('The Bike App')).toBeVisible();
   });
 
   test('discovery dashboard section renders its heading', async ({ page }) => {
@@ -15,7 +15,7 @@ test.describe('Navigation', () => {
 
   test('repository section renders the file tree panel', async ({ page }) => {
     await page.goto('/#repository');
-    await expect(page.getByRole('heading', { name: 'Files', level: 3 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Files', level: 2 })).toBeVisible();
   });
 
   test('graph builder section renders its heading', async ({ page }) => {
