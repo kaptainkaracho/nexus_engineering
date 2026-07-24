@@ -50,7 +50,7 @@ Expected tools:
 ```bash
 # Set auth
 API_KEY="<MINERVA_API_KEY>"
-TENANT="the_software_company"
+TENANT="paperclip_company"
 
 # Check events ingested
 curl -s -H "Authorization: Bearer ${API_KEY}" \
@@ -256,6 +256,28 @@ Scores are normalized 0–100:
 | 75–89 | Good |
 | 60–74 | Fair — needs attention |
 | <60 | Poor — requires intervention |
+
+### 4.3a Success Rate KPI Methodology
+
+**Known issue:** The Minerva API's raw success rate includes in-flight/running runs in the denominator, producing a lower-than-true value. Per CEO decision (THE-323), Minerva MUST report an adjusted success rate.
+
+**Adjusted calculation:**
+```
+success_rate_raw = succeeded / total_runs              # API default (includes in-flight)
+success_rate_adjusted = succeeded / (succeeded + failed)  # Corrected (terminal-only)
+```
+
+**Reporting requirement:** Both raw and adjusted rates MUST be included in every report:
+- `success_rate_raw` — the API-provided value (for transparency)
+- `success_rate_adjusted` — the corrected terminal-only value (for decision-making)
+
+**Implementation:** The adjustment is calculated post-hoc from the API response fields `succeeded`, `failed`, and `total_runs`. No API changes needed.
+
+Example:
+```
+Raw success rate:     996 / 1924 = 51.77%
+Adjusted success rate: 996 / 1492 = 66.76%  (432 in-flight runs excluded)
+```
 
 ### 4.4 Interpreting Evidence
 
@@ -464,7 +486,7 @@ Before closing any routine analysis issue:
 
 All API calls require:
 - **Header:** `Authorization: Bearer <MINERVA_API_KEY>`
-- **Header:** `X-Tenant-Id: the_software_company`
+- **Header:** `X-Tenant-Id: paperclip_company`
 
 The API key can be extracted from the Minerva server environment:
 ```bash

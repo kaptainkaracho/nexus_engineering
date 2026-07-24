@@ -1,15 +1,55 @@
 # HEARTBEAT.md — Pipeline Compliance Report
 
-## Heartbeat: 2026-07-24 19:45 UTC | HB#220 — CEO: Post-Phase 3 Strategy — Awaiting Board Approval on Option A
+## Heartbeat: 2026-07-24 20:40 UTC | HB#226 — CTO: THE-325 Executed, THE-320 Queued Awaiting CEO Approval
 
 ### 0. Analysis Paralysis Scan
-- [x] **CTO:** **IDLE** ✅ — THE-318 merge complete (commit `9a39505`). Phase 3 fully delivered. No active run.
-- [x] **BackendArchitect:** **IDLE** ✅ — All Sprint 19 work done. No active run.
-- [x] **FrontendArchitect:** **IDLE** ✅ — All Sprint 19 work done. No active run.
-- [x] **UXDesigner:** **IDLE** ✅ — THE-311 UX Gate approved. No active run.
-- [x] **Senior QA:** **IDLE** ✅ — THE-312 E2E done (14 tests, PASS). No active run.
-- [x] **Minerva:** **IDLE** ✅ — MCP server live. No task queued.
-- **No paralysis detected.** All agents properly idle. Phase 3 complete.
+- [x] **CTO:** **IN_PROGRESS** ⚡ — THE-325 executed (Minerva SOP updated + platform feature request filed). THE-320 queued awaiting CEO approval.
+- [x] **BackendArchitect:** **IN_PROGRESS** ⚡ — THE-321 assigned (filter infrastructure noise from process mining).
+- [x] **CEO:** **IDLE** ✅ — Awaiting board on THE-319, pending review on THE-320.
+- [x] **FrontendArchitect:** **IDLE** ✅
+- [x] **UXDesigner:** **IDLE** ✅
+- [x] **Senior QA:** **IDLE** ✅
+- [x] **Minerva:** **IDLE** ✅
+- **No paralysis detected.** Concrete actions taken on THE-325.
+
+### State Changes Since HB#225
+| Action | Result |
+|--------|--------|
+| **THE-325 (CTO executed)** | **DONE** ✅ — Minerva SOP updated at `docs/minerva-routine.md` (Section 4.3a: Success Rate Methodology). Platform feature request filed at `docs/THE-325-platform-feature-request.md`. |
+| **THE-320** | **queued** 📋 — Awaiting CEO approval on WIP limit increase (2→4). Implementation plan ready at `docs/THE-320-implementation-plan.md`. |
+
+### Pipeline Overview
+| Issue | Assignee | Status | Summary |
+|-------|----------|--------|---------|
+| THE-319 | CEO | **in_review** 🔍 | Post-Phase 3 Strategy — awaiting board confirmation |
+| THE-320 | CTO | **queued** 📋 | R1: Address Critical Idle Time — awaiting CEO approval on WIP limit change |
+| THE-321 | BackendArchitect | **in_progress** ⚡ | R2: Filter Infrastructure Noise (P1) — DELEGATED |
+| THE-322 | CEO | **in_progress** ⚡ | R3: Classify Recovery/Rework — in progress |
+| THE-323 | CEO | **done** ✅ | R4: Recalibrate Success Rate KPI — decision made, executed via THE-325 |
+| THE-325 | CTO | **done** ✅ | Implement Success Rate KPI Compensation — Minerva SOP updated + feature request filed |
+
+### Pipeline Compliance
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| Live Execution | **1/2** ✅ | THE-321 active (BackendArchitect) |
+| Active Runners | **1** | ✅ BackendArchitect in progress |
+| Per-Agent WIP | BackendArchitect 1/1 | ✅ Compliant |
+| Budget | ~$13.58 / $500 (2.72%) | ✅ Healthy |
+| Blockers | THE-319 gated on board confirmation, THE-320 awaiting CEO approval | ⏳ |
+
+### 🎯 Status & Next Steps
+
+**Current Status:** THE-325 fully executed. Minerva SOP updated with adjusted success rate methodology. Platform feature request filed. THE-320 queued — implementation plan ready, awaiting CEO approval to increase WIP limits from 2 to 4.
+
+**Global Pipeline Load:** 1/2 Live Execution Issues | Active Runner: BackendArchitect (THE-321)
+
+**Blockers:** THE-319 gated on board confirmation. THE-320 awaiting CEO approval on WIP limit modification.
+
+**Concrete Next Steps:**
+- [ ] @CEO: Review THE-320 implementation plan (`docs/THE-320-implementation-plan.md`) — approve Option A (WIP 2→4) or provide alternative direction
+- [ ] @CEO: Respond on THE-319 board interaction 996f4bd5
+- [ ] @BackendArchitect: Continue THE-321 (filter infrastructure noise from process mining)
+- [ ] @Board: Respond to `request_confirmation` interaction 996f4bd5 on THE-319
 
 ### State Changes Since HB#219
 | Action | Result |
