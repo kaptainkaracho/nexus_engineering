@@ -162,7 +162,6 @@ function RecommendationCard({
     <Card
       padding="lg"
       className="group transition-shadow hover:shadow-md focus-within:ring-2 focus-within:ring-primary-500"
-      tabIndex={0}
       role="article"
       aria-label={`Recommendation: ${formatCategory(rec.category)}, severity ${rec.severity}`}
     >
