@@ -4,6 +4,7 @@ import { scanRequirements } from './requirements'
 import { RepositoryScanner } from '../scanners/repositoryScanner'
 import { scanMetadataStore } from '../scanners/scanMetadata'
 import { parsePagination, buildPaginationMeta, paginate } from '../lib/pagination'
+import { AppError } from '../lib/errorHandler'
 
 /**
  * GET /api/scan
@@ -16,52 +17,41 @@ import { parsePagination, buildPaginationMeta, paginate } from '../lib/paginatio
  *   includeTree     build the full hierarchy tree in the response (default false)
  */
 export async function scanRepository (request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const q = request.query as Record<string, unknown>
-    const repositoryPath = q.repositoryPath as string
+  const q = request.query as Record<string, unknown>
+  const repositoryPath = q.repositoryPath as string
 
-    if (!repositoryPath) {
-      return reply.status(400).send({
-        error: 'repositoryPath query parameter is required'
-      })
-    }
-
-    let page
-    try {
-      page = parsePagination(q)
-    } catch (err) {
-      return reply.status(400).send({ error: (err as Error).message })
-    }
-
-    const computeHashes = q.computeHashes === 'true' || q.computeHashes === true
-    const includeTree = q.includeTree === 'true' || q.includeTree === true
-
-    const scanner = new RepositoryScanner()
-    const result = await scanner.scan(repositoryPath, {
-      computeHashes,
-    } as ScanOptions)
-
-    const totalFiles = result.fileMetadata.length
-    const totalArtifacts = result.artifacts.length
-
-    // Return processed repository data for UI consumption.
-    // fileMetadata/artifacts are paginated slices; totals + envelope let the
-    // client page without re-scanning. The tree is opt-in because it is
-    // expensive to build and serialize for large repositories.
-    return reply.send({
-      scanId: result.scanId,
-      fileMetadata: paginate(result.fileMetadata, page),
-      totalFiles,
-      artifacts: paginate(result.artifacts, page),
-      totalArtifacts,
-      scanReport: result.scanReport,
-      ...(includeTree ? { tree: buildRepositoryTree(result.fileMetadata) } : {}),
-      pagination: buildPaginationMeta(page.limit, page.offset, Math.max(totalFiles, totalArtifacts)),
-    })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to scan repository' })
+  if (!repositoryPath) {
+    throw new AppError(400, 'repositoryPath query parameter is required', { param: 'repositoryPath' })
   }
+
+  let page
+  try {
+    page = parsePagination(q)
+  } catch (err) {
+    throw new AppError(400, (err as Error).message, { param: 'pagination' })
+  }
+
+  const computeHashes = q.computeHashes === 'true' || q.computeHashes === true
+  const includeTree = q.includeTree === 'true' || q.includeTree === true
+
+  const scanner = new RepositoryScanner()
+  const result = await scanner.scan(repositoryPath, {
+    computeHashes,
+  } as ScanOptions)
+
+  const totalFiles = result.fileMetadata.length
+  const totalArtifacts = result.artifacts.length
+
+  return reply.send({
+    scanId: result.scanId,
+    fileMetadata: paginate(result.fileMetadata, page),
+    totalFiles,
+    artifacts: paginate(result.artifacts, page),
+    totalArtifacts,
+    scanReport: result.scanReport,
+    ...(includeTree ? { tree: buildRepositoryTree(result.fileMetadata) } : {}),
+    pagination: buildPaginationMeta(page.limit, page.offset, Math.max(totalFiles, totalArtifacts)),
+  })
 }
 
 /**
@@ -69,35 +59,24 @@ export async function scanRepository (request: FastifyRequest, reply: FastifyRep
  * Trigger a repository scan asynchronously; returns scan ID immediately.
  */
 export async function triggerScan (request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { repositoryPath, options } = request.body as {
-      repositoryPath: string
-      options?: ScanOptions
-    }
-
-    if (!repositoryPath) {
-      return reply.status(400).send({ error: 'repositoryPath is required' })
-    }
-
-    const scanner = new RepositoryScanner()
-    // Run scan in the background; we return the scanId right away.
-    const resultPromise = scanner.scan(repositoryPath, options ?? {})
-
-    // Resolve the scanId from the first completed session after this point.
-    // Since createSession() is synchronous and called at scan() start we need
-    // the scan to at least begin — await a microtask so the session is registered.
-    const result = await resultPromise
-
-    return reply.status(202).send({
-      scanId: result.scanId,
-      status: 'completed',
-      filesFound: result.scanReport.filesFound,
-      artifactsDetected: result.artifacts.length,
-    })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to trigger scan' })
+  const { repositoryPath, options } = request.body as {
+    repositoryPath: string
+    options?: ScanOptions
   }
+
+  if (!repositoryPath) {
+    throw new AppError(400, 'repositoryPath is required', { param: 'repositoryPath' })
+  }
+
+  const scanner = new RepositoryScanner()
+  const result = await scanner.scan(repositoryPath, options ?? {})
+
+  return reply.status(202).send({
+    scanId: result.scanId,
+    status: 'completed',
+    filesFound: result.scanReport.filesFound,
+    artifactsDetected: result.artifacts.length,
+  })
 }
 
 /**
@@ -105,19 +84,18 @@ export async function triggerScan (request: FastifyRequest, reply: FastifyReply)
  * Return scan status and results by scan ID.
  */
 export async function getScanById (request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { id } = request.params as { id: string }
-    const session = scanMetadataStore.getSession(id)
+  const { id } = request.params as { id: string }
 
-    if (!session) {
-      return reply.status(404).send({ error: `Scan ${id} not found` })
-    }
-
-    return reply.send(session)
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to retrieve scan' })
+  if (!id) {
+    throw new AppError(400, 'Scan ID is required', { param: 'id' })
   }
+
+  const session = scanMetadataStore.getSession(id)
+  if (!session) {
+    throw new AppError(404, `Scan ${id} not found`, { resourceId: id })
+  }
+
+  return reply.send(session)
 }
 
 /**
@@ -127,24 +105,19 @@ export async function getScanById (request: FastifyRequest, reply: FastifyReply)
  * Query params: limit / offset (default 100 / 0, capped at 1000)
  */
 export async function listArtifacts (request: FastifyRequest, reply: FastifyReply) {
+  let page
   try {
-    let page
-    try {
-      page = parsePagination(request.query as Record<string, unknown>)
-    } catch (err) {
-      return reply.status(400).send({ error: (err as Error).message })
-    }
-
-    const { artifacts, total } = scanMetadataStore.getArtifactsPage(page.limit, page.offset)
-    return reply.send({
-      artifacts,
-      total,
-      pagination: buildPaginationMeta(page.limit, page.offset, total),
-    })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to list artifacts' })
+    page = parsePagination(request.query as Record<string, unknown>)
+  } catch (err) {
+    throw new AppError(400, (err as Error).message, { param: 'pagination' })
   }
+
+  const { artifacts, total } = scanMetadataStore.getArtifactsPage(page.limit, page.offset)
+  return reply.send({
+    artifacts,
+    total,
+    pagination: buildPaginationMeta(page.limit, page.offset, total),
+  })
 }
 
 /**
