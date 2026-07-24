@@ -1,6 +1,10 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import { LifecycleState, artifactRegistry, now } from '../artifacts/repository'
 import type { ArtifactType, PatchArtifactInput } from '../artifacts/repository'
+import { AppError } from '../lib/errorHandler'
+
+const VALID_ARTIFACT_TYPES = ['requirement', 'architecture', 'adr', 'spec', 'unknown'] as const
+const VALID_LIFECYCLE_STATES: LifecycleState[] = ['discovered', 'parsed', 'indexed', 'related', 'error']
 
 export async function artifactRegistryRoutes(server: FastifyInstance) {
   // =========================================================
@@ -8,14 +12,9 @@ export async function artifactRegistryRoutes(server: FastifyInstance) {
   // Returns all artifacts and aggregate summary
   // =========================================================
   server.get('/api/artifacts/registry', async (_request: FastifyRequest, reply: FastifyReply) => {
-    try {
-      const all = artifactRegistry.getAll()
-      const summary = artifactRegistry.getSummary()
-      return reply.send({ data: all, summary })
-    } catch (error) {
-      server.log.error(error as Error)
-      return reply.status(500).send({ error: 'Failed to list artifacts' })
-    }
+    const all = artifactRegistry.getAll()
+    const summary = artifactRegistry.getSummary()
+    return reply.send({ data: all, summary })
   })
 
   // =========================================================
@@ -25,17 +24,12 @@ export async function artifactRegistryRoutes(server: FastifyInstance) {
   server.get('/api/artifacts/registry/type/:type', async (request: FastifyRequest, reply: FastifyReply) => {
     const { type } = request.params as { type: ArtifactType }
 
-    if (!['requirement', 'architecture', 'adr', 'spec', 'unknown'].includes(type)) {
-      return reply.status(400).send({ error: `Invalid artifact type '${type}'. Allowed: requirement, architecture, adr, spec` })
+    if (!(VALID_ARTIFACT_TYPES as readonly string[]).includes(type)) {
+      throw new AppError(400, `Invalid artifact type '${type}'`, { allowed: VALID_ARTIFACT_TYPES })
     }
 
-    try {
-      const artifacts = artifactRegistry.getByType(type)
-      return reply.send({ data: artifacts, total: artifacts.length, filter: { type } })
-    } catch (error) {
-      server.log.error(error as Error)
-      return reply.status(500).send({ error: 'Failed to query artifacts' })
-    }
+    const artifacts = artifactRegistry.getByType(type)
+    return reply.send({ data: artifacts, total: artifacts.length, filter: { type } })
   })
 
   // =========================================================
@@ -45,16 +39,15 @@ export async function artifactRegistryRoutes(server: FastifyInstance) {
   server.get('/api/artifacts/registry/:id', async (request: FastifyRequest, reply: FastifyReply) => {
     const { id } = request.params as { id: string }
 
-    try {
-      const artifact = artifactRegistry.get(id)
-      if (!artifact) {
-        return reply.status(404).send({ error: 'Artifact not found' })
-      }
-      return reply.send({ data: artifact })
-    } catch (error) {
-      server.log.error(error as Error)
-      return reply.status(500).send({ error: 'Failed to get artifact' })
+    if (!id) {
+      throw new AppError(400, 'Artifact ID is required', { param: 'id' })
     }
+
+    const artifact = artifactRegistry.get(id)
+    if (!artifact) {
+      throw new AppError(404, 'Artifact not found', { resourceId: id })
+    }
+    return reply.send({ data: artifact })
   })
 
   // =========================================================
@@ -64,6 +57,10 @@ export async function artifactRegistryRoutes(server: FastifyInstance) {
   server.patch('/api/artifacts/registry/:id', async (request: FastifyRequest, reply: FastifyReply) => {
     const { id } = request.params as { id: string }
     const body = (request.body ?? {}) as Record<string, unknown>
+
+    if (!id) {
+      throw new AppError(400, 'Artifact ID is required', { param: 'id' })
+    }
 
     // Validate allowed transitions
     const allowedTransitions: Record<LifecycleState, string[]> = {
@@ -76,19 +73,18 @@ export async function artifactRegistryRoutes(server: FastifyInstance) {
 
     const currentArtifact = artifactRegistry.get(id)
     if (!currentArtifact) {
-      return reply.status(404).send({ error: 'Artifact not found' })
+      throw new AppError(404, 'Artifact not found', { resourceId: id })
+    }
+
+    // Validate lifecycle value if provided
+    if (body.lifecycle && !(VALID_LIFECYCLE_STATES as readonly string[]).includes(body.lifecycle as string)) {
+      throw new AppError(400, `Invalid lifecycle state '${body.lifecycle}'`, { allowed: VALID_LIFECYCLE_STATES })
     }
 
     const lifecycleTarget = body.lifecycle as LifecycleState | undefined
     if (lifecycleTarget && !allowedTransitions[currentArtifact.lifecycle].includes(lifecycleTarget)) {
-      const allowedStr = allowedTransitions[lifecycleTarget]?.join(', ') ?? '<none>'
-      return reply.status(409).send({ error: `Cannot transition from '${currentArtifact.lifecycle}' to '${lifecycleTarget}'. Allowed: ${allowedStr}` })
-    }
-
-    // Validate lifecycle value if provided
-    const validLifecycle: LifecycleState[] = ['discovered', 'parsed', 'indexed', 'related', 'error']
-    if (body.lifecycle && !validLifecycle.includes(body.lifecycle as LifecycleState)) {
-      return reply.status(400).send({ error: `Invalid lifecycle state '${body.lifecycle}'.` })
+      const allowed = allowedTransitions[currentArtifact.lifecycle]
+      throw new AppError(409, `Cannot transition from '${currentArtifact.lifecycle}' to '${lifecycleTarget}'`, { allowed })
     }
 
     const patchBody: PatchArtifactInput = {
@@ -96,16 +92,12 @@ export async function artifactRegistryRoutes(server: FastifyInstance) {
       metadata: typeof body.metadata === 'object' ? (body.metadata as Record<string, unknown>) : undefined,
     }
 
-    try {
-      // If setting lifecycle to parsed or error without an explicit message, set a default message
-      const updated = artifactRegistry.update(id, patchBody)
-      if (!updated) return reply.status(404).send({ error: 'Artifact not found' })
-
-      return reply.send({ data: updated, success: true })
-    } catch (error) {
-      server.log.error(error as Error)
-      return reply.status(500).send({ error: 'Failed to update artifact' })
+    const updated = artifactRegistry.update(id, patchBody)
+    if (!updated) {
+      throw new AppError(404, 'Artifact not found', { resourceId: id })
     }
+
+    return reply.send({ data: updated, success: true })
   })
 
   // =========================================================
@@ -115,19 +107,20 @@ export async function artifactRegistryRoutes(server: FastifyInstance) {
   server.post('/api/artifacts/registry/:id/reparse', async (request: FastifyRequest, reply: FastifyReply) => {
     const { id } = request.params as { id: string }
 
-    try {
-      const artifact = artifactRegistry.get(id)
-      if (!artifact) {
-        return reply.status(404).send({ error: 'Artifact not found' })
-      }
-
-      const updated = artifactRegistry.update(id, { lifecycle: 'discovered', metadata: { reparseRequestedAt: now(), originalLifecycle: artifact.lifecycle } })
-      if (!updated) return reply.status(404).send({ error: 'Artifact not found' })
-
-      return reply.send({ data: updated, success: true })
-    } catch (error) {
-      server.log.error(error as Error)
-      return reply.status(500).send({ error: 'Failed to re-parse artifact' })
+    if (!id) {
+      throw new AppError(400, 'Artifact ID is required', { param: 'id' })
     }
+
+    const artifact = artifactRegistry.get(id)
+    if (!artifact) {
+      throw new AppError(404, 'Artifact not found', { resourceId: id })
+    }
+
+    const updated = artifactRegistry.update(id, { lifecycle: 'discovered', metadata: { reparseRequestedAt: now(), originalLifecycle: artifact.lifecycle } })
+    if (!updated) {
+      throw new AppError(404, 'Artifact not found', { resourceId: id })
+    }
+
+    return reply.send({ data: updated, success: true })
   })
 }
