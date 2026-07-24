@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Button, Card, Container, Stack } from '@nexus-engineering/shared';
+import { Badge, Button, Card, Container, Stack } from '@nexus-engineering/shared';
 import { fetchAuditLogs, exportAuditLogs, type AuditLogEntry, type AuditLogFilter } from '../../api/client';
 
 const ACTIONS = [
@@ -27,17 +27,20 @@ const RESOURCE_TYPES = [
   { value: 'session', label: 'Session' },
 ] as const;
 
-const ACTION_COLORS: Record<string, string> = {
-  CREATE: 'bg-success-500/10 text-success-700 dark:text-success-300',
-  UPDATE: 'bg-primary-500/10 text-primary-700 dark:text-primary-300',
-  DELETE: 'bg-error-500/10 text-error-700 dark:text-error-300',
-  LOGIN: 'bg-info-500/10 text-info-700 dark:text-info-300',
-  LOGOUT: 'bg-neutral-500/10 text-neutral-700 dark:text-neutral-300',
-  EXPORT: 'bg-warning-500/10 text-warning-700 dark:text-warning-300',
-  READ: 'bg-secondary-500/10 text-secondary-700 dark:text-secondary-300',
-  ARCHIVE: 'bg-warning-500/10 text-warning-700 dark:text-warning-300',
-  RESTORE: 'bg-success-500/10 text-success-700 dark:text-success-300',
-};
+function actionBadgeVariant(action: string): string {
+  switch (action) {
+    case 'CREATE': return 'approved';
+    case 'UPDATE': return 'implemented';
+    case 'DELETE': return 'critical';
+    case 'LOGIN': return 'info';
+    case 'LOGOUT': return 'draft';
+    case 'EXPORT': return 'performance';
+    case 'READ': return 'verified';
+    case 'ARCHIVE': return 'partially-automated';
+    case 'RESTORE': return 'approved';
+    default: return 'draft';
+  }
+}
 
 function formatTimestamp(iso: string): string {
   const d = new Date(iso);
@@ -416,9 +419,9 @@ export function AuditLogViewer() {
                             {entry.userEmail}
                           </td>
                           <td className="p-3">
-                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${ACTION_COLORS[entry.action] ?? 'bg-neutral-400/10 text-neutral-600'}`}>
+                            <Badge variant={actionBadgeVariant(entry.action)}>
                               {entry.action}
-                            </span>
+                            </Badge>
                           </td>
                           <td className="hidden p-3 sm:table-cell">
                             <span className="text-text-secondary">{entry.resourceType}</span>

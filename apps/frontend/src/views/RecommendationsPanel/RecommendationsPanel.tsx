@@ -12,32 +12,29 @@ import {
   type CrossArtifactGap,
 } from '../../api/client';
 
-const SEVERITY_CONFIG: Record<RecommendationSeverity, { bg: string; text: string; ring: string; dot: string }> = {
-  critical: {
-    bg: 'bg-error-100 dark:bg-error-950',
-    text: 'text-error-700 dark:text-error-300',
-    ring: 'ring-error-300 dark:ring-error-800',
-    dot: 'bg-error-500 dark:bg-error-400',
-  },
-  high: {
-    bg: 'bg-warning-100 dark:bg-warning-950',
-    text: 'text-warning-700 dark:text-warning-300',
-    ring: 'ring-warning-300 dark:ring-warning-800',
-    dot: 'bg-warning-500 dark:bg-warning-400',
-  },
-  medium: {
-    bg: 'bg-info-100 dark:bg-info-950',
-    text: 'text-info-700 dark:text-info-300',
-    ring: 'ring-info-300 dark:ring-info-800',
-    dot: 'bg-info-500 dark:bg-info-400',
-  },
-  low: {
-    bg: 'bg-surface-tertiary dark:bg-surface-quaternary',
-    text: 'text-text-secondary dark:text-text-tertiary',
-    ring: 'ring-border dark:ring-border-dark',
-    dot: 'bg-text-tertiary dark:bg-text-quaternary',
-  },
+const SEVERITY_DOT: Record<RecommendationSeverity, string> = {
+  critical: 'bg-error-500 dark:bg-error-400',
+  high: 'bg-warning-500 dark:bg-warning-400',
+  medium: 'bg-info-500 dark:bg-info-400',
+  low: 'bg-text-tertiary dark:bg-text-quaternary',
 };
+
+function severityBadgeVariant(sev: RecommendationSeverity): string {
+  switch (sev) {
+    case 'critical': return 'critical';
+    case 'high': return 'high';
+    case 'medium': return 'info';
+    case 'low': return 'low';
+  }
+}
+
+function statusBadgeVariant(status: RecommendationStatus): string {
+  switch (status) {
+    case 'pending': return 'performance';
+    case 'accepted': return 'approved';
+    case 'dismissed': return 'draft';
+  }
+}
 
 const CATEGORY_LABEL: Record<RecommendationCategory, string> = {
   coverage: 'Coverage',
@@ -139,7 +136,6 @@ function RecommendationCard({
   onAccept: (id: string) => void;
   onDismiss: (id: string) => void;
 }) {
-  const sev = SEVERITY_CONFIG[rec.severity];
   const [actionPending, setActionPending] = useState<string | null>(null);
 
   const handleAccept = async () => {
@@ -160,11 +156,7 @@ function RecommendationCard({
     }
   };
 
-  const statusBg: string = rec.status === 'pending'
-    ? 'bg-warning-100 text-warning-700 dark:bg-warning-950 dark:text-warning-300'
-    : rec.status === 'accepted'
-      ? 'bg-success-100 text-success-700 dark:bg-success-950 dark:text-success-300'
-      : 'bg-surface-tertiary text-text-tertiary dark:bg-surface-quaternary dark:text-text-quaternary';
+  const statusBadge = statusBadgeVariant(rec.status);
 
   return (
     <Card
@@ -182,21 +174,17 @@ function RecommendationCard({
               {CATEGORY_ICON[rec.category]}
             </span>
             <div>
-              <span
-                className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ring-1 ${sev.bg} ${sev.text} ${sev.ring}`}
-              >
+              <Badge variant={severityBadgeVariant(rec.severity)}>
                 {formatSeverity(rec.severity)}
-              </span>
-              <span className="ml-2 inline-flex items-center rounded-md bg-surface-tertiary px-2 py-0.5 text-xs font-medium text-text-secondary dark:bg-surface-quaternary dark:text-text-tertiary">
+              </Badge>
+              <Badge variant="info" className="ml-2">
                 {formatCategory(rec.category)}
-              </span>
+              </Badge>
             </div>
           </div>
-          <span
-            className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${statusBg}`}
-          >
+          <Badge variant={statusBadge} className="shrink-0">
             {STATUS_LABEL[rec.status]}
-          </span>
+          </Badge>
         </div>
 
         {/* Score */}
@@ -253,7 +241,7 @@ function RecommendationCard({
               <span className="text-xs font-medium text-text-tertiary">FROM</span>
             </div>
             <div className="flex items-center gap-2 pl-6">
-              <div className={`h-2 w-2 rounded-full ${sev.dot}`} aria-hidden="true" />
+              <div className={`h-2 w-2 rounded-full ${SEVERITY_DOT[rec.severity]}`} aria-hidden="true" />
               <span className="text-sm text-text-primary">
                 {formatArtifactType(rec.sourceArtifact.type)}:{' '}
                 <span className="font-medium">{rec.sourceArtifact.title}</span>
@@ -548,7 +536,7 @@ function FilterChips({
             <span className={`inline-block h-2 w-2 rounded-full ${sev.color}`} aria-hidden="true" />
             {sev.label}
             {counts.severity > 0 && (
-              <Badge variant={sev.value === 'critical' ? 'critical' : sev.value === 'high' ? 'high' : sev.value === 'medium' ? 'medium' : 'low'}>{counts.severity}</Badge>
+              <Badge variant={sev.value === 'all' ? 'low' : severityBadgeVariant(sev.value as RecommendationSeverity)}>{counts.severity}</Badge>
             )}
           </button>
         ))}
@@ -696,10 +684,10 @@ export function RecommendationsPanel() {
 
   const severities = [
     { value: 'all' as FilterSeverity, label: 'All', color: 'bg-text-tertiary dark:bg-text-quaternary' },
-    ...Object.entries(SEVERITY_CONFIG).map(([key, config]) => ({
+    ...Object.entries(SEVERITY_DOT).map(([key, dotClass]) => ({
       value: key as FilterSeverity,
       label: formatSeverity(key as RecommendationSeverity),
-      color: config.dot,
+      color: dotClass,
     })),
   ];
 
