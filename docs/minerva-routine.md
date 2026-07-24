@@ -276,6 +276,43 @@ Recommendations include:
 - `potential_impact` — high/medium/low
 - `estimated_savings_ms` — Estimated time savings
 
+### 4.6 Success Rate KPI Compensation (THE-323/THE-325)
+
+**Problem:** The API-reported success rate includes in-flight runs in the denominator, distorting the true terminal success rate.
+
+**Example (Sprint 19 data):**
+| Metric | API Value | Notes |
+|--------|-----------|-------|
+| `success_rate` | 0.5177 (51.77%) | Includes in-flight runs |
+| `failure_rate` | 0.2578 (25.78%) | |
+| `total_runs` | 1924 | |
+| `succeeded` | 996 | |
+| `failed` | 496 | |
+| **In-flight** | **432** | Not terminal (running/queued) |
+
+**Mathematical inconsistency:** `succeeded + failed = 1492`, but `total_runs = 1924`. Delta (432) = non-terminal states.
+
+**Correct calculation (terminal-only):**
+```
+adjusted_success_rate = succeeded / (succeeded + failed)
+adjusted_success_rate = 996 / 1492 ≈ 66.76%
+```
+
+**When generating reports, ALWAYS include both:**
+1. **Raw rate** — `succeeded / total_runs` (API-reported, includes in-flight)
+2. **Adjusted rate** — `succeeded / (succeeded + failed)` (terminal-only, true success rate)
+
+**Report format:**
+```markdown
+| Metric | Raw (API) | Adjusted (Terminal-Only) | Notes |
+|--------|-----------|--------------------------|-------|
+| Success Rate | 51.77% | 66.76% | Adjusted excludes 432 in-flight runs |
+```
+
+**Frontend component:** `SuccessRateKPI.tsx` displays adjusted rate as primary value with tooltip explaining the adjustment.
+
+**Platform fix status:** Feature request filed (THE-323). Interim compensation applied at consumption point (Minerva reports + Nexus UI).
+
 ---
 
 ## 5. Post-Analysis Cleanup

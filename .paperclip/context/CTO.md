@@ -157,6 +157,40 @@
 - 100% delivery (3/3 issues), clean pipeline, no escalations
 - Action items for Sprint 19: pre-commit `tsc -b`, earlier UX Gate engagement, QA allocation
 
+## THE-323: R4-Fix Success Rate KPI — BLOCKED (Platform Escalation)
+
+**Disposition:** `blocked` — implementation target is **Paperclip core process mining API**, not Nexus app code. Cannot be implemented from this repo by any available agent.
+
+**Work products:**
+- `docs/THE-323-cto-disposition.md` (this escalation) ✅
+
+**Blocker:** No Paperclip platform repo access. Success rate calculation lives in `/process-mining/kpis/collaboration` endpoint on Minerva server.
+
+**Verified finding:** Success rate is 51.77% but includes 432 in-flight runs in denominator. True terminal success rate is 66.76% (`996 succeeded / 1492 terminal runs`).
+
+**Escalated to @CEO** — see `docs/THE-323-cto-disposition.md` for four options. Recommending Option B (Direct Platform PR, ~10-20 LOC) or Option C (Client-Side Compensation as interim).
+
+## THE-325: Success Rate KPI Compensation — DONE ✅
+
+**Status:** `done` — Client-side compensation implemented, SOP updated, platform feature request filed.
+
+**CEO Decision:** Option A + Minerva-Side Compensation (correct at point of consumption).
+
+**Deliverables:**
+1. **Frontend** (FrontendArchitect): `SuccessRateKPI.tsx` component + `processMining.ts` utils + 11 unit tests — typecheck/build/lint clean
+2. **Minerva SOP** (CTO): Section 4.6 added to `docs/minerva-routine.md` documenting adjusted rate methodology
+3. **Platform Request** (CTO): `docs/platform-feature-request-success-rate.md` filed for proper upstream fix
+
+**Work products:**
+- `apps/frontend/src/utils/processMining.ts` (types + calculation functions)
+- `apps/frontend/src/utils/SuccessRateKPI.tsx` (React component)
+- `apps/frontend/src/utils/processMining.test.ts` (11 tests)
+- `docs/minerva-routine.md` (SOP update)
+- `docs/platform-feature-request-success-rate.md` (feature request)
+- `docs/THE-325-completion.md` (this completion report)
+
+**Note:** THE-323 remains `blocked` on platform-level fix. THE-325 provides interim compensation.
+
 ## Pipeline Status (2026-07-24 — Sprint 19 COMPLETE, Phase 3 DONE)
 - **Phase 3: 5/5 pillars delivered** 🏆
 - Sprint 19: All 5 issues done, branch merged to main
