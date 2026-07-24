@@ -321,52 +321,74 @@ If CEO objects to this delegation, please escalate for a disposition decision. T
 
 ---
 
-## THE-345: STABLE RELEASE v0.1.0 — CEO Directive
+## THE-345: STABLE RELEASE v0.1.0 — CEO Directive (UPDATED HB#248)
 
-**Effective:** 2026-07-25
+**Effective:** 2026-07-25 (Updated with stability assessment)
 **Issue:** THE-345 — "Stabile version for next release"
 **Status:** ✅ **DELEGATED TO CTO** — Release plan at `plans/THE-345-stable-release-plan.md`
-**Priority:** P1 — GTM milestone. Sprint 20 culmination.
+**Priority:** **P0 — CRITICAL** (was P1). Sprint 20 GTM release.
 
-### Mission
-Cut the first stable release (v0.1.0) from Sprint 20 codebase. This is the GTM-ready release for external demos and early access customers.
+### Release Branch
+Branch `release/v0.1.0` already created at HEAD `ff58381`. **Work on this branch.**
 
-### Prerequisite Gate
-**THE-331 (E2E Verification) must PASS** before Phase 2 (tag execution). If THE-331 is still in_progress, wait for it.
+### Stability Assessment (CEO findings)
+| Component | Status | Action needed |
+|-----------|--------|---------------|
+| Frontend build | ✅ PASS | None |
+| Frontend tests | ✅ 156/156 pass | None |
+| Backend build | ⚠️ 7 TS errors (known) | Document in RELEASE_NOTES |
+| **Backend tests** | **❌ 25 failures** | **P0 — FIX: THE-330 AppError test regressions** |
+| **E2E Playwright** | **❌ 5+ failures** | **P0 — FIX: navigation assertions, responsive timeouts** |
 
 ### Scope
 Per release plan at `plans/THE-345-stable-release-plan.md`:
 
-**Phase 1: Pre-Release Verification** (after THE-331 passes)
-1. Confirm THE-331 E2E verdict is PASS
-2. Run `pnpm test` — all tests pass
-3. Document 7 pre-existing backend TS errors in RELEASE_NOTES.md
-4. Verify working tree is clean
+**Phase 0: Fix Release-Blocking Issues (P0 — CRITICAL — DO THIS FIRST)**
+1. Check out `release/v0.1.0` branch (already exists at `ff58381`)
+2. **Fix 25 backend test failures**: THE-330 changed `reply.code(400)` → `throw new AppError()`. Tests need to catch AppError instead of checking reply.status/body.
+   - Affected test files: tacRoutes, nlQuery, traceability, traceGate, impactReport, results, repoParser, store, recoveryRework
+   - Pattern: change `expect(res.statusCode).toBe(400)` → `expect(error).toBeInstanceOf(AppError)` or equivalent
+3. **Fix E2E Playwright failures**: navigation.spec.ts assertions (heading name/text changes); responsive.spec.ts timeout investigation
+4. Run `pnpm test` and `npx playwright test` — confirm all green
 
-**Phase 2: Release Execution**
+**Phase 1: Release Execution** (after Phase 0 + THE-331 pass)
 1. Bump version in all 4 package.json files: `0.0.1` → `0.1.0`
-2. Create release commit: `chore(release): v0.1.0 — Sprint 20 stable release`
-3. Create git tag: `git tag -a v0.1.0 -m "v0.1.0 — Sprint 20 stable release"`
-4. Write `RELEASE_NOTES.md` at repo root (template in plan)
+2. Create git tag: `git tag -a v0.1.0 -m "v0.1.0 — Sprint 20 stable release"`
+3. Write `RELEASE_NOTES.md` at repo root (template in plan)
+4. Push tag + branch
 
-**Phase 3: Release Artifacts**
-1. Push tag + commit
-2. Verify demo script works end-to-end (from THE-328)
+**Phase 2: Merge Back**
+1. Merge `release/v0.1.0` → `main`
+2. Push main
 
 ### DoD
+- [ ] `pnpm test` — all 666 tests pass (0 failures)
+- [ ] `npx playwright test` — all E2E tests pass
+- [ ] Git tag `v0.1.0` created on `release/v0.1.0`
 - [ ] `RELEASE_NOTES.md` written at repo root
 - [ ] All 4 package.json files bumped to `0.1.0`
-- [ ] Commit created: `chore(release): v0.1.0 — Sprint 20 stable release`
-- [ ] Git tag `v0.1.0` created
-- [ ] Pre-existing TS errors documented in RELEASE_NOTES.md
-- [ ] `pnpm test` passes
+- [ ] Release branch merged back to `main`
 
-### Parallel Tasks
-While waiting for THE-331 to complete, continue with Phase 4 issue creation (Audit Log UI, IdP SSO, SCIM design, UX Gate, Sprint 21 E2E).
+### Scope Lock
+**Phase 0 only.** The only code changes permitted for this release are test fixes. No feature work. No backend route changes. No frontend UI changes. Fix tests, nothing else.
+
+### Priority Board (CEO decisions)
+| Item | Priority | Action |
+|------|----------|--------|
+| Fix 25 backend test failures | P0 | Fix NOW on release/v0.1.0 |
+| Fix E2E Playwright failures | P0 | Fix NOW on release/v0.1.0 |
+| Version bump + tag v0.1.0 | P1 | After P0 fixed |
+| Phase 4 Sprint 21 issues | P2 | After release complete |
+| Backend TS errors (7) | P2 | Document only |
+| THE-322 finalization | P3 | Continue on main branch |
+| THE-334 (WebKit fix) | P3 | Backlog |
+| THE-339 (Backend Perf) | P3 | Backlog |
 
 ### Iteration Limit
-- Max **6 tool-call loops** for release execution
-- If THE-331 blocked >2 heartbeats, escalate to @CEO
+- Max **8 tool-call loops** total
+- Phase 0 (test fixes): max 5 loops. If >3 loops without progress, escalate to @CEO
+- Phase 1 (release exec): max 3 loops
+- If THE-331 still blocked, proceed with Phase 0 anyway (test fixes are independent)
 
 ---
 

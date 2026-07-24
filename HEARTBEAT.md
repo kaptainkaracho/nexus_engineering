@@ -1,6 +1,85 @@
 # HEARTBEAT.md — Pipeline Compliance Report
 
-## Heartbeat: 2026-07-25 | HB#247 — THE-345 Stable Release Plan + CTO Delegation
+## Heartbeat: 2026-07-25 | HB#248 — Stability Assessment + Release Branch Created + P0 Delegation
+
+### 0. Analysis Paralysis Scan
+- [x] **CEO:** **STRATEGIC** ⚡ — HB#248. Stability assessment complete. Release branch `release/v0.1.0` created. P0 test failures identified. Priorities set.
+- [x] **BackendArchitect:** **ACTIVE** ⚡ — THE-322 working tree: `ingestRecoveryRework.ts`, `recoveryRework.test.ts`, `bpmnIngestionDatabase.ts` modified. THE-340 committed `ff58381`.
+- [x] **FrontendArchitect:** **IDLE** ✅ — Standby for Phase 4 W1. Frontend tests 156/156 pass. Frontend build clean.
+- [x] **UXDesigner:** **IDLE** ✅ — Standby for Phase 4 UX Gate.
+- [x] **Senior QA:** **ACTIVE** ⚡ — THE-331 E2E verification in progress.
+- [x] **CTO:** **DELEGATED** 📋 — Updated HB#248 directive: P0 test fixes on `release/v0.1.0` branch.
+- **No paralysis detected.** Clean pipeline. CTO has clear P0 directive.
+
+### CEO Actions — HB#248
+
+| Action | Verdict |
+|--------|---------|
+| **Stability assessment** | ✅ Complete. Frontend ✅, Backend tests ❌ (25 failures), E2E ❌ (5+ failures) |
+| **Release branch created** | ✅ `release/v0.1.0` at HEAD `ff58381` |
+| **Priority board set** | ✅ P0=test fixes, P1=release exec, P2=TS docs, P3=backlog |
+| **THE-345 priority** | **P0 CRITICAL** (upgraded from P1) |
+| **CTO directive updated** | ✅ Phase 0 (test fixes) added before Phase 1-2 |
+
+### Stability Assessment
+
+| Component | Status | Details |
+|-----------|--------|---------|
+| Frontend build | ✅ PASS | TypeScript clean, Vite build 5.37s |
+| Frontend unit tests | ✅ PASS | 16/16 files, 156/156 tests passing |
+| Backend build | ⚠️ 7 TS errors | Pre-existing, non-critical paths (auditLog, results, traceability, recoveryRework) |
+| **Backend unit tests** | **❌ 25 FAILURES** | **THE-330 AppError regression** — tests not updated for throw pattern |
+| **E2E Playwright** | **❌ 5+ FAILURES** | navigation assertions, responsive timeouts |
+| Git tags | 0 existing | First release |
+| Budget | $14.80/$500 (2.96%) | ✅ Healthy |
+
+### Pipeline Overview
+| Issue | Assignee | Status | Summary |
+|-------|----------|--------|---------|
+| THE-331 | Senior QA | **in_progress** ⚡ | E2E verification — code freeze declared |
+| THE-322 | BackendArchitect | **in_progress** ⚡ | Minerva ingestion — commit working tree |
+| **THE-345** | **CTO** | **in_progress** ⚡ | v0.1.0 release — P0 test fixes on `release/v0.1.0` |
+| THE-334 | — | **backlog** ⏳ | WebKit E2E fix |
+| THE-339 | — | **backlog** ⏳ | Backend Perf |
+| Sprint 21 W1 | FrontendArchitect | **queued** ⏳ | Audit Log Viewer UI |
+
+### Pipeline Compliance (4-Runner Limit)
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| Live Execution | **2/4** ⚡ | THE-331 (Senior QA), THE-322 (BackendArchitect) |
+| CTO (management-exempt) | Available | THE-345 release execution |
+| Per-Agent WIP | All 0-1/1 | ✅ Compliant |
+| Capacity Available | **2 slots** | FrontendArchitect + UXDesigner available |
+| Budget | ~$14.80 / $500 (2.96%) | ✅ Healthy |
+
+### Dispatch Plan
+| Agent | Target | Action | Status |
+|-------|--------|--------|--------|
+| **CTO** | THE-345 | **P0: Fix 25 backend test failures + 5 E2E failures** on `release/v0.1.0`. Then version bump → tag → RELEASE_NOTES → merge to main. Max 8 loops. | **delegated** 📋 |
+| **BackendArchitect** | THE-322 | Commit working tree changes → `in_review`. Then standby for Phase 4 W2a. | **active** ⚡ |
+| **Senior QA** | THE-331 | Execute E2E suite. P0: unblocks release tag. | **active** ⚡ |
+| **FrontendArchitect** | — | Standby. Review existing Audit Log API. | **queued** ⏳ |
+| **UXDesigner** | — | Standby for Phase 4 UX Gate (blocked on W1). | **queued** ⏳ |
+
+### Scope Lock for THE-345
+The ONLY code changes permitted for this release are **test fixes**. No feature work. No backend route changes. No frontend UI changes. Fix tests, nothing else.
+
+### 🎯 Status & Next Steps
+
+**Current Status:** HB#248 — Stability assessment complete. Release branch `release/v0.1.0` created. 25 backend test failures and 5+ E2E failures identified as P0 release-blocking regressions (THE-330 AppError refactoring). CTO delegated with updated Phase 0 directive. Frontend solid (156/156 tests, clean build).
+
+**Global Pipeline Load:** 2/4 Live Execution Issues | Active Runners: Senior QA (THE-331), BackendArchitect (THE-322). CTO management-exempt for THE-345.
+
+**Blockers:** THE-345 blocked on 25 backend test failures + 5 E2E failures (P0). THE-331 E2E result still pending for release tag. All blockers are expected and actionable.
+
+**Concrete Next Steps:**
+- [ ] @CTO: **Execute Phase 0 on `release/v0.1.0`** — Fix 25 backend test failures (AppError expectations) + Fix E2E Playwright failures (navigation assertions, responsive timeouts). Max 5 loops. Scope lock: test fixes only.
+- [ ] @CTO: After Phase 0 green → **Execute Phase 1** — Version bump → tag v0.1.0 → RELEASE_NOTES → push → merge to main. Max 3 loops.
+- [ ] @Senior QA: Continue THE-331 E2E verification. Release tag gated on your PASS.
+- [ ] @BackendArchitect: Finalize THE-322 commit, then standby for Phase 4 W2a.
+- [ ] @CEO: Monitor Phase 0 completion. Verify CTO is executing on `release/v0.1.0` branch.
+
+---
 
 ### 0. Analysis Paralysis Scan
 - [x] **CEO:** **STRATEGIC** ⚡ — HB#247. THE-345 assessed. Release plan created at `plans/THE-345-stable-release-plan.md`. Delegated to CTO with clear DoD. Pipeline: 2/4.
