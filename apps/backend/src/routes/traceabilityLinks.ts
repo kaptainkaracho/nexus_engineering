@@ -1,149 +1,112 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import type { TraceLink } from '@nexus-engineering/shared'
 import { traceLinkRepository } from '../traceabilityLinks/repository'
+import { AppError } from '../lib/errorHandler'
 
 export async function listTraceLinks (_: FastifyRequest, reply: FastifyReply) {
-  try {
-    const traceLinks = await traceLinkRepository.listTraceLinks()
-    return reply.send({
-      traceLinks,
-      total: traceLinks.length
-    })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to list traceability links' })
-  }
+  const traceLinks = await traceLinkRepository.listTraceLinks()
+  return reply.send({
+    traceLinks,
+    total: traceLinks.length
+  })
 }
 
 export async function getTraceLink (request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { id } = request.params as { id: string }
+  const { id } = request.params as { id: string }
 
-    if (!id) {
-      return reply.status(400).send({ error: 'Trace link ID is required' })
-    }
-
-    const traceLink = await traceLinkRepository.getTraceLink(id)
-    
-    if (!traceLink) {
-      return reply.status(404).send({ error: 'Traceability link not found' })
-    }
-
-    return reply.send(traceLink)
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to get traceability link' })
+  if (!id) {
+    throw new AppError(400, 'Trace link ID is required', { param: 'id' })
   }
+
+  const traceLink = await traceLinkRepository.getTraceLink(id)
+  if (!traceLink) {
+    throw new AppError(404, 'Traceability link not found', { resourceId: id })
+  }
+
+  return reply.send(traceLink)
 }
 
 export async function createTraceLink (request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const traceLink = request.body as TraceLink
+  const traceLink = request.body as TraceLink
 
   if (!traceLink.sourceId || !traceLink.sourceType || !traceLink.targetId || !traceLink.targetType || !traceLink.relationshipType || traceLink.confidence === undefined) {
-    return reply.status(400).send({ error: 'Source ID, source type, target ID, target type, relationship type and confidence are required' })
-  }
-
-    const createdTraceLink = await traceLinkRepository.createTraceLink({
-      ...traceLink,
-      id: '', // Will be generated
-      version: '1.0',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+    throw new AppError(400, 'Source ID, source type, target ID, target type, relationship type and confidence are required', {
+      param: 'sourceId, sourceType, targetId, targetType, relationshipType, confidence'
     })
-
-    return reply.status(201).send(createdTraceLink)
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to create traceability link' })
   }
+
+  const createdTraceLink = await traceLinkRepository.createTraceLink({
+    ...traceLink,
+    id: '', // Will be generated
+    version: '1.0',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  })
+
+  return reply.status(201).send(createdTraceLink)
 }
 
 export async function updateTraceLink (request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { id } = request.params as { id: string }
-    const updates = request.body as Partial<TraceLink>
+  const { id } = request.params as { id: string }
+  const updates = request.body as Partial<TraceLink>
 
-    if (!id) {
-      return reply.status(400).send({ error: 'Trace link ID is required' })
-    }
-
-    const updatedTraceLink = await traceLinkRepository.updateTraceLink(id, updates)
-    
-    if (!updatedTraceLink) {
-      return reply.status(404).send({ error: 'Traceability link not found' })
-    }
-
-    return reply.send(updatedTraceLink)
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to update traceability link' })
+  if (!id) {
+    throw new AppError(400, 'Trace link ID is required', { param: 'id' })
   }
+
+  const updatedTraceLink = await traceLinkRepository.updateTraceLink(id, updates)
+  if (!updatedTraceLink) {
+    throw new AppError(404, 'Traceability link not found', { resourceId: id })
+  }
+
+  return reply.send(updatedTraceLink)
 }
 
 export async function deleteTraceLink (request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { id } = request.params as { id: string }
+  const { id } = request.params as { id: string }
 
-    if (!id) {
-      return reply.status(400).send({ error: 'Trace link ID is required' })
-    }
-
-    const success = await traceLinkRepository.deleteTraceLink(id)
-    
-    if (!success) {
-      return reply.status(404).send({ error: 'Traceability link not found' })
-    }
-
-    return reply.send({ message: `Traceability link ${id} deleted successfully` })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to delete traceability link' })
+  if (!id) {
+    throw new AppError(400, 'Trace link ID is required', { param: 'id' })
   }
+
+  const success = await traceLinkRepository.deleteTraceLink(id)
+  if (!success) {
+    throw new AppError(404, 'Traceability link not found', { resourceId: id })
+  }
+
+  return reply.send({ message: `Traceability link ${id} deleted successfully` })
 }
 
 export async function getTraceLinksBySource (request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { sourceType, sourceId } = request.params as { sourceType: string; sourceId: string }
+  const { sourceType, sourceId } = request.params as { sourceType: string; sourceId: string }
 
-    if (!sourceType || !sourceId) {
-      return reply.status(400).send({ error: 'Source type and ID are required' })
-    }
-
-    const traceLinks = await traceLinkRepository.getTraceLinksBySource(sourceType, sourceId)
-    
-    return reply.send({
-      traceLinks,
-      sourceType,
-      sourceId,
-      total: traceLinks.length
-    })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to filter traceability links by source' })
+  if (!sourceType || !sourceId) {
+    throw new AppError(400, 'Source type and ID are required', { param: 'sourceType, sourceId' })
   }
+
+  const traceLinks = await traceLinkRepository.getTraceLinksBySource(sourceType, sourceId)
+  return reply.send({
+    traceLinks,
+    sourceType,
+    sourceId,
+    total: traceLinks.length
+  })
 }
 
 export async function getTraceLinksByTarget (request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { targetType, targetId } = request.params as { targetType: string; targetId: string }
+  const { targetType, targetId } = request.params as { targetType: string; targetId: string }
 
-    if (!targetType || !targetId) {
-      return reply.status(400).send({ error: 'Target type and ID are required' })
-    }
-
-    const traceLinks = await traceLinkRepository.getTraceLinksByTarget(targetType, targetId)
-
-    return reply.send({
-      traceLinks,
-      targetType,
-      targetId,
-      total: traceLinks.length
-    })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to filter traceability links by target' })
+  if (!targetType || !targetId) {
+    throw new AppError(400, 'Target type and ID are required', { param: 'targetType, targetId' })
   }
+
+  const traceLinks = await traceLinkRepository.getTraceLinksByTarget(targetType, targetId)
+  return reply.send({
+    traceLinks,
+    targetType,
+    targetId,
+    total: traceLinks.length
+  })
 }
 
 export function traceabilityLinksRoutes (server: FastifyInstance) {
