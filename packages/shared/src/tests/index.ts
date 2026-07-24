@@ -1,3 +1,4 @@
+export { TestLoader, ValidatedTestLoader, testLoader, validatedTestLoader } from './loader';
 export { testDocSchema } from './schema';
 export { validateTestTraceLinks, validateTestDocument } from './validator';
 

@@ -307,6 +307,157 @@ Record analysis execution:
 - Any issues encountered
 - Quality score result
 
+### 5.5 Recommendation-to-Issue Pipeline
+
+Jede Recommendation aus dem Report MUSS als eigenes Issue im Backlog dokumentiert werden, damit Erkenntnisse nicht verpuffen.
+
+#### 5.5.1 Issues Erstellen
+
+Für jede Recommendation (R1, R2, ...) ein child issue anlegen:
+
+```bash
+curl -s -X POST \
+  -H "Authorization: Bearer ${API_KEY}" \
+  -H "Content-Type: application/json" \
+  "http://127.0.0.1:3100/api/issues" \
+  -d '{
+    "projectId": "<PROJEKT_ID>",
+    "title": "<Titel der Recommendation>",
+    "description": "**Finding:** ...\n**Action:** ...\n**Expected Impact:** ...\n**Source:** Sprint <N> Minerva Report",
+    "parentId": "<ID_des_Routine_Issues>",
+    "status": "backlog",
+    "assigneeAgentId": "<AGENT_ID_laut_Recommendation>",
+    "priority": "<high/medium/low>"
+  }'
+# Expected: 201 Created mit Issue-ID
+```
+
+**Pflichtfelder:**
+| Feld | Wert |
+|------|------|
+| `projectId` | Aus dem Routine-Kontext (gleiches Projekt wie das Routine-Issue) |
+| `title` | Prägnanter Titel (z.B. "Filter Infrastructure Noise from Process Mining") |
+| `description` | Finding + Action + Impact aus dem Report |
+| `parentId` | ID des aktuellen Routine-Issues (damit Nachverfolgung möglich) |
+| `status` | `backlog` |
+| `assigneeAgentId` | UUID des verantwortlichen Agenten (laut Recommendation: CTO, CEO, etc.) |
+| `priority` | Aus dem Report (high/medium/low) |
+
+#### 5.5.2 Report mit Issue-Referenzen Aktualisieren
+
+Nach der Issue-Erstellung den Report aktualisieren:
+
+```markdown
+| Recommendation | Issue | Assignee | Status |
+|---------------|-------|----------|--------|
+| R1: ... | [THE-XXX] | @CTO | backlog |
+| R2: ... | [THE-YYY] | @CEO | backlog |
+```
+
+#### 5.5.3 CEO-Delegation Einleiten
+
+Nach der Issue-Erstellung das Routine-Issue an den CEO reassignen:
+
+```bash
+curl -s -X PATCH \
+  -H "Authorization: Bearer ${API_KEY}" \
+  -H "Content-Type: application/json" \
+  "http://127.0.0.1:3100/api/issues/<ROUTINE_ISSUE_ID>" \
+  -d '{
+    "assigneeAgentId": "<CEO_AGENT_ID>"
+  }'
+```
+
+Dann Kommentar posten (Achtung: das erzeugt einen neuen Kommentar, aber das Issue ist `in_progress`, kein `done`, daher kein Reopen-Problem):
+
+> **Recommendation-to-Issue Pipeline abgeschlossen.**
+>
+> N child issues mit `status: backlog` erstellt und mit dem Routine-Issue verknüpft:
+> - [THE-XXX](<url>) – Titel Recommendation 1
+> - [THE-YYY](<url>) – Titel Recommendation 2
+>
+> @CEO Bitte reviewen, priorisieren und delegieren. Setze dazu die Issues auf `status: todo` und weise sie den entsprechenden Agenten zu. Erst danach dieses Issue auf `done` setzen.
+
+#### 5.5.4 Abschluss durch CEO
+
+CEO prüft die Backlog-Issues:
+1. **Reviewen** – Ist die Recommendation valide?
+2. **Priorisieren** – `status` von `backlog` auf `todo` setzen
+3. **Delegieren** – `assignee` bestätigen/nachbessern
+4. **Routine-Issue schließen** – via PATCH ohne Kommentar (verhindert Reopen-Loop)
+
+```bash
+curl -s -X PATCH \
+  -H "Authorization: Bearer ${API_KEY}" \
+  -H "Content-Type: application/json" \
+  "http://127.0.0.1:3100/api/issues/<ROUTINE_ISSUE_ID>" \
+  -d '{
+    "status": "done",
+    "completedAt": "<ISO_TIMESTAMP>"
+  }'
+```
+
+---
+
+## 6. Routine Maintenance & Sustainability
+
+This section documents how to keep the Minerva routine itself healthy and sustainable.
+
+### 6.1 Routine Configuration Audit
+
+Every 3 sprints (or when routine behavior changes), verify:
+
+| Check | Expected | How to Verify |
+|-------|----------|---------------|
+| **Cron Schedule** | `0 16 * * 5` (Fri 16:00 UTC) | Fetch routine: `GET /api/routines/{id}` → check `originKind` is not `manual` |
+| **Concurrency Policy** | `coalesce_if_active` | Same endpoint → prevents duplicate runs |
+| **Catch-up Policy** | `skip_missed` | Same endpoint → skips missed triggers |
+| **Assignee** | Minerva agent | Same endpoint → `assigneeAgentId` matches Minerva |
+| **Run History** | Last run completed | `GET /api/routines/{id}/runs` → check last run `status` |
+
+If cron schedule is missing (routine shows `originKind: manual`):
+1. Create CTO issue to configure schedule via routine triggers API
+2. Update routine description to reflect actual schedule state
+
+### 6.2 Issue Output Audit
+
+Each routine execution creates a new issue. After each sprint, verify:
+
+| Check | Action if Failing |
+|-------|-------------------|
+| Issue was created | Check routine ran successfully |
+| All recommendations turned into child issues | Siehe Section 5.5 — jede Recommendation braucht ein child issue im Backlog |
+| CEO has reviewed and delegated | Issue bleibt `in_progress` bis CEO Delegation bestätigt |
+| Issue is properly closed | Close with `PATCH /api/issues/{id}` → `status: done, completedAt: <now>` |
+| Issue has no stale reopen loops | **Do not post closing comments** — they trigger `issue_reopened_via_comment`. Close via PATCH only. |
+
+**Known limitation:** Posting a comment on a `done` issue triggers automatic reopen. Always close via API PATCH without a follow-up comment.
+
+### 6.3 Self-Analysis Methodology (How This Routine Was Audited)
+
+When auditing the routine itself:
+
+1. **Fetch routine config:** `GET /api/routines/{id}` → check status, assignee, policies
+2. **Check run history:** `GET /api/routines/{id}/runs` → verify last runs completed
+3. **Compare description to reality:** Does the described trigger match actual configuration?
+4. **Check revisions:** `GET /api/routines/{id}/revisions` → verify latest revision is correct
+5. **Verify SOP references:** Does the routine description point to the correct SOP file?
+6. **Create backlog issues for problems found as child issues of the analysis issue**
+
+### 6.4 Sustainability Checklist
+
+Before closing any routine analysis issue:
+
+- [ ] Routine configuration verified (schedule, concurrency, assignee)
+- [ ] Run history checked (last run completed successfully)
+- [ ] Report generated and archived in `reports/`
+- [ ] Recommendation-to-Issue Pipeline abgeschlossen (Section 5.5):
+  - [ ] Alle Recommendations als child issues mit `status: backlog` erstellt
+  - [ ] Report mit Issue-Referenzen aktualisiert
+  - [ ] CEO zur Delegation zugewiesen (assigneeAgentId = CEO)
+- [ ] CEO hat delegiert: Issues von `backlog` auf `todo` gesetzt, Agenten zugewiesen
+- [ ] Routine geschlossen via PATCH ohne follow-up comments (verhindert reopen loop)
+
 ---
 
 ## Appendix: API Authentication

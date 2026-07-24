@@ -109,21 +109,20 @@ Wave 3 [1 RUNNER]:
 
 ---
 
-## Current Status (2026-07-20 13:02 UTC)
+## Current Status (2026-07-20 ~14:00 UTC)
 
 **Wave 1 — COMPLETE** ✅
 - THE-288 (Coverage Gap Analyzer + API) — **done** ✅ by BackendArchitect
-- THE-289 (Recommendations Panel UI) — **committed** ✅ by FrontendArchitect, **in_review** 🔍
+- THE-289 (Recommendations Panel UI) — **committed** ✅ by FrontendArchitect
 
-**Wave 2 — ACTIVE** 🔄
-- THE-289 UX Gate — @UXDesigner reviewing
+**Wave 2 — BYPASSED** 🚫
+- THE-289 UX Gate — @UXDesigner stalled 59+ min with zero output. **Bypassed per sprint guardrail** (>5 min → proceed without gate).
 
-**Wave 3 — QUEUED** 🗄️
-- FrontendArchitect polish + integration — awaiting UX Gate results
-- **CAUTION:** FrontendArchitect hit context overflow (71590 > 65536 tokens) after THE-289 commit. Wave 3 work may need to be decomposed into smaller atomic tasks or routed to CTO.
+**Wave 3 — ACTIVATED** 🆕
+- Polish + Integration — delegated to @CTO for execution
+- **Decision:** Route to CTO (not FrontendArchitect) because FrontendArchitect hit context overflow after THE-289 commit. CTO to assess and either execute directly or decompose into atomic tasks.
 
 ## Next Steps
 
-1. [ ] @UXDesigner: Complete THE-289 UX Gate review (max 3 loops)
-2. [ ] @CEO: After UX Gate → decide Wave 3 routing (FrontendArchitect with smaller tasks vs. CTO)
-3. [ ] @CEO: Close Sprint 16 after Wave 3 delivers
+1. [ ] @CTO: Execute Wave 3 — Polish + Integration of THE-289 (Recommendations Panel + Gap Visualization UI). Verify end-to-end flow with THE-288 backend API. Max 8 loops. If blocked >2 loops, escalate to @CEO.
+2. [ ] @CEO: Monitor Wave 3 progress; close Sprint 16 on delivery.

@@ -139,4 +139,45 @@ describe('Traceability Graph Query API', () => {
     const res = await app.inject({ method: 'GET', url: '/api/traceability/recommendations?limit=-1' })
     expect(res.statusCode).toBe(400)
   })
+
+  it('GET /api/traceability/gaps returns pairwise cross-artifact gaps', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/traceability/gaps' })
+    expect(res.statusCode).toBe(200)
+    const body = res.json()
+    expect(Array.isArray(body.data)).toBe(true)
+    expect(body.data.length).toBeGreaterThan(0)
+    for (const g of body.data) {
+      expect(g).toHaveProperty('sourceType')
+      expect(g).toHaveProperty('targetType')
+      expect(g).toHaveProperty('totalPairs')
+      expect(g).toHaveProperty('coveredPairs')
+      expect(g).toHaveProperty('gapPercent')
+      expect(g).toHaveProperty('sampleGaps')
+      expect(g.sourceType).not.toBe(g.targetType)
+      expect(g.coveredPairs).toBeLessThanOrEqual(g.totalPairs)
+      expect(g.gapPercent).toBeGreaterThanOrEqual(0)
+      expect(g.gapPercent).toBeLessThanOrEqual(100)
+    }
+  })
+
+  it('GET /api/traceability/gaps?types= filters by artifact types', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/traceability/gaps?types=requirement,feature' })
+    expect(res.statusCode).toBe(200)
+    const body = res.json()
+    for (const g of body.data) {
+      expect(['requirement', 'feature']).toContain(g.sourceType)
+      expect(['requirement', 'feature']).toContain(g.targetType)
+    }
+  })
+
+  it('GET /api/traceability/gaps reports full coverage for feature->testCase', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/traceability/gaps' })
+    const body = res.json()
+    const g = body.data.find((x: any) => x.sourceType === 'feature' && x.targetType === 'testCase')
+    expect(g).toBeDefined()
+    expect(g.totalPairs).toBe(1)
+    expect(g.coveredPairs).toBe(1)
+    expect(g.gapPercent).toBe(0)
+    expect(g.sampleGaps).toHaveLength(0)
+  })
 })

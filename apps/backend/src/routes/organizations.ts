@@ -508,6 +508,9 @@ function registerOrgRoutes(server: FastifyInstance, prefix: string) {
   server.get(`${prefix}/:orgId/teams`, { preHandler: [authenticate] }, listTeams)
   server.post(`${prefix}/:orgId/teams`, { preHandler: [authenticate, requireOrgRole('org:admin')] }, createTeam)
 
+}
+
+function registerTeamRoutes(server: FastifyInstance) {
   // Teams (direct access)
   server.get(`/api/teams/:id`, { preHandler: [authenticate] }, getTeam)
   server.put(`/api/teams/:id`, { preHandler: [authenticate, requireOrgRole('org:admin')] }, updateTeam)
@@ -523,4 +526,5 @@ function registerOrgRoutes(server: FastifyInstance, prefix: string) {
 export function organizationsRoutes(server: FastifyInstance) {
   registerOrgRoutes(server, '/api/organizations')
   registerOrgRoutes(server, '/api/orgs')
+  registerTeamRoutes(server)
 }
