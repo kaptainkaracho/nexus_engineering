@@ -418,7 +418,7 @@ Per HB#244 board approval, Phase 4 execution begins. Strategy at `plans/phase-4-
 | **THE-330 dependencies resolved** | **UNBLOCKED** ✅ — THE-326 (in_review), THE-327 (done), THE-328 (done). Work complete. |
 | **Working tree audit** | **UNCOMMITTED CHANGES FOUND** ⚠️ — 8 backend route files (AppError route hardening residuals), 6 frontend files (THE-338/326 residuals). Separate per issue and commit. |
 | **THE-338 disposition** | **DONE** ✅ — Bundle splitting committed per HB#242. |
-| **THE-339 activation** | **PENDING** ⏳ — CTO needs to execute backend perf optimization. |
+| **THE-339 activation** | **DONE** ✅ — Backend perf optimization committed: TTL cache layer, composite indexes, BFS/recommendation caching. |
 
 ### Pipeline Overview
 | Issue | Assignee | Status | Summary |
@@ -430,7 +430,7 @@ Per HB#244 board approval, Phase 4 execution begins. Strategy at `plans/phase-4-
 | THE-330 | CTO | **in_review** 🏁 | S20-W3: Bug Fixes — **18/18 routes hardened**, moved to in_review by CTO |
 | THE-331 | Senior QA | **blocked** 🔒 | S20-W5: E2E Verification |
 | THE-338 | FrontendArchitect | **done** ✅ | S20-W4a: Frontend Perf — bundle splitting |
-| THE-339 | BackendArchitect | **backlog** ⏳ | S20-W4b: Backend Perf — reassigned from QA→BA by CTO |
+| THE-339 | BackendArchitect | **done** ✅ | S20-W4b: Backend Perf — TTL cache, composite indexes, BFS/recommendation caching |
 | THE-322 | BackendArchitect | **todo** | R3: Classify Recovery/Rework Events |
 | THE-334 | BackendArchitect | **todo** | Fix WebKit E2E browser |
 
