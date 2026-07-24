@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import fastify from 'fastify'
 import { nlQueryRoutes } from './nlQuery'
+import { registerErrorHandler } from '../lib/errorHandler'
 import { getGraphDatabase } from '../graphBuilder/graphDatabase'
 
 describe('NL Query API (THE-293)', () => {
@@ -26,6 +27,7 @@ describe('NL Query API (THE-293)', () => {
     db.upsertEdge({ sourceId: 'login.ts', targetId: 'auth-feat-1', relationshipType: 'implements', confidence: 'high' })
 
     app = fastify()
+    registerErrorHandler(app)
     nlQueryRoutes(app)
     await app.ready()
   })
@@ -40,14 +42,13 @@ describe('NL Query API (THE-293)', () => {
   it('rejects an empty query with 400', async () => {
     const res = await postQuery('   ')
     expect(res.statusCode).toBe(400)
-    expect(res.json().success).toBe(false)
     expect(res.json().error).toMatch(/required/i)
   })
 
   it('rejects a missing/non-string query body', async () => {
     const res = await app.inject({ method: 'POST', url: '/api/traceability/query', payload: {} })
     expect(res.statusCode).toBe(400)
-    expect(res.json().success).toBe(false)
+    expect(res.json().code).toBe('BAD_REQUEST')
   })
 
   it('returns untested requirements in a module', async () => {

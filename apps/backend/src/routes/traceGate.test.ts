@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import fastify from 'fastify'
+import { registerErrorHandler } from '../lib/errorHandler'
 import { traceabilityRoutes } from './traceability'
 import { getGraphDatabase } from '../graphBuilder/graphDatabase'
 
@@ -17,6 +18,7 @@ describe('Trace Gate API', () => {
     db.upsertEdge({ sourceId: 'gate-f1', targetId: 'gate-t1', relationshipType: 'verifies', confidence: 'high' })
 
     app = fastify()
+    registerErrorHandler(app)
     traceabilityRoutes(app)
     await app.ready()
   })
@@ -86,8 +88,9 @@ describe('Trace Gate API', () => {
     })
     expect(res.statusCode).toBe(400)
     const body = res.json()
-    expect(Array.isArray(body.errors)).toBe(true)
-    expect(body.errors.length).toBeGreaterThan(0)
+    expect(body.details).toBeDefined()
+    expect(Array.isArray(body.details.errors)).toBe(true)
+    expect(body.details.errors.length).toBeGreaterThan(0)
   })
 
   it('PUT /api/traceability/gate-config rejects a bad mode with 400', async () => {

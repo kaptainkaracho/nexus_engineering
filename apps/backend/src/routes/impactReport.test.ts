@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import fastify from 'fastify'
 
+import { registerErrorHandler } from '../lib/errorHandler'
 import { traceabilityRoutes } from './traceability'
 import { getGraphDatabase } from '../graphBuilder/graphDatabase'
 
@@ -27,6 +28,7 @@ describe('GET /api/traceability/impact-report', () => {
     db.upsertEdge({ sourceId: 'auth-F1', targetId: 'auth-T1', relationshipType: 'verifies', confidence: 'medium' })
 
     app = fastify()
+    registerErrorHandler(app)
     traceabilityRoutes(app)
     await app.ready()
   })
