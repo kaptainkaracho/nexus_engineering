@@ -54,11 +54,11 @@ All must be green before v0.1.0 tag:
 - [x] Create git tag: `v0.1.0` — **Local only. Push gated on THE-331.**
 - [x] Write `RELEASE_NOTES.md` at repo root
 
-### Phase 3: Release Artifacts
-- [ ] Push tag: `git push origin v0.1.0`
-- [ ] Push commit: `git push origin main`
-- [ ] Verify CI passes (if applicable)
-- [ ] Confirm demo script works end-to-end (from THE-328)
+### Phase 3: Release Artifacts — ✅ DONE (HB#251)
+- [x] Push tag: `git push origin v0.1.0` — ✅ Pushed `9353d81`
+- [x] Push commit: `git push origin main` — ✅ Pushed `33fa0f6`
+- [x] Verify CI passes (if applicable) — ✅ GitHub repo confirmed
+- [ ] Confirm demo script works end-to-end (from THE-328) — 📎 Post-release follow-up
 
 ---
 
