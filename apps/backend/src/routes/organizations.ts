@@ -3,146 +3,118 @@ import type { Organization, Team } from '@nexus-engineering/shared'
 import { orgRepository } from '../organizations/repository'
 import { authenticate, requirePermission, requireOrgRole } from '../auth/middleware'
 import { logAuditAction } from '../auditLog/middleware'
+import { AppError } from '../lib/errorHandler'
 
 // --- Organization Handlers ---
 
 export async function listOrganizations(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const userId = request.user?.sub
-    const organizations = await orgRepository.listOrganizations(userId)
-    return reply.send({ organizations, total: organizations.length })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to list organizations' })
-  }
+  const userId = request.user?.sub
+  const organizations = await orgRepository.listOrganizations(userId)
+  return reply.send({ organizations, total: organizations.length })
 }
 
 export async function getOrganization(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { id } = request.params as { id: string }
-    if (!id) {
-      return reply.status(400).send({ error: 'Organization ID is required' })
-    }
+  const { id } = request.params as { id: string }
 
-    const organization = await orgRepository.getOrganization(id)
-    if (!organization) {
-      return reply.status(404).send({ error: 'Organization not found' })
-    }
-
-    return reply.send(organization)
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to get organization' })
+  if (!id) {
+    throw new AppError(400, 'Organization ID is required', { param: 'id' })
   }
+
+  const organization = await orgRepository.getOrganization(id)
+  if (!organization) {
+    throw new AppError(404, 'Organization not found', { resourceId: id })
+  }
+
+  return reply.send(organization)
 }
 
 export async function createOrganization(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const body = request.body as Partial<Organization>
+  const body = request.body as Partial<Organization>
 
-    if (!body.name || !body.slug) {
-      return reply.status(400).send({ error: 'Organization name and slug are required' })
-    }
-
-    if (!/^[a-z0-9-]+$/.test(body.slug)) {
-      return reply.status(400).send({ error: 'Slug must contain only lowercase letters, numbers, and hyphens' })
-    }
-
-    const existing = await orgRepository.getOrganizationBySlug(body.slug)
-    if (existing) {
-      return reply.status(409).send({ error: 'Organization with this slug already exists' })
-    }
-
-    const organization = await orgRepository.createOrganization({
-      ...body,
-      ownerId: request.user!.sub,
-    })
-
-    await orgRepository.addOrganizationMember(organization.id, request.user!.sub, 'org:admin')
-
-    logAuditAction(request, 'CREATE', 'organization', organization.id)
-    return reply.status(201).send(organization)
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to create organization' })
+  if (!body.name || !body.slug) {
+    throw new AppError(400, 'Organization name and slug are required', { param: 'name, slug' })
   }
+
+  if (!/^[a-z0-9-]+$/.test(body.slug)) {
+    throw new AppError(400, 'Slug must contain only lowercase letters, numbers, and hyphens', { param: 'slug', pattern: '^[a-z0-9-]+$' })
+  }
+
+  const existing = await orgRepository.getOrganizationBySlug(body.slug)
+  if (existing) {
+    throw new AppError(409, 'Organization with this slug already exists', { slug: body.slug })
+  }
+
+  const organization = await orgRepository.createOrganization({
+    ...body,
+    ownerId: request.user!.sub,
+  })
+
+  await orgRepository.addOrganizationMember(organization.id, request.user!.sub, 'org:admin')
+
+  logAuditAction(request, 'CREATE', 'organization', organization.id)
+  return reply.status(201).send(organization)
 }
 
 export async function updateOrganization(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { id } = request.params as { id: string }
-    const updates = request.body as Partial<Organization>
+  const { id } = request.params as { id: string }
+  const updates = request.body as Partial<Organization>
 
-    if (!id) {
-      return reply.status(400).send({ error: 'Organization ID is required' })
-    }
-
-    if (updates.slug && !/^[a-z0-9-]+$/.test(updates.slug)) {
-      return reply.status(400).send({ error: 'Slug must contain only lowercase letters, numbers, and hyphens' })
-    }
-
-    if (updates.slug) {
-      const existing = await orgRepository.getOrganizationBySlug(updates.slug)
-      if (existing && existing.id !== id) {
-        return reply.status(409).send({ error: 'Organization with this slug already exists' })
-      }
-    }
-
-    const updated = await orgRepository.updateOrganization(id, updates)
-    if (!updated) {
-      return reply.status(404).send({ error: 'Organization not found' })
-    }
-
-    logAuditAction(request, 'UPDATE', 'organization', id, JSON.stringify(Object.keys(updates)))
-    return reply.send(updated)
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to update organization' })
+  if (!id) {
+    throw new AppError(400, 'Organization ID is required', { param: 'id' })
   }
+
+  if (updates.slug && !/^[a-z0-9-]+$/.test(updates.slug)) {
+    throw new AppError(400, 'Slug must contain only lowercase letters, numbers, and hyphens', { param: 'slug', pattern: '^[a-z0-9-]+$' })
+  }
+
+  if (updates.slug) {
+    const existing = await orgRepository.getOrganizationBySlug(updates.slug)
+    if (existing && existing.id !== id) {
+      throw new AppError(409, 'Organization with this slug already exists', { slug: updates.slug })
+    }
+  }
+
+  const updated = await orgRepository.updateOrganization(id, updates)
+  if (!updated) {
+    throw new AppError(404, 'Organization not found', { resourceId: id })
+  }
+
+  logAuditAction(request, 'UPDATE', 'organization', id, JSON.stringify(Object.keys(updates)))
+  return reply.send(updated)
 }
 
 export async function deleteOrganization(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { id } = request.params as { id: string }
+  const { id } = request.params as { id: string }
 
-    if (!id) {
-      return reply.status(400).send({ error: 'Organization ID is required' })
-    }
-
-    const success = await orgRepository.deleteOrganization(id)
-    if (!success) {
-      return reply.status(404).send({ error: 'Organization not found' })
-    }
-
-    logAuditAction(request, 'DELETE', 'organization', id)
-    return reply.send({ message: `Organization ${id} deleted successfully` })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to delete organization' })
+  if (!id) {
+    throw new AppError(400, 'Organization ID is required', { param: 'id' })
   }
+
+  const success = await orgRepository.deleteOrganization(id)
+  if (!success) {
+    throw new AppError(404, 'Organization not found', { resourceId: id })
+  }
+
+  logAuditAction(request, 'DELETE', 'organization', id)
+  return reply.send({ message: `Organization ${id} deleted successfully` })
 }
 
 // --- Organization Member Handlers ---
 
 export async function listOrganizationMembers(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { id } = request.params as { id: string }
+  const { id } = request.params as { id: string }
 
-    if (!id) {
-      return reply.status(400).send({ error: 'Organization ID is required' })
-    }
-
-    const organization = await orgRepository.getOrganization(id)
-    if (!organization) {
-      return reply.status(404).send({ error: 'Organization not found' })
-    }
-
-    const members = await orgRepository.listOrganizationMembers(id)
-    return reply.send({ members, total: members.length })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to list organization members' })
+  if (!id) {
+    throw new AppError(400, 'Organization ID is required', { param: 'id' })
   }
+
+  const organization = await orgRepository.getOrganization(id)
+  if (!organization) {
+    throw new AppError(404, 'Organization not found', { resourceId: id })
+  }
+
+  const members = await orgRepository.listOrganizationMembers(id)
+  return reply.send({ members, total: members.length })
 }
 
 export async function addOrganizationMember(request: FastifyRequest, reply: FastifyReply) {
