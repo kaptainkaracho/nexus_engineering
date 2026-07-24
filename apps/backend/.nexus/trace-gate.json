@@ -1,0 +1,8 @@
+{
+  "coverageThreshold": 75,
+  "maxGaps": 2,
+  "requireTypes": [
+    "requirement"
+  ],
+  "mode": "warn"
+}
