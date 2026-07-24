@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname } from 'node:path'
 import { validatedRequirementsLoader } from '@nexus-engineering/shared/requirements/loader'
 import { reqDocSchema } from '@nexus-engineering/shared/requirements/schema'
+import { AppError } from '../lib/errorHandler'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -33,89 +34,71 @@ function mapRacDocument(doc: any, filePath: string) {
 }
 
 export async function listRacDocuments(_: FastifyRequest, reply: FastifyReply) {
+  const reqDir = RAC_DIR
+  let filePaths: string[]
   try {
-    const reqDir = RAC_DIR
-    let filePaths: string[]
-    try {
-      filePaths = await validatedRequirementsLoader.findRequirementFiles(reqDir)
-    } catch {
-      return reply.send({ data: [], total: 0 })
-    }
-
-    const documents = []
-    for (const fp of filePaths) {
-      try {
-        const doc: any = await validatedRequirementsLoader.loadRequirementFile(fp)
-        if (doc?.requirements) documents.push(mapRacDocument(doc, fp))
-      } catch {
-        // skip invalid files
-      }
-    }
-
-    return reply.send({ data: documents, total: documents.length })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to list RAC documents' })
+    filePaths = await validatedRequirementsLoader.findRequirementFiles(reqDir)
+  } catch {
+    return reply.send({ data: [], total: 0 })
   }
+
+  const documents = []
+  for (const fp of filePaths) {
+    try {
+      const doc: any = await validatedRequirementsLoader.loadRequirementFile(fp)
+      if (doc?.requirements) documents.push(mapRacDocument(doc, fp))
+    } catch {
+      // skip invalid files
+    }
+  }
+
+  return reply.send({ data: documents, total: documents.length })
 }
 
 export async function getRacDocument(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { id } = request.params as { id: string }
-    if (!id) {
-      return reply.status(400).send({ error: 'Document ID is required' })
-    }
+  const { id } = request.params as { id: string }
 
-    const reqDir = RAC_DIR
-    const filePaths = await validatedRequirementsLoader.findRequirementFiles(reqDir)
-    for (const fp of filePaths) {
-      const doc: any = await validatedRequirementsLoader.loadRequirementFile(fp)
-      const docId = doc.nexus?.metadata?.domain?.toLowerCase().replace(/\s+/g, '-')
-      if (docId === id || fp.includes(id) || (doc.requirements || []).some((r: any) => r.id === id)) {
-        return reply.send({ data: mapRacDocument(doc, fp) })
-      }
-    }
-
-    return reply.status(404).send({ error: `RAC document '${id}' not found` })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to get RAC document' })
+  if (!id) {
+    throw new AppError(400, 'Document ID is required', { param: 'id' })
   }
+
+  const reqDir = RAC_DIR
+  const filePaths = await validatedRequirementsLoader.findRequirementFiles(reqDir)
+  for (const fp of filePaths) {
+    const doc: any = await validatedRequirementsLoader.loadRequirementFile(fp)
+    const docId = doc.nexus?.metadata?.domain?.toLowerCase().replace(/\s+/g, '-')
+    if (docId === id || fp.includes(id) || (doc.requirements || []).some((r: any) => r.id === id)) {
+      return reply.send({ data: mapRacDocument(doc, fp) })
+    }
+  }
+
+  throw new AppError(404, `RAC document '${id}' not found`, { resourceId: id })
 }
 
 export async function validateRacDocument(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { document } = request.body as { document: any }
-    if (!document) {
-      return reply.status(400).send({ error: 'document is required in request body' })
-    }
+  const { document } = request.body as { document: any }
 
-    const Ajv = (await import('ajv')).default
-    const ajv = new Ajv()
-    const validate = ajv.compile(reqDocSchema)
-    const valid = validate(document)
-
-    if (!valid) {
-      return reply.send({
-        valid: false,
-        errors: validate.errors?.map((e: any) => ({ path: e.instancePath, message: e.message })),
-      })
-    }
-
-    return reply.send({ valid: true, errors: [] })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to validate RAC document' })
+  if (!document) {
+    throw new AppError(400, 'document is required in request body', { param: 'document' })
   }
+
+  const Ajv = (await import('ajv')).default
+  const ajv = new Ajv()
+  const validate = ajv.compile(reqDocSchema)
+  const valid = validate(document)
+
+  if (!valid) {
+    return reply.send({
+      valid: false,
+      errors: validate.errors?.map((e: any) => ({ path: e.instancePath, message: e.message })),
+    })
+  }
+
+  return reply.send({ valid: true, errors: [] })
 }
 
 export async function getRacSchema(_: FastifyRequest, reply: FastifyReply) {
-  try {
-    return reply.send({ data: reqDocSchema })
-  } catch (error) {
-    reply.log.error(error as Error)
-    return reply.status(500).send({ error: 'Failed to get RAC schema' })
-  }
+  return reply.send({ data: reqDocSchema })
 }
 
 export async function racRoutes(server: FastifyInstance) {
