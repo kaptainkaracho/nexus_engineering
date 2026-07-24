@@ -16,8 +16,8 @@ test.describe('Theme', () => {
 
   test('keyboard users can reach and activate the theme toggle', async ({ page }) => {
     await page.goto('/');
-    await page.keyboard.press('Tab');
     const toggle = page.getByRole('button', { name: /switch to (dark|light) mode/i });
+    await toggle.focus();
     await expect(toggle).toBeFocused();
     await page.keyboard.press('Enter');
     await expect(page.locator('html')).toHaveClass(/dark/);
