@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { AuditLogViewer } from './index';
 import * as api from '../../api/client';
-import type { AuditLogEntry, AuditLogFilter } from '../../api/client';
+import type { AuditLogEntry } from '../../api/client';
 
 function makeEntry(overrides: Partial<AuditLogEntry> = {}): AuditLogEntry {
   return {
