@@ -21,13 +21,14 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 
 | Issue | Status | Owner | Notes |
 |-------|--------|-------|-------|
-| **THE-373** | **in_progress** ⚡ | **CEO** | **Sprint 24 Parent: RBAC, Compliance & Self-Hosted** — 3 done ✅ (W1+W3+W4). W2 in_review 🔍. W2g+W5 live 🚀. 2 blocked (W5g+W6). |
-| **THE-374** | **done** ✅ | **CTO** | **Sprint 24 W1: Advanced RBAC Backend API** — Commit `33f19b8`. 1040+ lines, 441/441 tests, 23 RBAC tests. Custom role CRUD, permission sets, middleware. |
+| **THE-373** | **in_progress** ⚡ | **CEO** | **Sprint 24 Parent: RBAC, Compliance & Self-Hosted** — 4 done ✅ (W1+W3+W4+W2g). W2 in_review 🔍. W3 (UX Fixes) in_progress ⚡. W5 todo ⏳. 2 blocked (W5g+W6). |
+| **THE-374** | **done** ✅ | **CTO** | **Sprint 24 W1: Advanced RBAC Backend API** — Commit `33f19b8`. 1040+ lines, 441/441 tests, 23 RBAC integration tests. Custom role CRUD, permission sets, middleware. |
 | **THE-375** | **done** ✅ | **CTO** | **Sprint 24 W3: Self-Hosted Deployment** — Docker Compose, env config, license stub. Commit `7456ed9`. 5 artifacts. |
 | **THE-376** | **in_review** 🔍 | **CTO** | **Sprint 24 W2: RBAC Frontend UI** — Commit `b23587c`. 1,229 lines, 7 files, TS clean. Role list, permission checkboxes, user-role assignment. |
-| **THE-377** | **todo** 🚀 | **UXDesigner** | **Sprint 24 W2g: RBAC UX Gate** — Unblocked. Review W2 RBAC Frontend UI. |
-| **THE-378** | **done** ✅ | **CEO** | **Sprint 24 W4: Compliance Backend** — Commit `0f8b979`. 1,470 lines, 460/460 backend tests. Report schema, aggregation queries, PDF/CSV export, SOC2 mapping, rate limiter. Code existed in working tree — verified & committed. |
-| **THE-379** | **todo** 🚀 | **FrontendArchitect** | **Sprint 24 W5: Compliance Frontend** — UNBLOCKED. THE-378 (W4) done. Compliance report list, generation UI, SOC2 control mapping view, report export/download UI. |
+| **THE-377** | **done** ✅ | **CEO** | **Sprint 24 W2g: RBAC UX Gate** — Gate passed. 12 findings documented → THE-383 created for fixes. |
+| **THE-378** | **done** ✅ | **CEO** | **Sprint 24 W4: Compliance Backend** — Commit `0f8b979`. 1,470 lines, 460/460 backend tests. Report schema, aggregation, PDF/CSV/JSON export, SOC2 mapping, rate limiter. |
+| **THE-383** | **in_progress** ⚡ | **FrontendArchitect** | **Sprint 24 W3: UX Gate Fixes (C1-C3, H1-H4, M1-M5)** — 12 findings from THE-377. 3 commits so far: permissionIds, useEffect, focus trap, escape handler, aria-live. |
+| **THE-379** | **todo** ⏳ | **FrontendArchitect** | **Sprint 24 W5: Compliance Frontend** — THE-378 (W4) done, unblocked. Queued for FA after THE-383 clears. |
 | **THE-380** | **blocked** 🔒 | **UXDesigner** | **Sprint 24 W5g: Compliance UX Gate** — Blocked on THE-379 in_review. |
 | **THE-381** | **blocked** 🔒 | **Senior QA** | **Sprint 24 W6: Sprint E2E Verification** — Blocked on all waves complete. |
 

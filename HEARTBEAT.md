@@ -2389,3 +2389,70 @@ Per HB#244 board approval, Phase 4 execution begins. Strategy at `plans/phase-4-
 - [ ] @Board: Review and approve/reject Sprint 23 plan via interaction `1bf383db` on THE-359
 - [ ] @CEO (post-approval): Activate Sprint 23 Wave 1 — assign BackendArchitect to SCIM 2.0 Backend API
 - [ ] @All Agents: Standby — Sprint 23 activation pending board confirmation
+
+---
+
+## Heartbeat: 2026-07-26 22:06 UTC | HB#281 — Pipeline Reconciliation: Board vs HEARTBEAT Corrected, 4 Done, 2 Active, 3 Blocked/Queued
+
+### 0. Analysis Paralysis Scan
+- [x] **CEO:** **ACTIVE** ⚡ — HB#281. Full pipeline reconciliation. HEARTBEAT.md was stale vs board state. Recovery actions resolved on THE-373, THE-374, THE-378. THE-383 discovered as active UX Gate Fix issue.
+- [x] **FrontendArchitect:** **ACTIVE** ⚡ — THE-383 (UX Gate Fixes) in_progress with active run. 3 commits already: permissionIds, useEffect fix, focus trap, escape handler, aria-live.
+- [x] **CTO:** **RUNNING** 🔄 — THE-376 (W2 RBAC Frontend) in_review with active run. No new commits — review in progress.
+- [x] **BackendArchitect:** **IDLE** ✅ — All backend work done (THE-374 W1, THE-378 W4, THE-375 W3). Available.
+- [x] **UXDesigner:** **IDLE** ✅ — THE-377 done. THE-380 blocked on W5. Available.
+- [x] **Senior QA:** **IDLE** ✅ — THE-381 blocked on all waves. Expected.
+- **No paralysis.** FrontendArchitect producing commits on THE-383 (3 commits). CTO reviewing THE-376.
+
+### Sprint 24 — Wave Sequencing (HB#281 — Reconciled from Board)
+| Wave | Issue | Scope | Assignee | Status |
+|------|-------|-------|----------|--------|
+| W1 | **THE-374** | RBAC Backend API | CTO | **done** ✅ |
+| W2 | **THE-376** | RBAC Frontend UI | CTO | **in_review** 🔍 |
+| W2g | **THE-377** | RBAC UX Gate | CEO | **done** ✅ |
+| W3 | **THE-383** | UX Gate Fixes (C1-C3, H1-H4, M1-M5) | FrontendArchitect | **in_progress** ⚡ |
+| W3 | **THE-375** | Self-Hosted Deployment | CTO | **done** ✅ |
+| W4 | **THE-378** | Compliance Backend | CTO | **done** ✅ |
+| W5 | **THE-379** | Compliance Frontend | FrontendArchitect | **todo** ⏳ |
+| W5g | **THE-380** | Compliance UX Gate | UXDesigner | **blocked** 🔒 |
+| W6 | **THE-381** | Sprint E2E | Senior QA | **blocked** 🔒 |
+
+### Pipeline Compliance — HB#281
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| Live Execution | **2/4** ⚡ | THE-383 (FA) + THE-376 (CTO in_review) |
+| Active Runners | **2** ✅ | FrontendArchitect, CTO |
+| Done | **4** ✅ | W1 + W2g + W3 (Self-Hosted) + W4 |
+| Todo/Blocked | **3** 🔒 | W5, W5g, W6 |
+| Per-Agent WIP | All 1/1 | ✅ Compliant |
+| TypeScript | **Clean** ✅ | |
+| Tests | **460/460** ✅ | Backend (441 shared + 19 compliance) |
+| Budget | ~$16.30 / $500 (3.26%) | ✅ Healthy |
+| Uncommitted Residuals | **9 files** | RBAC fixes, Scim, BentoGrid, AuditLogFilters — need owner |
+
+### CEO Actions — HB#281
+| Action | Result |
+|--------|--------|
+| **THE-373→in_progress** | ✅ Recovery resolved. Parent now correctly active. |
+| **THE-374→done** | ✅ Code in 33f19b8. Run finished without disposition — CEO override. |
+| **THE-378→done** | ✅ Code in 0f8b979 (1,470 lines). Recovery resolved. |
+| **THE-379→todo** | ✅ W4 done → W5 unblocked. Queued for FA when THE-383 clears. |
+| **THE-383 discovered** | ✅ New UX Gate Fix issue (12 findings from THE-377). FA has 3 commits. |
+| **THE-377 status corrected** | ✅ UX Gate is done (CEO resolved). Findings forwarded to THE-383. |
+| **SOUL.md updated** | ✅ Corrected W1, W4, W2g, W5 statuses. THE-383 added. |
+| **HEARTBEAT.md HB#281** | ✅ Pipeline reconciliation complete. |
+
+### BackendArchitect Reallocation — Decision
+**Decision:** Hold idle for Sprint 24 completion. No remaining backend work. If Sprint 25 planning is needed, BackendArchitect will be the first dispatch for architecture/planning work. Budget: ~$483.70 remaining — no urgency.
+
+### 🎯 Status & Next Steps
+
+**Current Status:** **SPRINT 24 RECONCILED.** 4/6 implementation waves done ✅ (W1 RBAC Backend, W2g UX Gate, W3 Self-Hosted, W4 Compliance Backend). W2 (RBAC Frontend) in_review 🔍. THE-383 active with FrontendArchitect fixing 12 UX Gate findings 🛠️. W5 unblocked and queued for FA after THE-383 clears. All recovery actions resolved. Pipeline healthy at 2/4 live execution.
+
+**Global Pipeline Load:** 2/4 Live Execution | Active Runners: FrontendArchitect (THE-383), CTO (THE-376 in_review). 2 slots available.
+
+**Blockers:** THE-379 (W5) waiting for FrontendArchitect capacity (THE-383 must complete first). THE-380 (W5g) blocked on W5. THE-381 (W6) blocked on all waves. All expected.
+
+**Concrete Next Steps:**
+- [ ] @FrontendArchitect: **Complete THE-383** — UX Gate Fixes. 3 commits so far. Remaining: H3 (confirmation/undo), H4 (disabled button tooltips), M1-M5. When done → reassign to UXDesigner for re-review, then pick up THE-379 (W5 Compliance Frontend).
+- [ ] @CTO: **Finalize THE-376 review** — RBAC Frontend UI in_review. Advance to done when UX Gate has approved THE-383 fixes.
+- [ ] @CEO: When THE-383→done and THE-376→done, Sprint 24 accelerates to W5/W5g/W6. Monitor FA capacity for THE-379 dispatch.
