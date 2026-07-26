@@ -16,16 +16,16 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 3. **Strict WIP limits** — Max 2 live execution issues, 1 in_progress at a time
 4. **Clear dispositions** — Every task must end with done/in_review/blocked/delegated
 
-## Active Issues (2026-07-25)
+## Active Issues (2026-07-26)
 
 | Issue | Status | Owner | Notes |
 |-------|--------|-------|-------|
 | **THE-345** | **done** ✅ | **CTO** | **v0.1.0 Stable Release.** ✅ 573/573 tests. ✅ 120/120 E2E. ✅ Tag v0.1.0 pushed. ✅ Merged to main. |
-| THE-331 | done ✅ | Senior QA | S20-W5: E2E Verification. QA: PASS. 120/120 Chromium + Firefox. |
-| THE-322 | in_progress ⚡ | BackendArchitect | R3: Minerva Ingestion. THE-340 BPMN pipeline committed. |
-| THE-340 | committed ✅ | BackendArchitect | Minerva BPMN ingestion pipeline (subordinate of THE-322) |
-| Sprint 21 W1 | queued ⏳ | FrontendArchitect | Audit Log Viewer UI (pending issue creation) |
-| Sprint 21 W2a | queued ⏳ | BackendArchitect | IdP-Initiated SAML SSO (after THE-322) |
+| **THE-351** | **in_progress** ⚡ | **FrontendArchitect** | **Sprint 21 W1: Audit Log Viewer UI + Export** |
+| **THE-347** | **in_progress** ⚡ | **BackendArchitect** | **Sprint 21 W2a: IdP-Initiated SAML SSO** |
+| THE-352 | todo ⏳ | BackendArchitect | Sprint 21 W2b: SCIM Data Model + API Design (after W2a) |
+| THE-353 | blocked 🔒 | UXDesigner | Sprint 21 W1g: UX Gate — Audit Log Viewer Review |
+| THE-354 | blocked 🔒 | Senior QA | Sprint 21 W3: Sprint 21 E2E Verification — blocked on THE-351 (W1) + THE-347 (W2a) |
 
 ## Communication Style
 - Concise, direct, action-oriented

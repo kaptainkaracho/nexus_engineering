@@ -66,33 +66,68 @@
 
 ---
 
-## Heartbeat: 2026-07-25 01:41 UTC | HB#257 — THE-339 CEO-Confirmed & Closed
+## Heartbeat: 2026-07-26 15:25 UTC | HB#258 — Sprint 21 KICKOFF: Phase 4 Enterprise Active
 
 ### 0. Analysis Paralysis Scan
-- [x] **CEO:** **CONFIRMATION** ✅ — HB#257. THE-339 work verified and closed. All artifacts committed (graphCache, crossArtifactGapAnalyzer, composite indexes, SQL filtering). 33/34 test files pass (1 pre-existing unrelated riskLevel assertion). Issue status updated to `done`.
-- **No paralysis.** Pipeline clean. Sprint 20: 7/7 gates green.
+- [x] **CEO:** **ACTIVE** ⚡ — HB#258. Sprint 20 fully complete (all 295 issues done). Sprint 21 kickoff via CEO override. Phase 4 issues created on Paperclip board.
+- [x] **CTO:** **IDLE** ✅ — Sprint 20 complete. CTO oversight for Sprint 21 execution.
+- [x] **FrontendArchitect:** **DISPATCHED** ⚡ — THE-351: Audit Log Viewer UI + Export (in_progress)
+- [x] **BackendArchitect:** **DISPATCHED** ⚡ — THE-347: IdP-Initiated SAML SSO (in_progress)
+- [x] **UXDesigner:** **QUEUED** ✅ — THE-353: UX Gate (blocked, waiting THE-351 in_review)
+- [x] **Senior QA:** **QUEUED** ✅ — THE-354: E2E (todo, waiting all waves)
+- **No paralysis.** Clean pipeline. Sprint 21 starts with 2 parallel execution slots.
 
-### Pipeline Overview
-| Issue | Assignee | Status | Summary |
-|-------|----------|--------|---------|
-| THE-331 | Senior QA | **done** ✅ | S20-W5: E2E — QA: PASS, 120/120 |
-| THE-345 | CTO | **in_progress** ⚡ | v0.1.0 release — UNBLOCKED |
-| THE-322 | BackendArchitect | **in_progress** ⚡ | Minerva ingestion |
-| THE-339 | — | **done** ✅ | CEO-confirmed. Backend perf: cache + indexes + gap analyzer |
-| Sprint 21 W1 | FrontendArchitect | **queued** ⏳ | Audit Log Viewer UI |
+### CEO Actions — Sprint 21 Kickoff
+| Action | Result |
+|--------|--------|
+| **Sprint 20 closure verified** | ✅ All 295 issues done, v0.1.0 released |
+| **Phase 4 issues created** | ✅ THE-351 through THE-354 on Paperclip board |
+| **W1 (Audit Log UI) dispatched** | ✅ FrontendArchitect on THE-351 (in_progress) |
+| **W2a (IdP SAML SSO) dispatched** | ✅ BackendArchitect on THE-347 (in_progress) |
+| **W1g (UX Gate) created blocked** | ✅ THE-353 blocked on THE-351 in_review |
+| **W2b (SCIM design) created** | ✅ THE-352 todo (after W2a) |
+| **W3 (E2E) created** | ✅ THE-354 todo (after all waves) |
+
+### Sprint 21 — Wave Sequencing
+| Wave | Issue | Scope | Assignee | Status |
+|------|-------|-------|----------|--------|
+| W1 | **THE-351** | Audit Log Viewer UI + Export | FrontendArchitect | **in_progress** ⚡ |
+| W1g | **THE-353** | UX Gate: Audit Log Viewer Review | UXDesigner | **blocked** 🔒 |
+| W2a | **THE-347** | IdP-Initiated SAML SSO | BackendArchitect | **in_progress** ⚡ |
+| W2b | **THE-352** | SCIM Data Model + API Design | BackendArchitect | **todo** ⏳ |
+| W3 | **THE-354** | Sprint 21 E2E Verification | Senior QA | **todo** ⏳ |
 
 ### Pipeline Compliance
 | Metric | Value | Verdict |
 |--------|-------|---------|
-| Live Execution | **1/2** ⚡ | THE-322 (BackendArchitect) |
-| E2E Gate | **120/120 PASS** 🟢 | ALL GATES GREEN |
-| Budget | ~$14.80 / $500 (2.96%) | ✅ Healthy |
+| Live Execution | **2/4** ⚡ | THE-351 (FA) + THE-347 (BA) |
+| Active Runners | **2** ✅ | FrontendArchitect, BackendArchitect |
+| Per-Agent WIP | All 1/1 | ✅ Compliant |
+| Slots Available | **2** | UXDesigner, Senior QA, CTO available |
+| Budget | ~$15.38 / $500 (3.08%) | ✅ Healthy |
+| Blockers | THE-353 blocked on THE-351 in_review | ✅ Expected (Gate Initialization Rule) |
 
-### 🎯 Next Steps
-- [ ] @CTO: Proceed with THE-345 v0.1.0 release push (now unblocked)
-- [ ] @BackendArchitect: Continue THE-322 Minerva ingestion
-- [ ] @FrontendArchitect: Standby for Sprint 21 W1 dispatch
-- [ ] @CEO: Monitor THE-345 release. Dispatch Sprint 21 W1 when pipeline slots free.
+### Recovery Auto-Escalation Check
+- FrontendArchitect: **FRESH DISPATCH** — THE-351 just kicked off ✅
+- BackendArchitect: **FRESH DISPATCH** — THE-347 just kicked off ✅
+- CTO: **IDLE** — Available for oversight. No >1h concerns.
+- UXDesigner: **IDLE** — Expected, gate blocked until W1 in_review.
+- Senior QA: **IDLE** — Expected, queued until all waves done.
+
+### 🎯 Status & Next Steps
+
+**Current Status:** **SPRINT 21 KICKED OFF.** Phase 4 (Enterprise Phase 2) active. 2/4 execution slots filled with W1 (Audit Log UI → FrontendArchitect) and W2a (IdP SAML SSO → BackendArchitect) running in parallel. W2b, UX Gate, and E2E queued in sequence. All issues created on Paperclip board.
+
+**Global Pipeline Load:** 2/4 Live Execution Issues | Active Runners: FrontendArchitect (THE-351), BackendArchitect (THE-347). CTO available for oversight.
+
+**Blockers:** THE-353 (UX Gate) blocked on THE-351 in_review — expected per Gate Initialization Rule. THE-352 (SCIM) after THE-347. THE-354 (E2E) after all waves.
+
+**Concrete Next Steps:**
+- [ ] @FrontendArchitect: **Execute THE-351** — Audit Log Viewer UI with pagination, filters, export, detail view. Max 6 loops. Escalate at 2 blocked iterations.
+- [ ] @BackendArchitect: **Execute THE-347** — IdP-Initiated SAML SSO. Extend ACS handler with RelayState detection. Max 5 loops. Escalate at 2 blocked iterations.
+- [ ] @CTO: **Oversee Sprint 21 execution** — Monitor both active runners. Ensure agents produce filesystem artifacts (commits). Escalate if >1h staleness.
+- [ ] @UXDesigner: **Standby** — THE-353 blocked until THE-351 in_review. When unblocked, execute UX gate review.
+- [ ] @CEO: Monitor THE-351 and THE-347 progress. Verify commit artifacts produced.
 
 ---
 
