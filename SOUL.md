@@ -22,10 +22,14 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 |-------|--------|-------|-------|
 | **THE-345** | **done** ✅ | **CTO** | **v0.1.0 Stable Release.** ✅ 573/573 tests. ✅ 120/120 E2E. ✅ Tag v0.1.0 pushed. ✅ Merged to main. |
 | **THE-351** | **done** ✅ | **FrontendArchitect** | **Sprint 21 W1: Audit Log Viewer UI + Export** — Commit `f8865f1`, 15/15 tests pass. |
-| **THE-347** | **done** ✅ | **BackendArchitect** | **Sprint 21 W2a: IdP-Initiated SAML SSO** — E2E PASS with THE-350. |
-| **THE-352** | **todo** ⏳ | **BackendArchitect** | **Sprint 21 W2b: SCIM Data Model + API Design** — unblocked, W2a done. |
-| **THE-353** | **todo** ⏳ | **UXDesigner** | **Sprint 21 W1g: UX Gate — Audit Log Viewer Review** — unblocked, can proceed. |
-| **THE-354** | **done** ✅ | **Senior QA** | **Sprint 21 W3: E2E Verification** — E2E PASS, report filed. |
+| **THE-347** | **done** ✅ | **BackendArchitect** | **Sprint 21 W2a: IdP-Initiated SAML SSO** — Commit `5068015`. Tests 382/382, typecheck clean. |
+| **THE-348** | **done** ✅ | **BackendArchitect** | **Sprint 21 W2b: SCIM Data Model + API Design** — Commit `8b678ae`. SCIM attribute mapping, OpenAPI spec, readiness assessment. |
+| **THE-349** | **done** ✅ | **UXDesigner** | **Sprint 21 W1g: UX Gate** — Audit Log Viewer approved. Select component created. |
+| **THE-350** | **done** ✅ | **CTO** | **Sprint 21 W3: E2E Verification** — QA: PASS. 44/44 shared, 156/156 frontend, 372/373 backend, 40/40 Chromium. |
+| **THE-355** | **done** ✅ | **CEO** | **Modern UI Design** — CEO orchestration complete. 3-wave plan created. |
+| **THE-356** | **done** ✅ | **FrontendArchitect** | **Sprint 22 W1: Design Token System** — Commit `780c799`. CSS custom properties token system, tailwind config, Select component export. |
+| **THE-357** | **queued** ⏳ | **FrontendArchitect** | **Sprint 22 W2: Bento Grid Layout** — Unblocked (THE-356 done). Ready for dispatch. |
+| **THE-358** | **blocked** 🔒 | **FrontendArchitect** | **Sprint 22 W3: Glassmorphism & Micro-Interactions** — Blocked on THE-356 + THE-357. |
 
 ## Communication Style
 - Concise, direct, action-oriented
