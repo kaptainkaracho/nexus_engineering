@@ -589,7 +589,7 @@ export function PrivateRegistries() {
           aria-labelledby="registry-modal-title"
           onClick={(e) => { if (e.target === e.currentTarget) handleCloseModal(); }}
         >
-          <Card padding="lg" className="w-full max-w-lg max-h-[90vh] overflow-y-auto">
+          <Card padding="lg" className="glass-heavy w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <Stack gap={4}>
               <div className="flex items-center justify-between">
                 <h3 id="registry-modal-title" className="text-lg font-semibold text-text-primary">
@@ -678,7 +678,7 @@ export function PrivateRegistries() {
           aria-labelledby="delete-modal-title"
           onClick={(e) => { if (e.target === e.currentTarget) setDeleteConfirm(null); }}
         >
-          <Card padding="lg" className="w-full max-w-sm">
+          <Card padding="lg" className="glass-heavy w-full max-w-sm">
             <Stack gap={4}>
               <h3 id="delete-modal-title" className="text-lg font-semibold text-text-primary">
                 Delete registry

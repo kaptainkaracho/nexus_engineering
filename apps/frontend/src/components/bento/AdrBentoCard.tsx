@@ -1,4 +1,7 @@
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Card, Badge, Stack, cn } from '@nexus-engineering/shared';
+import { ChevronDown } from 'lucide-react';
 
 export interface AdrBentoCardProps {
   number: string;
@@ -40,6 +43,8 @@ export function AdrBentoCard({
   className,
 }: AdrBentoCardProps) {
   const isMain = variant === 'main';
+  const [expanded, setExpanded] = useState(false);
+  const hasExpandable = isMain && (pros.length > 0 || cons.length > 0);
 
   return (
     <Card
@@ -81,45 +86,73 @@ export function AdrBentoCard({
           </span>
         </div>
 
-        {/* Pro/Con — main card only */}
-        {isMain && (pros.length > 0 || cons.length > 0) && (
-          <div className="grid grid-cols-2 gap-4 mt-1">
-            {pros.length > 0 && (
-              <div>
-                <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-success-600 dark:text-success-400">
-                  Pros
-                </p>
-                <ul className="space-y-1">
-                  {pros.map((item, i) => (
-                    <li key={i} className="flex gap-1.5 text-sm text-text-secondary">
-                      <span className="mt-0.5 h-4 w-4 shrink-0 rounded-full bg-success-100 text-center text-[10px] font-bold text-success-700 dark:bg-success-950 dark:text-success-300">
-                        +
-                      </span>
-                      <span className="line-clamp-2">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {cons.length > 0 && (
-              <div>
-                <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-error-600 dark:text-error-400">
-                  Cons
-                </p>
-                <ul className="space-y-1">
-                  {cons.map((item, i) => (
-                    <li key={i} className="flex gap-1.5 text-sm text-text-secondary">
-                      <span className="mt-0.5 h-4 w-4 shrink-0 rounded-full bg-error-100 text-center text-[10px] font-bold text-error-700 dark:bg-error-950 dark:text-error-300">
-                        −
-                      </span>
-                      <span className="line-clamp-2">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
+        {/* Expand/collapse toggle — main card only */}
+        {hasExpandable && (
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="flex items-center gap-1.5 text-xs font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors -mt-1"
+            aria-expanded={expanded}
+          >
+            <motion.span
+              animate={{ rotate: expanded ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+              className="inline-flex"
+            >
+              <ChevronDown className="w-3.5 h-3.5" />
+            </motion.span>
+            {expanded ? 'Hide details' : 'Show pros & cons'}
+          </button>
         )}
+
+        {/* Pro/Con — animated expand/collapse */}
+        <AnimatePresence initial={false}>
+          {expanded && hasExpandable && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="overflow-hidden"
+            >
+              <div className="grid grid-cols-2 gap-4 pt-1">
+                {pros.length > 0 && (
+                  <div>
+                    <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-success-600 dark:text-success-400">
+                      Pros
+                    </p>
+                    <ul className="space-y-1">
+                      {pros.map((item, i) => (
+                        <li key={i} className="flex gap-1.5 text-sm text-text-secondary">
+                          <span className="mt-0.5 h-4 w-4 shrink-0 rounded-full bg-success-100 text-center text-[10px] font-bold text-success-700 dark:bg-success-950 dark:text-success-300">
+                            +
+                          </span>
+                          <span className="line-clamp-2">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {cons.length > 0 && (
+                  <div>
+                    <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-error-600 dark:text-error-400">
+                      Cons
+                    </p>
+                    <ul className="space-y-1">
+                      {cons.map((item, i) => (
+                        <li key={i} className="flex gap-1.5 text-sm text-text-secondary">
+                          <span className="mt-0.5 h-4 w-4 shrink-0 rounded-full bg-error-100 text-center text-[10px] font-bold text-error-700 dark:bg-error-950 dark:text-error-300">
+                            −
+                          </span>
+                          <span className="line-clamp-2">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Side card: compact link/reference */}
         {!isMain && (

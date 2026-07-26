@@ -1,4 +1,7 @@
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Card, Badge, Stack, cn } from '@nexus-engineering/shared';
+import { ChevronDown } from 'lucide-react';
 
 export type ReqPriority = 'low' | 'medium' | 'high' | 'critical';
 export type ReqStatus = 'proposed' | 'approved' | 'rejected' | 'implemented' | 'verified';
@@ -57,6 +60,8 @@ export function ReqBentoCard({
 }: ReqBentoCardProps) {
   const size = PRIORITY_SIZE_MAP[priority];
   const isFeatured = size === 'featured';
+  const [expanded, setExpanded] = useState(false);
+  const hasExpandable = isFeatured && acceptanceCriteria.length > 0;
 
   return (
     <Card
@@ -104,24 +109,52 @@ export function ReqBentoCard({
           </div>
         )}
 
-        {/* Acceptance Criteria — featured only */}
-        {isFeatured && acceptanceCriteria.length > 0 && (
-          <div>
-            <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-text-tertiary">
-              Acceptance Criteria
-            </p>
-            <ul className="space-y-1">
-              {acceptanceCriteria.map((ac, i) => (
-                <li key={i} className="flex gap-2 text-sm text-text-secondary">
-                  <span className="mt-0.5 h-4 w-4 shrink-0 rounded-full bg-success-100 text-center text-[10px] font-bold text-success-700 dark:bg-success-950 dark:text-success-300">
-                    ✓
-                  </span>
-                  {ac}
-                </li>
-              ))}
-            </ul>
-          </div>
+        {/* Expand/collapse toggle */}
+        {hasExpandable && (
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="flex items-center gap-1.5 text-xs font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors -mt-1"
+            aria-expanded={expanded}
+          >
+            <motion.span
+              animate={{ rotate: expanded ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+              className="inline-flex"
+            >
+              <ChevronDown className="w-3.5 h-3.5" />
+            </motion.span>
+            {expanded ? 'Hide criteria' : `Show acceptance criteria (${acceptanceCriteria.length})`}
+          </button>
         )}
+
+        {/* Acceptance Criteria — animated expand/collapse */}
+        <AnimatePresence initial={false}>
+          {expanded && hasExpandable && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="overflow-hidden"
+            >
+              <div className="pt-1">
+                <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-text-tertiary">
+                  Acceptance Criteria
+                </p>
+                <ul className="space-y-1">
+                  {acceptanceCriteria.map((ac, i) => (
+                    <li key={i} className="flex gap-2 text-sm text-text-secondary">
+                      <span className="mt-0.5 h-4 w-4 shrink-0 rounded-full bg-success-100 text-center text-[10px] font-bold text-success-700 dark:bg-success-950 dark:text-success-300">
+                        ✓
+                      </span>
+                      {ac}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </Stack>
     </Card>
   );

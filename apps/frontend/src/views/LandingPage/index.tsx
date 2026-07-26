@@ -118,7 +118,7 @@ function MobileNav({ open, onClose }: { open: boolean; onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 sm:hidden" role="dialog" aria-modal="true">
       <div className="fixed inset-0 bg-black/30" onClick={onClose} />
-      <div className="fixed right-0 top-0 bottom-0 w-72 bg-surface-primary shadow-xl p-6">
+      <div className="fixed right-0 top-0 bottom-0 w-72 glass-heavy shadow-xl p-6 sm:hidden">
         <div className="flex justify-end mb-6">
           <button onClick={onClose} className="text-text-tertiary hover:text-text-primary" aria-label="Close navigation menu">
             <X className="w-6 h-6" />
@@ -150,6 +150,14 @@ function MobileNav({ open, onClose }: { open: boolean; onClose: () => void }) {
 
 export function LandingPage() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   return (
     <div className="min-h-screen bg-surface-secondary">
@@ -157,7 +165,14 @@ export function LandingPage() {
         Skip to main content
       </a>
 
-      <header className="fixed top-0 left-0 right-0 h-16 bg-surface-primary/95 backdrop-blur-sm border-b border-border z-40">
+      <header
+        className={`fixed top-0 left-0 right-0 h-16 border-b border-border z-40 transition-all duration-300 ${
+          scrolled
+            ? 'bg-surface-primary/80 backdrop-blur-xl shadow-sm'
+            : 'bg-surface-primary/95 backdrop-blur-sm'
+        }`}
+        role="banner"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
           <a href="#/" className="flex items-center gap-2 font-bold text-lg text-text-primary">
             Nexus
@@ -196,7 +211,7 @@ export function LandingPage() {
       <main id="main-content">
         <section className="bg-gradient-to-b from-primary-50/50 dark:from-primary-950/30 to-surface-secondary pt-32 pb-20 px-4">
           <div className="max-w-5xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-text-primary leading-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-text-primary leading-tight animate-hero-reveal" style={{ animationFillMode: 'both' }}>
               Engineering Intelligence<br />
               for the <span className="text-primary-600">Modern Enterprise</span>
             </h1>
