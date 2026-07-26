@@ -24,6 +24,7 @@ import { traceabilityRoutes } from './routes/traceability'
 import { nlQueryRoutes } from './routes/nlQuery'
 import { livenessRoutes } from './routes/liveness'
 import { recoveryReworkRoutes } from './routes/recoveryRework'
+import { scimRoutes } from './routes/scim'
 
 const server = fastify({ logger: true })
 
@@ -83,6 +84,7 @@ const start = async () => {
     nlQueryRoutes(server)
     livenessRoutes(server)
     recoveryReworkRoutes(server)
+    scimRoutes(server)
 
     // SPA fallback: serve index.html for any non-API GET route in production.
     if (process.env.NODE_ENV === 'production' && existsSync(frontendDist)) {
