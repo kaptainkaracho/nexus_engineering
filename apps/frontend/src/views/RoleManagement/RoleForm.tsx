@@ -93,7 +93,7 @@ export function RoleForm({ role, permissions, onSubmit, onCancel, mode }: RoleFo
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <Alert variant="error" role="alert">
+        <Alert variant="error" role="alert" aria-live="assertive">
           {error}
         </Alert>
       )}

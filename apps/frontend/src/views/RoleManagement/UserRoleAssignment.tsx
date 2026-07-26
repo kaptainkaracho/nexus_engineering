@@ -99,13 +99,13 @@ export function UserRoleAssignment({ availableRoles }: UserRoleAssignmentProps) 
       />
 
       {success && (
-        <Alert variant="success" role="status">
+        <Alert variant="success" role="status" aria-live="polite">
           {success}
         </Alert>
       )}
 
       {error && (
-        <Alert variant="error" role="alert">
+        <Alert variant="error" role="alert" aria-live="assertive">
           {error}
         </Alert>
       )}
