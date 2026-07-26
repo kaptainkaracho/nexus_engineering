@@ -15,9 +15,9 @@ export class GraphCache {
   /**
    * Set a cached entry. `ttlMs` defaults to 30 seconds.
    */
-  set(key: string, value: string, ttlMs = 30_000): void {
+  set(key: string, value: unknown, ttlMs = 30_000): void {
     this.store.set(key, {
-      value,
+      value: JSON.stringify(value),
       expiresAt: Date.now() + ttlMs,
     })
   }

@@ -578,7 +578,7 @@ async function createGroup(request: FastifyRequest, reply: FastifyReply) {
   const db = getAuthDatabase()
 
   if (db.findGroupByDisplayName(displayName)) {
-    const err = scError(
+    const err = scimError(
       `Group with displayName '${displayName}' already exists`,
       '409',
       'duplicate',

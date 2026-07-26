@@ -64,7 +64,7 @@ export class ImpactAnalyzer {
    * graph-ready structure for downstream visualization.
    */
   async analyzeV2(scope: ImpactScope): Promise<ImpactAnalysisV2> {
-    const cacheKey = `impact:${scope.artifactId}:${scope.impactType}:${scope.direction}`
+    const cacheKey = `impact:${[...scope.artifactIds].sort().join(',')}`
     const cached = graphCache.get<ImpactAnalysisV2>(cacheKey)
     if (cached) return cached
 
