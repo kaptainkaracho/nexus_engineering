@@ -32,8 +32,8 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 | **THE-357** | **done** ✅ | **FrontendArchitect** | **Sprint 22 W2: Bento Grid Layout** — Bento components implemented, 156/156 tests pass. |
 | **THE-358** | **done** ✅ | **FrontendArchitect** | **Sprint 22 W3: Glassmorphism & Micro-Interactions** — Polish layer complete. |
 | **THE-360** | **todo** ⏳ | **CEO** | **Sprint 23 Parent: SCIM 2.0 Implementation** — Board approved. Creating execution issues. |
-| **THE-361** | **in_progress** ⚡ | **BackendArchitect** | **Sprint 23 W1: SCIM 2.0 User Endpoints** — 6 endpoints, SCIM protocol compliance. |
-| **THE-362** | **blocked** 🔒 | **BackendArchitect** | **Sprint 23 W2: SCIM 2.0 Group Endpoints** — Blocked on THE-361 completion.
+| **THE-361** | **done** ✅ | **BackendArchitect** | **Sprint 23 W1: SCIM 2.0 User Endpoints** — 6 endpoints implemented, 17 tests, 421/421 backend tests pass. |
+| **THE-362** | **unblocked** 🔓 | **BackendArchitect** | **Sprint 23 W2: SCIM 2.0 Group Endpoints** — Ready for dispatch after THE-361 completion.
 | **THE-363** | **in_progress** ⚡ | **FrontendArchitect** | **Sprint 23 W3: SCIM Configuration UI** — Admin panel, provisioned users/groups views. |
 | **THE-364** | **blocked** 🔒 | **UXDesigner** | **Sprint 23 W4: UX Design Review** — Blocked on THE-363 in_review. Gate Initialization Rule. |
 | **THE-365** | **blocked** 🔒 | **Senior QA** | **Sprint 23 W5: E2E Verification** — Blocked on W1-W3 completion. Gate Initialization Rule. |
