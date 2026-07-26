@@ -50,7 +50,7 @@ export default defineConfig({
             }
 
             // Admin views
-            if (/^(AdminDashboard|RoleManagement|AuditLogViewer|PrivateRegistries|TacViewer|OrgAdmin)/.test(path)) {
+            if (/^(AdminDashboard|RoleManagement|AuditLogViewer|PrivateRegistries|TacViewer|OrgAdmin|ScimSettings)/.test(path)) {
               return 'chunk-admin';
             }
 

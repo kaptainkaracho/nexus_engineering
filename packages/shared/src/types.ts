@@ -492,3 +492,69 @@ export interface AuditLogRetentionConfig {
   ttlDays: number
   enabled: boolean
 }
+
+// ─── SCIM 2.0 Types ──────────────────────────────────────────────────────────
+
+export interface ScimConfig {
+  enabled: boolean
+  endpointUrl: string
+  bearerToken: string
+  lastTokenRegeneratedAt?: IsoDateString
+  organizationId: string
+}
+
+export interface ScimUser {
+  id: string
+  userName: string
+  displayName: string
+  active: boolean
+  roles: string[]
+  ssoProvider?: string
+  ssoUserId?: string
+  lastSyncAt?: IsoDateString
+  meta?: {
+    resourceType: 'User'
+    created: IsoDateString
+    lastModified: IsoDateString
+    location?: string
+  }
+}
+
+export interface ScimGroup {
+  id: string
+  displayName: string
+  description?: string
+  members: ScimMember[]
+  meta?: {
+    resourceType: 'Group'
+    created: IsoDateString
+    lastModified: IsoDateString
+    location?: string
+  }
+}
+
+export interface ScimMember {
+  value: string
+  display?: string
+  type?: 'User'
+}
+
+export interface ScimListResponse<T> {
+  schemas: string[]
+  totalResults: number
+  itemsPerPage: number
+  startIndex: number
+  Resources: T[]
+  nextPageUrl?: string
+}
+
+export interface ScimProvisioningLog {
+  id: string
+  organizationId: string
+  operation: 'CREATE' | 'UPDATE' | 'DELETE' | 'PATCH'
+  resourceType: 'User' | 'Group'
+  resourceId: string
+  status: 'success' | 'failure'
+  errorMessage?: string
+  timestamp: IsoDateString
+}

@@ -112,6 +112,12 @@ export type {
   MultiScanSession,
   MultiRepoScanResult,
   MultiRepoScanOptions,
+  ScimConfig,
+  ScimUser,
+  ScimGroup,
+  ScimMember,
+  ScimListResponse,
+  ScimProvisioningLog,
 } from './types';
 
 export type {

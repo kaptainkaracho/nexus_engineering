@@ -37,6 +37,7 @@ const RecommendationsPanel = lazy(() => import('./views/RecommendationsPanel').t
 const NLTraceQuery = lazy(() => import('./views/NLTraceQuery'));
 const QualityDashboard = lazy(() => import('./views/QualityDashboard').then(m => ({ default: m.QualityDashboard })));
 const SSOSettings = lazy(() => import('./views/SSOSettings'));
+const ScimSettings = lazy(() => import('./views/ScimSettings'));
 
 // Auth + onboarding + landing — small bundles, grouped together
 const LandingPage = lazy(() => import('./views/LandingPage').then(m => ({ default: m.LandingPage })));
@@ -72,6 +73,7 @@ type Section =
   | 'quality-dashboard'
   | 'trace-gate'
   | 'sso'
+  | 'scim'
   | 'org'
   | 'landing'
   | 'onboarding';
@@ -89,6 +91,7 @@ const VALID_SECTIONS: Section[] = [
   'templates',
   'admin',
   'sso',
+  'scim',
   'org',
   'roles',
   'audit-log',
@@ -109,6 +112,7 @@ const VALID_SECTIONS: Section[] = [
 
 const ADMIN_SUB_ROUTES: Record<string, Section> = {
   sso: 'sso',
+  scim: 'scim',
   org: 'org',
   audit: 'audit-log',
 };
@@ -160,6 +164,7 @@ const SKELETON_VARIANTS: Record<string, RouteLoadingSkeletonProps['variant']> = 
   'quality-dashboard': 'grid',
   'trace-gate': 'form',
   'sso': 'form',
+  'scim': 'form',
   'org': 'form',
 };
 
@@ -334,6 +339,7 @@ function App() {
       ? [
           { label: 'Organizations', href: '#admin', active: activeSection === 'admin' },
           { label: 'SSO Settings', href: '#admin/sso', active: activeSection === 'sso' },
+          { label: 'SCIM Config', href: '#admin/scim', active: activeSection === 'scim' },
           { label: 'Org Admin', href: '#admin/org', active: activeSection === 'org' },
           { label: 'Roles', href: '#roles', active: activeSection === 'roles' },
           { label: 'Registries', href: '#registries', active: activeSection === 'registries' },
@@ -511,6 +517,14 @@ function App() {
           <ProtectedLayout allowedRoles={['admin']}>
             <Suspense fallback={<RouteLoadingSkeleton variant="form" />}>
               <SSOSettings />
+            </Suspense>
+          </ProtectedLayout>
+        );
+      case 'scim':
+        return (
+          <ProtectedLayout allowedRoles={['admin']}>
+            <Suspense fallback={<RouteLoadingSkeleton variant="form" />}>
+              <ScimSettings />
             </Suspense>
           </ProtectedLayout>
         );
