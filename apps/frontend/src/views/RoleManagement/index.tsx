@@ -1,73 +1,165 @@
+import { useState, useCallback, useEffect } from 'react';
+import type { Role, Permission } from '@nexus-engineering/shared';
 import { Card, Container, Stack } from '@nexus-engineering/shared';
+import { RoleList } from './RoleList';
+import { RoleForm } from './RoleForm';
+import { RolePermissionsPanel } from './RolePermissionsPanel';
+import { UserRoleAssignment } from './UserRoleAssignment';
+import { fetchRoles, fetchPermissions } from '../../api/rbac';
 
-function UsersIcon() {
-  return (
-    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-    </svg>
-  );
+interface ModalState {
+  type: 'create' | 'edit' | null;
+  role: Role | null;
 }
-
-function ShieldIcon() {
-  return (
-    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-    </svg>
-  );
-}
-
-const roles = [
-  { name: 'Admin', users: '\u2014', description: 'Full access to all features and settings', color: 'bg-error-100 text-error-700 dark:bg-error-900 dark:text-error-300' },
-  { name: 'User', users: '\u2014', description: 'Standard access to application features', color: 'bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300' },
-] as const;
 
 export function RoleManagement() {
+  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+  const [modal, setModal] = useState<ModalState>({ type: null, role: null });
+  const [availableRoles, setAvailableRoles] = useState<Role[]>([]);
+  const [permissionsByResource, setPermissionsByResource] = useState<
+    { resource: string; items: { id: string; name: string; description: string | null }[] }[]
+  >([]);
+
+  const loadData = useCallback(async () => {
+    const [rolesResult, permissionsResult] = await Promise.all([
+      fetchRoles(),
+      fetchPermissions(),
+    ]);
+    setAvailableRoles(rolesResult.roles);
+    const grouped: Record<string, { id: string; name: string; description: string | null }[]> = {};
+    for (const perm of permissionsResult.permissions) {
+      const key = perm.resource;
+      if (!grouped[key]) grouped[key] = [];
+      grouped[key].push({ id: perm.id, name: perm.name, description: perm.description });
+    }
+    setPermissionsByResource(Object.entries(grouped).map(([resource, items]) => ({ resource, items })));
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const handleCreate = () => setModal({ type: 'create', role: null });
+  const handleEdit = (role: Role) => setModal({ type: 'edit', role });
+  const handleCancel = () => setModal({ type: null, role: null });
+
+  const handleFormSubmit = async (data: { name: string; description?: string | null }) => {
+    if (modal.type === 'create') {
+      const { createRole } = await import('../../api/rbac');
+      const role = await createRole(data as { name: string; description?: string | null; permissionIds?: string[] });
+      if (role) {
+        setAvailableRoles(prev => [...prev, role]);
+        handleCancel();
+        return true;
+      }
+    } else if (modal.type === 'edit' && modal.role) {
+      const { updateRole } = await import('../../api/rbac');
+      const role = await updateRole(modal.role.id, data);
+      if (role) {
+        setAvailableRoles(prev => prev.map(r => r.id === role.id ? role : r));
+        handleCancel();
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const handlePermissionsUpdated = (role: Role) => {
+    setAvailableRoles(prev => prev.map(r => r.id === role.id ? role : r));
+  };
+
   return (
     <Container size="lg" className="py-8">
       <Stack gap={8}>
         <Stack gap={2}>
           <h1 className="text-2xl font-bold text-text-primary">Role Management</h1>
           <p className="text-text-secondary">
-            Manage roles and permissions for users across organizations.
+            Manage roles, permissions, and user assignments for access control.
           </p>
         </Stack>
 
-        <Stack gap={2}>
-          <h2 className="text-xl font-bold text-text-primary">Roles</h2>
-        </Stack>
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {roles.map((role) => (
-            <Card key={role.name} padding="lg">
-              <Stack gap={4}>
-                <div className="flex items-center gap-3">
-                  <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${role.color}`}>
-                    <ShieldIcon />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-semibold text-text-primary">{role.name}</h3>
-                    <p className="text-sm text-text-tertiary">{role.description}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-text-tertiary">
-                  <UsersIcon />
-                  <span>{role.users} users</span>
-                </div>
-              </Stack>
+        <div className="grid grid-cols-1 gap-8 xl:grid-cols-5">
+          {/* Left: Role List */}
+          <div className="xl:col-span-2">
+            <Card padding="lg">
+              <RoleList
+                onEdit={handleEdit}
+                onCreate={handleCreate}
+                selectedRole={selectedRole}
+                onSelectRole={setSelectedRole}
+              />
             </Card>
-          ))}
+          </div>
+
+          {/* Right: Role Details + Permissions */}
+          <div className="xl:col-span-3">
+            {selectedRole ? (
+              <Stack gap={6}>
+                <Card padding="lg">
+                  <Stack gap={4}>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h2 className="text-lg font-semibold text-text-primary">
+                          {selectedRole.name}
+                        </h2>
+                        <p className="text-sm text-text-secondary">
+                          {selectedRole.description || 'No description'}
+                        </p>
+                      </div>
+                    </div>
+                  </Stack>
+                </Card>
+
+                <Card padding="lg">
+                  <RolePermissionsPanel
+                    role={selectedRole}
+                    allPermissions={permissionsByResource}
+                    onPermissionsUpdated={handlePermissionsUpdated}
+                  />
+                </Card>
+              </Stack>
+            ) : (
+              <Card padding="lg">
+                <div className="flex items-center justify-center py-16">
+                  <p className="text-sm text-text-tertiary">
+                    Select a role to view and manage its permissions.
+                  </p>
+                </div>
+              </Card>
+            )}
+          </div>
         </div>
 
+        {/* User Role Assignment */}
         <Card padding="lg">
-          <Stack gap={4}>
-            <h2 className="text-lg font-semibold text-text-primary">Permission Assignments</h2>
-            <div className="rounded-lg border border-border p-8 text-center">
-              <p className="text-sm text-text-tertiary">
-                Role-based permission assignments will appear here once the backend API is connected.
-              </p>
-            </div>
-          </Stack>
+          <UserRoleAssignment availableRoles={availableRoles} />
         </Card>
       </Stack>
+
+      {/* Create/Edit Modal */}
+      {modal.type && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" role="dialog" aria-modal="true" aria-label={modal.type === 'create' ? 'Create new role' : 'Edit role'}>
+          <div className="w-full max-w-lg rounded-xl bg-surface-primary p-6 shadow-xl">
+            <h3 className="text-lg font-semibold text-text-primary">
+              {modal.type === 'create' ? 'Create New Role' : `Edit: ${modal.role?.name}`}
+            </h3>
+            <p className="mt-1 text-sm text-text-secondary">
+              {modal.type === 'create'
+                ? 'Define a new role and its permissions.'
+                : 'Update the role name and permissions.'}
+            </p>
+            <div className="mt-6">
+              <RoleForm
+                role={modal.role}
+                permissions={permissionsByResource}
+                onSubmit={handleFormSubmit}
+                onCancel={handleCancel}
+                mode={modal.type}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </Container>
   );
 }
