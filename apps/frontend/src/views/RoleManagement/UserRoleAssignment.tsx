@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { UserWithRole, Role } from '@nexus-engineering/shared';
-import { Button, Badge, Alert, Input } from '@nexus-engineering/shared';
+import { Button, Badge, Alert, Input, Select } from '@nexus-engineering/shared';
 import { fetchUsersWithRoles, updateUserRole } from '../../api/rbac';
 
 interface UserRoleAssignmentProps {
@@ -13,6 +13,7 @@ export function UserRoleAssignment({ availableRoles }: UserRoleAssignmentProps) 
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [roleChangeTarget, setRoleChangeTarget] = useState<{ userId: string; userEmail: string; newRoleId: string; newRoleName: string; oldRoleId: string | null } | null>(null);
 
   const loadUsers = useCallback(async () => {
     setLoading(true);
@@ -26,20 +27,39 @@ export function UserRoleAssignment({ availableRoles }: UserRoleAssignmentProps) 
     setLoading(false);
   }, []);
 
-  useState(() => {
+  useEffect(() => {
     loadUsers();
-  });
+  }, [loadUsers]);
 
-  const handleRoleChange = async (userId: string, roleId: string) => {
+  const handleRoleChangeSelect = (userId: string, userEmail: string, roleId: string, roleName: string, oldRoleId: string | null) => {
+    setRoleChangeTarget({ userId, userEmail, newRoleId: roleId, newRoleName: roleName, oldRoleId });
+  };
+
+  const handleRoleChangeConfirm = async () => {
+    if (!roleChangeTarget) return;
     setError(null);
-    const success = await updateUserRole(userId, roleId);
+    setSuccess(null);
+    const success = await updateUserRole(roleChangeTarget.userId, roleChangeTarget.newRoleId);
     if (success) {
       setSuccess(`User role updated successfully`);
       setTimeout(() => setSuccess(null), 3000);
       loadUsers();
+      setRoleChangeTarget(null);
     } else {
       setError('Failed to update user role. Please try again.');
     }
+  };
+
+  const handleRoleChangeUndo = async () => {
+    if (!roleChangeTarget) return;
+    setError(null);
+    const success = await updateUserRole(roleChangeTarget.userId, roleChangeTarget.oldRoleId ?? '');
+    if (success) {
+      setSuccess(`Role change reverted for ${roleChangeTarget.userEmail}`);
+      setTimeout(() => setSuccess(null), 3000);
+      loadUsers();
+    }
+    setRoleChangeTarget(null);
   };
 
   const filteredUsers = users.filter(user =>
@@ -47,18 +67,21 @@ export function UserRoleAssignment({ availableRoles }: UserRoleAssignmentProps) 
     (user.displayName && user.displayName.toLowerCase().includes(search.toLowerCase()))
   );
 
-  const getRoleColor = (roleName?: string) => {
+  const getRoleBadgeVariant = (roleName?: string) => {
     switch (roleName) {
       case 'Admin':
-        return 'bg-error-100 text-error-700 dark:bg-error-900 dark:text-error-300';
+        return 'critical';
       case 'Editor':
-        return 'bg-warning-100 text-warning-700 dark:bg-warning-900 dark:text-warning-300';
+        return 'high';
       default:
-        return 'bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300';
+        return 'implemented';
     }
   };
 
+  const roleSelectOptions = [{ value: '', label: 'Select role' }, ...availableRoles.map(r => ({ value: r.id, label: r.name }))];
+
   return (
+    <>
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-base font-semibold text-text-primary">User Role Assignment</h3>
@@ -124,7 +147,7 @@ export function UserRoleAssignment({ availableRoles }: UserRoleAssignmentProps) 
                   </td>
                   <td className="px-4 py-3">
                     {user.role ? (
-                      <Badge variant="primary" className={getRoleColor(user.role.name)}>
+                      <Badge variant={getRoleBadgeVariant(user.role.name)}>
                         {user.role.name}
                       </Badge>
                     ) : (
@@ -132,19 +155,15 @@ export function UserRoleAssignment({ availableRoles }: UserRoleAssignmentProps) 
                     )}
                   </td>
                   <td className="px-4 py-3">
-                    <select
-                      value={user.roleId || ''}
-                      onChange={e => handleRoleChange(user.id, e.target.value)}
-                      className="rounded-lg border border-border bg-surface-primary px-3 py-1.5 text-sm text-text-primary focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-                      aria-label={`Assign role to ${user.email}`}
-                    >
-                      <option value="">Select role</option>
-                      {availableRoles.map(role => (
-                        <option key={role.id} value={role.id}>
-                          {role.name}
-                        </option>
-                      ))}
-                    </select>
+                      <Select
+                        value={user.roleId || ''}
+                        onChange={e => {
+                          const role = availableRoles.find(r => r.id === e.target.value);
+                          if (role) handleRoleChangeSelect(user.id, user.email, e.target.value, role.name, user.roleId);
+                        }}
+                        options={roleSelectOptions}
+                        aria-label={`Assign role to ${user.email}`}
+                      />
                   </td>
                 </tr>
               ))}
@@ -152,6 +171,69 @@ export function UserRoleAssignment({ availableRoles }: UserRoleAssignmentProps) 
           </table>
         </div>
       )}
+    </div>
+    {roleChangeTarget && (
+      <RoleChangeConfirmModal
+        target={roleChangeTarget}
+        onConfirm={() => {
+          setRoleChangeTarget(null);
+          handleRoleChangeConfirm();
+        }}
+        onCancel={() => setRoleChangeTarget(null)}
+        onUndo={() => {
+          setRoleChangeTarget(null);
+          handleRoleChangeUndo();
+        }}
+      />
+    )}
+    </>
+  );
+}
+
+function RoleChangeConfirmModal({ target, onConfirm, onCancel, onUndo }: {
+  target: { userId: string; userEmail: string; newRoleId: string; newRoleName: string; oldRoleId: string | null };
+  onConfirm: () => void;
+  onCancel: () => void;
+  onUndo: () => void;
+}) {
+  const modalRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(modalRef, true);
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onCancel();
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [onCancel]);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" role="dialog" aria-modal="true" aria-label="Confirm role change">
+      <div ref={modalRef} className="w-full max-w-md rounded-xl bg-surface-primary p-6 shadow-xl">
+        <h3 className="text-lg font-semibold text-text-primary">Confirm Role Change</h3>
+        <p className="mt-2 text-sm text-text-secondary">
+          Change role for <span className="font-medium text-text-primary">{target.userEmail}</span> to{' '}
+          <span className="font-medium text-text-primary">{target.newRoleName}</span>?
+        </p>
+        <div className="mt-4 text-xs text-text-tertiary">
+          Current role: <span className="font-medium">{target.oldRoleId ? 'Existing role' : 'No role'}</span>
+        </div>
+        <div className="mt-6 flex items-center justify-between">
+          {target.oldRoleId && (
+            <Button variant="ghost" size="sm" onClick={onUndo}>
+              Undo
+            </Button>
+          )}
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" onClick={onCancel}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={onConfirm}>
+              Confirm
+            </Button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

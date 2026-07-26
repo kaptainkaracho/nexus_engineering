@@ -1,7 +1,8 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import type { Role } from '@nexus-engineering/shared';
 import { Button, Badge, Alert, Input } from '@nexus-engineering/shared';
 import { fetchRoles, deleteRole } from '../../api/rbac';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
 
 interface RoleListProps {
   onEdit: (role: Role) => void;
@@ -17,9 +18,20 @@ interface ConfirmDeleteProps {
 }
 
 function ConfirmDeleteModal({ role, onConfirm, onCancel }: ConfirmDeleteProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(containerRef, true);
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onCancel();
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [onCancel]);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" role="dialog" aria-modal="true" aria-label="Confirm delete">
-      <div className="w-full max-w-md rounded-xl bg-surface-primary p-6 shadow-xl">
+      <div ref={containerRef} className="w-full max-w-md rounded-xl bg-surface-primary p-6 shadow-xl">
         <h3 className="text-lg font-semibold text-text-primary">Delete Role</h3>
         <p className="mt-2 text-sm text-text-secondary">
           Are you sure you want to delete the role &ldquo;{role.name}&rdquo;? This action cannot be undone.
@@ -66,9 +78,9 @@ export function RoleList({ onEdit, onCreate, selectedRole, onSelectRole }: RoleL
     setLoading(false);
   }, []);
 
-  useState(() => {
+  useEffect(() => {
     loadRoles();
-  });
+  }, [loadRoles]);
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
@@ -162,6 +174,7 @@ export function RoleList({ onEdit, onCreate, selectedRole, onSelectRole }: RoleL
                   role="row"
                   aria-selected={selectedRole?.id === role.id}
                   aria-label={`Role: ${role.name}`}
+                  aria-describedby={`role-desc-${role.id}`}
                 >
                   <td className="px-4 py-3">
                     <span className="font-medium text-text-primary">{role.name}</span>
@@ -169,6 +182,9 @@ export function RoleList({ onEdit, onCreate, selectedRole, onSelectRole }: RoleL
                   <td className="px-4 py-3">
                     <span className="text-text-secondary">
                       {role.description || '\u2014'}
+                    </span>
+                    <span id={`role-desc-${role.id}`} className="sr-only">
+                      Click to view and manage permissions for {role.name}
                     </span>
                   </td>
                   <td className="px-4 py-3">
@@ -189,9 +205,15 @@ export function RoleList({ onEdit, onCreate, selectedRole, onSelectRole }: RoleL
                         }}
                         disabled={role.isSystem}
                         aria-label={`Edit ${role.name}`}
+                        aria-describedby={role.isSystem ? `edit-disabled-${role.id}` : undefined}
                       >
                         Edit
                       </Button>
+                      {role.isSystem && (
+                        <span id={`edit-disabled-${role.id}`} className="sr-only">
+                          System roles cannot be edited
+                        </span>
+                      )}
                       <Button
                         variant="ghost"
                         size="sm"
@@ -202,9 +224,15 @@ export function RoleList({ onEdit, onCreate, selectedRole, onSelectRole }: RoleL
                         disabled={role.isSystem}
                         className="text-text-destructive hover:text-text-destructive"
                         aria-label={`Delete ${role.name}`}
+                        aria-describedby={role.isSystem ? `delete-disabled-${role.id}` : undefined}
                       >
                         Delete
                       </Button>
+                      {role.isSystem && (
+                        <span id={`delete-disabled-${role.id}`} className="sr-only">
+                          System roles cannot be deleted
+                        </span>
+                      )}
                     </div>
                   </td>
                 </tr>
