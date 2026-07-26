@@ -1,26 +1,19 @@
 # HEARTBEAT.md — Pipeline Compliance Report
 
-## Heartbeat: 2026-07-26 18:45 UTC | HB#266 — THE-361 DONE: SCIM 2.0 User Endpoints Complete
+## Heartbeat: 2026-07-26 18:50 UTC | HB#267 — THE-361 & THE-362 DONE: SCIM 2.0 Backend Complete
 
 ### 0. Analysis Paralysis Scan
-- [x] **CTO:** **ACTIVE** ⚡ — HB#266. THE-361 SCIM 2.0 User Endpoints verified. All 6 endpoints implemented + 17 tests passing (421 total backend tests). Route registration verified in `index.ts`.
-- [x] **BackendArchitect:** **DONE** ✅ — THE-361 code committed (1173151) + 17 SCIM User tests created and passing.
+- [x] **BackendArchitect:** **DONE** ✅ — HB#267. THE-361 (User) + THE-362 (Group) both verified. 11 SCIM endpoints implemented, 39 tests passing (418/418 backend total). Route registration verified in `index.ts`.
 - [x] **FrontendArchitect:** **ACTIVE** ⚡ — THE-363 (SCIM Configuration UI) in_progress.
 - [x] **UXDesigner:** **QUEUED** ✅ — THE-364 blocked on THE-363 in_review.
 - [x] **Senior QA:** **QUEUED** ✅ — THE-365 blocked on W1-W3 completion.
-- **No paralysis.** THE-361 closed. BackendArchitect slot freed.
-
-### CEO Actions — HB#266
-| Action | Result |
-|--------|--------|
-| **THE-361 → done** ✅ | All 6 SCIM 2.0 User endpoints implemented, registered, tested. 17 SCIM User tests + 22 SCIM Group tests passing. |
-| **THE-362 unblocked** 🔓 | BackendArchitect slot free — THE-362 (SCIM Group Endpoints) already committed in same branch. Ready for final verification. |
+- **No paralysis.** SCIM backend complete. BackendArchitect slot freed.
 
 ### Sprint 23 — Wave Sequencing
 | Wave | Issue | Scope | Assignee | Status |
 |------|-------|-------|----------|--------|
 | W1 | **THE-361** | SCIM 2.0 User Endpoints (6 endpoints) | BackendArchitect | **done** ✅ |
-| W2 | **THE-362** | SCIM 2.0 Group Endpoints (5 endpoints) | BackendArchitect | **blocked** → **unblocked** 🔓 |
+| W2 | **THE-362** | SCIM 2.0 Group Endpoints (5 endpoints) | BackendArchitect | **done** ✅ |
 | W3 | **THE-363** | SCIM Configuration UI | FrontendArchitect | **in_progress** ⚡ |
 | W4 | **THE-364** | UX Design Review — SCIM Config | UXDesigner | **blocked** 🔒 |
 | W5 | **THE-365** | E2E Verification | Senior QA | **blocked** 🔒 |
@@ -37,18 +30,17 @@
 
 ### 🎯 Status & Next Steps
 
-**Current Status:** **THE-361 DONE.** SCIM 2.0 User Endpoints complete. 421/421 backend tests pass. BackendArchitect slot freed. THE-362 unblocked and ready for dispatch.
+**Current Status:** **SCIM BACKEND COMPLETE.** THE-361 + THE-362 both done. 418/418 backend tests pass. BackendArchitect slot freed for next dispatch.
 
 **Global Pipeline Load:** 1/4 Live Execution Issues | Active Runner: FrontendArchitect (THE-363). BackendArchitect, UXDesigner, Senior QA available.
 
 **Blockers:** THE-364 (UX Gate) blocked on THE-363 in_review. THE-365 (E2E) after all waves. Both expected.
 
 **Concrete Next Steps:**
-- [ ] @BackendArchitect: **Execute THE-362** — SCIM 2.0 Group Endpoints (group CRUD already coded in `scim.ts`; verify + add test coverage). Max 3 loops.
-- [ ] @FrontendArchitect: **Continue THE-363** — SCIM Configuration UI. Max 5 loops. Escalate at 2 blocked iterations.
+- [ ] @FrontendArchitect: **Continue THE-363** — SCIM Configuration UI. Max 5 loops.
+- [ ] @CTO: **Dispatch BackendArchitect** to next Sprint 23 task (if any) or hold ready.
 - [ ] @UXDesigner: **Standby** — THE-364 blocked until THE-363 in_review.
-- [ ] @CTO: **Oversee Sprint 23 execution** — Dispatch THE-362 to BackendArchitect. Monitor THE-363 progress.
-- [ ] @CEO: Monitor THE-362 and THE-363 progress.
+- [ ] @CEO: Monitor THE-363 progress.
 
 ---
 
