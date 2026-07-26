@@ -1,11 +1,12 @@
-import { useState, useCallback, useEffect } from 'react';
-import type { Role, Permission } from '@nexus-engineering/shared';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import type { Role, Permission, CreateRoleRequest } from '@nexus-engineering/shared';
 import { Card, Container, Stack } from '@nexus-engineering/shared';
 import { RoleList } from './RoleList';
 import { RoleForm } from './RoleForm';
 import { RolePermissionsPanel } from './RolePermissionsPanel';
 import { UserRoleAssignment } from './UserRoleAssignment';
 import { fetchRoles, fetchPermissions } from '../../api/rbac';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
 
 interface ModalState {
   type: 'create' | 'edit' | null;
@@ -43,10 +44,10 @@ export function RoleManagement() {
   const handleEdit = (role: Role) => setModal({ type: 'edit', role });
   const handleCancel = () => setModal({ type: null, role: null });
 
-  const handleFormSubmit = async (data: { name: string; description?: string | null }) => {
+  const handleFormSubmit = async (data: { name: string; description?: string | null; permissionIds?: string[] }) => {
     if (modal.type === 'create') {
       const { createRole } = await import('../../api/rbac');
-      const role = await createRole(data as { name: string; description?: string | null; permissionIds?: string[] });
+      const role = await createRole(data as CreateRoleRequest);
       if (role) {
         setAvailableRoles(prev => [...prev, role]);
         handleCancel();
@@ -137,9 +138,21 @@ export function RoleManagement() {
       </Stack>
 
       {/* Create/Edit Modal */}
-      {modal.type && (
+      {modal.type && (() => {
+        const modalRef = useRef<HTMLDivElement>(null);
+        useFocusTrap(modalRef, true);
+
+        useEffect(() => {
+          const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') handleCancel();
+          };
+          document.addEventListener('keydown', handleEscape);
+          return () => document.removeEventListener('keydown', handleEscape);
+        }, [handleCancel]);
+
+        return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" role="dialog" aria-modal="true" aria-label={modal.type === 'create' ? 'Create new role' : 'Edit role'}>
-          <div className="w-full max-w-lg rounded-xl bg-surface-primary p-6 shadow-xl">
+          <div ref={modalRef} className="w-full max-w-lg rounded-xl bg-surface-primary p-6 shadow-xl">
             <h3 className="text-lg font-semibold text-text-primary">
               {modal.type === 'create' ? 'Create New Role' : `Edit: ${modal.role?.name}`}
             </h3>
@@ -159,7 +172,8 @@ export function RoleManagement() {
             </div>
           </div>
         </div>
-      )}
+        );
+      })()}
     </Container>
   );
 }

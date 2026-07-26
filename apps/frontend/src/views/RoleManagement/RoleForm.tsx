@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import type { Role, CreateRoleRequest, UpdateRoleRequest } from '@nexus-engineering/shared';
-import { Button, Alert } from '@nexus-engineering/shared';
+import { Button, Alert, Input } from '@nexus-engineering/shared';
 
 interface RoleFormProps {
   role?: Role | null;
   permissions: { resource: string; items: { id: string; name: string; description: string | null }[] }[];
-  onSubmit: (data: CreateRoleRequest | UpdateRoleRequest) => Promise<boolean>;
+  onSubmit: (data: CreateRoleRequest | UpdateRoleRequest & { permissionIds?: string[] }) => Promise<boolean>;
   onCancel: () => void;
   mode: 'create' | 'edit';
 }
@@ -38,6 +38,7 @@ export function RoleForm({ role, permissions, onSubmit, onCancel, mode }: RoleFo
     const success = await onSubmit({
       name: name.trim(),
       description: description.trim() || null,
+      permissionIds: Array.from(permissionIds),
     });
     if (!success) {
       setError(mode === 'create' ? 'Failed to create role. Please try again.' : 'Failed to update role. Please try again.');
@@ -98,18 +99,19 @@ export function RoleForm({ role, permissions, onSubmit, onCancel, mode }: RoleFo
       )}
 
       <div className="space-y-3">
-        <label htmlFor="role-name" className="block text-sm font-medium text-text-primary">
-          Role Name <span className="text-text-destructive">*</span>
-        </label>
-        <input
+        <Input
           id="role-name"
+          label={
+            <span>
+              Role Name <span className="text-text-destructive">*</span>
+            </span>
+          }
           type="text"
           value={name}
           onChange={e => setName(e.target.value)}
           placeholder="e.g. Content Manager"
           required
-          className="w-full rounded-lg border border-border bg-surface-primary px-3 py-2 text-sm text-text-primary placeholder-text-tertiary focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-          aria-describedby={error ? 'role-name-error' : undefined}
+          error={error ? undefined : undefined}
         />
       </div>
 

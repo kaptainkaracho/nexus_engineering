@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { Role, Permission } from '@nexus-engineering/shared';
 import { Button, Alert } from '@nexus-engineering/shared';
+import { PermissionCheckboxGroup } from './PermissionCheckboxGroup';
 import { setRolePermissions } from '../../api/rbac';
 
 interface RolePermissionsPanelProps {
@@ -11,8 +12,21 @@ interface RolePermissionsPanelProps {
 
 export function RolePermissionsPanel({ role, allPermissions, onPermissionsUpdated }: RolePermissionsPanelProps) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => {
-    return new Set<string>();
+    const roleWithPerms = role as Role & { permissions?: { id: string }[] };
+    return new Set(roleWithPerms.permissions?.map((p: { id: string }) => p.id) ?? []);
   });
+
+  const seedPermissions = useCallback(() => {
+    const roleWithPerms = role as Role & { permissions?: { id: string }[] };
+    const ids = roleWithPerms.permissions?.map((p: { id: string }) => p.id);
+    if (ids && ids.length > 0) {
+      setSelectedIds(new Set(ids));
+    }
+  }, [role]);
+
+  useEffect(() => {
+    seedPermissions();
+  }, [seedPermissions]);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -96,44 +110,14 @@ export function RolePermissionsPanel({ role, allPermissions, onPermissionsUpdate
           <p className="text-sm text-text-tertiary text-center py-4">No permissions available</p>
         )}
         {allPermissions.map(group => (
-          <div key={group.resource} className="space-y-2">
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id={`perm-toggle-${group.resource}`}
-                checked={group.items.every(item => selectedIds.has(item.id)) && group.items.length > 0}
-                ref={el => {
-                  if (el) {
-                    const allChecked = group.items.every(item => selectedIds.has(item.id));
-                    const someChecked = group.items.some(item => selectedIds.has(item.id));
-                    el.indeterminate = someChecked && !allChecked;
-                  }
-                }}
-                onChange={e => toggleAllInGroup(group.resource, e.target.checked)}
-                className="h-4 w-4 rounded border-border text-primary-600 focus:ring-primary-500"
-                aria-label={`Toggle all ${group.resource} permissions`}
-              />
-              <span className="text-sm font-medium text-text-primary">{group.resource}</span>
-            </div>
-            <div className="ml-6 space-y-1">
-              {group.items.map(item => (
-                <label key={item.id} className="flex items-center gap-2 py-1 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.has(item.id)}
-                    onChange={() => togglePermission(item.id)}
-                    className="h-4 w-4 rounded border-border text-primary-600 focus:ring-primary-500"
-                  />
-                  <span className="text-sm text-text-secondary">{item.name}</span>
-                  {item.description && (
-                    <span className="text-xs text-text-tertiary">
-                      ({item.description})
-                    </span>
-                  )}
-                </label>
-              ))}
-            </div>
-          </div>
+          <PermissionCheckboxGroup
+            key={group.resource}
+            resource={group.resource}
+            permissions={group.items}
+            selectedIds={selectedIds}
+            onToggle={togglePermission}
+            onToggleGroup={e => toggleAllInGroup(group.resource, e)}
+          />
         ))}
       </div>
 
