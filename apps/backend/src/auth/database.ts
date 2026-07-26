@@ -26,11 +26,15 @@ const SEED_PERMISSIONS = [
   { id: 'perm_settings_read', name: 'settings:read', description: 'View system settings', resource: 'settings', action: 'read' },
   { id: 'perm_settings_write', name: 'settings:write', description: 'Update system settings', resource: 'settings', action: 'write' },
   { id: 'perm_admin_all', name: 'admin:all', description: 'Full administrative access', resource: 'admin', action: 'all' },
+  { id: 'perm_roles_read', name: 'roles:read', description: 'List and view roles and their permissions', resource: 'roles', action: 'read' },
+  { id: 'perm_roles_write', name: 'roles:write', description: 'Create, update, delete custom roles', resource: 'roles', action: 'write' },
+  { id: 'perm_permission_sets_read', name: 'permission-sets:read', description: 'List and view permission sets', resource: 'permission-sets', action: 'read' },
+  { id: 'perm_permission_sets_write', name: 'permission-sets:write', description: 'Create, update, delete permission sets', resource: 'permission-sets', action: 'write' },
 ]
 
 const ROLE_PERMISSIONS: Record<string, string[]> = {
-  admin: ['perm_admin_all', 'perm_users_read', 'perm_users_write', 'perm_requirements_read', 'perm_requirements_write', 'perm_artifacts_read', 'perm_artifacts_write', 'perm_trace_links_read', 'perm_trace_links_write', 'perm_graph_read', 'perm_settings_read', 'perm_settings_write'],
-  developer: ['perm_requirements_read', 'perm_requirements_write', 'perm_artifacts_read', 'perm_artifacts_write', 'perm_trace_links_read', 'perm_trace_links_write', 'perm_graph_read', 'perm_users_read'],
+  admin: ['perm_admin_all', 'perm_users_read', 'perm_users_write', 'perm_requirements_read', 'perm_requirements_write', 'perm_artifacts_read', 'perm_artifacts_write', 'perm_trace_links_read', 'perm_trace_links_write', 'perm_graph_read', 'perm_settings_read', 'perm_settings_write', 'perm_roles_read', 'perm_roles_write', 'perm_permission_sets_read', 'perm_permission_sets_write'],
+  developer: ['perm_requirements_read', 'perm_requirements_write', 'perm_artifacts_read', 'perm_artifacts_write', 'perm_trace_links_read', 'perm_trace_links_write', 'perm_graph_read', 'perm_users_read', 'perm_roles_read', 'perm_permission_sets_read'],
   viewer: ['perm_requirements_read', 'perm_artifacts_read', 'perm_trace_links_read', 'perm_graph_read'],
   analyst: ['perm_requirements_read', 'perm_artifacts_read', 'perm_trace_links_read', 'perm_graph_read', 'perm_settings_read'],
 }
@@ -51,7 +55,21 @@ export interface RoleRow {
   id: string
   name: string
   description: string | null
+  is_system: number
   created_at: string
+}
+
+export interface PermissionSetRow {
+  id: string
+  name: string
+  description: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface PermissionSetPermissionRow {
+  permission_set_id: string
+  permission_id: string
 }
 
 export interface PermissionRow {
@@ -114,9 +132,12 @@ export class AuthDatabase {
         id TEXT PRIMARY KEY,
         name TEXT UNIQUE NOT NULL,
         description TEXT,
+        is_system INTEGER NOT NULL DEFAULT 0,
         created_at TEXT NOT NULL
       )
     `)
+
+    try { this.db.exec(`ALTER TABLE roles ADD COLUMN is_system INTEGER NOT NULL DEFAULT 0`) } catch {}
 
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS permissions (
@@ -134,6 +155,26 @@ export class AuthDatabase {
         permission_id TEXT NOT NULL,
         PRIMARY KEY (role_id, permission_id),
         FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE,
+        FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE
+      )
+    `)
+
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS permission_sets (
+        id TEXT PRIMARY KEY,
+        name TEXT UNIQUE NOT NULL,
+        description TEXT,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      )
+    `)
+
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS permission_set_permissions (
+        permission_set_id TEXT NOT NULL,
+        permission_id TEXT NOT NULL,
+        PRIMARY KEY (permission_set_id, permission_id),
+        FOREIGN KEY (permission_set_id) REFERENCES permission_sets(id) ON DELETE CASCADE,
         FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE
       )
     `)
@@ -235,7 +276,7 @@ export class AuthDatabase {
     if (roleCount.c > 0) return
 
     const now = new Date().toISOString()
-    const insertRole = this.db.prepare('INSERT INTO roles (id, name, description, created_at) VALUES (?, ?, ?, ?)')
+    const insertRole = this.db.prepare('INSERT INTO roles (id, name, description, is_system, created_at) VALUES (?, ?, ?, 1, ?)')
     const insertPermission = this.db.prepare('INSERT INTO permissions (id, name, description, resource, action) VALUES (?, ?, ?, ?, ?)')
     const insertRolePerm = this.db.prepare('INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)')
 
@@ -296,7 +337,7 @@ export class AuthDatabase {
   }
 
   listRoles(): RoleRow[] {
-    return this.db.prepare('SELECT * FROM roles ORDER BY name').all() as RoleRow[]
+    return this.db.prepare('SELECT * FROM roles ORDER BY is_system DESC, name').all() as RoleRow[]
   }
 
   getPermissionsForRole(roleId: string): PermissionRow[] {
@@ -454,6 +495,142 @@ export class AuthDatabase {
     return this.db.prepare(
       'SELECT * FROM group_members WHERE group_id = ?'
     ).all(group_id) as GroupMemberRow[]
+  }
+
+  // --- RBAC: Role Management ---
+
+  createRole(role: { id: string; name: string; description: string | null }): RoleRow {
+    const now = new Date().toISOString()
+    const stmt = this.db.prepare(
+      'INSERT INTO roles (id, name, description, is_system, created_at) VALUES (?, ?, ?, 0, ?)'
+    )
+    stmt.run(role.id, role.name, role.description, now)
+    return this.findRoleById(role.id)!
+  }
+
+  updateRole(id: string, updates: { name?: string; description?: string | null }): boolean {
+    const role = this.findRoleById(id)
+    if (!role || role.is_system) return false
+
+    const parts: string[] = []
+    const values: unknown[] = []
+
+    if (updates.name !== undefined) {
+      parts.push('name = ?')
+      values.push(updates.name)
+    }
+    if (updates.description !== undefined) {
+      parts.push('description = ?')
+      values.push(updates.description)
+    }
+
+    if (parts.length === 0) return false
+    const sql = `UPDATE roles SET ${parts.join(', ')} WHERE id = ? AND is_system = 0`
+    values.push(id)
+    const result = this.db.prepare(sql).run(...values)
+    return result.changes > 0
+  }
+
+  deleteRole(id: string): boolean {
+    const role = this.findRoleById(id)
+    if (!role || role.is_system) return false
+
+    const userCount = this.db.prepare('SELECT COUNT(*) AS c FROM users WHERE role_id = ?').get(id) as any
+    if (userCount.c > 0) return false
+
+    this.db.prepare('DELETE FROM roles WHERE id = ? AND is_system = 0').run(id)
+    return true
+  }
+
+  setRolePermissions(roleId: string, permissionIds: string[]): void {
+    const tx = this.db.transaction(() => {
+      this.db.prepare('DELETE FROM role_permissions WHERE role_id = ?').run(roleId)
+      const insert = this.db.prepare('INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)')
+      for (const permId of permissionIds) {
+        insert.run(roleId, permId)
+      }
+    })
+    tx()
+  }
+
+  getAllPermissions(): PermissionRow[] {
+    return this.db.prepare('SELECT * FROM permissions ORDER BY resource, action').all() as PermissionRow[]
+  }
+
+  // --- RBAC: Permission Set Management ---
+
+  createPermissionSet(ps: { id: string; name: string; description: string | null }): PermissionSetRow {
+    const now = new Date().toISOString()
+    const stmt = this.db.prepare(
+      'INSERT INTO permission_sets (id, name, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?)'
+    )
+    stmt.run(ps.id, ps.name, ps.description, now, now)
+    return this.getPermissionSet(ps.id)!
+  }
+
+  getPermissionSet(id: string): PermissionSetRow | undefined {
+    return this.db.prepare('SELECT * FROM permission_sets WHERE id = ?').get(id) as PermissionSetRow | undefined
+  }
+
+  findPermissionSetByName(name: string): PermissionSetRow | undefined {
+    return this.db.prepare('SELECT * FROM permission_sets WHERE name = ?').get(name) as PermissionSetRow | undefined
+  }
+
+  listPermissionSets(): PermissionSetRow[] {
+    return this.db.prepare('SELECT * FROM permission_sets ORDER BY name').all() as PermissionSetRow[]
+  }
+
+  updatePermissionSet(id: string, updates: { name?: string; description?: string | null }): boolean {
+    const parts: string[] = ['updated_at = ?']
+    const values: unknown[] = [new Date().toISOString()]
+
+    if (updates.name !== undefined) {
+      parts.push('name = ?')
+      values.push(updates.name)
+    }
+    if (updates.description !== undefined) {
+      parts.push('description = ?')
+      values.push(updates.description)
+    }
+
+    if (parts.length === 1) return false
+    const sql = `UPDATE permission_sets SET ${parts.join(', ')} WHERE id = ?`
+    values.push(id)
+    const result = this.db.prepare(sql).run(...values)
+    return result.changes > 0
+  }
+
+  deletePermissionSet(id: string): boolean {
+    const result = this.db.prepare('DELETE FROM permission_sets WHERE id = ?').run(id)
+    return result.changes > 0
+  }
+
+  getPermissionsForPermissionSet(permissionSetId: string): PermissionRow[] {
+    return this.db.prepare(`
+      SELECT p.* FROM permissions p
+      JOIN permission_set_permissions psp ON psp.permission_id = p.id
+      WHERE psp.permission_set_id = ?
+      ORDER BY p.resource, p.action
+    `).all(permissionSetId) as PermissionRow[]
+  }
+
+  setPermissionSetPermissions(permissionSetId: string, permissionIds: string[]): void {
+    const tx = this.db.transaction(() => {
+      this.db.prepare('DELETE FROM permission_set_permissions WHERE permission_set_id = ?').run(permissionSetId)
+      const insert = this.db.prepare('INSERT INTO permission_set_permissions (permission_set_id, permission_id) VALUES (?, ?)')
+      for (const permId of permissionIds) {
+        insert.run(permissionSetId, permId)
+      }
+    })
+    tx()
+  }
+
+  // --- RBAC: User Role Assignment ---
+
+  updateUserRole(userId: string, roleId: string): boolean {
+    const role = this.findRoleById(roleId)
+    if (!role) return false
+    return this.updateUser(userId, { roleId })
   }
 
   close() {

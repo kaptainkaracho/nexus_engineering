@@ -328,7 +328,58 @@ export interface Role {
   id: string
   name: string
   description: string | null
+  isSystem: boolean
   createdAt: string
+}
+
+export interface PermissionSet {
+  id: string
+  name: string
+  description: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface PermissionSetWithPermissions extends PermissionSet {
+  permissions: Permission[]
+}
+
+export interface CreateRoleRequest {
+  name: string
+  description?: string | null
+  permissionIds?: string[]
+}
+
+export interface UpdateRoleRequest {
+  name?: string
+  description?: string | null
+}
+
+export interface CreatePermissionSetRequest {
+  name: string
+  description?: string | null
+  permissionIds?: string[]
+}
+
+export interface UpdatePermissionSetRequest {
+  name?: string
+  description?: string | null
+}
+
+export interface SetRolePermissionsRequest {
+  permissionIds: string[]
+}
+
+export interface SetPermissionSetPermissionsRequest {
+  permissionIds: string[]
+}
+
+export interface UpdateUserRoleRequest {
+  roleId: string
+}
+
+export interface RoleWithPermissions extends Role {
+  permissions: Permission[]
 }
 
 export interface Permission {
