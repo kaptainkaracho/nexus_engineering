@@ -1,0 +1,883 @@
+# SCIM 2.0 Data Model + API Specification
+# Nexus Engineering Platform
+
+openapi: 3.1.0
+info:
+  title: SCIM 2.0 API
+  description: System for Cross-domain Identity Management (SCIM) 2.0 API for Nexus Engineering Platform
+  version: "1.0"
+  contact:
+    name: Backend Engineering Team
+    email: backend@nexus-engineering.com
+
+servers:
+  - url: https://api.nexus-engineering.com
+    description: Production server
+  - url: https://api.staging.nexus-engineering.com
+    description: Staging server
+
+# SCIM Core Schemas
+schemas:
+  # SCIM User Schema
+  User:
+    allOf:
+      - $ref: '#/components/schemas/BaseResource'
+      - type: object
+        properties:
+          schemas:
+            type: array
+            items:
+              type: string
+              enum:
+                - urn:ietf:params:scim:schemas:core:2.0:User
+                - urn:ietf:params:scim:schemas:extension:org:1.0:User
+                - urn:ietf:params:scim:schemas:extension:trace:1.0:User
+                - urn:ietf:params:scim:schemas:extension:sso:1.0:User
+          id:
+            type: string
+            format: uuid
+            description: Unique ID for the User
+          userName:
+            type: string
+            format: email
+            description: User's email address (used for SCIM userName)
+          displayName:
+            type: string
+            description: User's display name
+          name:
+            $ref: '#/components/schemas/MultiValuedAttribute'
+          emails:
+            type: array
+            items:
+              $ref: '#/components/schemas/Email'
+          active:
+            type: boolean
+            description: User's active status
+          roles:
+            type: array
+            items:
+              type: string
+          groups:
+            type: array
+            items:
+              $ref: '#/components/schemas/GroupReference'
+          photos:
+            type: array
+            items:
+              $ref: '#/components/schemas/Photo'
+          urn:ietf:params:scim:schemas:extension:org:1.0:User:
+            $ref: '#/components/schemas/OrganizationExtension'
+          urn:ietf:params:scim:schemas:extension:trace:1.0:User:
+            $ref: '#/components/schemas/TraceExtension'
+          urn:ietf:params:scim:schemas:extension:sso:1.0:User:
+            $ref: '#/components/schemas/SSOExtension'
+          meta:
+            $ref: '#/components/schemas/Meta'
+
+  OrganizationExtension:
+    type: object
+    properties:
+      urn:nexus:orgId:
+        type: string
+        format: uuid
+        description: Organization ID
+      urn:nexus:orgRole:
+        type: string
+        enum:
+          - org:admin
+          - org:member
+          - org:viewer
+        description: Organization role
+
+  TraceExtension:
+    type: object
+    properties:
+      urn:nexus:tracePermissions:
+        type: array
+        items:
+          type: string
+        description: Traceability permissions
+
+  SSOExtension:
+    type: object
+    properties:
+      urn:nexus:ssoprovider:
+        type: string
+        description: SSO provider
+      urn:nexus:ssouserId:
+        type: string
+        description: Provider user ID
+      urn:nexus:ssoproviderEmail:
+        type: string
+        description: SSO provider email
+
+  Email:
+    type: object
+    properties:
+      type:
+        type: string
+        enum:
+          - work
+          - home
+          - other
+        default: work
+      primary:
+        type: boolean
+        default: true
+      value:
+        type: string
+        format: email
+
+  Photo:
+    type: object
+    properties:
+      type:
+        type: string
+        enum:
+          - photo
+      primary:
+        type: boolean
+        default: true
+      value:
+        type: string
+        format: uri
+        description: Avatar URL
+      height:
+        type: integer
+        description: Avatar height in pixels
+      width:
+        type: integer
+        description: Avatar width in pixels
+
+  GroupReference:
+    type: object
+    properties:
+      display:
+        type: string
+        description: Group display name
+      value:
+        type: string
+        format: uuid
+        description: Group ID
+      $ref:
+        type: string
+        description: SCIM URI reference
+
+  Group:
+    allOf:
+      - $ref: '#/components/schemas/BaseResource'
+      - type: object
+        properties:
+          schemas:
+            type: array
+            items:
+              type: string
+              enum:
+                - urn:ietf:params:scim:schemas:core:2.0:Group
+          id:
+            type: string
+            format: uuid
+            description: Unique ID for the Group
+          displayName:
+            type: string
+            description: Group display name
+          description:
+            type: string
+            description: Group description
+          members:
+            type: array
+            items:
+              $ref: '#/components/schemas/Member'
+          meta:
+            $ref: '#/components/schemas/Meta'
+
+  Member:
+    type: object
+    properties:
+      value:
+        type: string
+        format: uuid
+        description: Member user ID
+      display:
+        type: string
+        description: Member display name
+      $ref:
+        type: string
+        description: SCIM URI reference
+      type:
+        type: string
+        enum:
+          - User
+        default: User
+
+  Meta:
+    type: object
+    properties:
+      resourceType:
+        type: string
+        enum:
+          - User
+          - Group
+      created:
+        type: string
+        format: date-time
+        description: ISO 8601 timestamp
+      lastModified:
+        type: string
+        format: date-time
+        description: ISO 8601 timestamp
+      location:
+        type: string
+        description: SCIM resource location
+      version:
+        type: string
+        description: ETag-style version
+
+  BaseResource:
+    type: object
+    properties:
+      schemas:
+        type: array
+        items:
+          type: string
+      id:
+        type: string
+        description: Unique ID
+
+  ListResponse:
+    type: object
+    properties:
+      schemas:
+        type: array
+        items:
+          type: string
+        example:
+          - urn:ietf:params:scim:api:messages:2.0:ListResponse
+      totalResults:
+        type: integer
+        description: Total number of matching results
+      itemsPerPage:
+        type: integer
+        description: Number of results in this page
+      startIndex:
+        type: integer
+        minimum: 1
+        description: 1-based index of the first result
+      Resources:
+        type: array
+        description: Array of SCIM resources
+      nextPageUrl:
+        type: string
+        description: URL to retrieve next page
+
+  Error:
+    type: object
+    properties:
+      schemas:
+        type: array
+        items:
+          type: string
+        example:
+          - urn:ietf:params:scim:api:messages:2.0:Error
+      scimType:
+        type: string
+        description: SCIM-specific error type
+      detail:
+        type: string
+        description: Detailed error message
+      status:
+        type: string
+        description: HTTP status code as string
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    SCIMError:
+      description: SCIM Error Response
+      content:
+        application/scim+json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ResourceNotFound:
+      description: Resource not found
+      content:
+        application/scim+json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            schemas:
+              - urn:ietf:params:scim:api:messages:2.0:Error
+            scimType: noTarget
+            detail: Resource 'User' with id '123e4567-e89b-12d3-a456-426614174000' does not exist
+            status: "404"
+    SCIMSuccess:
+      description: Successful SCIM operation
+      content:
+        application/scim+json:
+          schema:
+            type: object
+            properties:
+              schemas:
+                type: array
+                items:
+                  type: string
+              id:
+                type: string
+
+paths:
+  /api/scim/Users:
+    get:
+      tags:
+        - Users
+      summary: List SCIM Users
+      description: List all users with SCIM 2.0 pagination and filtering support
+      operationId: listUsers
+      parameters:
+        - name: startIndex
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: 1-based index of the first result (SCIM)
+        - name: count
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 100
+          description: Number of results per page (SCIM)
+        - name: filter
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter expression (SCIM)
+      responses:
+        '200':
+          description: Successful list operation
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ListResponse'
+              example:
+                schemas:
+                  - urn:ietf:params:scim:api:messages:2.0:ListResponse
+                totalResults: 150
+                itemsPerPage: 100
+                startIndex: 1
+                Resources:
+                  - id: 123e4567-e89b-12d3-a456-426614174000
+                    schemas:
+                      - urn:ietf:params:scim:schemas:core:2.0:User
+                      - urn:ietf:params:scim:schemas:extension:org:1.0:User
+                    userName: "jdoe@example.com"
+                    displayName: "John Doe"
+                    active: true
+                    urn:ietf:params:scim:schemas:extension:org:1.0:User:
+                      urn:nexus:orgId: "org-123"
+                      urn:nexus:orgRole: "org:admin"
+                    meta:
+                      resourceType: "User"
+                      created: "2024-01-15T10:30:00Z"
+                      lastModified: "2024-01-20T15:45:00Z"
+                      location: "https://api.nexus-engineering.com/api/scim/Users/123e4567-e89b-12d3-a456-426614174000"
+        '400':
+          $ref: '#/components/responses/SCIMError'
+      security:
+        - BearerAuth: []
+
+    post:
+      tags:
+        - Users
+      summary: Create SCIM User
+      description: Create a new user with SCIM 2.0 compliant attributes
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              $ref: '#/components/schemas/User'
+            examples:
+              standard:
+                summary: Standard SCIM User
+                value:
+                  schemas:
+                    - urn:ietf:params:scim:schemas:core:2.0:User
+                    - urn:ietf:params:scim:schemas:extension:org:1.0:User
+                  userName: "jdoe@example.com"
+                  displayName: "John Doe"
+                  active: true
+                  urn:ietf:params:scim:schemas:extension:org:1.0:User:
+                    urn:nexus:orgId: "org-123"
+                    urn:nexus:orgRole: "org:member"
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '409':
+          $ref: '#/components/responses/SCIMError'
+      security:
+        - BearerAuth: []
+
+  /api/scim/Users/{id}:
+    get:
+      tags:
+        - Users
+      summary: Get SCIM User by ID
+      description: Retrieve a specific SCIM User by ID
+      operationId: getUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+      security:
+        - BearerAuth: []
+
+    put:
+      tags:
+        - Users
+      summary: Replace SCIM User (PUT)
+      description: Replace an existing SCIM User with a new version
+      operationId: replaceUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        '409':
+          $ref: '#/components/responses/SCIMError'
+      security:
+        - BearerAuth: []
+
+    patch:
+      tags:
+        - Users
+      summary: Update SCIM User (PATCH)
+      description: Update a SCIM User using SCIM PatchOp operations
+      operationId: patchUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              type: object
+              properties:
+                schemas:
+                  type: array
+                  items:
+                    type: string
+                  example:
+                    - urn:ietf:params:scim:api:messages:2.0:PatchOp
+                Operations:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/PatchOperation'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        '409':
+          $ref: '#/components/responses/SCIMError'
+      security:
+        - BearerAuth: []
+
+    delete:
+      tags:
+        - Users
+      summary: Delete SCIM User
+      description: Delete a SCIM User
+      operationId: deleteUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+      responses:
+        '200':
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  id:
+                    type: string
+          example:
+            message: "User deleted successfully"
+            id: "123e4567-e89b-12d3-a456-426614174000"
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+      security:
+        - BearerAuth: []
+
+  /api/scim/Groups:
+    get:
+      tags:
+        - Groups
+      summary: List SCIM Groups
+      description: List all groups with SCIM 2.0 pagination and filtering support
+      operationId: listGroups
+      parameters:
+        - name: startIndex
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: 1-based index of the first result (SCIM)
+        - name: count
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 100
+          description: Number of results per page (SCIM)
+        - name: filter
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter expression (SCIM)
+      responses:
+        '200':
+          description: Successful list operation
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ListResponse'
+        '400':
+          $ref: '#/components/responses/SCIMError'
+      security:
+        - BearerAuth: []
+
+    post:
+      tags:
+        - Groups
+      summary: Create SCIM Group
+      description: Create a new group with SCIM 2.0 compliant attributes
+      operationId: createGroup
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              $ref: '#/components/schemas/Group'
+      responses:
+        '201':
+          description: Group created successfully
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '409':
+          $ref: '#/components/responses/SCIMError'
+      security:
+        - BearerAuth: []
+
+  /api/scim/Groups/{id}:
+    get:
+      tags:
+        - Groups
+      summary: Get SCIM Group by ID
+      description: Retrieve a specific SCIM Group by ID
+      operationId: getGroup
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Group ID
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+      security:
+        - BearerAuth: []
+
+    put:
+      tags:
+        - Groups
+      summary: Replace SCIM Group (PUT)
+      description: Replace an existing SCIM Group with a new version
+      operationId: replaceGroup
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Group ID
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              $ref: '#/components/schemas/Group'
+      responses:
+        '200':
+          description: Group updated successfully
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+      security:
+        - BearerAuth: []
+
+    patch:
+      tags:
+        - Groups
+      summary: Update SCIM Group (PATCH)
+      description: Update a SCIM Group using SCIM PatchOp operations
+      operationId: patchGroup
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Group ID
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              type: object
+              properties:
+                schemas:
+                  type: array
+                  items:
+                    type: string
+                  example:
+                    - urn:ietf:params:scim:api:messages:2.0:PatchOp
+                Operations:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/PatchOperation'
+      responses:
+        '200':
+          description: Group updated successfully
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+      security:
+        - BearerAuth: []
+
+    delete:
+      tags:
+        - Groups
+      summary: Delete SCIM Group
+      description: Delete a SCIM Group
+      operationId: deleteGroup
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Group ID
+      responses:
+        '200':
+          description: Group deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  id:
+                    type: string
+          example:
+            message: "Group deleted successfully"
+            id: "456e7890-e89b-12d3-a456-426614174000"
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+      security:
+        - BearerAuth: []
+
+  /api/scim/Users/{userId}/groups:
+    get:
+      tags:
+        - Groups
+      summary: Get SCIM Groups for User
+      description: Retrieve all groups a user is a member of
+      operationId: getUserGroups
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/scim+json:
+              schema:
+                type: object
+                properties:
+                  schemas:
+                    type: array
+                    items:
+                      type: string
+                  totalResults:
+                    type: integer
+                  startIndex:
+                    type: integer
+                  Resources:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Group'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+      security:
+        - BearerAuth: []
+
+  /api/scim/Groups/{groupId}/members:
+    get:
+      tags:
+        - Groups
+      summary: Get SCIM Members for Group
+      description: Retrieve all members of a group
+      operationId: getGroupMembers
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Group ID
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/scim+json:
+              schema:
+                type: object
+                properties:
+                  schemas:
+                    type: array
+                    items:
+                      type: string
+                  totalResults:
+                    type: integer
+                  startIndex:
+                    type: integer
+                  Resources:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+      security:
+        - BearerAuth: []
+
+components:
+  schemas:
+    PatchOperation:
+      type: object
+      properties:
+        op:
+          type: string
+          enum:
+            - add
+            - remove
+            - replace
+            - move
+            - copy
+            - test
+          description: Operation type
+        path:
+          type: string
+          description: SCIM path to modify
+        value:
+          type: string
+          description: Value to assign
+        _pathTarget:
+          type: string
+          description: Path target for move operation
+      required:
+        - op
