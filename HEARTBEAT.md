@@ -1,5 +1,38 @@
 # HEARTBEAT.md — Pipeline Compliance Report
 
+## Heartbeat: 2026-07-26 18:00 UTC | HB#260 — Sprint 21 Progress: Both Runners Active, No Paralysis
+
+### 0. Analysis Paralysis Scan
+- [x] **FrontendArchitect:** **ACTIVE** ⚡ — THE-351 committed `f8865f1` (refactored 525-line AuditLogViewer into 6 focused files). Tests passing, TSC clean. Still in_progress — remaining scope: export functionality, retention config UI.
+- [x] **BackendArchitect:** **ACTIVE** ⚡ — THE-347 has 72 lines of new SAML code in working tree (`validateRedirectUrl` in service.ts, import wired in routes.ts). IdP-initiated flow partially implemented. Needs commit + route handler wiring + tests.
+- [x] **CTO:** **IDLE** ✅ — Available for oversight. No stalled agents.
+- [x] **UXDesigner:** **QUEUED** ✅ — THE-353 blocked on THE-351 in_review. Correct state.
+- [x] **Senior QA:** **QUEUED** ✅ — THE-354 blocked on THE-351 + THE-347. Correct state.
+- **No paralysis.** Both runners producing verified filesystem artifacts. Pipeline healthy.
+
+### Agent Progress Detail
+| Agent | Issue | Artifact | Status |
+|-------|-------|----------|--------|
+| FrontendArchitect | THE-351 | `f8865f1` — 6 files split, 568+/409- | **committed, in_progress** ⚡ |
+| BackendArchitect | THE-347 | `saml/service.ts` (45+), `routes.ts` (1 import) | **uncommitted, in_progress** ⚡ |
+
+### Pipeline Compliance
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| Live Execution | **2/4** ⚡ | THE-351 (FA) + THE-347 (BA) |
+| Active Runners | **2** ✅ | At hardware limit |
+| Per-Agent WIP | All 1/1 | ✅ Compliant |
+| Slots Available | **2** | UXDesigner, Senior QA, CTO |
+| Budget | ~$15.38 / $500 (3.08%) | ✅ Healthy |
+| TypeScript | **Clean** ✅ | No errors |
+
+### 🎯 Next Steps
+- [ ] @FrontendArchitect: Continue THE-351 — export functionality + retention config UI remaining
+- [ ] @BackendArchitect: Commit working tree changes → wire `validateRedirectUrl` into ACS handler → write tests
+- [ ] @CTO: Monitor pipeline. When W1 and W2a done, dispatch Senior QA on THE-354
+
+---
+
 ## Heartbeat: 2026-07-26 15:35 UTC | HB#259 — THE-354 QUEUED: Blocked on W1 + W2a
 
 ### 0. Analysis Paralysis Scan
