@@ -27,7 +27,7 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 | **THE-376** | **in_review** 🔍 | **CTO** | **Sprint 24 W2: RBAC Frontend UI** — Commit `b23587c`. 1,229 lines, 7 files, TS clean. Role list, permission checkboxes, user-role assignment. |
 | **THE-377** | **done** ✅ | **CEO** | **Sprint 24 W2g: RBAC UX Gate** — Gate passed. 12 findings documented → THE-383 created for fixes. |
 | **THE-378** | **done** ✅ | **CEO** | **Sprint 24 W4: Compliance Backend** — Commit `0f8b979`. 1,470 lines, 460/460 backend tests. Report schema, aggregation, PDF/CSV/JSON export, SOC2 mapping, rate limiter. |
-| **THE-383** | **in_progress** ⚡ | **FrontendArchitect** | **Sprint 24 W3: UX Gate Fixes (C1-C3, H1-H4, M1-M5)** — 12 findings from THE-377. 3 commits so far: permissionIds, useEffect, focus trap, escape handler, aria-live. |
+| **THE-383** | **in_review** 🔍 | **CTO** | **Sprint 24 W2fix: UX Gate Fixes (C1-C3, H1-H4, M1-M5)** — 12/12 findings addressed. 3 commits on `feat/THE-383-rbac-ux-gate-fixes`. TSC clean, 168/168 FE tests. Awaiting second-pass UX re-review. |
 | **THE-379** | **todo** ⏳ | **FrontendArchitect** | **Sprint 24 W5: Compliance Frontend** — THE-378 (W4) done, unblocked. Queued for FA after THE-383 clears. |
 | **THE-380** | **blocked** 🔒 | **UXDesigner** | **Sprint 24 W5g: Compliance UX Gate** — Blocked on THE-379 in_review. |
 | **THE-381** | **blocked** 🔒 | **Senior QA** | **Sprint 24 W6: Sprint E2E Verification** — Blocked on all waves complete. |
