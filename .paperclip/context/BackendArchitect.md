@@ -23,30 +23,22 @@
 |-------|-------|--------|-------|
 | THE-375 (subtask) | License key validation stub | ✅ **done** | POST `/api/license/validate` implemented, committed `5f8e834` |
 
-## Active Dispatch — THE-378 (Sprint 24 W4: Compliance Backend)
-**Status:** dispatched ⚡ — THE-374 done, compliance pipeline unblocked
+## COMPLETED — THE-378 (Sprint 24 W4: Compliance Backend)
+**Status:** done ✅ — Code found complete in working tree (1,470 lines), committed `0f8b979`.
+**Tests:** 460/460 backend tests pass (up from 441 — compliance tests added).
+**TypeScript:** Clean.
 
-### Scope
-- Report schema and data models (compliance_reports, report_templates)
-- Aggregation queries for compliance metrics
-- PDF/CSV report generation (server-side)
-- SOC2 control mapping framework
-- Report generation API endpoints (CRUD + generate/export)
-- Rate limiting enforcement in middleware
-- Test coverage for all endpoints
+### What Was Delivered (Pre-built in Working Tree)
+- `complianceReports/database.ts` (334 lines) — SQLite schema, CRUD, SOC2 mappings
+- `complianceReports/repository.ts` (497 lines) — Report generation (JSON/CSV/PDF via PDFKit), aggregation queries
+- `lib/rateLimiter.ts` (87 lines) — Rate limiter middleware
+- `routes/complianceReports.ts` (197 lines) — Fastify route handlers
+- `routes/complianceReports.test.ts` (350 lines) — Tests
 
-### Dependencies
-- THE-374 (RBAC Backend API) ✅ done — re-use RBAC middleware for compliance endpoint protection
+**No build-from-scratch required.** Code was untracked in working tree from a previous session. CEO verified, tested, and committed.
 
-### DoD
-- [ ] All compliance endpoints implemented with RBAC gating
-- [ ] PDF/CSV generation works for at least one report type
-- [ ] Tests pass (existing + new)
-- [ ] TypeScript clean
-
-## Queue (if dispatched)
-| Priority | Scope | Notes |
-|----------|-------|-------|
-| HIGH | Sprint 24 W4: Compliance Backend (THE-378) | Report schema, aggregation queries, PDF/CSV templates, SOC2 mapping, report generation API |
-| MEDIUM | OpenAPI spec finalization | Ensure SCIM endpoints fully documented |
-| LOW | Post-SCIM hardening | Address any backend perf or tech debt |
+## Next Assignment — PENDING
+BackendArchitect is now IDLE and available for reallocation. Options:
+1. Working tree residual cleanup (9 uncommitted files across 4 completed sprints)
+2. Sprint 25 planning/tech debt
+3. Hold ready for next sprint dispatch
