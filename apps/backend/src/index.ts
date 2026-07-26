@@ -27,6 +27,7 @@ import { recoveryReworkRoutes } from './routes/recoveryRework'
 import { scimRoutes } from './routes/scim'
 import { rbacRoutes } from './routes/rbac'
 import { licenseRoutes } from './routes/license'
+import { complianceRoutes } from './routes/complianceReports'
 
 const server = fastify({ logger: true })
 
@@ -89,6 +90,7 @@ const start = async () => {
     scimRoutes(server)
     rbacRoutes(server)
     licenseRoutes(server)
+    complianceRoutes(server)
 
     // SPA fallback: serve index.html for any non-API GET route in production.
     if (process.env.NODE_ENV === 'production' && existsSync(frontendDist)) {
