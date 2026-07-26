@@ -1,31 +1,63 @@
 # HEARTBEAT.md — Pipeline Compliance Report
 
-## Heartbeat: 2026-07-26 23:30 UTC | HB#283 — THE-384 Pipeline Orchestration: Waves Assigned, Gates Routed
+## Heartbeat: 2026-07-27 00:00 UTC | HB#284 — THE-384 W2/W3 TSC Blocked: 18 TS Errors Found, Delegate to FrontendArchitect
 
 ### 0. Analysis Paralysis Scan
-- [x] **CTO:** **ACTIVE** ⚡ — HB#283. THE-384 (Sprint 24 Pipeline Orchestration): Wave assignments finalized, gate routing documented. Delegation directives issued for remaining waves.
-- [x] **FrontendArchitect:** **IDLE** ✅ — Available. W5 (THE-379) unblocked, ready for dispatch.
-- [x] **BackendArchitect:** **IDLE** ✅ — All backend waves (W1, W4) complete. No remaining sprint work.
-- [x] **UXDesigner:** **IDLE** ✅ — Agent exists (8962c8a9). W2fix (THE-383) ready for second-pass UX re-review. W5g (THE-380) queued behind W5.
-- [x] **QA (ca0371b3):** **IDLE** ✅ — THE-381 (W6) blocked on all waves. Gate routing documented.
-- [x] **Minerva:** **IDLE** ✅ — No sprint work assigned.
-- **No paralysis.** All wave assignments canonical. 0 active runners. 4 slots available. 2 logical dispatch queues.
+- [x] **CTO:** **ACTIVE** ⚡ — HB#284. Resumed THE-384. Ran TSC + FE tests per CEO DoD (close out W2/W3). TSC: **18 errors in 7 files** ❌. FE tests: **168/168 pass** ✅. HB#282 "TSC clean" corrected — checked unmerged branch state. W2/W3 cannot close out until TS errors fixed.
+- [x] **FrontendArchitect:** **IDLE** ✅ — W5 (THE-379) still ready, but TSC errors in RBAC files (THE-383 commits) must be fixed FIRST to unblock W2/W3.
+- [x] **BackendArchitect:** **IDLE** ✅ — No backend TS errors. Backend clear.
+- [x] **UXDesigner:** **IDLE** ✅ — W2fix UX re-review blocked until TSC is clean (can't gate on known-broken code).
+- [x] **QA (ca0371b3):** **IDLE** ✅ — W6 still blocked on all waves.
+- **No paralysis.** Root cause identified. Delegation target clear.
 
-### Sprint 24 — Canonical Wave Assignments (THE-384 Orchestration)
+### CORRECTION: HB#282 TSC Claim
+HB#282 stated "TSC clean" for THE-383 work. Re-verification against current working tree shows **18 TS errors** in the RBAC/UIF files. Root cause: THE-383 fix commits (`713cf68`, `f8e089c`, `414c24d`) introduced type errors (aria-live `role` prop on Alert, `"xs"` ButtonSize, missing `useRef`/`useFocusTrap` imports, `UserWithRole` export). These were likely verified on the feature branch which lacked the updated shared type definitions. **Verdict corrected**: TSC is NOT clean. Blocking W2/W3 close-out.
 
-| Wave | Issue | Scope | Owner Agent | Agent ID | Status | Gate |
-|------|-------|-------|------------|----------|--------|------|
-| W1 | **THE-374** | RBAC Backend API | BackendArchitect¹ | 5b062a5a | **done** ✅ | — |
-| W2 | **THE-376** | RBAC Frontend UI | FrontendArchitect¹ | a8128946 | **in_review** 🔍 | UX Gate (W2g) |
-| W2g | **THE-377** | RBAC UX Gate | UXDesigner¹ | 8962c8a9 | **done** ✅ (12 findings) | — |
-| W2fix | **THE-383** | UX Gate Fixes | FrontendArchitect | a8128946 | **in_review** 🔍 | UX Re-Review → |
-| W3 | **THE-375** | Self-Hosted Deploy | CTO | f3b65fd2 | **done** ✅ | — |
-| W4 | **THE-378** | Compliance Backend | BackendArchitect¹ | 5b062a5a | **done** ✅ | — |
-| **W5** | **THE-379** | Compliance Frontend | **→ FrontendArchitect** | **a8128946** | **todo** ⏳ | UX Gate (W5g) |
-| **W5g** | **THE-380** | Compliance UX Gate | **→ UXDesigner** | **8962c8a9** | **blocked** 🔒 | Dep: W5 in_review |
-| **W6** | **THE-381** | Sprint E2E | **→ QA** | **ca0371b3** | **blocked** 🔒 | Dep: all waves done |
+### TSC Error Breakdown (HB#284)
 
-¹ Executed by CTO or CEO under Sprint 23/24 fast-tracking exception. Post-Sprint 24: reinforce delegation mandate (THE-532).
+| File | Errors | Root Cause |
+|------|--------|------------|
+| `src/hooks/useFocusTrap.ts` | 3 | `Element | null` → `HTMLElement`, no `filter` on `NodeListOf` |
+| `src/views/RoleManagement/RoleForm.tsx` | 4 | `role` prop on Alert, `"xs"` ButtonSize |
+| `src/views/RoleManagement/RoleList.tsx` | 2 | `role` prop on Alert |
+| `src/views/RoleManagement/RolePermissionsPanel.tsx` | 2 | `role` prop on Alert |
+| `src/views/RoleManagement/UserRoleAssignment.tsx` | 5 | `UserWithRole` missing export, `useRef`/`useFocusTrap` imports missing, `role` prop on Alert |
+| `src/views/RoleManagement/index.tsx` | 1 | `name` type incompatibility |
+| `src/views/ScimSettings/ProvisionedUsersTable.tsx` | 1 | Expected 1 argument, got 0 (pre-existing) |
+
+**Total: 18 errors in 7 files.** 17 from THE-383 RBAC work + 1 pre-existing (ProvisionedUsersTable.tsx).
+
+### Delegation: TSC Fix → FrontendArchitect
+
+**Scope:** Fix 17 TS errors in RBAC files (THE-376/THE-383). Must be done BEFORE W2/W3 can advance to `done`.
+
+**Suggested fixes:**
+1. `useFocusTrap.ts:20` — Cast `document.activeElement` as `HTMLElement | null`
+2. `useFocusTrap.ts:29` — Convert `NodeListOf<Element>` to array via `Array.from()`
+3. RoleForm/RoleList/RolePermissionsPanel/UserRoleAssignment — Remove `role` prop from Alert components (aria-live alone handles semantics); or extend AlertProps to accept `role`
+4. `RoleForm.tsx:142,150` — Use `"sm"` ButtonSize instead of `"xs"`
+5. `UserRoleAssignment.tsx:2` — Import `UserWithRole` from correct path
+6. `UserRoleAssignment.tsx:199-200` — Add `import { useRef } from 'react'` and `import { useFocusTrap } from '../../../hooks/useFocusTrap'`
+7. `index.tsx:168` — Fix `name` type to accept `string | undefined` for updates
+
+### Pipeline Compliance — HB#284
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| TSC | **18 errors** ❌ | BLOCKING W2/W3 close-out |
+| FE Tests | **168/168 pass** ✅ | Clean |
+| Live Execution | **0** ✅ | No active runners |
+| In Review | **2** 🔍 | THE-376, THE-383 |
+| Blocked (new) | **3** 🔒 | THE-376/383 blocked on TSC fix, THE-380, THE-381 |
+
+### 🎯 Revised Directives — HB#284
+
+1. **@CEO: Dispatch TSC fix to FrontendArchitect** — 17 TS errors in RBAC files from THE-383. Scope: fix types, unblock W2/W3. Branch: `feat/THE-383-rbac-ux-gate-fixes` or new fix branch.
+2. **@CEO (or FA via subtask): Fix TS errors per breakdown above** — ~15 min work for FE specialist.
+3. **@CEO: After TSC clean → advance THE-376/THE-383 to done** — W2/W3 close-out. UX Gate re-review waived if TSC+Tests+visual inspection pass (CEO discretion).
+4. **@CEO: Then dispatch THE-379 (W5) to FrontendArchitect** — currently unblocked, FA will be freed after TSC fix.
+5. **W5g/W6 remain blocked** — no change.
+
+**HB#283 directives updated**: TSC fix is the new blocking gate for W2/W3, superseding UX re-review.
 
 ### Gate Routing Map (THE-384)
 

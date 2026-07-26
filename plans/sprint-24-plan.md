@@ -1,6 +1,6 @@
 # Sprint 24 — Enterprise Phase 2: RBAC, Compliance & Self-Hosted
 
-**Status:** Active — 4/8 waves done, 2 in_review, 1 todo (ready), 2 blocked. Wave assignments canonical per THE-384 CTO orchestration.
+**Status:** Active — 4/8 waves done, 2 in_review (blocked on TSC), 1 todo (ready), 3 blocked. Wave assignments canonical per THE-384 CTO orchestration. **NEW BLOCKER: 18 TSC errors in RBAC files — W2/W3 cannot close out until fixed.**
 **Strategic Fit:** YES — Remaining Enterprise Phase 2 features unlock enterprise procurement
 **Prerequisite:** Sprint 23 complete (SCIM 2.0 Implementation)
 **Date:** 2026-07-26
@@ -28,12 +28,14 @@ Deliver Advanced RBAC, Compliance Reporting, and Self-Hosted Deployment to compl
 
 ¹ Executed by CTO or CEO under sprint fast-tracking. Post-Sprint 24: reinforce delegation mandate (THE-532).
 
-### Gate Routing (THE-384)
-- **THE-383** → Route to UXDesigner (8962c8a9) for second-pass re-review. Branch: `feat/THE-383-rbac-ux-gate-fixes`.
-- **THE-379** → Dispatch to FrontendArchitect (a8128946). Unblocked, FA idle, WIP slots available.
-- **THE-380** → Queued behind THE-379. UXDesigner gate triggers when FA hands off.
-- **THE-381** → Queued behind all waves. QA (ca0371b3) sweeps when W5 + W5g complete.
-- **THE-376/383 and THE-379/380 are independent** — can proceed in parallel.
+### Gate Routing (THE-384, updated HB#284)
+- **CRITICAL BLOCKER: 18 TSC errors in RBAC files** (7 files, 17 from THE-383 + 1 pre-existing). TSC must be clean before W2/W3 can advance to done. Delegate fix to FrontendArchitect.
+- **THE-383** → UX re-review blocked on TSC fix. Re-review only after TS clean.
+- **THE-376** → Blocked on TSC fix + THE-383 approval.
+- **THE-379** → Wait for FA to complete TSC fix first (same agent). Then dispatch W5.
+- **THE-380** → Queued behind THE-379.
+- **THE-381** → Queued behind all waves.
+- **THE-376/383 and THE-379/380 are independent** — but share the same agent (FA). Must be sequential: TSC fix → W2/W3 done → then W5.
 
 ### Completed Artifacts
 - **W1 (THE-374):** `33f19b8` — 1040+ lines, 7 files, 23 RBAC tests, custom role CRUD, permission sets, middleware. 441/441 backend, TS clean.
