@@ -394,4 +394,133 @@ describe('SAMLService', () => {
     const samlResponse = Buffer.from(samlXml).toString('base64')
     await expect(handleSamlCallback(samlResponse)).rejects.toThrow(AppError)
   })
+
+  it('returns IdpInitiatedResult when RelayState is present', async () => {
+    const { handleSamlCallback } = await import('./saml/service')
+
+    const samlXml = `<?xml version="1.0"?>
+<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
+  <saml:Assertion>
+    <saml:Subject>
+      <saml:NameID>idp-init@example.com</saml:NameID>
+    </saml:Subject>
+    <saml:AttributeStatement>
+      <saml:Attribute Name="email">
+        <saml:AttributeValue>idp-init@example.com</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="displayName">
+        <saml:AttributeValue>IDP User</saml:AttributeValue>
+      </saml:Attribute>
+    </saml:AttributeStatement>
+  </saml:Assertion>
+</samlp:Response>`
+
+    const samlResponse = Buffer.from(samlXml).toString('base64')
+    const result = await handleSamlCallback(samlResponse, 'https://myapp.example.com/app')
+
+    expect((result as any).isIdpInitiated).toBe(true)
+    expect((result as any).relayState).toBe('https://myapp.example.com/app')
+    expect((result as any).user.email).toBe('idp-init@example.com')
+    expect((result as any).isNewUser).toBe(true)
+    expect((result as any).accessToken).toBeTruthy()
+  })
+
+  it('redirects to relative RelayState URL', async () => {
+    const { handleSamlCallback } = await import('./saml/service')
+
+    const samlXml = `<?xml version="1.0"?>
+<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
+  <saml:Assertion>
+    <saml:Subject>
+      <saml:NameID>relative@example.com</saml:NameID>
+    </saml:Subject>
+    <saml:AttributeStatement>
+      <saml:Attribute Name="email">
+        <saml:AttributeValue>relative@example.com</saml:AttributeValue>
+      </saml:Attribute>
+    </saml:AttributeStatement>
+  </saml:Assertion>
+</samlp:Response>`
+
+    const samlResponse = Buffer.from(samlXml).toString('base64')
+    const result = await handleSamlCallback(samlResponse, '/custom/dashboard?tenant=acme')
+
+    expect((result as any).isIdpInitiated).toBe(true)
+    expect((result as any).relayState).toBe('/custom/dashboard?tenant=acme')
+  })
+
+  it('returns SP-initiated result when no RelayState', async () => {
+    const { handleSamlCallback } = await import('./saml/service')
+
+    const samlXml = `<?xml version="1.0"?>
+<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
+  <saml:Assertion>
+    <saml:Subject>
+      <saml:NameID>sp-init@example.com</saml:NameID>
+    </saml:Subject>
+    <saml:AttributeStatement>
+      <saml:Attribute Name="email">
+        <saml:AttributeValue>sp-init@example.com</saml:AttributeValue>
+      </saml:Attribute>
+    </saml:AttributeStatement>
+  </saml:Assertion>
+</samlp:Response>`
+
+    const samlResponse = Buffer.from(samlXml).toString('base64')
+    const result = await handleSamlCallback(samlResponse)
+
+    expect('isIdpInitiated' in result).toBe(false)
+    expect((result as any).user.email).toBe('sp-init@example.com')
+    expect((result as any).isNewUser).toBe(true)
+    expect((result as any).accessToken).toBeTruthy()
+  })
+})
+
+describe('ValidateRedirectUrl', () => {
+  const ORIGINAL_ENV = process.env
+
+  beforeEach(() => {
+    process.env = { ...ORIGINAL_ENV }
+    delete process.env.ALLOWED_REDIRECT_ORIGINS
+  })
+
+  afterEach(() => {
+    process.env = ORIGINAL_ENV
+  })
+
+  it('returns default dashboard for empty relayState', async () => {
+    const { validateRedirectUrl } = await import('./saml/service')
+    expect(validateRedirectUrl('')).toBe('/dashboard')
+  })
+
+  it('returns default dashboard for null relayState', async () => {
+    const { validateRedirectUrl } = await import('./saml/service')
+    expect(validateRedirectUrl('')).toBe('/dashboard')
+  })
+
+  it('accepts valid relative URLs', async () => {
+    const { validateRedirectUrl } = await import('./saml/service')
+    expect(validateRedirectUrl('/dashboard')).toBe('/dashboard')
+    expect(validateRedirectUrl('/app/settings')).toBe('/app/settings')
+    expect(validateRedirectUrl('/app?tab=security')).toBe('/app?tab=security')
+  })
+
+  it('accepts absolute URLs when origin matches ALLOWED_REDIRECT_ORIGINS', async () => {
+    process.env.ALLOWED_REDIRECT_ORIGINS = 'https://myapp.example.com,https://login.okta.com'
+    const { validateRedirectUrl } = await import('./saml/service')
+    const result = validateRedirectUrl('https://myapp.example.com/app/dashboard')
+    expect(result).toBe('/app/dashboard')
+  })
+
+  it('rejects absolute URLs from disallowed origins', async () => {
+    process.env.ALLOWED_REDIRECT_ORIGINS = 'https://myapp.example.com'
+    const { validateRedirectUrl } = await import('./saml/service')
+    expect(() => validateRedirectUrl('https://evil.com/phish')).toThrow(/not allowed/)
+  })
+
+  it('rejects absolute URLs when ALLOWED_REDIRECT_ORIGINS is set but origin missing', async () => {
+    process.env.ALLOWED_REDIRECT_ORIGINS = 'https://myapp.example.com'
+    const { validateRedirectUrl } = await import('./saml/service')
+    expect(() => validateRedirectUrl('https://other.com/path')).toThrow(/not allowed/)
+  })
 })

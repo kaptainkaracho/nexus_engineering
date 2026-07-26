@@ -14,6 +14,53 @@ export interface SamlConfig {
   attrMapping: Record<string, string>
 }
 
+export interface IdpInitiatedResult {
+  user: any
+  accessToken: string
+  refreshToken: string
+  isNewUser: boolean
+  relayState: string
+  isIdpInitiated: true
+}
+
+function parseAllowedOrigins(): string[] | null {
+  if (!process.env.ALLOWED_REDIRECT_ORIGINS) return null
+  return process.env.ALLOWED_REDIRECT_ORIGINS.split(',').map((o) => o.trim())
+}
+
+export function validateRedirectUrl(relayState: string): string {
+  if (!relayState) {
+    return '/dashboard'
+  }
+
+  try {
+    const url = new URL(relayState)
+    const allowedOrigins = parseAllowedOrigins()
+
+    if (allowedOrigins) {
+      const isAllowed = allowedOrigins.some((origin) => origin === url.origin)
+      if (!isAllowed) {
+        throw new AppError(`Redirect URL origin not allowed: ${url.origin}`, 400)
+      }
+    }
+
+    return `${url.pathname}${url.search}${url.hash}`
+  } catch (err) {
+    if (err instanceof AppError) throw err
+
+    const hasProtocol = /^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(relayState)
+    if (hasProtocol) {
+      throw new AppError(`Invalid RelayState URL (absolute URLs require ALLOWED_REDIRECT_ORIGINS): ${relayState}`, 400)
+    }
+
+    if (/^\//.test(relayState)) {
+      return relayState
+    }
+
+    throw new AppError(`Invalid RelayState URL: ${relayState}`, 400)
+  }
+}
+
 function getSamlConfig(): SamlConfig {
   const baseUrl = process.env.SAML_ACS_URL || process.env.OAUTH_CALLBACK_URL || 'http://localhost:3001'
   return {
@@ -111,31 +158,43 @@ function validateSignature(_xml: string, _certPem: string): void {
   // TODO: Implement XML signature verification with xml-crypto or similar.
 }
 
-export async function handleSamlCallback(samlResponse: string): Promise<{ user: any; accessToken: string; refreshToken: string; isNewUser: boolean }> {
+export async function handleSamlCallback(
+  samlResponse: string,
+  relayState?: string,
+): Promise<{ user: any; accessToken: string; refreshToken: string; isNewUser: boolean } | IdpInitiatedResult> {
   const db = getAuthDatabase()
   const attributes = parseSamlResponse(samlResponse)
 
   const existingUser = db.findUserByEmail(attributes.email)
   let userId: string
+  let user: any
+  let isNewUser: boolean
 
   if (existingUser) {
     userId = existingUser.id
-    const user = getCurrentUser(userId)!
-    const jwt = await sign(generateAccessTokenPayload(user), { expiresIn: ACCESS_TOKEN_EXPIRY })
-    return { user, accessToken: jwt, refreshToken: '', isNewUser: false }
-  }
+    user = getCurrentUser(userId)!
+    isNewUser = false
+  } else {
+    const result = await registerUser(attributes.email, randomBytes(24).toString('hex'), attributes.displayName || undefined)
+    userId = result.user.id
+    user = result.user
+    isNewUser = true
 
-  const result = await registerUser(attributes.email, randomBytes(24).toString('hex'), attributes.displayName || undefined)
-  userId = result.user.id
-
-  if (attributes.role) {
-    const role = db.findRoleByName(attributes.role.toLowerCase())
-    if (role) {
-      db.updateUser(userId, { roleId: role.id })
+    if (attributes.role) {
+      const role = db.findRoleByName(attributes.role.toLowerCase())
+      if (role) {
+        db.updateUser(userId, { roleId: role.id })
+      }
     }
   }
 
-  const user = getCurrentUser(userId)!
   const jwt = await sign(generateAccessTokenPayload(user), { expiresIn: ACCESS_TOKEN_EXPIRY })
-  return { user, accessToken: jwt, refreshToken: '', isNewUser: true }
+  const refreshToken = ''
+
+  if (relayState) {
+    const redirectPath = validateRedirectUrl(relayState)
+    return { user, accessToken: jwt, refreshToken, isNewUser, relayState, isIdpInitiated: true }
+  }
+
+  return { user, accessToken: jwt, refreshToken, isNewUser }
 }

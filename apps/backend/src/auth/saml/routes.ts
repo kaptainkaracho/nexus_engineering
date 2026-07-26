@@ -1,7 +1,9 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
-import { generateMetadataXml, handleSamlCallback } from './service'
+import { generateMetadataXml, handleSamlCallback, validateRedirectUrl } from './service'
 import { AppError } from '../service'
 import { auditLogRepository } from '../../auditLog/repository'
+
+const DEFAULT_REDIRECT = '/dashboard'
 
 async function samlCallback(request: FastifyRequest, reply: FastifyReply) {
   try {
@@ -12,14 +14,28 @@ async function samlCallback(request: FastifyRequest, reply: FastifyReply) {
       return reply.status(400).send({ error: 'SAMLResponse is required' })
     }
 
-    const result = await handleSamlCallback(body.SAMLResponse)
-    auditLogRepository.log(result.user.id, result.user.email, result.isNewUser ? 'CREATE' : 'LOGIN', 'user', result.user.id, `SAML login (RelayState: ${relayState || 'none'})`)
+    const result = await handleSamlCallback(body.SAMLResponse, relayState)
+
+    if ('isIdpInitiated' in result && result.isIdpInitiated) {
+      try {
+        const redirectPath = validateRedirectUrl(result.relayState)
+        auditLogRepository.log(result.user.id, result.user.email, result.isNewUser ? 'CREATE' : 'LOGIN', 'user', result.user.id, `IdP-initiated SAML login (RelayState: ${result.relayState})`)
+        return reply.redirect(redirectPath)
+      } catch (redirectError) {
+        request.log.warn(`Invalid RelayState URL (${result.relayState}), falling back to dashboard`)
+        auditLogRepository.log(result.user.id, result.user.email, result.isNewUser ? 'CREATE' : 'LOGIN', 'user', result.user.id, `IdP-initiated SAML login with invalid RelayState (${result.relayState}), using default dashboard`)
+        return reply.redirect(DEFAULT_REDIRECT)
+      }
+    }
+
+    const userResult = result as { user: any; accessToken: string; refreshToken: string; isNewUser: boolean }
+    auditLogRepository.log(userResult.user.id, userResult.user.email, userResult.isNewUser ? 'CREATE' : 'LOGIN', 'user', userResult.user.id, `SAML login (RelayState: ${relayState || 'none'})`)
 
     return reply.send({
-      user: result.user,
-      accessToken: result.accessToken,
-      refreshToken: result.refreshToken,
-      isNewUser: result.isNewUser,
+      user: userResult.user,
+      accessToken: userResult.accessToken,
+      refreshToken: userResult.refreshToken,
+      isNewUser: userResult.isNewUser,
     })
   } catch (error) {
     if (error instanceof AppError) {
