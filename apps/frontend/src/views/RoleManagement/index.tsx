@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import type { Role, Permission, CreateRoleRequest } from '@nexus-engineering/shared';
+import type { Role, Permission, CreateRoleRequest, UpdateRoleRequest } from '@nexus-engineering/shared';
 import { Card, Container, Stack } from '@nexus-engineering/shared';
 import { RoleList } from './RoleList';
 import { RoleForm } from './RoleForm';
@@ -44,10 +44,18 @@ export function RoleManagement() {
   const handleEdit = (role: Role) => setModal({ type: 'edit', role });
   const handleCancel = () => setModal({ type: null, role: null });
 
-  const handleFormSubmit = async (data: { name: string; description?: string | null; permissionIds?: string[] }) => {
+  const handleFormSubmit = async (data: CreateRoleRequest | UpdateRoleRequest & { permissionIds?: string[] }) => {
+    const name = 'name' in data && data.name ? data.name.trim() : '';
+    if (!name && modal.type === 'create') {
+      return false;
+    }
     if (modal.type === 'create') {
       const { createRole } = await import('../../api/rbac');
-      const role = await createRole(data as CreateRoleRequest);
+      const role = await createRole({
+        name,
+        description: ('description' in data ? data.description : null) ?? null,
+        permissionIds: 'permissionIds' in data ? data.permissionIds : [],
+      } as CreateRoleRequest);
       if (role) {
         setAvailableRoles(prev => [...prev, role]);
         handleCancel();

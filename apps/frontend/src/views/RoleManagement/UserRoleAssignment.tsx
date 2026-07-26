@@ -1,7 +1,9 @@
-import { useState, useCallback, useEffect } from 'react';
-import type { UserWithRole, Role } from '@nexus-engineering/shared';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import type { Role } from '@nexus-engineering/shared';
 import { Button, Badge, Alert, Input, Select } from '@nexus-engineering/shared';
 import { fetchUsersWithRoles, updateUserRole } from '../../api/rbac';
+import type { UserWithRole } from '../../api/rbac';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
 
 interface UserRoleAssignmentProps {
   availableRoles: Role[];
@@ -99,13 +101,13 @@ export function UserRoleAssignment({ availableRoles }: UserRoleAssignmentProps) 
       />
 
       {success && (
-        <Alert variant="success" role="status" aria-live="polite">
+        <Alert variant="success">
           {success}
         </Alert>
       )}
 
       {error && (
-        <Alert variant="error" role="alert" aria-live="assertive">
+        <Alert variant="error">
           {error}
         </Alert>
       )}

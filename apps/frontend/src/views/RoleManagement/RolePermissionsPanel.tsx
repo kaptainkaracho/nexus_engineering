@@ -94,13 +94,13 @@ export function RolePermissionsPanel({ role, allPermissions, onPermissionsUpdate
       </div>
 
       {success && (
-        <Alert variant="success" role="status" aria-live="polite">
+        <Alert variant="success">
           {success}
         </Alert>
       )}
 
       {error && (
-        <Alert variant="error" role="alert" aria-live="assertive">
+        <Alert variant="error">
           {error}
         </Alert>
       )}

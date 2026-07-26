@@ -122,13 +122,13 @@ export function RoleList({ onEdit, onCreate, selectedRole, onSelectRole }: RoleL
       />
 
       {success && (
-        <Alert variant="success" role="status" aria-live="polite">
+        <Alert variant="success">
           {success}
         </Alert>
       )}
 
       {error && (
-        <Alert variant="error" role="alert" aria-live="assertive">
+        <Alert variant="error">
           {error}
         </Alert>
       )}

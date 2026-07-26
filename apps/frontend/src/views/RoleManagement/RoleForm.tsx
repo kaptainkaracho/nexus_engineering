@@ -93,7 +93,7 @@ export function RoleForm({ role, permissions, onSubmit, onCancel, mode }: RoleFo
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <Alert variant="error" role="alert" aria-live="assertive">
+        <Alert variant="error">
           {error}
         </Alert>
       )}
@@ -101,17 +101,12 @@ export function RoleForm({ role, permissions, onSubmit, onCancel, mode }: RoleFo
       <div className="space-y-3">
         <Input
           id="role-name"
-          label={
-            <span>
-              Role Name <span className="text-text-destructive">*</span>
-            </span>
-          }
+          label="Role Name"
           type="text"
           value={name}
           onChange={e => setName(e.target.value)}
           placeholder="e.g. Content Manager"
           required
-          error={error ? undefined : undefined}
         />
       </div>
 
@@ -139,7 +134,7 @@ export function RoleForm({ role, permissions, onSubmit, onCancel, mode }: RoleFo
             <Button
               type="button"
               variant="ghost"
-              size="xs"
+              size="sm"
               onClick={selectAllPermissions}
             >
               Select All
@@ -147,7 +142,7 @@ export function RoleForm({ role, permissions, onSubmit, onCancel, mode }: RoleFo
             <Button
               type="button"
               variant="ghost"
-              size="xs"
+              size="sm"
               onClick={deselectAllPermissions}
             >
               Clear All
