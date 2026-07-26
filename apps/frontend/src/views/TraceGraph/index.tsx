@@ -4,20 +4,22 @@ import { Container, Stack, Card } from '@nexus-engineering/shared';
 import { fetchTraceGraph } from '../../api/client';
 import type { TraceGraphData } from '../../api/client';
 
+// Token references: --color-primary-500, --color-info-500, --color-secondary-500, --color-warning-500
 const NODE_COLORS: Record<string, string> = {
-  requirement: '#3b82f6',
-  architectureModel: '#8b5cf6',
-  softwareComponent: '#10b981',
-  testCase: '#f59e0b',
+  requirement: '#3b82f6',   // primary-500
+  architectureModel: '#8b5cf6', // accent (violet — no token, kept as-is)
+  softwareComponent: '#10b981', // secondary-500
+  testCase: '#f59e0b',      // warning-500
 };
 
+// Token references: --color-success-500, --color-primary-500, --color-warning-500, --color-error-500
 const LINK_COLORS: Record<string, string> = {
-  verifies: '#22c55e',
-  satisfies: '#3b82f6',
-  tracesTo: '#8b5cf6',
-  dependsOn: '#f59e0b',
-  refines: '#ec4899',
-  conflictsWith: '#ef4444',
+  verifies: '#22c55e',      // success-500
+  satisfies: '#3b82f6',     // primary-500
+  tracesTo: '#8b5cf6',      // accent (violet — no token, kept as-is)
+  dependsOn: '#f59e0b',     // warning-500
+  refines: '#ec4899',       // accent (pink — no token, kept as-is)
+  conflictsWith: '#ef4444', // error-500
 };
 
 const NODE_LABELS: Record<string, string> = {

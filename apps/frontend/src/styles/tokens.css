@@ -1,0 +1,322 @@
+/*
+ * Design Tokens — Single Source of Truth
+ * Nexus Design System
+ *
+ * All design decisions live here. Components consume these via
+ * Tailwind utility classes or direct CSS variable references.
+ *
+ * Scale: 4px base unit for spacing.
+ */
+
+/* ============================================
+   1. SPACING (4px base unit)
+   ============================================ */
+:root {
+  --space-0: 0px;
+  --space-px: 1px;
+  --space-0-5: 0.125rem;  /* 2px */
+  --space-1: 0.25rem;     /* 4px */
+  --space-1-5: 0.375rem;  /* 6px */
+  --space-2: 0.5rem;      /* 8px */
+  --space-2-5: 0.625rem;  /* 10px */
+  --space-3: 0.75rem;     /* 12px */
+  --space-3-5: 0.875rem;  /* 14px */
+  --space-4: 1rem;        /* 16px */
+  --space-5: 1.25rem;     /* 20px */
+  --space-6: 1.5rem;      /* 24px */
+  --space-7: 1.75rem;     /* 28px */
+  --space-8: 2rem;        /* 32px */
+  --space-9: 2.25rem;     /* 36px */
+  --space-10: 2.5rem;     /* 40px */
+  --space-11: 2.75rem;    /* 44px */
+  --space-12: 3rem;       /* 48px */
+  --space-14: 3.5rem;     /* 56px */
+  --space-16: 4rem;       /* 64px */
+  --space-20: 5rem;       /* 80px */
+  --space-24: 6rem;       /* 96px */
+  --space-28: 7rem;       /* 112px */
+  --space-32: 8rem;       /* 128px */
+  --space-36: 9rem;       /* 144px */
+  --space-40: 10rem;      /* 160px */
+  --space-44: 11rem;      /* 176px */
+  --space-48: 12rem;      /* 192px */
+  --space-52: 13rem;      /* 208px */
+  --space-56: 14rem;      /* 224px */
+  --space-60: 15rem;      /* 240px */
+  --space-64: 16rem;      /* 256px */
+  --space-72: 18rem;      /* 288px */
+  --space-80: 20rem;      /* 320px */
+  --space-96: 24rem;      /* 384px */
+
+  /* ============================================
+     2. COLORS — Primary (Violet-Blue)
+     ============================================ */
+  --color-primary-50: #EFF6FF;
+  --color-primary-100: #DBEAFE;
+  --color-primary-200: #BFDBFE;
+  --color-primary-300: #93C5FD;
+  --color-primary-400: #60A5FA;
+  --color-primary-500: #3B82F6;
+  --color-primary-600: #2563EB;
+  --color-primary-700: #1D4ED8;
+  --color-primary-800: #1E40AF;
+  --color-primary-900: #1E3A8A;
+  --color-primary-950: #172554;
+
+  /* ============================================
+     3. COLORS — Secondary (Emerald)
+     ============================================ */
+  --color-secondary-50: #ECFDF5;
+  --color-secondary-100: #D1FAE5;
+  --color-secondary-200: #A7F3D0;
+  --color-secondary-300: #6EE7B7;
+  --color-secondary-400: #34D399;
+  --color-secondary-500: #10B981;
+  --color-secondary-600: #059669;
+  --color-secondary-700: #047857;
+  --color-secondary-800: #065F46;
+  --color-secondary-900: #064E3B;
+  --color-secondary-950: #022C22;
+
+  /* ============================================
+     4. COLORS — Neutral (Slate)
+     ============================================ */
+  --color-neutral-50: #F8FAFC;
+  --color-neutral-100: #F1F5F9;
+  --color-neutral-200: #E2E8F0;
+  --color-neutral-300: #CBD5E1;
+  --color-neutral-400: #94A3B8;
+  --color-neutral-500: #64748B;
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155;
+  --color-neutral-800: #1E293B;
+  --color-neutral-900: #0F172A;
+  --color-neutral-950: #020617;
+
+  /* ============================================
+     5. COLORS — Semantic: Success (Green)
+     ============================================ */
+  --color-success-50: #F0FDF4;
+  --color-success-100: #DCFCE7;
+  --color-success-200: #BBF7D0;
+  --color-success-300: #86EFAC;
+  --color-success-400: #4ADE80;
+  --color-success-500: #22C55E;
+  --color-success-600: #16A34A;
+  --color-success-700: #15803D;
+  --color-success-800: #166534;
+  --color-success-900: #14532D;
+  --color-success-950: #052E16;
+
+  /* ============================================
+     6. COLORS — Semantic: Warning (Amber)
+     ============================================ */
+  --color-warning-50: #FFFBEB;
+  --color-warning-100: #FEF3C7;
+  --color-warning-200: #FDE68A;
+  --color-warning-300: #FCD34D;
+  --color-warning-400: #FBBF24;
+  --color-warning-500: #F59E0B;
+  --color-warning-600: #D97706;
+  --color-warning-700: #B45309;
+  --color-warning-800: #92400E;
+  --color-warning-900: #78350F;
+  --color-warning-950: #451A03;
+
+  /* ============================================
+     7. COLORS — Semantic: Error (Red)
+     ============================================ */
+  --color-error-50: #FEF2F2;
+  --color-error-100: #FEE2E2;
+  --color-error-200: #FECACA;
+  --color-error-300: #FCA5A5;
+  --color-error-400: #F87171;
+  --color-error-500: #EF4444;
+  --color-error-600: #DC2626;
+  --color-error-700: #B91C1C;
+  --color-error-800: #991B1B;
+  --color-error-900: #7F1D1D;
+  --color-error-950: #450A0A;
+
+  /* ============================================
+     8. COLORS — Semantic: Info (Sky)
+     ============================================ */
+  --color-info-50: #F0F9FF;
+  --color-info-100: #E0F2FE;
+  --color-info-200: #BAE6FD;
+  --color-info-300: #7DD3FC;
+  --color-info-400: #38BDF8;
+  --color-info-500: #0EA5E9;
+  --color-info-600: #0284C7;
+  --color-info-700: #0369A1;
+  --color-info-800: #075985;
+  --color-info-900: #0C4A6E;
+  --color-info-950: #082F49;
+
+  /* ============================================
+     9. SURFACES
+     ============================================ */
+  --surface-primary: #FFFFFF;
+  --surface-secondary: #F8FAFC;
+  --surface-tertiary: #F1F5F9;
+
+  /* ============================================
+     10. TEXT COLORS
+     ============================================ */
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-tertiary: #64748B;
+  --text-inverse: #FFFFFF;
+
+  /* ============================================
+     11. BORDERS
+     ============================================ */
+  --border-default: #E2E8F0;
+  --border-hover: #CBD5E1;
+
+  /* ============================================
+     12. TYPOGRAPHY
+     ============================================ */
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+
+  --text-xs: 0.75rem;      /* 12px */
+  --text-xs-lh: 1rem;
+  --text-sm: 0.875rem;     /* 14px */
+  --text-sm-lh: 1.25rem;
+  --text-base: 1rem;       /* 16px */
+  --text-base-lh: 1.5rem;
+  --text-lg: 1.125rem;     /* 18px */
+  --text-lg-lh: 1.75rem;
+  --text-xl: 1.25rem;      /* 20px */
+  --text-xl-lh: 1.75rem;
+  --text-2xl: 1.5rem;      /* 24px */
+  --text-2xl-lh: 2rem;
+  --text-3xl: 1.875rem;    /* 30px */
+  --text-3xl-lh: 2.25rem;
+  --text-4xl: 2.25rem;     /* 36px */
+  --text-4xl-lh: 2.5rem;
+  --text-5xl: 3rem;        /* 48px */
+  --text-5xl-lh: 1.16;
+  --text-6xl: 3.75rem;     /* 60px */
+  --text-6xl-lh: 1.1;
+
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  --leading-none: 1;
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  --leading-loose: 2;
+
+  --tracking-tighter: -0.05em;
+  --tracking-tight: -0.025em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.025em;
+  --tracking-wider: 0.05em;
+  --tracking-widest: 0.1em;
+
+  /* ============================================
+     13. BORDER RADIUS
+     ============================================ */
+  --radius-none: 0px;
+  --radius-sm: 0.375rem;   /* 6px */
+  --radius-default: 0.5rem;  /* 8px */
+  --radius-md: 0.625rem;   /* 10px */
+  --radius-lg: 0.75rem;    /* 12px */
+  --radius-xl: 1rem;       /* 16px */
+  --radius-2xl: 1.5rem;    /* 24px */
+  --radius-full: 9999px;
+
+  /* ============================================
+     14. SHADOWS
+     ============================================ */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-default: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  /* ============================================
+     15. TRANSITIONS
+     ============================================ */
+  --duration-fast: 100ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+  --duration-slower: 500ms;
+
+  --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ============================================
+   DARK THEME
+   ============================================ */
+.dark {
+  /* Colors — Primary (inverted for dark) */
+  --color-primary-50: #172554;
+  --color-primary-100: #1E3A8A;
+  --color-primary-200: #1E40AF;
+  --color-primary-300: #1D4ED8;
+  --color-primary-400: #2563EB;
+  --color-primary-500: #3B82F6;
+  --color-primary-600: #60A5FA;
+  --color-primary-700: #93C5FD;
+  --color-primary-800: #BFDBFE;
+  --color-primary-900: #DBEAFE;
+  --color-primary-950: #EFF6FF;
+
+  /* Colors — Secondary (inverted for dark) */
+  --color-secondary-50: #022C22;
+  --color-secondary-100: #064E3B;
+  --color-secondary-200: #065F46;
+  --color-secondary-300: #047857;
+  --color-secondary-400: #059669;
+  --color-secondary-500: #10B981;
+  --color-secondary-600: #34D399;
+  --color-secondary-700: #6EE7B7;
+  --color-secondary-800: #A7F3D0;
+  --color-secondary-900: #D1FAE5;
+  --color-secondary-950: #ECFDF5;
+
+  /* Colors — Neutral (inverted for dark) */
+  --color-neutral-50: #020617;
+  --color-neutral-100: #0F172A;
+  --color-neutral-200: #1E293B;
+  --color-neutral-300: #334155;
+  --color-neutral-400: #475569;
+  --color-neutral-500: #64748B;
+  --color-neutral-600: #94A3B8;
+  --color-neutral-700: #CBD5E1;
+  --color-neutral-800: #E2E8F0;
+  --color-neutral-900: #F1F5F9;
+  --color-neutral-950: #F8FAFC;
+
+  /* Surfaces */
+  --surface-primary: #0F172A;
+  --surface-secondary: #1E293B;
+  --surface-tertiary: #334155;
+
+  /* Text */
+  --text-primary: #F8FAFC;
+  --text-secondary: #CBD5E1;
+  --text-tertiary: #94A3B8;
+  --text-inverse: #0F172A;
+
+  /* Borders */
+  --border-default: #334155;
+  --border-hover: #475569;
+
+  /* Shadows (stronger in dark mode) */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-default: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.3);
+}

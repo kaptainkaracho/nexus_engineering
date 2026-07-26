@@ -5,6 +5,7 @@ export {
   cn,
   Button,
   Input,
+  Select,
   Card,
   Container,
   Stack,
@@ -19,6 +20,7 @@ export {
 export type {
   ButtonProps,
   InputProps,
+  SelectProps,
   CardProps,
   ContainerProps,
   StackProps,

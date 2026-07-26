@@ -23,11 +23,12 @@ const COLUMN_LABEL: Record<GraphNodeType, string> = {
   testCase: 'Tests',
 };
 
+// Token references: --color-info-500, --color-warning-500, --color-primary-500, --color-secondary-400
 const TYPE_COLOR: Record<GraphNodeType, string> = {
-  requirement: '#0EA5E9',
-  architectureModel: '#F59E0B',
-  softwareComponent: '#6366F1',
-  testCase: '#14B8A6',
+  requirement: '#0EA5E9',       // info-500
+  architectureModel: '#F59E0B', // warning-500
+  softwareComponent: '#6366F1', // accent (indigo — no token, kept as-is)
+  testCase: '#14B8A6',          // secondary-400 (teal — closest match)
 };
 
 const COL_W = 240;

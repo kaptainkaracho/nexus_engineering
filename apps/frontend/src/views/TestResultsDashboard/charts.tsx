@@ -1,12 +1,13 @@
 import { useId } from 'react';
 import type { ExecutionStatus } from '../../api/client';
 
+// Token references: --color-success-500, --color-error-500, --color-warning-500, --color-neutral-400
 export const STATUS_COLORS: Record<ExecutionStatus, string> = {
-  passed: '#22C55E',
-  failed: '#EF4444',
-  error: '#F97316',
-  skipped: '#94A3B8',
-  flaky: '#8B5CF6',
+  passed: '#22C55E',   // success-500
+  failed: '#EF4444',   // error-500
+  error: '#F97316',    // warning-400 (orange — no exact token, closest match)
+  skipped: '#94A3B8',  // neutral-400
+  flaky: '#8B5CF6',    // accent (violet — no token, kept as-is)
 };
 
 export const STATUS_LABELS: Record<ExecutionStatus, string> = {

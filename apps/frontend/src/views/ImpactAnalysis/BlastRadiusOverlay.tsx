@@ -4,11 +4,12 @@ import type { TraceGraphData, ImpactAnalysisData } from '../../api/client';
 
 export type BlastRadiusLevel = 'direct' | 'indirect' | 'transitive' | 'none';
 
+// Token references: --color-error-500, --color-warning-500, --color-success-500
 export const BLAST_RADIUS_COLORS: Record<BlastRadiusLevel, string> = {
-  direct: '#EF4444', // red — directly impacted
-  indirect: '#F59E0B', // yellow — indirectly impacted
-  transitive: '#FB923C', // orange — transitively impacted
-  none: '#22C55E', // green — no impact
+  direct: '#EF4444',       // error-500
+  indirect: '#F59E0B',     // warning-500
+  transitive: '#FB923C',   // warning-400 (no exact token — closest match)
+  none: '#22C55E',         // success-500
 };
 
 export const BLAST_RADIUS_LABELS: Record<BlastRadiusLevel, string> = {
