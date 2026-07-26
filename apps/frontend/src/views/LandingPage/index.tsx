@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Button, Card } from '@nexus-engineering/shared';
+import { Button } from '@nexus-engineering/shared';
 import { Target, Search, Link2, BarChart3, Shield, Rocket, ArrowRight, Play, Menu, X, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
+import { BentoGrid, BentoCell, BentoFeatureCard } from '../../components/bento';
 
 function GithubIcon({ className }: { className?: string }) {
   return (
@@ -230,16 +231,39 @@ export function LandingPage() {
               Everything you need to engineer<br />
               with confidence
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
-              {features.map((feature) => (
-                <Card key={feature.title} variant="outlined" padding="lg" className="hover:shadow-md transition-shadow">
-                  <div className="w-12 h-12 rounded-xl bg-primary-50 dark:bg-primary-950 flex items-center justify-center mb-4">
-                    <feature.icon className="w-6 h-6 text-primary-500" />
-                  </div>
-                  <h3 className="text-base font-semibold text-text-primary">{feature.title}</h3>
-                  <p className="text-sm text-text-secondary mt-1 leading-relaxed">{feature.description}</p>
-                </Card>
-              ))}
+            <div className="bento-feature-grid mt-12" role="list" aria-label="Platform features">
+              <BentoCell area="feature-main" className="min-h-[200px]">
+                <BentoFeatureCard
+                  icon={Target}
+                  title={features[0].title}
+                  description={features[0].description}
+                  variant="featured"
+                />
+              </BentoCell>
+              <BentoCell area="feature-side" className="min-h-[200px]">
+                <BentoFeatureCard
+                  icon={Search}
+                  title={features[1].title}
+                  description={features[1].description}
+                  variant="standard"
+                />
+              </BentoCell>
+              <BentoCell area="feature-wide" className="min-h-[180px]">
+                <BentoFeatureCard
+                  icon={Link2}
+                  title={features[2].title}
+                  description={features[2].description}
+                  variant="standard"
+                />
+              </BentoCell>
+              <BentoCell area="feature-square" className="min-h-[180px]">
+                <BentoFeatureCard
+                  icon={BarChart3}
+                  title={features[3].title}
+                  description={features[3].description}
+                  variant="standard"
+                />
+              </BentoCell>
             </div>
           </div>
         </section>
