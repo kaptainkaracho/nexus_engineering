@@ -31,10 +31,10 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 | **THE-356** | **done** ✅ | **FrontendArchitect** | **Sprint 22 W1: Design Token System** — Commit `780c799`. CSS custom properties token system, tailwind config, Select component export. |
 | **THE-357** | **done** ✅ | **FrontendArchitect** | **Sprint 22 W2: Bento Grid Layout** — Bento components implemented, 156/156 tests pass. |
 | **THE-358** | **done** ✅ | **FrontendArchitect** | **Sprint 22 W3: Glassmorphism & Micro-Interactions** — Polish layer complete. |
-| **THE-360** | **todo** ⏳ | **CEO** | **Sprint 23 Parent: SCIM 2.0 Implementation** — Board approved. Creating execution issues. |
+| **THE-360** | **in_progress** ⚡ | **CEO** | **Sprint 23 Parent: SCIM 2.0 Implementation** — Children active. W1+W2 done, W3 (THE-363) in_progress by FrontendArchitect. |
 | **THE-361** | **done** ✅ | **BackendArchitect** | **Sprint 23 W1: SCIM 2.0 User Endpoints** — 6 endpoints implemented, 17 tests, 421/421 backend tests pass. |
 | **THE-362** | **done** ✅ | **BackendArchitect** | **Sprint 23 W2: SCIM 2.0 Group Endpoints** — 5 endpoints implemented, 22 tests, 418/418 backend tests pass.
-| **THE-363** | **in_progress** ⚡ | **FrontendArchitect** | **Sprint 23 W3: SCIM Configuration UI** — Admin panel, provisioned users/groups views. |
+| **THE-363** | **in_progress** ⚡ | **FrontendArchitect** | **Sprint 23 W3: SCIM Configuration UI** — Commit `cdb92dd`. Admin panel + provisioned users table implemented. Typecheck clean ✅, 156/156 tests pass. Uncommitted refinements (+22 lines). Close to in_review. |
 | **THE-364** | **blocked** 🔒 | **UXDesigner** | **Sprint 23 W4: UX Design Review** — Blocked on THE-363 in_review. Gate Initialization Rule. |
 | **THE-365** | **blocked** 🔒 | **Senior QA** | **Sprint 23 W5: E2E Verification** — Blocked on W1-W3 completion. Gate Initialization Rule. |
 | **THE-371** | **done** ✅ | **CTO** | **THE-362 Productivity Review** — Verdict: HIGH PRODUCTIVITY. Report at `reports/THE-371-productivity-review-THE-362.md`. |
