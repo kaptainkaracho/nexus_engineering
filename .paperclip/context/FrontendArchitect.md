@@ -1,48 +1,37 @@
 # FrontendArchitect Context State
-> Last updated: 2026-07-26T17:46:00Z
+> Last updated: 2026-07-26 21:37 UTC — Sprint 24 Active
 
-## Last Run
-- Issue: THE-363 — Sprint 23 W3: SCIM Configuration UI
-- Timestamp: 2026-07-26T17:46:00Z
-- Status: Built complete SCIM Config UI (4 files created, 3 files modified). TypeScript clean, 156/156 tests pass.
+## Completed Assignment
+- **Issue:** THE-376 — Sprint 24 W2: Advanced RBAC Frontend UI
+- **Status:** committed ✅ (branch `feat/THE-376-rbac-frontend-ui`, commit `b23587c`)
+- **Next:** Awaiting UXDesigner gate (THE-377) for merge approval
 
-## Files Read This Session
-- apps/frontend/src/App.tsx
-- apps/frontend/src/views/SSOSettings/index.tsx
-- packages/shared/src/types.ts
-- apps/frontend/vite.config.ts
-- docs/openapi/scim.yaml
-- packages/shared/src/index.ts
-- apps/frontend/src/api/sso.ts
-- packages/shared/src/design-system/components/Button.tsx
-- packages/shared/src/design-system/components/Badge.tsx
-- packages/shared/src/design-system/components/Alert.tsx
-- apps/frontend/src/views/OrgAdmin/index.tsx
+## Artifacts Delivered (THE-376)
+| File | Lines | Description |
+|------|-------|-------------|
+| `apps/frontend/src/views/RoleManagement/index.tsx` | 167 | Composed layout with role list, details, permissions, user-role assignment |
+| `apps/frontend/src/views/RoleManagement/RoleList.tsx` | 226 | Role CRUD list with search, delete confirmation modal |
+| `apps/frontend/src/views/RoleManagement/RoleForm.tsx` | 204 | Create/edit form with permission checkboxes |
+| `apps/frontend/src/views/RoleManagement/PermissionCheckboxGroup.tsx` | 55 | Permission checkbox group component |
+| `apps/frontend/src/views/RoleManagement/RolePermissionsPanel.tsx` | 152 | Role permissions management panel |
+| `apps/frontend/src/views/RoleManagement/UserRoleAssignment.tsx` | 157 | User-role assignment UI |
+| `apps/frontend/src/api/rbac.ts` | 294 | RBAC API client (7 endpoint wrappers) |
+| **Total** | **1,255** | |
 
-## Files Created/Modified
-- packages/shared/src/types.ts (modified: added ScimConfig, ScimUser, ScimGroup, ScimMember, ScimListResponse, ScimProvisioningLog types)
-- packages/shared/src/index.ts (modified: re-exported SCIM types)
-- apps/frontend/src/api/scim.ts (created: fetchScimConfig, toggleScimProvisioning, regenerateBearerToken, fetchProvisionedUsers, fetchProvisionedGroups)
-- apps/frontend/src/views/ScimSettings/index.tsx (created: main SCIM settings page composing 3 sub-components)
-- apps/frontend/src/views/ScimSettings/ScimConfigPanel.tsx (created: enable/disable toggle, endpoint URL, bearer token display/regen, setup instructions)
-- apps/frontend/src/views/ScimSettings/ProvisionedUsersTable.tsx (created: table with search, pagination, status badges, role chips)
-- apps/frontend/src/views/ScimSettings/ProvisionedGroupsTable.tsx (created: table with expandable member lists, pagination)
-- apps/frontend/src/App.tsx (modified: added 'scim' section, lazy import, nav item, switch case, admin sub-route)
-- apps/frontend/vite.config.ts (modified: added ScimSettings to chunk-admin regex)
+## Verification
+- ✅ `pnpm typecheck` — clean (full workspace)
+- ✅ `pnpm test -- frontend` — 168/168 pass
+- ✅ TypeScript: No errors found
 
-## Quality Checks
-- TypeScript: clean (no errors)
-- Tests: 156/156 passing
-- Accessibility: semantic HTML, ARIA labels, keyboard navigation, screen reader support
-- Responsive: mobile-friendly layout with overflow-x-auto tables
-- Design system: uses tokens, shared components (Card, Stack, Button, Alert)
+## DoD Check (THE-376)
+- [x] Role list renders with create/edit/delete
+- [x] Permission checkboxes functional
+- [x] User-role assignment UI works
+- [x] `pnpm typecheck` passes
+- [x] `pnpm test -- frontend` passes
 
-## DoD Checklist
-1. ✅ SCIM config panel renders and functions (enable/disable, endpoint URL, bearer token, token regeneration)
-2. ✅ Provisioned users table with filters (search, pagination, status badges, role chips, source IdP, last sync)
-3. ✅ Provisioned groups table (member count, expandable member list, pagination)
-4. ✅ `pnpm typecheck` passes (frontend clean)
-5. ✅ `pnpm test -- frontend` passes (156/156)
+## Next Assignment (when ready)
+- **THE-379** — Sprint 24 W5: Compliance Frontend (blocked on THE-378 W4 API complete)
 
-## Next Action
-- Mark THE-363 as done, await THE-364 (UX Design Review) assignment
+## Previous Work (Sprint 23 - SCIM)
+- THE-363: SCIM Configuration UI ✅ — Done and verified

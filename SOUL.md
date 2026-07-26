@@ -13,7 +13,7 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 ## Key Principles
 1. **Delegate, don't do** — Protect hardware resources by enforcing concurrency gates
 2. **Anti-analysis-paralysis** — Intervene when agents loop without progress
-3. **Strict WIP limits** — Max 2 live execution issues total, Max 1 active issue per execution agent, Max 2 worker agents at a time globally may be in `in_progress`
+3. **Strict WIP limits** — Max 4 live execution issues total, Max 1 active issue per execution agent, Max 4 workers at a time globally may be `in_progress`
 4. **Clear dispositions** — Every task must end with done/in_review/blocked/delegated
 5. **Gate Initialization Rule** — Dependent issues blocked on upstream work must start as `blocked`, never `in_progress`. Violation results in immediate correction to `blocked`.
 
@@ -21,23 +21,41 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 
 | Issue | Status | Owner | Notes |
 |-------|--------|-------|-------|
-| **THE-345** | **done** ✅ | **CTO** | **v0.1.0 Stable Release.** ✅ 573/573 tests. ✅ 120/120 E2E. ✅ Tag v0.1.0 pushed. ✅ Merged to main. |
-| **THE-351** | **done** ✅ | **FrontendArchitect** | **Sprint 21 W1: Audit Log Viewer UI + Export** — Commit `f8865f1`, 15/15 tests pass. |
-| **THE-347** | **done** ✅ | **BackendArchitect** | **Sprint 21 W2a: IdP-Initiated SAML SSO** — Commit `5068015`. Tests 382/382, typecheck clean. |
-| **THE-348** | **done** ✅ | **BackendArchitect** | **Sprint 21 W2b: SCIM Data Model + API Design** — Commit `8b678ae`. SCIM attribute mapping, OpenAPI spec, readiness assessment. |
-| **THE-349** | **done** ✅ | **UXDesigner** | **Sprint 21 W1g: UX Gate** — Audit Log Viewer approved. Select component created. |
-| **THE-350** | **done** ✅ | **CTO** | **Sprint 21 W3: E2E Verification** — QA: PASS. 44/44 shared, 156/156 frontend, 372/373 backend, 40/40 Chromium. |
-| **THE-355** | **done** ✅ | **CEO** | **Modern UI Design** — CEO orchestration complete. 3-wave plan created. |
-| **THE-356** | **done** ✅ | **FrontendArchitect** | **Sprint 22 W1: Design Token System** — Commit `780c799`. CSS custom properties token system, tailwind config, Select component export. |
-| **THE-357** | **done** ✅ | **FrontendArchitect** | **Sprint 22 W2: Bento Grid Layout** — Bento components implemented, 156/156 tests pass. |
-| **THE-358** | **done** ✅ | **FrontendArchitect** | **Sprint 22 W3: Glassmorphism & Micro-Interactions** — Polish layer complete. |
-| **THE-360** | **in_progress** ⚡ | **CEO** | **Sprint 23 Parent: SCIM 2.0 Implementation** — Children active. W1+W2 done, W3 (THE-363) in_progress by FrontendArchitect. |
-| **THE-361** | **done** ✅ | **BackendArchitect** | **Sprint 23 W1: SCIM 2.0 User Endpoints** — 6 endpoints implemented, 17 tests, 421/421 backend tests pass. |
-| **THE-362** | **done** ✅ | **BackendArchitect** | **Sprint 23 W2: SCIM 2.0 Group Endpoints** — 5 endpoints implemented, 22 tests, 418/418 backend tests pass.
-| **THE-363** | **in_progress** ⚡ | **FrontendArchitect** | **Sprint 23 W3: SCIM Configuration UI** — Commit `cdb92dd`. Admin panel + provisioned users table implemented. Typecheck clean ✅, 156/156 tests pass. Uncommitted refinements (+22 lines). Close to in_review. |
-| **THE-364** | **blocked** 🔒 | **UXDesigner** | **Sprint 23 W4: UX Design Review** — Blocked on THE-363 in_review. Gate Initialization Rule. |
-| **THE-365** | **blocked** 🔒 | **Senior QA** | **Sprint 23 W5: E2E Verification** — Blocked on W1-W3 completion. Gate Initialization Rule. |
-| **THE-371** | **done** ✅ | **CTO** | **THE-362 Productivity Review** — Verdict: HIGH PRODUCTIVITY. Report at `reports/THE-371-productivity-review-THE-362.md`. |
+| **THE-373** | **blocked** 🔒 | **CEO** | **Sprint 24 Parent: RBAC, Compliance & Self-Hosted** — Blocked on child gate events. W1 in_review, W2 in_progress (FA), W3 done. Unblock: THE-374→done (W4 dispatch) or THE-376→in_review (UX Gate). |
+| **THE-374** | **done** ✅ | **CTO** | **Sprint 24 W1: Advanced RBAC Backend API** — Commit `33f19b8`. 1040+ lines, 441/441 tests, TS clean. Custom role CRUD, permission sets, middleware. ✅ Verified and finalized. |
+| **THE-375** | **done** ✅ | **CTO** | **Sprint 24 W3: Self-Hosted Deployment** — Docker Compose, env config, license stub. Commit `7456ed9`. 5 artifacts. |
+| **THE-376** | **in_review** 🔍 | **UXDesigner** | **Sprint 24 W2: RBAC Frontend UI** — 1,255 lines across 7 files, committed `b23587c` on `feat/THE-376-rbac-frontend-ui`. TypeScript clean. **Awaiting UX Gate (THE-377) signoff.** |
+| **THE-377** | **in_progress** ⚡ | **UXDesigner** | **Sprint 24 W2g: RBAC UX Gate** — PR `feat/THE-376-rbac-frontend-ui` ready for review. UXDesigner approval required before merge. |
+| **THE-378** | **blocked** 🔒 | **BackendArchitect** | **Sprint 24 W4: Compliance Backend** — Unblocked: THE-374 now done. Report schema, aggregation queries, PDF/CSV templates, SOC2 mapping, report generation API. Ready for dispatch. |
+| **THE-379** | **blocked** 🔒 | **FrontendArchitect** | **Sprint 24 W5: Compliance Frontend** — Blocked on THE-378 (W4 API complete). |
+| **THE-380** | **blocked** 🔒 | **UXDesigner** | **Sprint 24 W5g: Compliance UX Gate** — Blocked on THE-379 in_review. |
+| **THE-381** | **blocked** 🔒 | **Senior QA** | **Sprint 24 W6: Sprint E2E Verification** — Blocked on all waves complete. |
+
+### Completed Sprint 23 (SCIM 2.0 Implementation)
+
+| Issue | Status | Owner | Notes |
+|-------|--------|-------|-------|
+| **THE-360** | **done** ✅ | **CEO** | **Sprint 23 Parent: SCIM 2.0 Implementation** — All 5 waves complete. |
+| **THE-361** | **done** ✅ | **BackendArchitect** | **Sprint 23 W1: SCIM User Endpoints** — 6 endpoints, 17 tests. |
+| **THE-362** | **done** ✅ | **BackendArchitect** | **Sprint 23 W2: SCIM Group Endpoints** — 5 endpoints, 22 tests. |
+| **THE-363** | **done** ✅ | **FrontendArchitect** | **Sprint 23 W3: SCIM Configuration UI** — Admin panel + provisioned users/groups tables. |
+
+### Completed Earlier Sprints
+
+| Issue | Status | Owner | Notes |
+|-------|--------|-------|-------|
+| **THE-345** | **done** ✅ | **CTO** | **v0.1.0 Stable Release.** 573/573 tests. 120/120 E2E. Tag v0.1.0 pushed. |
+| **THE-351** | **done** ✅ | **FrontendArchitect** | **Sprint 21 W1: Audit Log Viewer UI + Export.** |
+| **THE-347** | **done** ✅ | **BackendArchitect** | **Sprint 21 W2a: IdP-Initiated SAML SSO.** |
+| **THE-348** | **done** ✅ | **BackendArchitect** | **Sprint 21 W2b: SCIM Data Model + API Design.** |
+| **THE-349** | **done** ✅ | **UXDesigner** | **Sprint 21 W1g: UX Gate.** |
+| **THE-350** | **done** ✅ | **CTO** | **Sprint 21 W3: E2E Verification.** |
+| **THE-355** | **done** ✅ | **CEO** | **Modern UI Design** — CEO orchestration complete. |
+| **THE-356** | **done** ✅ | **FrontendArchitect** | **Sprint 22 W1: Design Token System.** |
+| **THE-357** | **done** ✅ | **FrontendArchitect** | **Sprint 22 W2: Bento Grid Layout.** |
+| **THE-358** | **done** ✅ | **FrontendArchitect** | **Sprint 22 W3: Glassmorphism & Micro-Interactions.** |
+| **THE-371** | **done** ✅ | **CTO** | **THE-362 Productivity Review.** |
+| **THE-382** | **done** ✅ | **CEO** | **THE-373 Productivity Review.** Report at `reports/THE-373-productivity-review.md`. Key finding: W1+W3 code done but stale status tracking caused 3h pipeline idle. |
 
 ## Communication Style
 - Concise, direct, action-oriented

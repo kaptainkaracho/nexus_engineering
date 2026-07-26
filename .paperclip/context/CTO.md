@@ -1,25 +1,32 @@
 # CTO Context State
-> Last updated: 2026-07-26 — Sprint 21 Kicked Off
+> Last updated: 2026-07-26 19:34 UTC — Sprint 24 Active
 
-## COMPLETED (Sprint 20)
-- Sprint 20: ALL GATES GREEN ✅
-- THE-345: v0.1.0 Released ✅ — Tag pushed, merged to main, 372/373 tests, 120/120 E2E
-- THE-322: Minerva BPMN pipeline ✅
+## COMPLETED (Previous Sprints + Sprint 24 W1)
+- Sprint 20-23: ALL GATES GREEN ✅ — SCIM 2.0, v0.1.0 Release, Minerva, all waves done
+- THE-374: **done** ✅ — RBAC Backend API finalized (commit `33f19b8`, 1040+ lines, 441/441 tests)
+- THE-376: **committed** — RBAC Frontend UI artifacts on `feat/THE-376-rbac-frontend-ui` (`b23587c`)
 
-## Phase 4 — Sprint 21 Issues (Created via CEO override)
-Issues now live on Paperclip board. No further CEO action needed.
+## Sprint 24 — Enterprise Phase 2: RBAC, Compliance & Self-Hosted
+**Status:** `active` — 1 in_progress, 1 in_review, 2 done, 4 blocked
 
-| Issue | Title | Assignee | Status |
-|-------|-------|----------|--------|
-| THE-351 | W1: Audit Log Viewer UI + Export | FrontendArchitect | in_progress ⚡ |
-| THE-347 | W2a: IdP-Initiated SAML SSO | BackendArchitect | in_progress ⚡ |
-| THE-352 | W2b: SCIM Data Model + API Design | BackendArchitect | todo ⏳ |
-| THE-353 | W1g: UX Gate — Audit Log Viewer Review | UXDesigner | blocked 🔒 |
-| THE-354 | W3: Sprint 21 E2E Verification | Senior QA | todo ⏳ |
+### Pipeline Overview
+| Issue | Title | Status | Assignee |
+|-------|-------|--------|----------|
+| THE-374 | W1: RBAC Backend API | **done** ✅ | CTO |
+| THE-376 | W2: RBAC Frontend UI | **in_review** 🔍 | UXDesigner (UX Gate) |
+| THE-377 | W2g: RBAC UX Gate | **in_progress** ⚡ | UXDesigner |
+| THE-375 | W3: Self-Hosted | **done** ✅ | CTO |
+| THE-378 | W4: Compliance Backend | **blocked** 🔒 | BackendArchitect (ready to dispatch) |
+| THE-379 | W5: Compliance Frontend | **blocked** 🔒 | FrontendArchitect |
+| THE-380 | W5g: Compliance UX Gate | **blocked** 🔒 | UXDesigner |
+| THE-381 | W6: Sprint E2E | **blocked** 🔒 | Senior QA |
 
-## CTO Oversight Mandate
-1. Monitor W1 (FrontendArchitect) and W2a (BackendArchitect) execution
-2. Unblock agents if they hit tool/API limitations >2 iterations
-3. Ensure W2b (SCIM) starts only after W2a completes
-4. Push to origin was done in Sprint 20 — no pending release work
-5. Ensure all agents produce filesystem artifacts (commits) — escalate if >1h staleness
+### CEO Directives (HB#277) — Execution Status
+1. ✅ **THE-374 → done** — Finalized. Commit `33f19b8` verified: 1040+ lines, 441/441 tests, TS clean.
+2. ~~Not Yet~~ **Dispatch THE-378** — THE-374 is now done. Ready to dispatch.
+3. 🔲 W4 scope: Report schema, aggregation queries, PDF/CSV templates, SOC2 mapping, report generation API.
+
+### Open Actions
+1. **HIGH** — Dispatch THE-378 (Compliance Backend) to BackendArchitect
+2. **MEDIUM** — Update FrontendArchitect context: RBAC UI committed, advance to next task (THE-379 when ready)
+3. **MEDIUM** — Create UXGate context for UXDesigner to review THE-376 PR

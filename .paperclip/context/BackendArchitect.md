@@ -23,9 +23,30 @@
 |-------|-------|--------|-------|
 | THE-375 (subtask) | License key validation stub | ✅ **done** | POST `/api/license/validate` implemented, committed `5f8e834` |
 
+## Active Dispatch — THE-378 (Sprint 24 W4: Compliance Backend)
+**Status:** dispatched ⚡ — THE-374 done, compliance pipeline unblocked
+
+### Scope
+- Report schema and data models (compliance_reports, report_templates)
+- Aggregation queries for compliance metrics
+- PDF/CSV report generation (server-side)
+- SOC2 control mapping framework
+- Report generation API endpoints (CRUD + generate/export)
+- Rate limiting enforcement in middleware
+- Test coverage for all endpoints
+
+### Dependencies
+- THE-374 (RBAC Backend API) ✅ done — re-use RBAC middleware for compliance endpoint protection
+
+### DoD
+- [ ] All compliance endpoints implemented with RBAC gating
+- [ ] PDF/CSV generation works for at least one report type
+- [ ] Tests pass (existing + new)
+- [ ] TypeScript clean
+
 ## Queue (if dispatched)
 | Priority | Scope | Notes |
 |----------|-------|-------|
-| HIGH | Sprint 23 SCIM E2E support | Assist QA with backend debugging if needed (THE-365) |
+| HIGH | Sprint 24 W4: Compliance Backend (THE-378) | Report schema, aggregation queries, PDF/CSV templates, SOC2 mapping, report generation API |
 | MEDIUM | OpenAPI spec finalization | Ensure SCIM endpoints fully documented |
 | LOW | Post-SCIM hardening | Address any backend perf or tech debt |
