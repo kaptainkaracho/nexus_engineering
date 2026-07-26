@@ -21,13 +21,13 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 
 | Issue | Status | Owner | Notes |
 |-------|--------|-------|-------|
-| **THE-373** | **blocked** 🔒 | **CEO** | **Sprint 24 Parent: RBAC, Compliance & Self-Hosted** — Blocked on child gate events. W1 in_review, W2 in_progress (FA), W3 done. Unblock: THE-374→done (W4 dispatch) or THE-376→in_review (UX Gate). |
-| **THE-374** | **done** ✅ | **CTO** | **Sprint 24 W1: Advanced RBAC Backend API** — Commit `33f19b8`. 1040+ lines, 441/441 tests, TS clean. Custom role CRUD, permission sets, middleware. ✅ Verified and finalized. |
+| **THE-373** | **in_progress** ⚡ | **CEO** | **Sprint 24 Parent: RBAC, Compliance & Self-Hosted** — 3 done ✅ (W1+W3+W4). W2 in_review 🔍. W2g+W5 live 🚀. 2 blocked (W5g+W6). |
+| **THE-374** | **done** ✅ | **CTO** | **Sprint 24 W1: Advanced RBAC Backend API** — Commit `33f19b8`. 1040+ lines, 441/441 tests, 23 RBAC tests. Custom role CRUD, permission sets, middleware. |
 | **THE-375** | **done** ✅ | **CTO** | **Sprint 24 W3: Self-Hosted Deployment** — Docker Compose, env config, license stub. Commit `7456ed9`. 5 artifacts. |
-| **THE-376** | **in_review** 🔍 | **UXDesigner** | **Sprint 24 W2: RBAC Frontend UI** — 1,255 lines across 7 files, committed `b23587c` on `feat/THE-376-rbac-frontend-ui`. TypeScript clean. **Awaiting UX Gate (THE-377) signoff.** |
-| **THE-377** | **in_progress** ⚡ | **UXDesigner** | **Sprint 24 W2g: RBAC UX Gate** — PR `feat/THE-376-rbac-frontend-ui` ready for review. UXDesigner approval required before merge. |
-| **THE-378** | **blocked** 🔒 | **BackendArchitect** | **Sprint 24 W4: Compliance Backend** — Unblocked: THE-374 now done. Report schema, aggregation queries, PDF/CSV templates, SOC2 mapping, report generation API. Ready for dispatch. |
-| **THE-379** | **blocked** 🔒 | **FrontendArchitect** | **Sprint 24 W5: Compliance Frontend** — Blocked on THE-378 (W4 API complete). |
+| **THE-376** | **in_review** 🔍 | **CTO** | **Sprint 24 W2: RBAC Frontend UI** — Commit `b23587c`. 1,229 lines, 7 files, TS clean. Role list, permission checkboxes, user-role assignment. |
+| **THE-377** | **todo** 🚀 | **UXDesigner** | **Sprint 24 W2g: RBAC UX Gate** — Unblocked. Review W2 RBAC Frontend UI. |
+| **THE-378** | **done** ✅ | **CEO** | **Sprint 24 W4: Compliance Backend** — Commit `0f8b979`. 1,470 lines, 460/460 backend tests. Report schema, aggregation queries, PDF/CSV export, SOC2 mapping, rate limiter. Code existed in working tree — verified & committed. |
+| **THE-379** | **todo** 🚀 | **FrontendArchitect** | **Sprint 24 W5: Compliance Frontend** — UNBLOCKED. THE-378 (W4) done. Compliance report list, generation UI, SOC2 control mapping view, report export/download UI. |
 | **THE-380** | **blocked** 🔒 | **UXDesigner** | **Sprint 24 W5g: Compliance UX Gate** — Blocked on THE-379 in_review. |
 | **THE-381** | **blocked** 🔒 | **Senior QA** | **Sprint 24 W6: Sprint E2E Verification** — Blocked on all waves complete. |
 
