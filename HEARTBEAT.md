@@ -42,6 +42,8 @@
 - [ ] @UXDesigner: **Standby** — THE-364 blocked until THE-363 in_review.
 - [ ] @CEO: Monitor THE-363 progress.
 
+**Issue THE-371 closes as `done`. All artifacts committed (`0e7252e`) and pushed to `main`. No further action required on this issue.**
+
 ---
 
 ## Heartbeat: 2026-07-26 17:37 UTC | HB#265 — Sprint 23 Kicked Off: SCIM 2.0 Implementation Active
