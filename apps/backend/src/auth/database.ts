@@ -82,6 +82,19 @@ export interface OAuthAccountRow {
   created_at: string
 }
 
+export interface GroupRow {
+  id: string
+  display_name: string
+  created_at: string
+  updated_at: string
+}
+
+export interface GroupMemberRow {
+  group_id: string
+  member_id: string
+  member_type: string
+}
+
 export class AuthDatabase {
   private db: Database.Database
   private initialized = false
@@ -184,6 +197,33 @@ export class AuthDatabase {
     `)
     this.db.exec(`
       CREATE INDEX IF NOT EXISTS idx_oauth_accounts_provider ON oauth_accounts (provider, provider_user_id)
+    `)
+
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS groups (
+        id TEXT PRIMARY KEY,
+        display_name TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      )
+    `)
+
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS group_members (
+        group_id TEXT NOT NULL,
+        member_id TEXT NOT NULL,
+        member_type TEXT NOT NULL DEFAULT 'User',
+        PRIMARY KEY (group_id, member_id),
+        FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE
+      )
+    `)
+
+    this.db.exec(`
+      CREATE INDEX IF NOT EXISTS idx_group_members_group ON group_members (group_id)
+    `)
+
+    this.db.exec(`
+      CREATE INDEX IF NOT EXISTS idx_group_members_member ON group_members (member_id)
     `)
 
     this.seedDefaults()
@@ -349,6 +389,71 @@ export class AuthDatabase {
     values.push(id)
     const result = this.db.prepare(sql).run(...values)
     return result.changes > 0
+  }
+
+  // --- Group operations ---
+
+  createGroup(group: { id: string; displayName: string }): GroupRow {
+    const now = new Date().toISOString()
+    const stmt = this.db.prepare(
+      'INSERT INTO groups (id, display_name, created_at, updated_at) VALUES (?, ?, ?, ?)'
+    )
+    stmt.run(group.id, group.displayName, now, now)
+    return this.findGroupById(group.id)!
+  }
+
+  findGroupById(id: string): GroupRow | undefined {
+    return this.db.prepare('SELECT * FROM groups WHERE id = ?').get(id) as GroupRow | undefined
+  }
+
+  findGroupByDisplayName(name: string): GroupRow | undefined {
+    return this.db.prepare('SELECT * FROM groups WHERE display_name = ?').get(name) as GroupRow | undefined
+  }
+
+  listGroups(): GroupRow[] {
+    return this.db.prepare('SELECT * FROM groups ORDER BY display_name').all() as GroupRow[]
+  }
+
+  updateGroup(id: string, updates: { displayName?: string }): boolean {
+    const parts: string[] = ['updated_at = ?']
+    const values: unknown[] = [new Date().toISOString()]
+
+    if (updates.displayName !== undefined) {
+      parts.push('display_name = ?')
+      values.push(updates.displayName)
+    }
+
+    if (parts.length === 1) return false
+    const sql = `UPDATE groups SET ${parts.join(', ')} WHERE id = ?`
+    values.push(id)
+    const result = this.db.prepare(sql).run(...values)
+    return result.changes > 0
+  }
+
+  deleteGroup(id: string): boolean {
+    const result = this.db.prepare('DELETE FROM groups WHERE id = ?').run(id)
+    return result.changes > 0
+  }
+
+  addGroupMember(group_id: string, member_id: string, member_type = 'User'): boolean {
+    const stmt = this.db.prepare(
+      'INSERT OR IGNORE INTO group_members (group_id, member_id, member_type) VALUES (?, ?, ?)'
+    )
+    const result = stmt.run(group_id, member_id, member_type)
+    return result.changes > 0
+  }
+
+  removeGroupMember(group_id: string, member_id: string): boolean {
+    const result = this.db.prepare(
+      'DELETE FROM group_members WHERE group_id = ? AND member_id = ?'
+    ).run(group_id, member_id)
+    return result.changes > 0
+  }
+
+  getGroupMembers(group_id: string): GroupMemberRow[] {
+    return this.db.prepare(
+      'SELECT * FROM group_members WHERE group_id = ?'
+    ).all(group_id) as GroupMemberRow[]
   }
 
   close() {
