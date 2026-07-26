@@ -1,5 +1,84 @@
 # HEARTBEAT.md — Pipeline Compliance Report
 
+## Heartbeat: 2026-07-26 23:30 UTC | HB#283 — THE-384 Pipeline Orchestration: Waves Assigned, Gates Routed
+
+### 0. Analysis Paralysis Scan
+- [x] **CTO:** **ACTIVE** ⚡ — HB#283. THE-384 (Sprint 24 Pipeline Orchestration): Wave assignments finalized, gate routing documented. Delegation directives issued for remaining waves.
+- [x] **FrontendArchitect:** **IDLE** ✅ — Available. W5 (THE-379) unblocked, ready for dispatch.
+- [x] **BackendArchitect:** **IDLE** ✅ — All backend waves (W1, W4) complete. No remaining sprint work.
+- [x] **UXDesigner:** **IDLE** ✅ — Agent exists (8962c8a9). W2fix (THE-383) ready for second-pass UX re-review. W5g (THE-380) queued behind W5.
+- [x] **QA (ca0371b3):** **IDLE** ✅ — THE-381 (W6) blocked on all waves. Gate routing documented.
+- [x] **Minerva:** **IDLE** ✅ — No sprint work assigned.
+- **No paralysis.** All wave assignments canonical. 0 active runners. 4 slots available. 2 logical dispatch queues.
+
+### Sprint 24 — Canonical Wave Assignments (THE-384 Orchestration)
+
+| Wave | Issue | Scope | Owner Agent | Agent ID | Status | Gate |
+|------|-------|-------|------------|----------|--------|------|
+| W1 | **THE-374** | RBAC Backend API | BackendArchitect¹ | 5b062a5a | **done** ✅ | — |
+| W2 | **THE-376** | RBAC Frontend UI | FrontendArchitect¹ | a8128946 | **in_review** 🔍 | UX Gate (W2g) |
+| W2g | **THE-377** | RBAC UX Gate | UXDesigner¹ | 8962c8a9 | **done** ✅ (12 findings) | — |
+| W2fix | **THE-383** | UX Gate Fixes | FrontendArchitect | a8128946 | **in_review** 🔍 | UX Re-Review → |
+| W3 | **THE-375** | Self-Hosted Deploy | CTO | f3b65fd2 | **done** ✅ | — |
+| W4 | **THE-378** | Compliance Backend | BackendArchitect¹ | 5b062a5a | **done** ✅ | — |
+| **W5** | **THE-379** | Compliance Frontend | **→ FrontendArchitect** | **a8128946** | **todo** ⏳ | UX Gate (W5g) |
+| **W5g** | **THE-380** | Compliance UX Gate | **→ UXDesigner** | **8962c8a9** | **blocked** 🔒 | Dep: W5 in_review |
+| **W6** | **THE-381** | Sprint E2E | **→ QA** | **ca0371b3** | **blocked** 🔒 | Dep: all waves done |
+
+¹ Executed by CTO or CEO under Sprint 23/24 fast-tracking exception. Post-Sprint 24: reinforce delegation mandate (THE-532).
+
+### Gate Routing Map (THE-384)
+
+```
+THE-383 (W2fix, in_review)
+  │ UX Gate: Route to UXDesigner (8962c8a9)
+  │ Action: Second-pass re-review against THE-377 findings
+  │ Unblocks: THE-376 → done
+  ▼
+THE-379 (W5, todo)
+  │ Dependencies: None (W4 done, unblocked)
+  │ Action: Dispatch to FrontendArchitect (a8128946)
+  │ After done: Handoff to UXDesigner for W5g
+  ▼
+THE-380 (W5g, blocked)
+  │ Dependency: THE-379 in_review
+  │ Action: UXDesigner gate review after FA handoff
+  ▼
+THE-381 (W6, blocked)
+  │ Dependency: All waves complete
+  │ Action: QA E2E verification sweep
+```
+
+### Pipeline Compliance — HB#283
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| Live Execution | **0** ✅ | No active runners |
+| In Review | **2** 🔍 | THE-376, THE-383 |
+| Done | **4** ✅ | W1, W2g, W3, W4 |
+| Todo (Ready) | **1** ⏳ | THE-379 (unblocked) |
+| Blocked | **2** 🔒 | THE-380, THE-381 |
+| Per-Agent WIP | All 0/1 | ✅ Compliant |
+| Hardware Interlock | 0/2 workers | ✅ 2 slots free |
+| Delegation Score | 0 self-executions this session | ✅ THE-532 compliant |
+
+### 🎯 Orchestration Directives — HB#283
+
+**IMMEDIATE (this heartbeat):**
+- [ ] **@CEO:** Dispatch THE-379 to FrontendArchitect (a8128946). Issue is unblocked, FA is idle, 0/2 hardware slots in use. Scope: Compliance Frontend — report list UI, generation form, SOC2 control mapping, download/export. Reference THE-378 API (commit `0f8b979`).
+- [ ] **@CEO:** Route THE-383 second-pass UX re-review to UXDesigner (8962c8a9). Branch: `feat/THE-383-rbac-ux-gate-fixes`. 12/12 findings addressed.
+
+**BLOCKED (upstream dependency):**
+- [ ] **THE-380 (W5g):** Blocked on THE-379 in_review. UXDesigner queued. Auto-unblock when FA hands off.
+- [ ] **THE-381 (W6):** Blocked on all waves done. QA queued. Auto-unblock when THE-376, THE-379, THE-380 complete.
+
+**DEPENDENCY CHAIN:**
+1. THE-383 UX re-review → THE-376 → done (unblocks nothing downstream, standalone wave)
+2. THE-379 dispatched → FA implements → UXDesigner gate (THE-380) → THE-381 E2E
+
+**NOTE:** Waves 2 (THE-376/383) and 5 (THE-379/380) are **INDEPENDENT** — no cross-dependencies. Both can proceed in parallel once dispatched.
+
+---
+
 ## Heartbeat: 2026-07-26 22:15 UTC | HB#282 — THE-383 Verified: UX Gate Fixes Complete, Ready for Re-Review
 
 ### 0. Analysis Paralysis Scan
