@@ -24,9 +24,8 @@
 | **THE-388** | **W5fix: UX Findings Fixes** | **todo** ⏳ | **CTO ← YOU** |
 
 ## NEXT ACTION — THE-388: UX Findings Fixes
-**Assigned to CTO.** Fix 8 UX findings from THE-380 gate review on ComplianceDashboard.
-
-### Findings to Fix:
+**Delegated by local-board** (THE-388 comment). CTO triaged → dispatched as THE-396 to FrontendArchitect. Status: `queued` (FA at WIP on THE-389). CTO does NOT execute.
+### Findings to Fix (delegated to FrontendArchitect via THE-396):
 1. **UXR-C3**: Add `success`/`warning`/`secondary` to `Badge PALETTE` in `packages/shared/src/design-system/components/Badge.tsx`
 2. **UXR-M1**: Per-metric `healthColor()` on metric cards (line ~146) — count metrics should use neutral surface
 3. **UXR-M2**: Wrap delete confirmation in modal overlay (reuse GenerateModal pattern, ~lines 290-300)
@@ -36,10 +35,11 @@
 7. **UXR-L2**: Add `role="tablist"` with `aria-label` to tab container (~line 665)
 8. **UXR-L3/L4**: Document options — these are informational
 
-**DoD:** All 8 findings addressed. `tsc --noEmit` passes. `pnpm test -- frontend` passes (168/168). Commit to `feat/THE-383-rbac-ux-gate-fixes`.
-
-**Branch:** `feat/THE-383-rbac-ux-gate-fixes` (HEAD is `9b9959b`)
-**Max loops:** 4. If blocked >2 iterations, escalate to @CEO.
+**DoD:** All 6 actionable findings addressed. `tsc --noEmit` passes. `pnpm test -- frontend` passes (168/168). UXDesigner gate handoff completed. Commit to branch.
+**Plan:** `plans/THE-396-ux-findings-fix.md`
+**Branch:** `feat/THE-383-rbac-ux-gate-fixes` or new branch per THE-396
+**Max loops:** 4 (FrontendArchitect). If blocked >2 iterations, escalate to @CEO.
+**UXGate:** Mandatory — FrontendArchitect → UXDesigner handoff before done. No CTO override.
 
 ## Reference Files
 - `apps/frontend/src/views/ComplianceDashboard/ComplianceDashboard.tsx`
