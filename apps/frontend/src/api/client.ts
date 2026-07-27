@@ -1316,3 +1316,218 @@ export async function fetchNLQuery(query: string): Promise<NLQueryResult | null>
     return null;
   }
 }
+
+// =========================================================
+// Compliance Reporting (THE-379)
+// =========================================================
+
+export type ComplianceReportType = 'coverage' | 'traceability' | 'audit' | 'gap_analysis' | 'soc2' | 'full';
+export type ComplianceReportFormat = 'json' | 'csv' | 'pdf';
+export type ComplianceReportStatus = 'generating' | 'completed' | 'failed';
+
+export interface ComplianceReport {
+  id: string;
+  title: string;
+  report_type: ComplianceReportType;
+  format: ComplianceReportFormat;
+  status: ComplianceReportStatus;
+  config: Record<string, unknown> | null;
+  summary: string | null;
+  file_path: string | null;
+  error_message: string | null;
+  created_by: string;
+  org_id: string | null;
+  created_at: string;
+  completed_at: string | null;
+}
+
+export interface ComplianceAggregationResult {
+  generatedAt: string;
+  summary: {
+    totalNodes: number;
+    totalEdges: number;
+    nodesByType: Record<string, number>;
+    edgesByRelationship: Record<string, number>;
+  };
+  coverage: {
+    overallCoveragePercent: number;
+    axes: Array<{ axis: string; total: number; linked: number; percent: number }>;
+  };
+  soc2?: {
+    totalMappings: number;
+    compliant: number;
+    nonCompliant: number;
+    notAssessed: number;
+    byCategory: Record<string, { compliant: number; nonCompliant: number; notAssessed: number }>;
+  };
+}
+
+export type Soc2Category =
+  | 'CC1' | 'CC2' | 'CC3' | 'CC4' | 'CC5'
+  | 'CC6' | 'CC7' | 'CC8' | 'CC9'
+  | 'A1' | 'A2' | 'C1' | 'PI1' | 'P1' | 'P2' | 'P3' | 'P4';
+
+export const SOC2_CATEGORIES: Soc2Category[] = [
+  'CC1', 'CC2', 'CC3', 'CC4', 'CC5',
+  'CC6', 'CC7', 'CC8', 'CC9',
+  'A1', 'A2', 'C1', 'PI1',
+  'P1', 'P2', 'P3', 'P4',
+] as const;
+
+export const SOC2_CATEGORY_LABELS: Record<Soc2Category, string> = {
+  CC1: 'Control Environment',
+  CC2: 'Communication and Information',
+  CC3: 'Risk Assessment',
+  CC4: 'Monitoring Activities',
+  CC5: 'Control Activities',
+  CC6: 'Logical and Physical Access',
+  CC7: 'System Operations',
+  CC8: 'Change Management',
+  CC9: 'Risk Mitigation',
+  A1: 'Availability — Capacity Management',
+  A2: 'Availability — Disaster Recovery',
+  C1: 'Confidentiality — Protection',
+  PI1: 'Processing Integrity — Accuracy',
+  P1: 'Privacy — Notice and Communication',
+  P2: 'Privacy — Choice and Consent',
+  P3: 'Privacy — Data Minimization',
+  P4: 'Privacy — Data Quality and Retention',
+};
+
+export const VALID_REPORT_TYPES: ComplianceReportType[] = [
+  'coverage', 'traceability', 'audit', 'gap_analysis', 'soc2', 'full',
+];
+
+export const VALID_REPORT_FORMATS: ComplianceReportFormat[] = [
+  'json', 'csv', 'pdf',
+];
+
+export interface Soc2ControlMapping {
+  id: string;
+  category: Soc2Category;
+  artifact_id: string;
+  artifact_type: string;
+  notes: string | null;
+  evidence_path: string | null;
+  status: 'compliant' | 'non_compliant' | 'not_assessed';
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GenerateReportRequest {
+  title: string;
+  reportType: ComplianceReportType;
+  format: ComplianceReportFormat;
+  config?: Record<string, unknown>;
+}
+
+export interface ComplianceReportsResponse {
+  data: ComplianceReport[];
+  total: number;
+  hasMore: boolean;
+}
+
+export async function fetchComplianceReports(params?: {
+  limit?: number;
+  offset?: number;
+  orgId?: string;
+  reportType?: string;
+}): Promise<ComplianceReportsResponse> {
+  const query = new URLSearchParams();
+  if (params?.limit) query.set('limit', String(params.limit));
+  if (params?.offset) query.set('offset', String(params.offset));
+  if (params?.orgId) query.set('orgId', params.orgId);
+  if (params?.reportType) query.set('reportType', params.reportType);
+
+  try {
+    const res = await fetch(`${BASE}/api/compliance/reports?${query}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    const json = await res.json();
+    return {
+      data: json.data ?? json.reports ?? [],
+      total: json.total ?? json.data?.length ?? json.reports?.length ?? 0,
+      hasMore: json.hasMore ?? false,
+    };
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('HTTP')) throw error;
+    return { data: [], total: 0, hasMore: false };
+  }
+}
+
+export async function fetchComplianceReport(id: string): Promise<ComplianceReport> {
+  try {
+    const res = await fetch(`${BASE}/api/compliance/reports/${id}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return await res.json();
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('HTTP')) throw error;
+    throw new Error('Failed to fetch compliance report');
+  }
+}
+
+export async function generateComplianceReport(req: GenerateReportRequest): Promise<ComplianceReport> {
+  try {
+    const res = await fetch(`${BASE}/api/compliance/reports`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req),
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => null);
+      throw new Error(body?.message ?? `HTTP ${res.status}: ${res.statusText}`);
+    }
+    return await res.json();
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('HTTP')) throw error;
+    throw new Error('Failed to generate compliance report');
+  }
+}
+
+export async function deleteComplianceReport(id: string): Promise<void> {
+  try {
+    const res = await fetch(`${BASE}/api/compliance/reports/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('HTTP')) throw error;
+    throw new Error('Failed to delete compliance report');
+  }
+}
+
+export function getComplianceReportDownloadUrl(id: string): string {
+  return `${BASE}/api/compliance/reports/${id}/download`;
+}
+
+export async function fetchComplianceAggregations(): Promise<ComplianceAggregationResult> {
+  try {
+    const res = await fetch(`${BASE}/api/compliance/aggregations`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return await res.json();
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('HTTP')) throw error;
+    throw new Error('Failed to fetch compliance aggregations');
+  }
+}
+
+export async function fetchSoc2Mappings(params?: {
+  category?: string;
+  status?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<Soc2ControlMapping[]> {
+  const query = new URLSearchParams();
+  if (params?.category) query.set('category', params.category);
+  if (params?.status) query.set('status', params.status);
+  if (params?.limit) query.set('limit', String(params.limit));
+  if (params?.offset) query.set('offset', String(params.offset));
+
+  try {
+    const res = await fetch(`${BASE}/api/compliance/soc2/mappings?${query}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    const json = await res.json();
+    return json.data ?? json.mappings ?? [];
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('HTTP')) throw error;
+    return [];
+  }
+}

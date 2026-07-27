@@ -36,6 +36,7 @@ const ImpactReport = lazy(() => import('./views/ImpactReport'));
 const RecommendationsPanel = lazy(() => import('./views/RecommendationsPanel').then(m => ({ default: m.RecommendationsPanel })));
 const NLTraceQuery = lazy(() => import('./views/NLTraceQuery'));
 const QualityDashboard = lazy(() => import('./views/QualityDashboard').then(m => ({ default: m.QualityDashboard })));
+const ComplianceDashboard = lazy(() => import('./views/ComplianceDashboard').then(m => ({ default: m.ComplianceDashboard })));
 const SSOSettings = lazy(() => import('./views/SSOSettings'));
 const ScimSettings = lazy(() => import('./views/ScimSettings'));
 
@@ -71,6 +72,7 @@ type Section =
   | 'recommendations'
   | 'nl-query'
   | 'quality-dashboard'
+  | 'compliance-dashboard'
   | 'trace-gate'
   | 'sso'
   | 'scim'
@@ -105,6 +107,7 @@ const VALID_SECTIONS: Section[] = [
   'recommendations',
   'nl-query',
   'quality-dashboard',
+  'compliance-dashboard',
   'trace-gate',
   'landing',
   'onboarding',
@@ -162,6 +165,7 @@ const SKELETON_VARIANTS: Record<string, RouteLoadingSkeletonProps['variant']> = 
   'recommendations': 'grid',
   'nl-query': 'chart',
   'quality-dashboard': 'grid',
+  'compliance-dashboard': 'grid',
   'trace-gate': 'form',
   'sso': 'form',
   'scim': 'form',
@@ -354,6 +358,7 @@ function App() {
     { label: 'Recommendations', href: '#recommendations', active: activeSection === 'recommendations' },
     { label: 'NL Query', href: '#nl-query', active: activeSection === 'nl-query' },
     { label: 'Quality Dashboard', href: '#quality-dashboard', active: activeSection === 'quality-dashboard' },
+    { label: 'Compliance Dashboard', href: '#compliance-dashboard', active: activeSection === 'compliance-dashboard' },
     { label: 'Trace Gate', href: '#trace-gate', active: activeSection === 'trace-gate' },
   ];
 
@@ -570,6 +575,12 @@ function App() {
         return (
           <Suspense fallback={<RouteLoadingSkeleton variant="grid" />}>
             <QualityDashboard />
+          </Suspense>
+        );
+      case 'compliance-dashboard':
+        return (
+          <Suspense fallback={<RouteLoadingSkeleton variant="grid" />}>
+            <ComplianceDashboard />
           </Suspense>
         );
       case 'trace-gate':
