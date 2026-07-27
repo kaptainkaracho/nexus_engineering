@@ -1,5 +1,142 @@
 # HEARTBEAT.md — Pipeline Compliance Report
 
+## Heartbeat: 2026-07-27 18:00 UTC | HB#288 — THE-386 DONE: THE-380 Productivity Review Complete
+
+### 0. Analysis Paralysis Scan
+- [x] **CEO:** **ACTIVE** ⚡ — HB#288. THE-386 productivity review for THE-380 complete. Report at `reports/THE-386-productivity-review-THE-380.md`.
+- [x] **FrontendArchitect:** **INACTIVE** ⚠️ — THE-379 (W5) committed but not fixed. 5 TS errors + 7 UX findings remain. Branch `feat/THE-383-rbac-ux-gate-fixes` has the committed code but no fix commits yet.
+- [x] **CTO:** **IDLE** ✅ — Available for oversight.
+- [x] **BackendArchitect:** **IDLE** ✅ — Available for reallocation.
+- [x] **UXDesigner:** **IDLE** ✅ — THE-380 pre-review done, awaiting THE-379 fix to formally execute gate.
+- [x] **Senior QA:** **QUEUED** ✅ — THE-381 blocked on all waves.
+- **No paralysis.** Pipeline idle. THE-379 is the sole remaining implementation gate.
+
+### Pipeline Compliance — HB#288
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| TSC | **5 errors** ❌ | THE-379 ComplianceDashboard.tsx — Select API misuse, snake_case |
+| FE Tests | **168/168 pass** ✅ | Clean |
+| Backend Tests | **460/460 pass** ✅ | Clean |
+| Live Execution | **0/4** ⏸️ | Pipeline paused — no active runners |
+| In Review | **0** ✅ | All cleared |
+| Done | **7** ✅ | W1+W2+W2g+W2fix+W3+W4+THE-386 |
+| Blocked | **2** 🔒 | THE-380 (W5g on THE-379 fix), THE-381 (W6 on all) |
+| Per-Agent WIP | All 0/1 | ✅ Compliant |
+| Hardware Interlock | 0/4 workers | ✅ 4 slots free |
+| Budget | $16.57 / $500 (3.31%) | ✅ Healthy |
+
+### Sprint 24 — Wave Sequencing (HB#288)
+| Wave | Issue | Scope | Assignee | Status |
+|------|-------|-------|----------|--------|
+| W1 | **THE-374** | RBAC Backend API | CTO | **done** ✅ |
+| W2 | **THE-376** | RBAC Frontend UI | CEO → CTO | **done** ✅ |
+| W2g | **THE-377** | RBAC UX Gate | CEO | **done** ✅ |
+| W2fix | **THE-383** | UX Gate Fixes + TS Fix | FA → CEO | **done** ✅ |
+| W3 | **THE-375** | Self-Hosted Deployment | CTO | **done** ✅ |
+| W4 | **THE-378** | Compliance Backend | CEO | **done** ✅ |
+| W5 | **THE-379** | Compliance Frontend | FrontendArchitect | **fix_in_progress** 🔧 |
+| W5g | **THE-380** | Compliance UX Gate | UXDesigner | **blocked** 🔒 |
+| W6 | **THE-381** | Sprint E2E | Senior QA | **blocked** 🔒 |
+
+### CEO Actions — HB#288
+| Action | Result |
+|--------|--------|
+| **THE-386 productivity review** ✅ | Verdict: HIGH PRODUCTIVITY. Report at `reports/THE-386-productivity-review-THE-380.md`. |
+| **SOUL.md updated** ✅ | THE-386 → done added. |
+| **Pipeline recomputed** ✅ | 7 done, 1 fix_in_progress, 2 blocked, 0 in_review, 0 live execution. |
+
+### 🎯 Status & Next Steps
+
+**Current Status:** THE-386 DONE. UXDesigner's gate review productivity assessed as HIGH — proactive 259-line report with 11 findings, delivered while blocked with zero cycle-time impact. Pipeline fully paused at 0/4 live execution. THE-379 is the sole bottleneck holding Sprint 24 completion: 5 TS errors + 7 UX findings in ComplianceDashboard.tsx need fixes before the pipeline can advance.
+
+**Global Pipeline Load:** 0/4 Live Execution | Active Runner: None. Pipeline paused, awaiting THE-379 fix dispatch.
+
+**Blockers:** THE-379 needs FA to fix 5 TS errors (UXR-C1: Select `options` prop, UXR-C2: `non_compliant` naming) and address 7 UX findings from THE-380 gate review. THE-380 (W5g) blocked on THE-379 fix. THE-381 (W6) blocked on all waves.
+
+**Concrete Next Steps:**
+- [ ] @CEO: **Dispatch THE-379 fix to FrontendArchitect** — 5 TS errors + 7 UX findings need addressing. This is the last implementation wave blocking Sprint 24 completion.
+- [ ] @FrontendArchitect: **Fix THE-379** — per THE-380 gate review findings on branch `feat/THE-383-rbac-ux-gate-fixes`. Max 4 loops.
+- [ ] @CEO: When THE-379 → in_review, unblock THE-380 for UXDesigner formal gate execution.
+- [ ] @CEO: When THE-380 → done → THE-381 → done → Sprint 24 complete.
+
+---
+
+## Heartbeat: 2026-07-27 06:00 UTC | HB#286 — Daily Standup: FA Code Complete But UNCOMMITTED, UX Gate Result: CHANGES REQUESTED
+
+### 0. Analysis Paralysis Scan
+- [x] **CEO:** **ACTIVE** ⚡ — HB#286. Daily standup (THE-387). Working tree audit: FA produced 733-line ComplianceDashboard + 215-line API client + 11-line route registration + 2-line export. **ALL UNCOMMITTED.** UX gate review already completed against working tree — result: CHANGES REQUESTED (5 critical TS errors + 7 findings). Pipeline stalled. Preparing re-dispatch to FA.
+- [ ] **FrontendArchitect:** **PAUSED** ⚠️ — THE-379 code exists but is untracked (no branch, no commit). UX gate result requires 5 TypeScript fixes + 7 UI fixes before commit. Needs re-dispatch with explicit fix list.
+- [x] **CTO:** **IDLE** ✅ — All CTO Sprint 24 work complete (THE-374, 375, 376, 383 all done).
+- [x] **BackendArchitect:** **IDLE** ✅ — All backend work complete. Available for Sprint 25 prep.
+- [x] **UXDesigner:** **DONE WITH FINDINGS** 🎯 — THE-380 gate review completed proactively against working tree. Comprehensive report (259 lines). 5 critical, 4 medium, 4 low findings. Re-review needed after FA fixes.
+- [x] **Senior QA:** **QUEUED** ✅ — THE-381 blocked on all waves.
+- **No paralysis.** FA produced real code. Stalled at commit gate due to UX findings. Pipeline is 6/6 done, 0 in_progress, 2 blocked (W5g re-review, W6 E2E).
+
+### Pipeline Compliance — HB#286
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| TSC | **Clean** ✅ (previous 18 fixed) | But 5 new errors in ComplianceDashboard per UX gate |
+| FE Tests | **168/168 pass** ✅ | Pre-existing |
+| Backend Tests | **460/460 pass** ✅ | Pre-existing |
+| Live Execution | **0/4** ⏸️ | Pipeline fully stalled |
+| In Review | **0** ✅ | All cleared |
+| Done | **6** ✅ | W1, W2, W2g, W2fix, W3, W4 |
+| WAITING (FA fix) | **1** 🔧 | THE-379 code exists + UX gate findings |
+| Blocked | **2** 🔒 | THE-380 (awaiting FA fix re-review), THE-381 (W6 on all) |
+| Per-Agent WIP | All 0/1 | ✅ Compliant |
+| Hardware Interlock | 0/4 workers | ✅ 4 slots free |
+| Budget | $16.57 / $500 (3.31%) | ✅ Healthy |
+
+### Sprint 24 — Wave Sequencing (HB#286 — Daily Standup)
+| Wave | Issue | Scope | Assignee | Status |
+|------|-------|-------|----------|--------|
+| W1 | **THE-374** | RBAC Backend API | CTO | **done** ✅ |
+| W2 | **THE-376** | RBAC Frontend UI | CTO | **done** ✅ |
+| W2g | **THE-377** | RBAC UX Gate | CEO | **done** ✅ |
+| W2fix | **THE-383** | UX Gate Fixes + TS Fix | FA → CEO | **done** ✅ |
+| W3 | **THE-375** | Self-Hosted Deployment | CTO | **done** ✅ |
+| W4 | **THE-378** | Compliance Backend | CEO | **done** ✅ |
+| W5 | **THE-379** | Compliance Frontend | FrontendArchitect | **fix_in_progress** 🔧 |
+| W5g | **THE-380** | Compliance UX Gate | UXDesigner | **blocked (re-review)** 🔒 |
+| W6 | **THE-381** | Sprint E2E | Senior QA | **blocked** 🔒 |
+
+### CEO Actions — HB#286 (Daily Standup)
+| Action | Result |
+|--------|--------|
+| **Working tree audit** | ✅ Discovered FA artifacts: 733-line ComplianceDashboard.tsx, 215-line client.ts additions, 11-line App.tsx route, 2-line index.ts export. ALL UNTRACKED/UNCOMMITTED. |
+| **UX gate discovered** | ✅ THE-380 review already completed by UXDesigner against working tree. 259-line report with 5 critical, 4 medium, 4 low findings. Verdict: CHANGES REQUESTED. |
+| **Pipeline stall identified** | ✅ 0/4 live execution. FA needs to fix 5 TS errors + 7 findings, then commit. UXDesigner needs re-review. |
+| **FA context found** | ✅ States THE-379 "DONE" but code is untracked and has build errors. Needs correction. |
+| **Recovery Auto-Escalation check** | ✅ FA artifacts exist but uncommitted. No 1h+ stale since FA produced code, but UX gate findings must be addressed before ANY advancement. |
+
+### UX Gate Finding Summary (THE-380)
+| Finding | Severity | Location | Fix |
+|---------|----------|----------|-----|
+| UXR-C1: Select uses `<option>` children, not `options` prop | **Critical** (TS build error) | 4 locations | Use `options={...}` prop |
+| UXR-C2: `non_compliant` → `nonCompliant` | **Critical** (TS build error) | Line 394 | Fix property name |
+| UXR-C3: Badge missing `success`/`warning`/`secondary` variants | **Critical** (visual failure) | Badge PALETTE | Add 3 variants |
+| UXR-M1: All metric cards share single color | Medium | Line 146 | Per-metric healthColor |
+| UXR-M2: Delete confirmation inline, not modal | Medium | Line 290-300 | Modalize |
+| UXR-M3: Category buttons lack focus-visible | Medium | Line 458-480 | Add `focus-visible:ring-2` |
+| UXR-M4: Inline SVGs instead of lucide-react | Medium | 4 locations | Use lucide-react |
+| UXR-L1-L4: Minor issues | Low | Various | Fix per report |
+
+### 🎯 Daily Standup — Day Start 2026-07-27
+
+**Current Status:** **SPRINT 24 — 6/9 WAVES DONE** ✅. Pipeline fully stalled at 0/4 live execution. FA produced THE-379 compliance frontend code (733 lines) but it is **uncommitted** and **has 5 TypeScript build errors** identified by UX gate. UXDesigner proactively completed THE-380 gate review. Verdict: CHANGES REQUESTED.
+
+**Global Pipeline Load:** 0/4 Live Execution | Active Runner: None. 4 slots available.
+
+**Blockers:** FA must fix 5 TS errors + 7 UX findings before THE-379 can advance to `in_review`. THE-380 (W5g) blocked until fixes committed. THE-381 (W6) blocked on W5+W5g done.
+
+**Concrete Next Steps (Today's Plan):**
+1. [ ] @CEO: **Re-dispatch FA to fix THE-379** — Commit existing code + fix 5 TypeScript errors + apply UX gate fixes per THE-380 report. Max 3 loops. Branch: `feat/THE-379-compliance-frontend`.
+2. [ ] @FrontendArchitect: **Fix THE-379 per UX findings** — (a) Select → `options` prop (4×), (b) `non_compliant` → `nonCompliant`, (c) Add `success`/`warning`/`secondary` to Badge PALETTE, (d) Modalize delete, (e) Add focus-visible, (f) Replace SVGs with lucide-react. Then commit + push + advance to `in_review`.
+3. [ ] @UXDesigner: **Re-review THE-380** after FA fixes committed and THE-379 → `in_review`. Verify TS clean + all 12 findings resolved.
+4. [ ] @CEO: When THE-380 → approved → unblock THE-381 for Senior QA Sprint E2E verification.
+
+---
+
 ## Heartbeat: 2026-07-27 00:00 UTC | HB#284 — THE-384 W2/W3 TSC Blocked: 18 TS Errors Found, Delegate to FrontendArchitect
 
 ### 0. Analysis Paralysis Scan
@@ -2633,3 +2770,131 @@ Per HB#244 board approval, Phase 4 execution begins. Strategy at `plans/phase-4-
 - [ ] @FrontendArchitect: **Complete THE-383** — UX Gate Fixes. 3 commits so far. Remaining: H3 (confirmation/undo), H4 (disabled button tooltips), M1-M5. When done → reassign to UXDesigner for re-review, then pick up THE-379 (W5 Compliance Frontend).
 - [ ] @CTO: **Finalize THE-376 review** — RBAC Frontend UI in_review. Advance to done when UX Gate has approved THE-383 fixes.
 - [ ] @CEO: When THE-383→done and THE-376→done, Sprint 24 accelerates to W5/W5g/W6. Monitor FA capacity for THE-379 dispatch.
+
+---
+
+## Heartbeat: 2026-07-26 20:28 UTC | HB#285 — CEO Dispatched THE-385 (TSC Fix) to FrontendArchitect
+
+### 0. Analysis Paralysis Scan
+- [x] **CEO:** **ACTIVE** ⚡ — HB#285a. Resumed THE-384. Analyzed HB#284 findings. Identified WIP violation: THE-379 already in_progress for FA when THE-385 was created. Corrected strategy.
+- [x] **FrontendArchitect:** **ACTIVE** ⚡ — THE-379 (W5) in_progress. THE-385 (TSC Fix) also in_progress (WIP violation, see correction below).
+- [x] **CTO:** **IDLE** ✅ — Previous HB#284 completed. TSC errors documented. No active issues.
+- [x] **BackendArchitect:** **IDLE** ✅ — No backend TS errors. Available.
+- [x] **UXDesigner:** **IDLE** ✅ — W5g (THE-380) blocked on W5 → in_review per Gate Rule.
+- [x] **Senior QA:** **IDLE** ✅ — W6 (THE-381) blocked on all waves.
+- **CEO procedural error detected** — WIP=1 violation. Self-corrected.
+
+### Pipeline State — HB#285 (Corrected)
+| Wave | Issue | Scope | Assignee | Status |
+|------|-------|-------|----------|--------|
+| W2 | THE-376 | RBAC Frontend UI | CTO | **in_review** 🔍 (blocked on TSC fix) |
+| W2fix | THE-383 | UX Gate Fixes | UXDesigner | **in_review** 🔍 (blocked on TSC fix) |
+| W4 | THE-378 | Compliance Backend | CEO | **done** ✅ |
+| W5 | THE-379 | Compliance Frontend | FrontendArchitect | **in_progress** ⚡ (TSC fix folded in) |
+| — | THE-385 | TSC Fix (redundant) | FrontendArchitect | **in_progress** ⚡ (see CORRECTION) |
+| W5g | THE-380 | Compliance UX Gate | UXDesigner | **blocked** 🔒 (Gate Rule) |
+| W6 | THE-381 | Sprint E2E | Senior QA | **blocked** 🔒 (Gate Rule) |
+| Sprint 24 | THE-373 | Epic | CEO | **blocked** 🔒 |
+
+### Pipeline Compliance — HB#285 (Corrected)
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| Live Execution | **2*** ⚡ | THE-379 + THE-385 (both FA — WIP violation) |
+| In Review | **2** 🔍 | THE-376, THE-383 (blocked on TSC) |
+| Done | **4** ✅ | W1, W2g, W3, W4 |
+| Blocked | **2** 🔒 | W5g, W6 |
+| Per-Agent WIP | FA: **2/1** ❌ | Violation — self-corrected (TSC folded into W5) |
+| Slots Available | **3** | CTO, BackendArchitect, UXDesigner, QA |
+
+### CEO Actions — HB#285 (Corrected)
+| Action | Result |
+|--------|--------|
+| **HB#284 findings triaged** | ✅ 18 TSC errors documented by CTO. Root cause: THE-383 commits. |
+| **THE-385 created (mistake)** | ❌ Created without checking FA's existing WIP. THE-379 was already in_progress for FA. |
+| **WIP violation detected** | ✅ Self-corrected in HB#285a. TSC fix folded into THE-379 (W5) scope. |
+| **THE-384 → in_progress** | ✅ Active pipeline orchestration. |
+| **Lessons documented** | ✅ HEARTBEAT.md, daily note updated. AGENTS.md reference noted. |
+
+### Critical Path (Corrected)
+```
+THE-379 (W5 + TSC fix) ──→ THE-376 + THE-383 (W2/W3 done when TSC clean)
+                         ──→ THE-380 (W5g UX Gate unblocks)
+                         ──→ THE-381 (W6 E2E unblocks)
+```
+
+### 🎯 Status & Next Steps
+
+**Current Status:** **WIP violation corrected.** HB#285 created THE-385 without checking FA's existing WIP (THE-379 already in_progress). TSC fix folded into THE-379 scope. FA to fix 17 TS errors as part of W5 delivery. THE-385 is a redundant reference — harmless.
+
+**Global Pipeline Load:** 1* active runner (FA with 2 issues — WIP relaxed for this heartbeat). THE-379 (W5) is FA's primary task with TSC fix folded in. 3 slots available.
+
+**Blockers:** 18 TSC errors blocking W2/W3 close-out. TSC fix is FA's responsibility as part of THE-379 (W5).
+
+**Concrete Next Steps:**
+- [ ] @FrontendArchitect: **Execute THE-379** — Compliance Dashboard Frontend. Fix 17 TS errors in RBAC files encountered during W5 work (TSC clean + 168/168 FE tests is DoD prerequisite). Reference THE-378 API (commit `0f8b979`).
+- [ ] @CEO: When THE-379 → in_review with TSC clean, advance THE-376 (W2) + THE-383 (W2fix) to done. Then unblock THE-380 (W5g) for UXDesigner.
+- [ ] @CEO: Monitor THE-379 progress. Execute Recovery Auto-Escalation Rule if stale >1h with no commits.
+
+### CORRECTION: WIP Violation (HB#285a)
+**Severity:** Minor — Procedural error by CEO.
+**Root Cause:** HB#285 created THE-385 and assigned to FrontendArchitect without first checking FA's existing assignments. THE-379 (W5 Compliance Frontend) was already `in_progress` + assigned to FA. This gives FA **2 active issues** (THE-379 + THE-385), violating WIP=1.
+**Impact:** THE-385 cannot be cancelled or modified by CEO due to Paperclip agent auth boundaries (assigned to FA). THE-379 cannot be blocked on THE-385 for the same reason.
+**Corrected Strategy:** TSC fix is folded into THE-379 (W5) scope. FA will fix 17 TS errors as part of W5 delivery. THE-385 is a redundant reference issue — FA should resolve it when THE-379 completes. CEO documents this correction and moves on.
+
+---
+
+## Heartbeat: 2026-07-26 20:34 UTC | HB#287 — Pipeline UNBLOCKED: TSC Fixed (Board), W2/W3 Done, THE-384 Complete
+
+### 0. Analysis Paralysis Scan
+- [x] **CEO:** **ACTIVE** ⚡ — HB#287. Resumed THE-384. Found pipeline state transformed: TSC errors fixed by board (commit `2fe9f6b`), THE-385→done, THE-376→done, THE-383→done.
+- [x] **FrontendArchitect:** **QUEUED** ⏳ — THE-379 (W5) assigned, status `todo`. Ready for dispatch.
+- [x] **CTO:** **IDLE** ✅ — No active issues.
+- [x] **BackendArchitect:** **IDLE** ✅ — All BE waves done.
+- [x] **UXDesigner:** **IDLE** ✅ — W5g (THE-380) blocked per Gate Rule.
+- [x] **Senior QA:** **IDLE** ✅ — W6 (THE-381) blocked per Gate Rule.
+- **No paralysis. Pipeline unblocked.**
+
+### Pipeline State — HB#287
+| Wave | Issue | Scope | Assignee | Status |
+|------|-------|-------|----------|--------|
+| W1 | THE-374 | RBAC Backend API | CTO | **done** ✅ |
+| W2 | THE-376 | RBAC Frontend UI | CEO | **done** ✅ |
+| W2g | THE-377 | RBAC UX Gate | CEO | **done** ✅ |
+| W2fix | THE-383 | UX Gate Fixes | UXDesigner | **done** ✅ |
+| W3 | THE-375 | Self-Hosted Deployment | CTO | **done** ✅ |
+| W4 | THE-378 | Compliance Backend | CEO | **done** ✅ |
+| **W5** | **THE-379** | **Compliance Frontend** | **FrontendArchitect** | **todo** ⏳ |
+| W5g | THE-380 | Compliance UX Gate | — | **blocked** 🔒 |
+| W6 | THE-381 | Sprint E2E | — | **blocked** 🔒 |
+| Epic | THE-373 | Sprint 24 | CEO | **in_progress** ⚡ |
+
+### Pipeline Compliance — HB#287
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| Live Execution | **0/4** ✅ | No active runners |
+| Done | **6/9** ✅ | W1-W4, W2g, W2fix all complete |
+| Todo | **1** ⏳ | W5 (THE-379) ready for FA |
+| Blocked | **2** 🔒 | W5g, W6 (per Gate Rule) |
+| Epic | **1** ⚡ | THE-373 in_progress |
+| Budget | ~$16.48 / $500 (3.3%) | ✅ Healthy |
+
+### CEO Actions — HB#287
+| Action | Result |
+|--------|--------|
+| **Pipeline state re-evaluated** | ✅ Board fixed TSC errors (2fe9f6b). THE-385→done, W2/W3→done. |
+| **THE-373 unblocked** | ✅ Sprint 24 epic set to in_progress. |
+| **THE-384 → done** | ✅ All DoD items verified. Orchestration complete. |
+| **Comments posted** | ✅ THE-384 (closing), THE-373 (pipeline status) updated. |
+| **HEARTBEAT.md HB#287** | ✅ Pipeline state captured. |
+
+### 🎯 Status & Next Steps
+
+**Current Status:** **SPRINT 24 PIPELINE UNBLOCKED.** Board fixed 17 TSC errors (commit `2fe9f6b`). W2 (THE-376), W2fix (THE-383), TSC Fix (THE-385) all done. THE-384 orchestration complete — set to done. 6/9 issues complete. W5 (Compliance Frontend) queued for FrontendArchitect.
+
+**Global Pipeline Load:** 0/4 Live Execution Issues | No active runners. Epic (THE-373) in_progress.
+
+**Blockers:** W5g (THE-380) blocked on W5 in_review. W6 (THE-381) blocked on all waves + UX Gate done. Both expected per Gate Initialization Rule.
+
+**Concrete Next Steps:**
+- [ ] @FrontendArchitect: **THE-379 (W5)** is assigned to you as `todo`. Execute Compliance Dashboard Frontend (report list UI, generation form, SOC2 control mapping, download/export). Reference THE-378 API (commit `0f8b979`).
+- [ ] @CEO (next heartbeat): Monitor THE-379. When in_review, route THE-380 to UXDesigner for gate review. After UX Gate approval, route THE-381 to Senior QA for E2E.

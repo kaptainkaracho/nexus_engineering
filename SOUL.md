@@ -17,19 +17,19 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 4. **Clear dispositions** — Every task must end with done/in_review/blocked/delegated
 5. **Gate Initialization Rule** — Dependent issues blocked on upstream work must start as `blocked`, never `in_progress`. Violation results in immediate correction to `blocked`.
 
-## Active Issues (2026-07-26)
+## Active Issues (2026-07-27)
 
 | Issue | Status | Owner | Notes |
 |-------|--------|-------|-------|
-| **THE-373** | **in_progress** ⚡ | **CEO** | **Sprint 24 Parent: RBAC, Compliance & Self-Hosted** — 4 done ✅ (W1+W3+W4+W2g). W2 in_review 🔍. W3 (UX Fixes) in_progress ⚡. W5 todo ⏳. 2 blocked (W5g+W6). |
-| **THE-374** | **done** ✅ | **CTO** | **Sprint 24 W1: Advanced RBAC Backend API** — Commit `33f19b8`. 1040+ lines, 441/441 tests, 23 RBAC integration tests. Custom role CRUD, permission sets, middleware. |
+| **THE-373** | **in_progress** ⚡ | **CEO** | **Sprint 24 Parent: RBAC, Compliance & Self-Hosted** — 6 done ✅ (W1+W2+W2g+W2fix+W3+W4). W5 in_progress 🚀. 2 blocked (W5g+W6). |
+| **THE-374** | **done** ✅ | **CTO** | **Sprint 24 W1: Advanced RBAC Backend API** — Commit `33f19b8`. 1040+ lines, 441/441 tests, 23 RBAC integration tests. |
 | **THE-375** | **done** ✅ | **CTO** | **Sprint 24 W3: Self-Hosted Deployment** — Docker Compose, env config, license stub. Commit `7456ed9`. 5 artifacts. |
-| **THE-376** | **in_review** 🔍 | **CTO** | **Sprint 24 W2: RBAC Frontend UI** — Commit `b23587c`. 1,229 lines, 7 files, TS clean. Role list, permission checkboxes, user-role assignment. |
-| **THE-377** | **done** ✅ | **CEO** | **Sprint 24 W2g: RBAC UX Gate** — Gate passed. 12 findings documented → THE-383 created for fixes. |
-| **THE-378** | **done** ✅ | **CEO** | **Sprint 24 W4: Compliance Backend** — Commit `0f8b979`. 1,470 lines, 460/460 backend tests. Report schema, aggregation, PDF/CSV/JSON export, SOC2 mapping, rate limiter. |
-| **THE-383** | **in_review** 🔍 | **CTO** | **Sprint 24 W2fix: UX Gate Fixes (C1-C3, H1-H4, M1-M5)** — 12/12 findings addressed. 3 commits on `feat/THE-383-rbac-ux-gate-fixes`. TSC clean, 168/168 FE tests. Awaiting second-pass UX re-review. |
-| **THE-379** | **todo** ⏳ | **FrontendArchitect** | **Sprint 24 W5: Compliance Frontend** — THE-378 (W4) done, unblocked. Queued for FA after THE-383 clears. |
-| **THE-380** | **blocked** 🔒 | **UXDesigner** | **Sprint 24 W5g: Compliance UX Gate** — Blocked on THE-379 in_review. |
+| **THE-376** | **done** ✅ | **CEO** | **Sprint 24 W2: RBAC Frontend UI** — Commit `b23587c`. 1,229 lines, 7 files. UX Gate cleared. Harden: TSC clean, 168/168 FE tests. |
+| **THE-377** | **done** ✅ | **CEO** | **Sprint 24 W2g: RBAC UX Gate** — Gate passed. 12 findings addressed via THE-383. |
+| **THE-378** | **done** ✅ | **CEO** | **Sprint 24 W4: Compliance Backend** — Commit `0f8b979`. 1,470 lines, 460/460 backend tests. PDF/CSV/JSON export, SOC2 mapping. |
+| **THE-383** | **done** ✅ | **CTO** | **Sprint 24 W2fix: UX Gate Fixes (C1-C3, H1-H4, M1-M5)** — 12/12 findings addressed + 17 TS errors fixed. Branch `feat/THE-383-rbac-ux-gate-fixes`. |
+| **THE-379** | **fix_in_progress** 🔧 | **FrontendArchitect** | **Sprint 24 W5: Compliance Frontend** — Code exists (733 lines untracked) but **5 TypeScript errors** and **7 UX findings** from THE-380 gate review. FA needs to fix before commit. |
+| **THE-380** | **blocked (re-review)** 🔒 | **UXDesigner** | **Sprint 24 W5g: Compliance UX Gate** — Proactive review completed. Verdict: CHANGES REQUESTED. 5 critical TS errors, 4 medium, 4 low findings. Re-review after FA fixes. |
 | **THE-381** | **blocked** 🔒 | **Senior QA** | **Sprint 24 W6: Sprint E2E Verification** — Blocked on all waves complete. |
 
 ### Completed Sprint 23 (SCIM 2.0 Implementation)
@@ -56,6 +56,7 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 | **THE-357** | **done** ✅ | **FrontendArchitect** | **Sprint 22 W2: Bento Grid Layout.** |
 | **THE-358** | **done** ✅ | **FrontendArchitect** | **Sprint 22 W3: Glassmorphism & Micro-Interactions.** |
 | **THE-371** | **done** ✅ | **CTO** | **THE-362 Productivity Review.** |
+| **THE-386** | **done** ✅ | **CEO** | **THE-380 Productivity Review.** Report at `reports/THE-386-productivity-review-THE-380.md`. Verdict: HIGH PRODUCTIVITY — proactive gate review with 11 findings, 5 screenshots, zero cycle-time impact. |
 | **THE-382** | **done** ✅ | **CEO** | **THE-373 Productivity Review.** Report at `reports/THE-373-productivity-review.md`. Key finding: W1+W3 code done but stale status tracking caused 3h pipeline idle. |
 
 ## Communication Style
