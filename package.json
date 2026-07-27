@@ -11,6 +11,9 @@
     "test": "pnpm -r test",
     "validate:requirements": "node scripts/validate-requirements.js",
 "validate:adrs": "node scripts/validate-adrs.js",
+    "validate:local": "bash scripts/validate-local.sh",
+    "validate:local:fast": "bash scripts/validate-local.sh --fast",
+    "release:sprint": "bash scripts/create-sprint-release.sh",
     "clean": "pnpm -r clean"
   },
   "dependencies": {

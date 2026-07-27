@@ -81,34 +81,83 @@ nexus_engineering/
 
 ### Branch Strategy
 
-- `main` - Production-ready code
-- `develop` - Integration branch for features
-- `feature/*` - Feature branches
-- `fix/*` - Bug fix branches
-- `release/*` - Release preparation branches
+```
+main          ──●─────────────────●────────── (production, auto-deployed)
+                 \               /
+develop       ────●──●──●──●──●── (integration, CI on PR)
+                   \  /
+feat/THE-NNN  ─────●  ●
+```
+
+| Branch | Purpose | Base | Lifecycle |
+|--------|---------|------|-----------|
+| `main` | Production-ready code. Auto-deployed to Railway on push. | — | Protected. PR only from `release/*` or hotfix. |
+| `develop` | Integration branch for active sprint work. CI runs on PRs. | `main` | Created. Always exists. |
+| `feat/THE-NNN-*` | Feature branches (one per issue). | `develop` | Delete after merge. |
+| `fix/THE-NNN-*` | Bug fix branches during a sprint. | `develop` | Delete after merge. |
+| `hotfix/THE-NNN-*` | Urgent production fixes. | `main` | Merged to `main` + `develop`. Delete after merge. |
+| `release/sprint-N` | Sprint release candidate. | `develop` | PR into `main`. Delete after merge. |
 
 ### Creating a Feature Branch
 
 ```bash
-git checkout -b feature/your-feature-name
+git checkout develop
+git pull origin develop
+git checkout -b feat/THE-NNN-your-feature-name
 ```
 
 ### Development Process
 
-1. **Create a feature branch** from `main` or `develop`
+1. **Create a feature branch** from `develop`
 2. **Make your changes** following the code style guidelines
 3. **Write tests** for new functionality
-4. **Run linting and type checking**:
+4. **Run local validation**:
    ```bash
-   pnpm lint
-   pnpm typecheck
+   ./scripts/validate-local.sh
    ```
-5. **Run tests**:
+   Or for a faster pre-push check:
    ```bash
-   pnpm test
+   ./scripts/validate-local.sh --fast
    ```
-6. **Commit your changes** with a descriptive message
-7. **Push to remote** and create a pull request
+5. **Commit your changes** with a descriptive message
+6. **Push to remote** and create a pull request targeting `develop`
+
+### Local Validation
+
+Run full validation before pushing:
+
+```bash
+./scripts/validate-local.sh
+```
+
+This runs lint → typecheck → tests → build. It exits non-zero on any failure
+and is suitable as a pre-push hook:
+
+```bash
+# Install as pre-push hook
+ln -sf ../../scripts/validate-local.sh .git/hooks/pre-push
+```
+
+### Sprint Releases
+
+At the end of each sprint, create a release branch:
+
+```bash
+./scripts/create-sprint-release.sh <N> [version]
+# Example:
+./scripts/create-sprint-release.sh 25 v0.2.0
+```
+
+This creates `release/sprint-25` from `develop` and optionally tags it.
+
+**Release workflow:**
+
+1. `./scripts/create-sprint-release.sh 25 v0.2.0` — creates branch + tag
+2. `./scripts/validate-local.sh` — final validation on release branch
+3. Open a PR from `release/sprint-25` into `main`
+4. Merge PR → auto-deploys to Railway production
+5. `git push origin v0.2.0` — push the tag
+6. Merge release back to `develop`: `git checkout develop && git merge release/sprint-25`
 
 ## Code Style
 
