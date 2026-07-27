@@ -609,3 +609,44 @@ export interface ScimProvisioningLog {
   errorMessage?: string
   timestamp: IsoDateString
 }
+
+export type ConnectorType = 'jira' | 'linear' | 'github';
+
+export type ConnectorHealth = 'connected' | 'disconnected' | 'error' | 'syncing';
+
+export type AuthMethod = 'oauth' | 'api_key';
+
+export interface ConnectorAuthConfig {
+  connector: ConnectorType;
+  method: AuthMethod;
+  clientId?: string;
+  clientSecret?: string;
+  apiKey?: string;
+  baseUrl?: string;
+  oauthRedirectUri?: string;
+  lastTestedAt?: IsoDateString;
+  lastTestResult?: 'success' | 'failure';
+  lastTestError?: string;
+}
+
+export interface SyncStatus {
+  connector: ConnectorType;
+  health: ConnectorHealth;
+  lastSyncAt?: IsoDateString;
+  lastSyncResult?: 'success' | 'failure' | 'partial';
+  lastSyncError?: string;
+  itemsSynced?: number;
+  itemsFailed?: number;
+  inProgress: boolean;
+}
+
+export interface SyncResult {
+  connector: ConnectorType;
+  status: 'success' | 'failure' | 'partial';
+  itemsTotal: number;
+  itemsSynced: number;
+  itemsFailed: number;
+  errors: string[];
+  startedAt: IsoDateString;
+  completedAt?: IsoDateString;
+}

@@ -39,6 +39,7 @@ const QualityDashboard = lazy(() => import('./views/QualityDashboard').then(m =>
 const ComplianceDashboard = lazy(() => import('./views/ComplianceDashboard').then(m => ({ default: m.ComplianceDashboard })));
 const SSOSettings = lazy(() => import('./views/SSOSettings'));
 const ScimSettings = lazy(() => import('./views/ScimSettings'));
+const IntegrationsView = lazy(() => import('./views/Integrations').then(m => ({ default: m.IntegrationsView })));
 
 // Auth + onboarding + landing — small bundles, grouped together
 const LandingPage = lazy(() => import('./views/LandingPage').then(m => ({ default: m.LandingPage })));
@@ -78,6 +79,7 @@ type Section =
   | 'scim'
   | 'org'
   | 'landing'
+  | 'integrations'
   | 'onboarding';
 
 const VALID_SECTIONS: Section[] = [
@@ -109,6 +111,7 @@ const VALID_SECTIONS: Section[] = [
   'quality-dashboard',
   'compliance-dashboard',
   'trace-gate',
+  'integrations',
   'landing',
   'onboarding',
 ];
@@ -167,6 +170,7 @@ const SKELETON_VARIANTS: Record<string, RouteLoadingSkeletonProps['variant']> = 
   'quality-dashboard': 'grid',
   'compliance-dashboard': 'grid',
   'trace-gate': 'form',
+  'integrations': 'grid',
   'sso': 'form',
   'scim': 'form',
   'org': 'form',
@@ -360,6 +364,7 @@ function App() {
     { label: 'Quality Dashboard', href: '#quality-dashboard', active: activeSection === 'quality-dashboard' },
     { label: 'Compliance Dashboard', href: '#compliance-dashboard', active: activeSection === 'compliance-dashboard' },
     { label: 'Trace Gate', href: '#trace-gate', active: activeSection === 'trace-gate' },
+    { label: 'Integrations', href: '#integrations', active: activeSection === 'integrations' },
   ];
 
   if (!authReady) {
@@ -587,6 +592,12 @@ function App() {
         return (
           <Suspense fallback={<RouteLoadingSkeleton variant="form" />}>
             <GateConfigPanel />
+          </Suspense>
+        );
+      case 'integrations':
+        return (
+          <Suspense fallback={<RouteLoadingSkeleton variant="grid" />}>
+            <IntegrationsView />
           </Suspense>
         );
       default:

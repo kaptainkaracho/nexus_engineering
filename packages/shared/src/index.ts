@@ -128,6 +128,12 @@ export type {
   ScimMember,
   ScimListResponse,
   ScimProvisioningLog,
+  ConnectorType,
+  ConnectorHealth,
+  AuthMethod,
+  ConnectorAuthConfig,
+  SyncStatus,
+  SyncResult,
 } from './types';
 
 export type {
