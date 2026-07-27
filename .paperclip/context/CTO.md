@@ -1,64 +1,48 @@
 # CTO Context State
-> Last updated: 2026-07-27 17:44 UTC — HB#289: THE-379 DONE, UX Findings Fix Dispatched
+> Last updated: 2026-07-27 19:02 UTC — HB#302: THE-389 fixes found applied uncommitted (working tree). FA directed to commit. CTO IDLE.
 
-## COMPLETED
-- Sprint 20-23: ALL GATES GREEN ✅
-- THE-374: **done** ✅ — RBAC Backend API (commit `33f19b8`, 1040+ lines, 441/441 tests)
-- THE-375: **done** ✅ — Self-Hosted Deployment (commit `7456ed9`)
-- THE-376: **done** ✅ — RBAC Frontend UI (commit `b23587c`, 1229 lines)
-- THE-377: **done** ✅ — RBAC UX Gate (CEO), 12 findings → THE-383
-- THE-378: **done** ✅ — Compliance Backend (commit `0f8b979`, 460/460 tests)
-- THE-379: **done** ✅ — Compliance Frontend (commit `0d2902e`, 960 lines, TSC clean, 168/168 FE tests)
-- THE-383: **done** ✅ — UX Gate Fixes + TSC Fix
-- THE-386: **done** ✅ — THE-380 Productivity Review (HIGH)
+## CTO ACTION: HB#302 Pipeline Dispatch
 
-## Sprint 24 — Enterprise Phase 2
-**Status:** `active` — 7/7 waves done ✅, 1 blocked, 1 ready for dispatch
+### What CTO Did (HB#302)
+1. ✅ Working tree audit — THE-389 3 remaining fixes (C2, L1, M2) found APPLIED but NOT committed
+2. ✅ TSC re-verified — 0 errors (clean, fixes resolved the previous error)
+3. ✅ HEARTBEAT.md HB#302 appended with pipeline state and FA routing
+4. ✅ SOUL.md updated — THE-389 line reflects applied-but-uncommitted state
+5. ✅ FA directed to commit working tree and advance THE-389 to in_review
+6. ✅ THE-392 remains blocked (correct per WIP rules — FA slot occupied)
 
-### Pipeline Overview
+### Remaining Work (Delegated to FA)
+| Item | File | Fix | Status |
+|------|------|-----|--------|
+| C2/TS Error | ComplianceDashboard.tsx:421 | `non_compliant`→`nonCompliant` | ✅ APPLIED (uncommitted) |
+| L1 | ComplianceDashboard.tsx:316,364 | `bg-black/40`→`bg-neutral-950/40` | ✅ APPLIED (uncommitted) |
+| M2 | ComplianceDashboard.tsx:315-333 | Modalize delete confirmation | ✅ APPLIED (uncommitted) |
+| UXR-C1 | ComplianceDashboard.tsx:380-398 | Select `options` prop | ✅ APPLIED (uncommitted) |
+| **Commit** | Working tree | `git add -A && git commit -m "fix(THE-389)..."` | ⏳ PENDING FA |
+
+## COMPLETED (Sprint 24)
+- THE-374: RBAC Backend API (commit `33f19b8`)
+- THE-375: Self-Hosted Deployment (commit `7456ed9`)
+- THE-376: RBAC Frontend UI (commit `b23587c`)
+- THE-377: RBAC UX Gate (CEO)
+- THE-378: Compliance Backend (commit `0f8b979`)
+- THE-379: Compliance Frontend (commit `0d2902e`)
+- THE-383: UX Gate Fixes + TSC Fix
+- THE-386: THE-380 Productivity Review (HIGH)
+- HB#301: THE-389 Scope creep cleanup + delegation ✅
+
+## Pipeline Overview (Current)
 | Issue | Title | Status | Assignee |
 |-------|-------|--------|----------|
-| THE-374-W5 | W1-W5: All Implementation | **done** ✅ | Various |
-| THE-380 | W5g: Compliance UX Gate | **blocked** 🔒 | UXDesigner |
+| THE-389 | W5fix: Compliance UX Fixes | **in_progress** 🚀 | **FrontendArchitect** |
+| THE-380 | W5g: Compliance UX Gate | **in_review** 🔍 | UXDesigner |
 | THE-381 | W6: Sprint E2E | **blocked** 🔒 | Senior QA |
-| **THE-388** | **W5fix: UX Findings Fixes** | **todo** ⏳ | **CTO ← YOU** |
+| THE-388 | Sprint Planning | **in_review** 🔍 | **CTO ← YOU** |
+| THE-390-394 | Sprint 25 | **blocked** 🔒 | Various |
 
-## NEXT ACTION — THE-388: UX Findings Fixes
-**Delegated by local-board** (THE-388 comment). CTO triaged → dispatched as THE-396 to FrontendArchitect. Status: `queued` (FA at WIP on THE-389). CTO does NOT execute.
-### Findings to Fix (delegated to FrontendArchitect via THE-396):
-1. **UXR-C3**: Add `success`/`warning`/`secondary` to `Badge PALETTE` in `packages/shared/src/design-system/components/Badge.tsx`
-2. **UXR-M1**: Per-metric `healthColor()` on metric cards (line ~146) — count metrics should use neutral surface
-3. **UXR-M2**: Wrap delete confirmation in modal overlay (reuse GenerateModal pattern, ~lines 290-300)
-4. **UXR-M3**: Add `focus-visible:ring-2` on SOC2 category grid buttons (~line 458)
-5. **UXR-M4**: Replace 4 inline SVGs with lucide-react (`CircleCheck`, `Download`, `Trash2`, `X`)
-6. **UXR-L1**: Replace `bg-black/40` with a design token
-7. **UXR-L2**: Add `role="tablist"` with `aria-label` to tab container (~line 665)
-8. **UXR-L3/L4**: Document options — these are informational
-
-**DoD:** All 6 actionable findings addressed. `tsc --noEmit` passes. `pnpm test -- frontend` passes (168/168). UXDesigner gate handoff completed. Commit to branch.
-**Plan:** `plans/THE-396-ux-findings-fix.md`
-**Branch:** `feat/THE-383-rbac-ux-gate-fixes` or new branch per THE-396
-**Max loops:** 4 (FrontendArchitect). If blocked >2 iterations, escalate to @CEO.
-**UXGate:** Mandatory — FrontendArchitect → UXDesigner handoff before done. No CTO override.
-
-## Reference Files
-- `apps/frontend/src/views/ComplianceDashboard/ComplianceDashboard.tsx`
-- `packages/shared/src/design-system/components/Badge.tsx`
-- Full gate report: `reports/THE-380-compliance-ux-gate-review.md`
-| THE-375 | W3: Self-Hosted | **done** ✅ | CTO |
-| THE-378 | W4: Compliance Backend | **done** ✅ | CEO |
-| THE-379 | W5: Compliance Frontend | **todo** ⏳ | FrontendArchitect |
-| THE-380 | W5g: Compliance UX Gate | **blocked** 🔒 | UXDesigner |
-| THE-381 | W6: Sprint E2E | **blocked** 🔒 | Senior QA |
-
-### THE-383 Verification (HB#282)
-- ✅ TSC clean, 168/168 frontend tests, 460/460 backend tests
-- ✅ All 12 UX findings addressed (C1-C3, H1-H4, M1-M5)
-- ✅ 3 commits on `feat/THE-383-rbac-ux-gate-fixes`
-- 🔍 **Awaiting second-pass UX re-review** before THE-376 → done
-
-### Open Actions
-1. **HIGH** — THE-383 needs CEO re-review (second UX gate pass). When approved → THE-376 → done.
-2. **HIGH** — THE-379 (W5 Compliance Frontend) unblocked. FrontendArchitect available.
-3. **MEDIUM** — BackendArchitect IDLE. Assign to residuals or Sprint 25 prep.
-4. **LOW** — Uncommitted residuals (10 files) from previous sprints — triage needed.
+## CTO Status: IDLE ✅ (HB#302 Complete)
+- THE-389 fixes applied (uncommitted) — FA directed to commit + advance
+- THE-392 remains blocked awaiting FA slot — correct per WIP rules
+- THE-388 (Sprint Planning) available for completion
+- Available for oversight, escalation backup, or Sprint Planning review
+- Pipeline chain: FA commit → THE-389 in_review → THE-380 UX Gate → Sprint 24 close → Sprint 25 start → THE-392 unblocked

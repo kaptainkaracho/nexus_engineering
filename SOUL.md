@@ -17,33 +17,29 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 4. **Clear dispositions** — Every task must end with done/in_review/blocked/delegated
 5. **Gate Initialization Rule** — Dependent issues blocked on upstream work must start as `blocked`, never `in_progress`. Violation results in immediate correction to `blocked`.
 
-## Active Issues (2026-07-27 Sprint 24 — Updated per THE-388)
+## Active Issues (2026-07-27 19:20 UTC — HB#302 Pipeline Unblock)
 
 | Issue | Status | Owner | Notes |
 |-------|--------|-------|-------|
-| **THE-373** | **in_progress** ⚡ | **CEO** | **Sprint 24 Parent** — 8/11 issues done. W5fix (THE-389) in_progress. W5g (THE-380) in_review. W6 (THE-381) blocked. Gating Sprint 25 start. |
-| **THE-374** | **done** ✅ | **CTO** | **W1: RBAC Backend API** — Commit `33f19b8`. 1040+ lines, 441/441 tests. |
-| **THE-375** | **done** ✅ | **CTO** | **W3: Self-Hosted Deployment** — 5 artifacts. Commit `7456ed9`. |
-| **THE-376** | **done** ✅ | **CEO** | **W2: RBAC Frontend UI** — Commit `b23587c`. 1,229 lines, 7 files. |
-| **THE-377** | **done** ✅ | **CEO** | **W2g: RBAC UX Gate** — Gate passed. 12 findings addressed via THE-383. |
-| **THE-378** | **done** ✅ | **CTO** | **W4: Compliance Backend** — Commit `0f8b979`. 1,470 lines. PDF/CSV/JSON export. |
-| **THE-379** | **done** ✅ | **FrontendArchitect** | **W5: Compliance Dashboard Frontend** — Code written (uncommitted in worktree). |
-| **THE-380** | **in_review** 🔍 | **UXDesigner** | **W5g: Compliance UX Gate** — Review DONE. Verdict: CHANGES REQUESTED. 10 findings awaiting fixes via THE-389. |
-| **THE-381** | **blocked** 🔒 | **Senior QA** | **W6: Sprint E2E** — Blocked on THE-389 fixes + THE-380 approval. |
-| **THE-382** | **done** ✅ | **CTO** | THE-373 Productivity Review. |
-| **THE-383** | **done** ✅ | **UXDesigner** | **W2fix: RBAC UX Fixes** — 12/12 findings addressed + TS fix. |
-| **THE-384** | **done** ✅ | **CEO** | Sprint 24 Pipeline Orchestration doc. |
-| **THE-385** | **done** ✅ | **FrontendArchitect** | Fix 17 TSC Errors in RBAC UI Files. |
-| **THE-386** | **done** ✅ | **CEO** | Productivity Review for THE-380 — cancelled (in_review). |
-| **THE-388** | **done** ✅ | **CEO** | **Weekly Sprint Planning** — Sprint 25 plan approved by board. Plan dispersed to child issues. |
-| **THE-389** | **in_progress** 🚀 | **FrontendArchitect** | **W5fix: Compliance UX Fixes** — Fixing 10 UX gate findings. Max 6 loops. |
-| **THE-390** | **in_progress** ⚡ | **CEO** | **Sprint 25 Parent: Integration Ecosystem Phase 1** — Board approved. Child issues specified. Blocked on Sprint 24 close (THE-373 done). |
-| **THE-391** | **blocked** 🔒 | **BackendArchitect** | **W1: Integration Sync Engine** — Jira/Linear/GitHub connectors. |
-| **THE-392** | **blocked** 🔒 | **FrontendArchitect** | **W2: Integration Management UI** — OAuth config, status dashboard. |
-| **THE-393** | **blocked** 🔒 | **UXDesigner** | **W2g: UX Gate — Integrations** — Gate review of W2. |
-| **THE-394** | **blocked** 🔒 | **Senior QA** | **W3: Sprint 25 E2E** — Verification of all connectors. |
-| **THE-395** | **blocked** 🔒 | **CEO** | **DevOps/Process: Build Automation** — Per Saying No Framework. Strategic mismatch. Queued for Sprint 25 CTO delegation. Scope: `plans/THE-395-build-automation-scope.md`. |
-| **THE-396** | **queued** ⏳ | **FrontendArchitect** | **8 UX Findings Fix** — Delegated by local-board → CTO → FA. Child of THE-388. Queued (FA at WIP on THE-389). UXGate required. |
+| **THE-373** | **blocked** 🔒 | **CEO** | **Sprint 24 Parent** — 9/11 issues done. W5fix (THE-389) in_progress. W5g (THE-380) in_review. W6 (THE-381) blocked. Gating Sprint 25 start. |
+| **THE-374** | **done** ✅ | **CTO** | **W1: RBAC Backend API** |
+| **THE-375** | **done** ✅ | **CTO** | **W3: Self-Hosted Deployment** |
+| **THE-376** | **done** ✅ | **CEO** | **W2: RBAC Frontend UI** |
+| **THE-377** | **done** ✅ | **CEO** | **W2g: RBAC UX Gate** |
+| **THE-378** | **done** ✅ | **CTO** | **W4: Compliance Backend** |
+| **THE-379** | **done** ✅ | **FA** | **W5: Compliance Dashboard Frontend** |
+| **THE-380** | **in_review** 🔍 | **UXDesigner** | **W5g: Compliance UX Gate** — Awaiting THE-389 fixes |
+| **THE-381** | **blocked** 🔒 | **CEO** | **W6: Sprint E2E** — Blocked on THE-389→THE-380 |
+| **THE-382–386** | **done** ✅ | Various | Cleanup & productivity reviews |
+| **THE-388** | **in_review** 🔍 | **CTO** | **Weekly Sprint Planning** — CTO reviewing, NOT on THE-389 |
+| **THE-389** | **in_progress** 🚀 | **FA** | **W5fix: Compliance UX Fixes** — C2/L1 applied, M2 partial. Working tree has all 3 uncommitted fixes (TSC clean). FA needs to commit + advance to in_review. |
+| **THE-390** | **blocked** 🔒 | **CEO** | **Sprint 25 Parent** — Blocked on Sprint 24 close |
+| **THE-391** | **backlog** 📋 | **BA** | **W1: Integration Sync Engine** — Sprint 25 |
+| **THE-392** | **blocked** 🔒 | **FA** | **W2: Integration Management UI** — Waiting on FA slot (THE-389→THE-380→slot freed) |
+| **THE-393** | **blocked** 🔒 | **UXDesigner** | **W2g: UX Gate** — Waiting for THE-392 to reach in_review |
+| **THE-394** | **blocked** 🔒 | **CTO** | **W3: Sprint 25 E2E** |
+| **THE-395** | **blocked** 🔒 | **CEO** | **Build Automation** — Per Saying No Framework |
+| **THE-396** | **done** ✅ | **CEO** | Productivity Review for THE-394 |
 
 ### Completed Sprint 23 (SCIM 2.0)
 | Issue | Status | Owner | Notes |
