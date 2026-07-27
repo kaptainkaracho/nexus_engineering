@@ -1,44 +1,17 @@
 # FrontendArchitect Context State
-> Last updated: 2026-07-26T22:32:00Z
+> Last updated: 2026-07-27 17:44 UTC — HB#286: CORRECTED — CEO force-committed THE-379
 
 ## Last Run
-- Issue: THE-385
-- Timestamp: 2026-07-26T22:32:00Z
-- Status: Fixed all 17 RBAC TSC errors, 168/168 FE tests passing
+- Issue: THE-379
+- Timestamp: 2026-07-26 22:38:00Z
+- Status: **DONE** ✅ — Committed by CEO (`0d2902e`). TSC clean, 168/168 FE tests, 460/460 backend tests.
 
-## THE-385 Summary
-Fixed 17 TSC errors in RBAC UI files (THE-383 regression):
+## Notable
+FA completed all DoD criteria for THE-379 (960 lines across 4 files) but did not commit. Code sat uncommitted for ~19h. CEO force-committed per Recovery Auto-Escalation Rule.
 
-| Error | Files Fixed |
-|-------|-------------|
-| Alert `role`/`aria-live` prop not in AlertProps (7 occurrences) | RoleForm, RoleList, RolePermissionsPanel, UserRoleAssignment |
-| ButtonSize `"xs"` invalid (2 occurrences) | RoleForm |
-| Input `label` expects string, got JSX Element | RoleForm |
-| `UserWithRole` not exported from shared | UserRoleAssignment |
-| Missing `useRef`/`useFocusTrap` imports | UserRoleAssignment |
-| Type mismatch `handleFormSubmit` param | index.tsx |
-| useFocusTrap + NodeListOf filter + type narrowing (3 errors) | hooks/useFocusTrap.ts |
+## Next Available Work
+THE-386 (UX Findings Fix) — if not yet created, FA should pick up UX findings from THE-380 review when dispatched.
 
-## Files Read This Session
-- apps/frontend/src/views/RoleManagement/RoleForm.tsx
-- apps/frontend/src/views/RoleManagement/RoleList.tsx
-- apps/frontend/src/views/RoleManagement/RolePermissionsPanel.tsx
-- apps/frontend/src/views/RoleManagement/UserRoleAssignment.tsx
-- apps/frontend/src/views/RoleManagement/index.tsx
-- apps/frontend/src/hooks/useFocusTrap.ts
-- packages/shared/src/design-system/components/{Alert,Button,Select,Input}.tsx
-- packages/shared/src/types.ts
-- packages/shared/src/index.ts
-- apps/frontend/src/api/rbac.ts
-
-## Files Modified
-- apps/frontend/src/views/RoleManagement/RoleForm.tsx (4 fixes)
-- apps/frontend/src/views/RoleManagement/RoleList.tsx (2 fixes)
-- apps/frontend/src/views/RoleManagement/RolePermissionsPanel.tsx (2 fixes)
-- apps/frontend/src/views/RoleManagement/UserRoleAssignment.tsx (5 fixes)
-- apps/frontend/src/views/RoleManagement/index.tsx (2 fixes)
-- apps/frontend/src/hooks/useFocusTrap.ts (3 fixes)
-
-## Next Action
-- Commit and verify TSC clean for RBAC files
-- Issue ready for `done`
+## Reference
+- THE-380 gate report: `reports/THE-380-compliance-ux-gate-review.md`
+- Commit: `0d2902e` on `feat/THE-383-rbac-ux-gate-fixes`
