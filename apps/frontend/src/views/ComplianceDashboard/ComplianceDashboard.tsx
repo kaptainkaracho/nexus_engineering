@@ -227,110 +227,111 @@ function ReportList({
             </Button>
           </div>
         ) : (
-          <>
-            <div className="flex items-center justify-between">
-              <Stack gap={1}>
-                <h2 className="text-2xl font-bold text-text-primary">Compliance Reports</h2>
-                <p className="text-sm text-text-secondary">{reports.length} report{reports.length !== 1 ? 's' : ''} generated</p>
-              </Stack>
-              <Button variant="primary" onClick={onGenerate}>
-                + New Report
-              </Button>
-            </div>
-            <Stack gap={4}>
-              {Array.from(grouped.entries()).map(([type, items]) => (
-                <Card key={type} padding="lg">
-                  <Stack gap={4}>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="info">{REPORT_TYPE_LABELS[type as ComplianceReportType] ?? type}</Badge>
-                      <Badge variant="secondary">{items.length}</Badge>
-                    </div>
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left text-sm" role="table" aria-label={`${type} reports`}>
-                        <thead>
-                          <tr className="border-b border-border text-xs uppercase tracking-wide text-text-tertiary">
-                            <th className="pb-2 pr-4 font-medium" scope="col">Title</th>
-                            <th className="pb-2 pr-4 font-medium" scope="col">Format</th>
-                            <th className="pb-2 pr-4 font-medium" scope="col">Status</th>
-                            <th className="pb-2 pr-4 font-medium" scope="col">Created</th>
-                            <th className="pb-2 pr-4 font-medium" scope="col">Completed</th>
-                            <th className="pb-2 font-medium" scope="col">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border">
-                          {items.map((r) => (
-                            <tr key={r.id} className="hover:bg-surface-secondary/50">
-                              <td className="py-3 pr-4 font-medium text-text-primary">{r.title}</td>
-                              <td className="py-3 pr-4">
-                                <Badge variant="info">{REPORT_FORMAT_LABELS[r.format]}</Badge>
-                              </td>
-                              <td className="py-3 pr-4">
-                                <Badge variant={statusBadgeVariant(r.status)}>{statusLabel(r.status)}</Badge>
-                              </td>
-                              <td className="py-3 pr-4 text-text-secondary">
-                                {new Date(r.created_at).toLocaleDateString()}
-                              </td>
-                              <td className="py-3 pr-4 text-text-secondary">
-                                {r.completed_at ? new Date(r.completed_at).toLocaleDateString() : '—'}
-                              </td>
-                              <td className="py-3">
-                                <Stack direction="row" gap={2}>
-                                  {r.status === 'completed' && (
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      icon={<Download className="h-3.5 w-3.5" />}
-                                      onClick={() => handleDownload(r)}
-                                      aria-label={`Download ${r.title}`}
-                                    >
-                                      Download
-                                    </Button>
-                                  )}
-                                  {r.status !== 'generating' && (
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      icon={<Trash2 className="h-3.5 w-3.5" />}
-                                      onClick={() => setDeleteId(r.id)}
-                                      aria-label={`Delete ${r.title}`}
-                                    >
-                                      Delete
-                                    </Button>
-                                  )}
-                                </Stack>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </Stack>
-                </Card>
-              ))}
+          <div className="flex items-center justify-between">
+            <Stack gap={1}>
+              <h2 className="text-2xl font-bold text-text-primary">Compliance Reports</h2>
+              <p className="text-sm text-text-secondary">{reports.length} report{reports.length !== 1 ? 's' : ''} generated</p>
             </Stack>
-          )}
+            <Button variant="primary" onClick={onGenerate}>
+              + New Report
+            </Button>
+          </div>
+        )}
 
-          {deleteId && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" role="dialog" aria-modal="true" aria-label="Confirm delete">
-              <div className="w-full max-w-sm rounded-2xl bg-surface-primary p-6 shadow-xl ring-1 ring-border">
-                <Stack gap={5}>
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-text-primary">Delete Report</h3>
-                    <Button variant="ghost" size="sm" onClick={() => setDeleteId(null)} aria-label="Close">
-                      <X className="h-5 w-5" />
-                    </Button>
+        {reports.length > 0 && (
+          <Stack gap={4}>
+            {Array.from(grouped.entries()).map(([type, items]) => (
+              <Card key={type} padding="lg">
+                <Stack gap={4}>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="info">{REPORT_TYPE_LABELS[type as ComplianceReportType] ?? type}</Badge>
+                    <Badge variant="secondary">{items.length}</Badge>
                   </div>
-                  <p className="text-sm text-text-secondary">Are you sure you want to delete this report? This action cannot be undone.</p>
-                  <Stack direction="row" gap={3}>
-                    <Button variant="danger" onClick={() => { onDelete(deleteId); setDeleteId(null); }}>Delete</Button>
-                    <Button variant="ghost" onClick={() => setDeleteId(null)}>Cancel</Button>
-                  </Stack>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-sm" role="table" aria-label={`${type} reports`}>
+                      <thead>
+                        <tr className="border-b border-border text-xs uppercase tracking-wide text-text-tertiary">
+                          <th className="pb-2 pr-4 font-medium" scope="col">Title</th>
+                          <th className="pb-2 pr-4 font-medium" scope="col">Format</th>
+                          <th className="pb-2 pr-4 font-medium" scope="col">Status</th>
+                          <th className="pb-2 pr-4 font-medium" scope="col">Created</th>
+                          <th className="pb-2 pr-4 font-medium" scope="col">Completed</th>
+                          <th className="pb-2 font-medium" scope="col">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border">
+                        {items.map((r) => (
+                          <tr key={r.id} className="hover:bg-surface-secondary/50">
+                            <td className="py-3 pr-4 font-medium text-text-primary">{r.title}</td>
+                            <td className="py-3 pr-4">
+                              <Badge variant="info">{REPORT_FORMAT_LABELS[r.format]}</Badge>
+                            </td>
+                            <td className="py-3 pr-4">
+                              <Badge variant={statusBadgeVariant(r.status)}>{statusLabel(r.status)}</Badge>
+                            </td>
+                            <td className="py-3 pr-4 text-text-secondary">
+                              {new Date(r.created_at).toLocaleDateString()}
+                            </td>
+                            <td className="py-3 pr-4 text-text-secondary">
+                              {r.completed_at ? new Date(r.completed_at).toLocaleDateString() : '—'}
+                            </td>
+                            <td className="py-3">
+                              <Stack direction="row" gap={2}>
+                                {r.status === 'completed' && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    icon={<Download className="h-3.5 w-3.5" />}
+                                    onClick={() => handleDownload(r)}
+                                    aria-label={`Download ${r.title}`}
+                                  >
+                                    Download
+                                  </Button>
+                                )}
+                                {r.status !== 'generating' && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    icon={<Trash2 className="h-3.5 w-3.5" />}
+                                    onClick={() => setDeleteId(r.id)}
+                                    aria-label={`Delete ${r.title}`}
+                                  >
+                                    Delete
+                                  </Button>
+                                )}
+                              </Stack>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </Stack>
-              </div>
+              </Card>
+            ))}
+          </Stack>
+        )}
+
+        {deleteId && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/40" role="dialog" aria-modal="true" aria-label="Confirm delete">
+            <div className="w-full max-w-sm rounded-2xl bg-surface-primary p-6 shadow-xl ring-1 ring-border">
+              <Stack gap={5}>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold text-text-primary">Delete Report</h3>
+                  <Button variant="ghost" size="sm" onClick={() => setDeleteId(null)} aria-label="Close">
+                    <X className="h-5 w-5" />
+                  </Button>
+                </div>
+                <p className="text-sm text-text-secondary">Are you sure you want to delete this report? This action cannot be undone.</p>
+                <Stack direction="row" gap={3}>
+                  <Button variant="danger" onClick={() => { onDelete(deleteId); setDeleteId(null); }}>Delete</Button>
+                  <Button variant="ghost" onClick={() => setDeleteId(null)}>Cancel</Button>
+                </Stack>
+              </Stack>
             </div>
-          )}
-        </Stack>
-      </Container>
+          </div>
+        )}
+      </Stack>
     </Container>
   );
 }
@@ -360,7 +361,7 @@ function GenerateModal({ open, onClose, onGenerate, generating }: GenerateModalP
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" role="dialog" aria-modal="true" aria-label="Generate compliance report">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/40" role="dialog" aria-modal="true" aria-label="Generate compliance report">
       <div className="w-full max-w-md rounded-2xl bg-surface-primary p-6 shadow-xl ring-1 ring-border">
         <Stack gap={5}>
           <div className="flex items-center justify-between">
@@ -379,25 +380,19 @@ function GenerateModal({ open, onClose, onGenerate, generating }: GenerateModalP
             fullWidth
           />
 
-          <Select
-            label="Report Type"
-            value={reportType}
-            onChange={(e) => setReportType(e.target.value as ComplianceReportType)}
-          >
-            {VALID_REPORT_TYPES.map((t) => (
-              <option key={t} value={t}>{REPORT_TYPE_LABELS[t]}</option>
-            ))}
-          </Select>
+            <Select
+              label="Report Type"
+              value={reportType}
+              onChange={(e) => setReportType(e.target.value as ComplianceReportType)}
+              options={VALID_REPORT_TYPES.map((t) => ({ value: t, label: REPORT_TYPE_LABELS[t] }))}
+            />
 
-          <Select
-            label="Format"
-            value={format}
-            onChange={(e) => setFormat(e.target.value as ComplianceReportFormat)}
-          >
-            {VALID_REPORT_FORMATS.map((f) => (
-              <option key={f} value={f}>{REPORT_FORMAT_LABELS[f]}</option>
-            ))}
-          </Select>
+            <Select
+              label="Format"
+              value={format}
+              onChange={(e) => setFormat(e.target.value as ComplianceReportFormat)}
+              options={VALID_REPORT_FORMATS.map((f) => ({ value: f, label: REPORT_FORMAT_LABELS[f] }))}
+            />
 
           <Stack direction="row" gap={3} className="mt-2">
             <Button variant="primary" onClick={handleSubmit} loading={generating} disabled={generating}>
@@ -423,7 +418,8 @@ function Soc2MappingsPanel({ mappings }: { mappings: Soc2ControlMapping[] }) {
     for (const m of mappings) {
       if (!byCategory[m.category]) byCategory[m.category] = { total: 0, compliant: 0, nonCompliant: 0, notAssessed: 0 };
       byCategory[m.category].total++;
-      byCategory[m.category][m.status]++;
+      const statusKey = m.status === 'non_compliant' ? 'nonCompliant' : m.status;
+      byCategory[m.category][statusKey as keyof (typeof byCategory[typeof m.category])]++;
       byStatus[m.status] = (byStatus[m.status] || 0) + 1;
     }
     return { byCategory, byStatus };
@@ -522,18 +518,16 @@ function Soc2MappingsPanel({ mappings }: { mappings: Soc2ControlMapping[] }) {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h3 className="text-base font-semibold text-text-primary">Controls</h3>
               <Stack direction="row" gap={3}>
-                <Select value={activeCategory} onChange={(e) => setActiveCategory(e.target.value)}>
-                  <option value="all">All Categories</option>
-                  {SOC2_CATEGORIES.map((c) => (
-                    <option key={c} value={c}>{c}: {SOC2_CATEGORY_LABELS[c]}</option>
-                  ))}
-                </Select>
-                <Select value={activeStatus} onChange={(e) => setActiveStatus(e.target.value)}>
-                  <option value="all">All Status</option>
-                  <option value="compliant">Compliant</option>
-                  <option value="non_compliant">Non-Compliant</option>
-                  <option value="not_assessed">Not Assessed</option>
-                </Select>
+                <Select 
+                  value={activeCategory} 
+                  onChange={(e) => setActiveCategory(e.target.value)}
+                  options={[{value: 'all', label: 'All Categories'}, ...SOC2_CATEGORIES.map((c) => ({ value: c, label: `${c}: ${SOC2_CATEGORY_LABELS[c]}` }))]}
+                />
+                <Select 
+                  value={activeStatus} 
+                  onChange={(e) => setActiveStatus(e.target.value)}
+                  options={[{value: 'all', label: 'All Status'}, {value: 'compliant', label: 'Compliant'}, {value: 'non_compliant', label: 'Non-Compliant'}, {value: 'not_assessed', label: 'Not Assessed'}]} 
+                />
               </Stack>
             </div>
 
