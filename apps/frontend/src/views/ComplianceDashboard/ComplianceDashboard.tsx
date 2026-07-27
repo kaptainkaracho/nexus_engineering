@@ -19,6 +19,7 @@ import {
   type ComplianceAggregationResult,
   type Soc2ControlMapping,
 } from '../../api/client';
+import { CircleCheck, Download, Trash2, X } from 'lucide-react';
 
 const REPORT_TYPE_LABELS: Record<ComplianceReportType, string> = {
   coverage: 'Coverage Report',
@@ -28,6 +29,11 @@ const REPORT_TYPE_LABELS: Record<ComplianceReportType, string> = {
   soc2: 'SOC2 Compliance',
   full: 'Full Compliance Report',
 };
+
+const COVERAGE_THRESHOLDS = {
+  HEALTHY: 0.8,
+  NEEDS_ATTENTION: 0.5,
+} as const;
 
 const REPORT_FORMAT_LABELS: Record<ComplianceReportFormat, string> = {
   json: 'JSON',
@@ -52,15 +58,25 @@ function formatScore(pct: number): string {
 }
 
 function coverageBarColor(pct: number): string {
-  if (pct >= 80) return 'bg-success-500 dark:bg-success-400';
-  if (pct >= 50) return 'bg-warning-500 dark:bg-warning-400';
+  if (pct >= COVERAGE_THRESHOLDS.HEALTHY) return 'bg-success-500 dark:bg-success-400';
+  if (pct >= COVERAGE_THRESHOLDS.NEEDS_ATTENTION) return 'bg-warning-500 dark:bg-warning-400';
   return 'bg-error-500 dark:bg-error-400';
 }
 
 function healthColor(pct: number): string {
-  if (pct >= 80) return 'text-success-600 dark:text-success-400';
-  if (pct >= 50) return 'text-warning-600 dark:text-warning-400';
+  if (pct >= COVERAGE_THRESHOLDS.HEALTHY) return 'text-success-600 dark:text-success-400';
+  if (pct >= COVERAGE_THRESHOLDS.NEEDS_ATTENTION) return 'text-warning-600 dark:text-warning-400';
   return 'text-error-600 dark:text-error-400';
+}
+
+function healthSurfaceColor(pct: number): string {
+  if (pct >= COVERAGE_THRESHOLDS.HEALTHY) return 'bg-success-50 dark:bg-success-950';
+  if (pct >= COVERAGE_THRESHOLDS.NEEDS_ATTENTION) return 'bg-warning-50 dark:bg-warning-950';
+  return 'bg-error-50 dark:bg-error-950';
+}
+
+function countSurfaceColor(): string {
+  return 'bg-surface-secondary';
 }
 
 function mapStatus(s: string): 'compliant' | 'non_compliant' | 'not_assessed' {
@@ -81,9 +97,7 @@ function EmptyState() {
     <Container size="lg">
       <Stack gap={6} align="center" className="pt-20">
         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-tertiary">
-          <svg className="h-8 w-8 text-text-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+          <CircleCheck className="h-8 w-8 text-text-tertiary" />
         </div>
         <Stack gap={2} align="center">
           <p className="text-lg font-semibold text-text-primary">No compliance reports</p>
@@ -129,11 +143,11 @@ function HealthOverview({ data }: { data: ComplianceAggregationResult }) {
   const overallPct = coverage?.overallCoveragePercent ?? 0;
 
   const metrics = [
-    { label: 'Overall Coverage', value: formatScore(overallPct), color: healthColor(overallPct) },
-    { label: 'Total Nodes', value: String(summary?.totalNodes ?? 0), color: 'text-text-primary' },
-    { label: 'Total Edges', value: String(summary?.totalEdges ?? 0), color: 'text-text-primary' },
+    { label: 'Overall Coverage', value: formatScore(overallPct), color: healthColor(overallPct), surface: healthSurfaceColor(overallPct), isCount: false },
+    { label: 'Total Nodes', value: String(summary?.totalNodes ?? 0), color: 'text-text-primary', surface: 'bg-surface-secondary', isCount: true },
+    { label: 'Total Edges', value: String(summary?.totalEdges ?? 0), color: 'text-text-primary', surface: 'bg-surface-secondary', isCount: true },
     ...(soc2
-      ? [{ label: 'SOC2 Coverage', value: formatScore(soc2.totalMappings > 0 ? soc2.compliant / soc2.totalMappings : 0), color: healthColor(soc2.totalMappings > 0 ? soc2.compliant / soc2.totalMappings : 0) }]
+      ? [{ label: 'SOC2 Coverage', value: formatScore(soc2.totalMappings > 0 ? soc2.compliant / soc2.totalMappings : 0), color: healthColor(soc2.totalMappings > 0 ? soc2.compliant / soc2.totalMappings : 0), surface: healthSurfaceColor(soc2.totalMappings > 0 ? soc2.compliant / soc2.totalMappings : 0), isCount: false }]
       : []),
   ];
 
@@ -143,7 +157,7 @@ function HealthOverview({ data }: { data: ComplianceAggregationResult }) {
         <h3 className="text-base font-semibold text-text-primary">Compliance Health</h3>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           {metrics.map((m) => (
-            <div key={m.label} className={`rounded-xl p-4 ring-1 ring-inset ring-border/50 dark:ring-border/30 ${overallPct >= 80 ? 'bg-success-50 dark:bg-success-950' : overallPct >= 50 ? 'bg-warning-50 dark:bg-warning-950' : 'bg-error-50 dark:bg-error-950'}`}>
+            <div key={m.label} className={`rounded-xl p-4 ring-1 ring-inset ring-border/50 dark:ring-border/30 ${m.surface}`}>
               <p className="text-xs font-medium uppercase tracking-wide text-text-tertiary">{m.label}</p>
               <p className={`mt-1 text-2xl font-bold ${m.color}`}>{m.value}</p>
             </div>
@@ -200,105 +214,123 @@ function ReportList({
     return map;
   }, [reports]);
 
-  if (reports.length === 0) return <EmptyState />;
-
   return (
     <Container size="lg">
       <Stack gap={6}>
-        <div className="flex items-center justify-between">
-          <Stack gap={1}>
-            <h2 className="text-2xl font-bold text-text-primary">Compliance Reports</h2>
-            <p className="text-sm text-text-secondary">{reports.length} report{reports.length !== 1 ? 's' : ''} generated</p>
-          </Stack>
-          <Button variant="primary" onClick={onGenerate}>
-            + New Report
-          </Button>
-        </div>
-
-        <Stack gap={4}>
-          {Array.from(grouped.entries()).map(([type, items]) => (
-            <Card key={type} padding="lg">
-              <Stack gap={4}>
-                <div className="flex items-center gap-2">
-                  <Badge variant="info">{REPORT_TYPE_LABELS[type as ComplianceReportType] ?? type}</Badge>
-                  <Badge variant="secondary">{items.length}</Badge>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm" role="table" aria-label={`${type} reports`}>
-                    <thead>
-                      <tr className="border-b border-border text-xs uppercase tracking-wide text-text-tertiary">
-                        <th className="pb-2 pr-4 font-medium" scope="col">Title</th>
-                        <th className="pb-2 pr-4 font-medium" scope="col">Format</th>
-                        <th className="pb-2 pr-4 font-medium" scope="col">Status</th>
-                        <th className="pb-2 pr-4 font-medium" scope="col">Created</th>
-                        <th className="pb-2 pr-4 font-medium" scope="col">Completed</th>
-                        <th className="pb-2 font-medium" scope="col">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                      {items.map((r) => (
-                        <tr key={r.id} className="hover:bg-surface-secondary/50">
-                          <td className="py-3 pr-4 font-medium text-text-primary">{r.title}</td>
-                          <td className="py-3 pr-4">
-                            <Badge variant="info">{REPORT_FORMAT_LABELS[r.format]}</Badge>
-                          </td>
-                          <td className="py-3 pr-4">
-                            <Badge variant={statusBadgeVariant(r.status)}>{statusLabel(r.status)}</Badge>
-                          </td>
-                          <td className="py-3 pr-4 text-text-secondary">
-                            {new Date(r.created_at).toLocaleDateString()}
-                          </td>
-                          <td className="py-3 pr-4 text-text-secondary">
-                            {r.completed_at ? new Date(r.completed_at).toLocaleDateString() : '—'}
-                          </td>
-                          <td className="py-3">
-                            <Stack direction="row" gap={2}>
-                              {r.status === 'completed' && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  icon={<svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>}
-                                  onClick={() => handleDownload(r)}
-                                  aria-label={`Download ${r.title}`}
-                                >
-                                  Download
-                                </Button>
-                              )}
-                              {r.status !== 'generating' && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  icon={<svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>}
-                                  onClick={() => setDeleteId(r.id)}
-                                  aria-label={`Delete ${r.title}`}
-                                >
-                                  Delete
-                                </Button>
-                              )}
-                            </Stack>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+        {reports.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16">
+            <CircleCheck className="mb-4 h-12 w-12 text-text-tertiary" />
+            <p className="text-lg font-semibold text-text-primary">No compliance reports</p>
+            <p className="mt-1 text-sm text-text-secondary">Generate your first compliance report to get started.</p>
+            <Button variant="primary" onClick={onGenerate} className="mt-4">
+              + New Report
+            </Button>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center justify-between">
+              <Stack gap={1}>
+                <h2 className="text-2xl font-bold text-text-primary">Compliance Reports</h2>
+                <p className="text-sm text-text-secondary">{reports.length} report{reports.length !== 1 ? 's' : ''} generated</p>
               </Stack>
-            </Card>
-          ))}
-        </Stack>
-
-        {deleteId && (
-          <Card padding="lg">
+              <Button variant="primary" onClick={onGenerate}>
+                + New Report
+              </Button>
+            </div>
             <Stack gap={4}>
-              <p className="text-sm text-text-primary">Are you sure you want to delete this report? This action cannot be undone.</p>
-              <Stack direction="row" gap={3}>
-                <Button variant="danger" onClick={() => { onDelete(deleteId); setDeleteId(null); }}>Confirm Delete</Button>
-                <Button variant="ghost" onClick={() => setDeleteId(null)}>Cancel</Button>
-              </Stack>
+              {Array.from(grouped.entries()).map(([type, items]) => (
+                <Card key={type} padding="lg">
+                  <Stack gap={4}>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="info">{REPORT_TYPE_LABELS[type as ComplianceReportType] ?? type}</Badge>
+                      <Badge variant="secondary">{items.length}</Badge>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-sm" role="table" aria-label={`${type} reports`}>
+                        <thead>
+                          <tr className="border-b border-border text-xs uppercase tracking-wide text-text-tertiary">
+                            <th className="pb-2 pr-4 font-medium" scope="col">Title</th>
+                            <th className="pb-2 pr-4 font-medium" scope="col">Format</th>
+                            <th className="pb-2 pr-4 font-medium" scope="col">Status</th>
+                            <th className="pb-2 pr-4 font-medium" scope="col">Created</th>
+                            <th className="pb-2 pr-4 font-medium" scope="col">Completed</th>
+                            <th className="pb-2 font-medium" scope="col">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border">
+                          {items.map((r) => (
+                            <tr key={r.id} className="hover:bg-surface-secondary/50">
+                              <td className="py-3 pr-4 font-medium text-text-primary">{r.title}</td>
+                              <td className="py-3 pr-4">
+                                <Badge variant="info">{REPORT_FORMAT_LABELS[r.format]}</Badge>
+                              </td>
+                              <td className="py-3 pr-4">
+                                <Badge variant={statusBadgeVariant(r.status)}>{statusLabel(r.status)}</Badge>
+                              </td>
+                              <td className="py-3 pr-4 text-text-secondary">
+                                {new Date(r.created_at).toLocaleDateString()}
+                              </td>
+                              <td className="py-3 pr-4 text-text-secondary">
+                                {r.completed_at ? new Date(r.completed_at).toLocaleDateString() : '—'}
+                              </td>
+                              <td className="py-3">
+                                <Stack direction="row" gap={2}>
+                                  {r.status === 'completed' && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      icon={<Download className="h-3.5 w-3.5" />}
+                                      onClick={() => handleDownload(r)}
+                                      aria-label={`Download ${r.title}`}
+                                    >
+                                      Download
+                                    </Button>
+                                  )}
+                                  {r.status !== 'generating' && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      icon={<Trash2 className="h-3.5 w-3.5" />}
+                                      onClick={() => setDeleteId(r.id)}
+                                      aria-label={`Delete ${r.title}`}
+                                    >
+                                      Delete
+                                    </Button>
+                                  )}
+                                </Stack>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </Stack>
+                </Card>
+              ))}
             </Stack>
-          </Card>
-        )}
-      </Stack>
+          )}
+
+          {deleteId && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" role="dialog" aria-modal="true" aria-label="Confirm delete">
+              <div className="w-full max-w-sm rounded-2xl bg-surface-primary p-6 shadow-xl ring-1 ring-border">
+                <Stack gap={5}>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-text-primary">Delete Report</h3>
+                    <Button variant="ghost" size="sm" onClick={() => setDeleteId(null)} aria-label="Close">
+                      <X className="h-5 w-5" />
+                    </Button>
+                  </div>
+                  <p className="text-sm text-text-secondary">Are you sure you want to delete this report? This action cannot be undone.</p>
+                  <Stack direction="row" gap={3}>
+                    <Button variant="danger" onClick={() => { onDelete(deleteId); setDeleteId(null); }}>Delete</Button>
+                    <Button variant="ghost" onClick={() => setDeleteId(null)}>Cancel</Button>
+                  </Stack>
+                </Stack>
+              </div>
+            </div>
+          )}
+        </Stack>
+      </Container>
     </Container>
   );
 }
@@ -334,7 +366,7 @@ function GenerateModal({ open, onClose, onGenerate, generating }: GenerateModalP
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-text-primary">Generate Report</h3>
             <Button variant="ghost" size="sm" onClick={onClose} aria-label="Close">
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              <X className="h-5 w-5" />
             </Button>
           </div>
 
@@ -457,7 +489,7 @@ function Soc2MappingsPanel({ mappings }: { mappings: Soc2ControlMapping[] }) {
                   return (
                     <button
                       key={cat}
-                      className="rounded-xl p-4 text-left ring-1 ring-border transition-colors hover:bg-surface-secondary dark:ring-border/30"
+                      className="rounded-xl p-4 text-left ring-1 ring-border transition-colors hover:bg-surface-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:ring-border/30"
                       onClick={() => setActiveCategory(activeCategory === cat ? 'all' : cat)}
                     >
                       <div className="flex items-center justify-between">
@@ -662,7 +694,7 @@ export function ComplianceDashboard() {
         </Stack>
 
         {/* Tab bar */}
-        <div className="flex gap-0 border-b border-border">
+        <div className="flex gap-0 border-b border-border" role="tablist" aria-label="Compliance dashboard tabs">
           {tabs.map((tab) => (
             <button
               key={tab.key}

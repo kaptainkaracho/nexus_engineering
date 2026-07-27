@@ -6,7 +6,8 @@ export type BadgeVariant =
   | 'completed' | 'draft' | 'ready' | 'automated' | 'manual' | 'partially-automated'
   | 'satisfies' | 'verifies' | 'tracesTo' | 'dependsOn' | 'refines' | 'conflictsWith'
   | 'block' | 'part' | 'port' | 'unit' | 'info'
-  | 'integration' | 'e2e' | 'performance' | 'security' | 'usability';
+  | 'integration' | 'e2e' | 'performance' | 'security' | 'usability'
+  | 'success' | 'warning' | 'secondary';
 
 interface PaletteEntry { light: string; dark: string }
 
@@ -42,6 +43,9 @@ const PALETTE: Record<BadgeVariant, PaletteEntry> = {
   performance:      { light: 'warning-500/10',          dark: 'dark:bg-warning-950 dark:text-warning-300' },
   security:         { light: 'error-500/10',            dark: 'dark:bg-error-950 dark:text-error-300' },
   usability:        { light: 'success-500/10',          dark: 'dark:bg-success-950 dark:text-success-300' },
+  success:          { light: 'success-500/10',          dark: 'dark:bg-success-950 dark:text-success-300' },
+  warning:          { light: 'warning-500/10',          dark: 'dark:bg-warning-950 dark:text-warning-300' },
+  secondary:       { light: 'neutral-500/10',          dark: 'dark:bg-neutral-950 dark:text-neutral-400' },
 };
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
