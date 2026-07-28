@@ -17,7 +17,7 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 4. **Clear dispositions** — Every task must end with done/in_review/blocked/delegated
 5. **Gate Initialization Rule** — Dependent issues blocked on upstream work must start as `blocked`, never `in_progress`. Violation results in immediate correction to `blocked`.
 
-## Active Issues (2026-07-28 18:07 UTC — HB#328: Pipeline Stable, 1/4 Live Exec, No Stalls)
+## Active Issues (2026-07-28 18:30 CEST — HB#329: THE-413 Productivity Review Complete, Delegation Drift Flagged)
 
 | Issue | Status | Owner | Notes |
 |-------|--------|-------|-------|
@@ -31,6 +31,7 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 | **THE-406** | **blocked** 🔒 | **Senior QA** | **W4: E2E** — Sprint 26 verification. Blocked on W1-W3 completion. |
 
 | **THE-412** | **done** ✅ | **CEO** | **Productivity Review — THE-403 (Sprint 26)** — HIGH PRODUCTIVITY verdict. 2/4 waves delivered in ~14 min. |
+| **THE-413** | **done** ✅ | **CTO** | **Productivity Review — THE-407 (Landing Page)** — HIGH OUTPUT, CRITICAL DELEGATION DRIFT. CTO self-executed 6 frontend commits. Report at `reports/THE-413-productivity-review-THE-407.md`. |
 | **THE-411** | **todo** 📋 | **CEO** | **Sprint 29 placeholder** — Not yet created. |
 
 ### Recent Completions
