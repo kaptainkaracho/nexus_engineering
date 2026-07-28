@@ -17,17 +17,31 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 4. **Clear dispositions** — Every task must end with done/in_review/blocked/delegated
 5. **Gate Initialization Rule** — Dependent issues blocked on upstream work must start as `blocked`, never `in_progress`. Violation results in immediate correction to `blocked`.
 
-## Active Issues (2026-07-27 23:28 UTC — HB#315: All Sprints Closed, Pipeline Idle)
+## Active Issues (2026-07-28 17:55 UTC — HB#326: THE-407 Advanced to in_review, THE-408 Unblocked)
 
-**No active issues.** All 20 issues terminal. Pipeline idle awaiting board direction for next phase.
+| Issue | Status | Owner | Notes |
+|-------|--------|-------|-------|
+| **THE-403** | **done** ✅ | **CEO** | **Sprint 26 Parent** — GTM Content & Market Readiness. ALL planning/dispatch complete. |
+| **THE-404** | **blocked→done** ✅ | **CTO Agent** | **W1: Demo Mode** — Complete! Commit 584bf10. Awaiting sync. |
+| **THE-407** | **in_review** 🔍 | **FrontendArchitect → UXDesigner** | **W2: Landing Page** — Delivered (commit 740e09d). Ready for UX Gate (THE-408). |
+| **THE-405** | **queued→in_progress** 🚀 | **CTO** | **W3: GTM Docs** — Work started (492bc3f). Board confirmed advancement. |
+| **THE-408** | **in_progress** 🚀 | **UXDesigner** | **W2g: UX Gate** — THE-407 is `in_review`. Ready for UX review. |
+| **THE-409** | **todo** 📋 | **CEO** | **Sprint 27: Docs & DX** — Child of THE-403. Awaiting Sprint 26. |
+| **THE-410** | **todo** 📋 | **CEO** | **Sprint 28: Perf & Hardening** — Child of THE-403. Awaiting Sprint 27. |
+| **THE-406** | **blocked** 🔒 | **Senior QA** | **W4: E2E** — Sprint 26 verification. Blocked on W1-W3 completion. |
+
+| **THE-412** | **done** ✅ | **CEO** | **Productivity Review — THE-403 (Sprint 26)** — HIGH PRODUCTIVITY verdict. 2/4 waves delivered in ~14 min. |
+| **THE-411** | **todo** 📋 | **CEO** | **Sprint 29 placeholder** — Not yet created. |
 
 ### Recent Completions
 | Issue | Status | Owner | Notes |
 |-------|--------|-------|-------|
+| **THE-402** | **done** ✅ | **CEO** | **Phase 5 Board Decision** — Board approved GTM Strategy. Sprint 26 delegated. |
+| **THE-401** | **cancelled** 🗑️ | **CEO** | Superseded by THE-402. |
 | **THE-390** | **done** ✅ | **CEO** | **Sprint 25 Parent** — ALL 5/5 WAVES COMPLETE |
 | **THE-394** | **done** ✅ | **QA** | **W3: Sprint 25 E2E** — Integration Ecosystem verified. |
 | **THE-395** | **done** ✅ | **CEO** | **Build Automation** — Delivered via THE-399 (CTO). |
-| **THE-399** | **done** ✅ | **CTO** | **THE-395 subtask** — Sprint release branching (create-sprint-release.sh), local build validation (validate-local.sh), CONTRIBUTING.md docs, PR template, package.json scripts. |
+| **THE-399** | **done** ✅ | **CTO** | **THE-395 subtask** — Sprint release branching, build validation, docs. |
 
 ### Completed Sprint 24 — Enterprise Phase 2 ✅
 | Issue | Status | Owner | Notes |
