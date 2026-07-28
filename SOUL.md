@@ -22,9 +22,9 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 | Issue | DB Status | Correct Status | Owner | Notes |
 |-------|-----------|----------------|-------|-------|
 | **THE-403** | `in_progress` | *pending W3-W4* | **CEO** | **Sprint 26 Parent** — W1/W2 done. Awaiting W3 (BA) + W4 (QA). |
-| **THE-404** | `blocked` 🔒 | `done` ✅ | **BA (fix)** | **W1: Demo Mode** — Complete! Commit 584bf10. DB stuck — needs correction. |
+| **THE-404** | `done` ✅ | `done` ✅ | **CEO (fixed)** | **W1: Demo Mode** — Complete! Commit 584bf10. DB corrected. |
 | **THE-407** | `done` ✅ | `done` ✅ | **FA** | **W2: Landing Page** — UX Gate APPROVED. Done. |
-| **THE-408** | `blocked` 🔒 | `done` ✅ | **UXD** | **W2g: UX Gate** — APPROVED HB#332. DB stuck — needs correction. |
+| **THE-408** | `done` ✅ | `done` ✅ | **CEO (fixed)** | **W2g: UX Gate** — APPROVED HB#332. DB corrected. |
 | **THE-405** | `in_progress` 🚀 | 🚀 Active | **BA (reassigned)** | **W3: GTM Docs** — Reassigned from CTO to BA. HB#334 decision. |
 | **THE-411** | `in_review` 🔍 | 🔍 Needs FA | **FA** | **Demo Mode** — Unauthorized CTO issue. Needs FA ownership. |
 | **THE-415** | `blocked` 🔒 | 🔒 Correct | **QA** | **Sprint 26 W4: E2E** — Blocked on W1-W3. |

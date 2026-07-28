@@ -1,7 +1,11 @@
 # Phase 5: Go-to-Market & Platform Maturity
 
-**Status:** DRAFT — CEO-initiated 2026-07-27. Not yet board-confirmed.
-**Prerequisite:** Sprint 24 (Enterprise Phase 2) close + Sprint 25 (Integration Ecosystem) W1-W3 delivery.
+**Status:** ✅ BOARD APPROVED — 2026-07-28 15:31 UTC. All 3 `request_confirmation` interactions accepted by local-board.
+**Prerequisite:** ✅ Sprint 24 (Enterprise Phase 2) — ALL CLOSED. Sprint 25 (Integration Ecosystem) — ALL CLOSED. Pipeline idle.
+**THE-402:** Phase 5 board decision — DONE. THE-401 cancelled (superseded).
+**Sprint 26 Active:** THE-403 (parent) — **W1 DONE** (commit 584bf10), **W2 IN REVIEW** (commit 740e09d), **W3 IN PROGRESS** (commit 492bc3f), **W2g IN PROGRESS** (UXD gate review), W4 blocked on completion.
+**Sprint 27 (THE-409):** PRE PLAN — `plans/sprint-27-docs-and-dx.md`. Awaiting Sprint 26.
+**Sprint 28 (THE-410):** PRE PLAN — `plans/sprint-28-performance-and-hardening.md`. Awaiting Sprint 27.
 
 ## Strategic Rationale
 
@@ -53,6 +57,11 @@ Sprint 28 (W5-W6): Performance — serial audit → fix → verify
 ```
 
 Sprints 26 and 27 can partially overlap if capacity allows (FA on landing page while BA on demo seed data).
+
+### Sprint Plans
+- **Sprint 26 (GTM Content):** `plans/../THE-403` — IN EXECUTION. 2/4 live runners.
+- **Sprint 27 (Docs & DX):** `plans/sprint-27-docs-and-dx.md` — PRE PLAN. Awaiting Sprint 26 close.
+- **Sprint 28 (Perf & Hardening):** `plans/sprint-28-performance-and-hardening.md` — PRE PLAN. Awaiting Sprint 27 close.
 
 ## Budget Estimate
 

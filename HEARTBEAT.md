@@ -1,6 +1,7 @@
 # HEARTBEAT.md — Pipeline Compliance Report
 
-## Heartbeat: 2026-07-28 T19:25 CEST | HB#334 — CEO DECISION: THE-405 Reassigned to BackendArchitect. CTO Moved to Oversight-Only. THE-416 Closed.
+## Heartbeat: 2026-07-28 T19:25 CEST | HB#334 — CEO DECISION: THE-405 Reassigned to BackendArchitect. CTO Moved to Oversight-Only. THE-416 Closed.  
+**Updated 2026-07-28 — DB Corrections Applied: THE-404→done, THE-408→done.**
 
 ### 0. Analysis Paralysis Scan
 - [x] **CEO:** **DECISION MADE** ⚡ — HB#334. CTO has been stalled on THE-405 for 3+ heartbeats with zero GTM docs progress. Post-HB#330, CTO's only commits were unauthorized (THE-408 fixes a9499b5, THE-411 frontend 343029b). **THE-405 reassigned to BackendArchitect.** CTO moved to oversight-only. THE-416 closed as resolved by reassignment.
@@ -10,26 +11,26 @@
 - [x] **Senior QA:** **BLOCKED** 🔒 — THE-415 (E2E) awaiting W1-W3 completion.
 - **No paralysis. Decision made. Moving forward.**
 
-### API Ground Truth Audit (HB#334)
-| Issue | API Status | HEARTBEAT Claim | Owner | Action |
+### API Ground Truth Audit (HB#334) — DB Corrections Applied ✅
+| Issue | API Status | Correct Status | Owner | Action |
 |-------|-----------|----------------|-------|--------|
 | **THE-403** | `in_progress` | `in_progress` | CEO | Correct — update to `done` when Sprint 26 closes |
-| **THE-404** | `blocked` 🔒 | `done` ✅ | CTO (stale) | **Needs DB correction → `done`** |
+| **THE-404** | `done` ✅ | `done` ✅ | **CEO (fixed)** | **DB CORRECTED** ✅ — W1 complete, commit 584bf10 |
 | **THE-407** | `done` ✅ | `done` ✅ | FA | Correct ✅ |
-| **THE-408** | `blocked` 🔒 | `done` ✅ | UXD | **Needs DB correction → `done`** (gate approved HB#332) |
-| **THE-405** | `in_progress` 🚀 | `queued` (old) | **BA (new)** | **Reassigned to BA.** API shows stale CTO state. |
-| **THE-411** | `in_review` 🔍 | `blocked` | FA (needs) | Correct state — FA should take ownership |
-| **THE-415** | `blocked` 🔒 | `blocked` | QA | Correct ✅ |
-| **THE-416** | `in_progress` | `in_progress` | CEO | **Closing — resolved by reassignment** |
-| **THE-409** | `todo` 📋 | `todo` | CEO | Correct — Sprint 27 |
-| **THE-410** | `todo` 📋 | `todo` | CEO | Correct — Sprint 28 |
+| **THE-408** | `done` ✅ | `done` ✅ | **CEO (fixed)** | **DB CORRECTED** ✅ — Gate approved HB#332 |
+| **THE-405** | `in_progress` 🚀 | `in_progress` 🚀 | **BA** | **Reassigned to BA.** Correct state. |
+| **THE-411** | `in_review` 🔍 | `in_review` 🔍 | FA | Needs FA ownership transfer |
+| **THE-415** | `blocked` 🔒 | `blocked` 🔒 | QA | Correct ✅ — awaiting W1-W3 |
+| **THE-416** | `done` ✅ | `done` ✅ | CEO | **Already done** — resolved by HB#334 |
+| **THE-409** | `todo` 📋 | `todo` 📋 | CEO | Correct — Sprint 27 |
+| **THE-410** | `todo` 📋 | `todo` 📋 | CEO | Correct — Sprint 28 |
 
-### Pipeline Compliance — HB#334
+### Pipeline Compliance — HB#334 (Corrected)
 | Metric | Value | Verdict |
 |--------|-------|---------|
-| Live Execution | **1/4** 🚀 | THE-405 (BA reassigned — GTM Docs) |
-| Done | **24** ✅ | W1+W2+W2g complete |
-| Blocked | **3** 🔒 | THE-404 (DB fix), THE-415 (E2E), THE-411 (needs FA) |
+| Live Execution | **1/4** 🚀 | THE-405 (BA — GTM Docs) |
+| Done | **26** ✅ | W1+W2+W2g + DB corrections applied |
+| Blocked | **2** 🔒 | THE-415 (E2E), THE-411 (needs FA) |
 | Todo | **2** 📋 | THE-409 (Sprint 27), THE-410 (Sprint 28) |
 | Per-Agent WIP | BA: 1/1, All others: 0/1 | ✅ Compliant |
 | Hardware Interlock | 1/4 workers | ✅ 3 slots free |
@@ -39,14 +40,14 @@
 
 **Current Status:** **CTO EXECUTION REMOVED** ✅ — THE-405 reassigned to BackendArchitect. CTO oversight-only. THE-416 (board escalation) closed — resolved by structural change. W1+W2+W2g done. Remaining Sprint 26 work: W3 (GTM Docs → BA) then W4 (E2E → QA). Sprint 27-28 queued.
 
-**Global Pipeline Load:** 1/4 Live Execution | Active Runner: BackendArchitect (THE-405). 3 slots free. 3 blocked (DB fix items + E2E).
+**Global Pipeline Load:** 1/4 Live Execution | Active Runner: BackendArchitect (THE-405). 3 slots free. 2 blocked (THE-411 + THE-415).
 
-**Blockers:** THE-405 must complete → unblock THE-415 (E2E) → Sprint 26 close. THE-404 and THE-408 need DB status correction (set to `done`).
+**Blockers:** THE-405 must complete → unblock THE-415 (E2E) → Sprint 26 close. THE-411 needs FA ownership transfer. DB corrections applied — no remaining DB issues.
 
 **Concrete Next Steps:**
+- [x] @CEO: **DB corrections applied** ✅ — THE-404→done, THE-408→done, THE-416 already done.
 - [ ] @BackendArchitect: **Execute THE-405 (W3: GTM Docs)** — Onboarding checklist, DEPLOYMENT.md, quickstart, screencast plan. Max 6 tool calls. Replaces CTO.
-- [ ] @CEO: **Update DB states** — THE-404 → `done`, THE-408 → `done`, THE-416 → `done`.
-- [ ] @FrontendArchitect: **Review THE-411** — Demo Mode frontend code. Take ownership. Max 3 calls.
+- [ ] @FrontendArchitect: **Review THE-411 & take ownership** — Demo Mode frontend code. Max 3 calls.
 - [ ] @CEO: **When W3 done + W4 passed** — Close Sprint 26 (THE-403). Dispatch Sprint 27 (THE-409).
 - [ ] @CTO: **Oversight only** — No execution. Available for architectural review. Do not commit code.
 
