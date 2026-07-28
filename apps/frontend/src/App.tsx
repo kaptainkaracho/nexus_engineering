@@ -42,6 +42,7 @@ const ScimSettings = lazy(() => import('./views/ScimSettings'));
 // Auth + onboarding + landing — small bundles, grouped together
 const LandingPage = lazy(() => import('./views/LandingPage').then(m => ({ default: m.LandingPage })));
 const OnboardingFlow = lazy(() => import('./views/OnboardingFlow').then(m => ({ default: m.OnboardingFlow })));
+const DemoMode = lazy(() => import('./views/DemoMode').then(m => ({ default: m.DemoMode })));
 const GateConfigPanel = lazy(() => import('./components/trace-gate').then(m => ({ default: m.GateConfigPanel })));
 
 // Test results (chunk-analysis family)
@@ -76,7 +77,8 @@ type Section =
   | 'scim'
   | 'org'
   | 'landing'
-  | 'onboarding';
+  | 'onboarding'
+  | 'demo';
 
 const VALID_SECTIONS: Section[] = [
   'overview',
@@ -108,6 +110,7 @@ const VALID_SECTIONS: Section[] = [
   'trace-gate',
   'landing',
   'onboarding',
+  'demo',
 ];
 
 const ADMIN_SUB_ROUTES: Record<string, Section> = {
@@ -166,6 +169,7 @@ const SKELETON_VARIANTS: Record<string, RouteLoadingSkeletonProps['variant']> = 
   'sso': 'form',
   'scim': 'form',
   'org': 'form',
+  'demo': 'grid',
 };
 
 function SuspenseView({ children, section }: { children: React.ReactNode; section: Section }) {
@@ -390,6 +394,13 @@ function App() {
     if (hash === 'login' || hash === 'register' || hash.startsWith('reset-password') || hash.startsWith('forgot-password') || hash.startsWith('auth/')) {
       return <AuthPage onAuthenticated={handleAuthenticated} resetToken={resetToken} />;
     }
+    if (hash === 'demo') {
+      return (
+        <Suspense fallback={<RouteLoadingSkeleton variant="grid" />}>
+          <DemoMode />
+        </Suspense>
+      );
+    }
     return (
       <Suspense fallback={<RouteLoadingSkeleton variant="grid" />}>
         <LandingPage />
@@ -579,6 +590,12 @@ function App() {
         return (
           <Suspense fallback={<RouteLoadingSkeleton variant="form" />}>
             <GateConfigPanel />
+          </Suspense>
+        );
+      case 'demo':
+        return (
+          <Suspense fallback={<RouteLoadingSkeleton variant="grid" />}>
+            <DemoMode />
           </Suspense>
         );
       default:

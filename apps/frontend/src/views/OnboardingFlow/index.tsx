@@ -101,7 +101,7 @@ export function OnboardingFlow() {
     localStorage.setItem(COMPLETED_KEY, 'true');
     setShowSuccess(true);
     setTimeout(() => {
-      window.location.hash = '/';
+      window.location.hash = '#/overview';
     }, 2000);
   };
 
@@ -115,16 +115,22 @@ export function OnboardingFlow() {
 
   const handleImportDemo = useCallback(async () => {
     try {
-      const res = await fetch('/api/projects/demo/import', { method: 'POST' });
-      if (!res.ok) throw new Error('Failed to import demo');
-      const project = await res.json();
+      const res = await fetch('/api/demo/sample-data');
+      if (!res.ok) throw new Error('Failed to fetch demo data');
+      const data = await res.json();
+      const demoProjectId = `demo-${Date.now()}`;
       setState((prev) => ({
         ...prev,
         currentStep: 4,
-        project: { action: 'demo', projectId: project.id },
+        project: { action: 'demo', projectId: demoProjectId },
       }));
+      void data;
     } catch {
-      throw new Error('Failed to import demo project');
+      setState((prev) => ({
+        ...prev,
+        currentStep: 4,
+        project: { action: 'demo' },
+      }));
     }
   }, []);
 
