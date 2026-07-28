@@ -16,7 +16,20 @@ This directory contains all documentation for the Nexus Engineering platform. Do
 | Document | Description |
 |----------|-------------|
 | [USER_GUIDE.md](./USER_GUIDE.md) | Comprehensive user guide for the Nexus application |
+| [ONBOARDING.md](./onboarding.md) | Customer onboarding guide — first 30 minutes with Nexus |
 | [API_REFERENCE.md](./API_REFERENCE.md) | Complete API documentation for all endpoints |
+
+---
+
+## Technical Documentation
+
+| Document | Description |
+|----------|-------------|
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | System architecture with Mermaid diagrams, components, and design patterns |
+| [DATA_MODEL.md](./DATA_MODEL.md) | Unified engineering data model with TypeScript interfaces |
+| [API_CONTRACT.md](./API_CONTRACT.md) | API contract between frontend and backend |
+| [CODING_STANDARDS.md](./CODING_STANDARDS.md) | TypeScript, Fastify, React, and shared package conventions |
+| [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md) | Design system: tokens, colors, typography, components |
 
 ---
 
@@ -100,8 +113,9 @@ This directory contains all documentation for the Nexus Engineering platform. Do
 
 ### For Users
 
-1. Start with [USER_GUIDE.md](./USER_GUIDE.md) for an overview of the application
-2. Use [API_REFERENCE.md](./API_REFERENCE.md) for programmatic access
+1. Start with [ONBOARDING.md](./onboarding.md) for your first 30 minutes with Nexus
+2. Use [USER_GUIDE.md](./USER_GUIDE.md) for an overview of the application
+3. Use [API_REFERENCE.md](./API_REFERENCE.md) for programmatic access
 
 ### For Developers
 

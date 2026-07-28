@@ -126,9 +126,10 @@ nexus/
 |----------|-------------|
 | [Setup Guide](docs/SETUP_GUIDE.md) | Prerequisites, install, configure, run, deploy |
 | [Quickstart Tutorial](docs/quickstart.md) | Step-by-step first-user guide |
-| [Architecture](docs/ARCHITECTURE.md) | System architecture, data flow, deployment |
+| [Onboarding Guide](docs/onboarding.md) | Customer onboarding — first 30 minutes |
+| [Architecture](docs/ARCHITECTURE.md) | System architecture deep-dive |
 | [API Reference](docs/API_REFERENCE.md) | Complete API documentation |
-| [Developer Guide](docs/DEVELOPER_GUIDE.md) | Contributing, testing, code style |
+| [Developer Guide](docs/DEVELOPER_GUIDE.md) | Contributing and development workflow |
 | [Deployment Guide](docs/DEPLOYMENT.md) | Railway deployment, CI/CD |
 | [Demo Project](docs/demo/) | Pre-built demo with seed data |
 | [Coding Standards](docs/CODING_STANDARDS.md) | TypeScript, React, Fastify conventions |

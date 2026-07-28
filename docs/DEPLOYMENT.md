@@ -1,21 +1,23 @@
 # Nexus Engineering — Deployment Guide
 
-**Version:** 1.0  
-**Last Updated:** 2026-07-18
+**Version:** 1.1  
+**Last Updated:** 2026-07-28  
+**Changelog:** Added Railway one-click deploy flow for GTM (THE-405)
 
 ---
 
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [Prerequisites](#prerequisites)
-3. [Environment Variables](#environment-variables)
-4. [Railway Deployment](#railway-deployment)
-5. [GitHub Actions CI/CD](#github-actions-cicd)
-6. [Preview Environments](#preview-environments)
-7. [Production Deployment](#production-deployment)
-8. [Monitoring & Scaling](#monitoring--scaling)
-9. [Troubleshooting](#troubleshooting)
+2. [One-Click Deploy](#one-click-deploy)
+3. [Prerequisites](#prerequisites)
+4. [Environment Variables](#environment-variables)
+5. [Railway Deployment](#railway-deployment)
+6. [GitHub Actions CI/CD](#github-actions-cicd)
+7. [Preview Environments](#preview-environments)
+8. [Production Deployment](#production-deployment)
+9. [Monitoring & Scaling](#monitoring--scaling)
+10. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -43,7 +45,69 @@ Railway (Hosting)
 
 ---
 
-## Prerequisites
+## One-Click Deploy
+
+Deploy Nexus Engineering to Railway with a single click — no CLI setup required.
+
+### Deploy to Railway
+
+[![Deploy to Railway](https://railway.app/button.svg)](https://railway.app/new/template?templateRepo=https://github.com/TheBikeApp/Nexus)
+
+Click the button above to start a new Railway deployment from the Nexus repository. Railway will:
+
+1. Detect the `railway.toml` configuration
+2. Install Node.js 20 and pnpm 9
+3. Build the frontend via `pnpm --filter @nexus-engineering/frontend build`
+4. Start the backend with `pnpm --filter @nexus-engineering/backend start`
+5. Configure health checks at `/health`
+
+### What You Get
+
+| Resource | Default |
+|----------|---------|
+| Frontend URL | `https://your-project.up.railway.app` |
+| Backend API | Same origin (`:3001` → proxy) |
+| Health Check | `/health` on the backend service |
+| Database | SQLite at `/data/nexus.db` (persistent volume) |
+| Build | Nixpacks auto-detection + `pnpm build` |
+
+### Configure After Deploy
+
+After deployment, set your environment variables in the Railway dashboard:
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `NODE_ENV` | Yes | Set to `production` |
+| `DATABASE_PATH` | Yes | Set to `/data/nexus.db` |
+| `JWT_SECRET` | Yes | A strong secret for JWT signing |
+| `CORS_ORIGIN` | No | Allowed origins (defaults to `*`) |
+| `LOG_LEVEL` | No | Logging level (defaults to `info`) |
+
+### Deploy via CLI
+
+If you prefer the command line:
+
+```bash
+# Install Railway CLI
+curl -fsSL https://railway.app/install.sh | sh
+
+# Login and link your project
+railway login
+railway init
+
+# Deploy
+railway up
+```
+
+### Self-Hosting Alternatives
+
+If Railway is not available, Nexus can be deployed to any Docker-compatible platform:
+
+```bash
+docker compose up -d
+```
+
+See the `docker-compose.yml` in the repository root for the full configuration.
 
 Before deploying, ensure you have:
 
@@ -426,4 +490,4 @@ ls -la ./data/
 
 ---
 
-**Last updated:** 2026-07-18 | THE-178
+**Last updated:** 2026-07-28 | THE-405
