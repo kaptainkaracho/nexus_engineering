@@ -129,7 +129,7 @@ function MobileNav({ open, onClose }: { open: boolean; onClose: () => void }) {
           <ul className="flex flex-col gap-2">
             {navLinks.map((link) => (
               <li key={link.label}>
-                <a href={link.href} className="block px-3 py-2.5 rounded-lg text-sm font-medium text-text-secondary hover:bg-neutral-100 hover:text-text-primary dark:hover:bg-neutral-800 transition-colors" onClick={onClose}>
+                <a href={link.href} className="block px-3 py-2.5 rounded-lg text-sm font-medium text-text-secondary hover:bg-neutral-100 hover:text-text-primary dark:hover:bg-neutral-800 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500" onClick={onClose}>
                   {link.label}
                 </a>
               </li>
@@ -180,7 +180,7 @@ export function LandingPage() {
           </a>
           <nav aria-label="Main navigation" className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
-              <a key={link.label} href={link.href} className="px-3 py-2 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors rounded-lg">
+              <a key={link.label} href={link.href} className="px-3 py-2 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500">
                 {link.label}
               </a>
             ))}
@@ -218,7 +218,7 @@ export function LandingPage() {
           </div>
           <div className="relative max-w-5xl mx-auto text-center">
             <ScrollReveal>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-text-primary leading-tight animate-hero-reveal" style={{ animationFillMode: 'both' }}>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-text-primary leading-tight animate-hero-reveal">
                 Engineering Intelligence<br />
                 for the <span className="text-primary-600">Modern Enterprise</span>
               </h1>
@@ -443,13 +443,13 @@ export function LandingPage() {
               <p className="font-bold text-lg text-text-primary">Nexus</p>
               <p className="text-sm text-text-tertiary mt-2">Engineering Intelligence Platform</p>
               <div className="flex gap-4 mt-6">
-                <a href="#" className="text-text-tertiary hover:text-text-primary transition-colors" aria-label="GitHub">
+                <a href="#" className="text-text-tertiary hover:text-text-primary transition-colors rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500" aria-label="GitHub">
                   <GithubIcon className="w-5 h-5" />
                 </a>
-                <a href="#" className="text-text-tertiary hover:text-text-primary transition-colors" aria-label="Twitter">
+                <a href="#" className="text-text-tertiary hover:text-text-primary transition-colors rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500" aria-label="Twitter">
                   <TwitterIcon className="w-5 h-5" />
                 </a>
-                <a href="#" className="text-text-tertiary hover:text-text-primary transition-colors" aria-label="LinkedIn">
+                <a href="#" className="text-text-tertiary hover:text-text-primary transition-colors rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500" aria-label="LinkedIn">
                   <LinkedinIcon className="w-5 h-5" />
                 </a>
               </div>
@@ -464,7 +464,7 @@ export function LandingPage() {
                 <ul className="space-y-1">
                   {col.links.map((link) => (
                     <li key={link}>
-                      <a href={`#/legal/${link.toLowerCase()}`} className="text-sm text-text-tertiary hover:text-text-primary transition-colors block py-1">
+                      <a href={`#/legal/${link.toLowerCase()}`} className="text-sm text-text-tertiary hover:text-text-primary transition-colors block py-1 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500">
                         {link}
                       </a>
                     </li>
