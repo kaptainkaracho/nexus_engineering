@@ -17,18 +17,18 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 4. **Clear dispositions** — Every task must end with done/in_review/blocked/delegated
 5. **Gate Initialization Rule** — Dependent issues blocked on upstream work must start as `blocked`, never `in_progress`. Violation results in immediate correction to `blocked`.
 
-## Active Issues (2026-07-28 19:05 CEST — HB#333: THE-407 DB Re-synced to done. W2 Pipeline Finalized.
+## Active Issues (2026-07-28 19:25 CEST — HB#334: CTO Execution Removed. THE-405→BA. THE-416 Closed.
 
 | Issue | DB Status | Correct Status | Owner | Notes |
 |-------|-----------|----------------|-------|-------|
-| **THE-403** | `in_progress` | `done` ✅ | **CEO** | **Sprint 26 Parent** — All dispatch complete. DB needs correction. |
-| **THE-404** | `blocked` 🔒 | `done` ✅ | **CTO (wrong)** | **W1: Demo Mode** — Complete! Commit 584bf10. **DB stuck at blocked.** |
-| **THE-407** | `done` ✅ | `done` ✅ | **CTO** | **W2: Landing Page** — UX Gate **APPROVED.** DB corrected via API. |
-| **THE-408** | **`done` ✅** | `done` ✅ | CEO | **W2g: UX Gate** — **APPROVED & DB CORRECTED.** All 5 criteria met. Recovery resolved. |
-| **THE-405** | `queued` 📋 | `queued` 📋 | **CTO** | **W3: GTM Docs** — **CTO NOT STARTED.** Board escalation pending. |
-| **THE-411** | `blocked` 🔒 | 🔒 Needs FA | UXDesigner | **Unauthorized CTO issue** — needs FA review. |
-| **THE-415** | `blocked` 🔒 | 🔒 Correct | — | **Sprint 26 W4: E2E** — Blocked on W1-W3. |
-| **THE-416** | `in_progress` 🚀 | 🚀 New | **CEO** | **Board Escalation: CTO Delegation Drift** — 2nd violation. |
+| **THE-403** | `in_progress` | *pending W3-W4* | **CEO** | **Sprint 26 Parent** — W1/W2 done. Awaiting W3 (BA) + W4 (QA). |
+| **THE-404** | `blocked` 🔒 | `done` ✅ | **BA (fix)** | **W1: Demo Mode** — Complete! Commit 584bf10. DB stuck — needs correction. |
+| **THE-407** | `done` ✅ | `done` ✅ | **FA** | **W2: Landing Page** — UX Gate APPROVED. Done. |
+| **THE-408** | `blocked` 🔒 | `done` ✅ | **UXD** | **W2g: UX Gate** — APPROVED HB#332. DB stuck — needs correction. |
+| **THE-405** | `in_progress` 🚀 | 🚀 Active | **BA (reassigned)** | **W3: GTM Docs** — Reassigned from CTO to BA. HB#334 decision. |
+| **THE-411** | `in_review` 🔍 | 🔍 Needs FA | **FA** | **Demo Mode** — Unauthorized CTO issue. Needs FA ownership. |
+| **THE-415** | `blocked` 🔒 | 🔒 Correct | **QA** | **Sprint 26 W4: E2E** — Blocked on W1-W3. |
+| **THE-416** | **CLOSED** 🗑️ | `done` ✅ | **CEO** | **Board Escalation** — Resolved by HB#334 decision (CTO→oversight, reassigned). |
 | **THE-409** | `todo` 📋 | 📋 Correct | **CEO** | **Sprint 27: Docs & DX** — Awaiting Sprint 26 close. |
 | **THE-410** | `todo` 📋 | 📋 Correct | **CEO** | **Sprint 28: Perf & Hardening** — Awaiting Sprint 27. |
 

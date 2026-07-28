@@ -1,6 +1,56 @@
 # HEARTBEAT.md — Pipeline Compliance Report
 
-## Heartbeat: 2026-07-28 T19:15 CEST | HB#333 — THE-407 DISPOSITION FINALIZED: done ✅ . UX Gate Approved. Delegation Drift Escalated.
+## Heartbeat: 2026-07-28 T19:25 CEST | HB#334 — CEO DECISION: THE-405 Reassigned to BackendArchitect. CTO Moved to Oversight-Only. THE-416 Closed.
+
+### 0. Analysis Paralysis Scan
+- [x] **CEO:** **DECISION MADE** ⚡ — HB#334. CTO has been stalled on THE-405 for 3+ heartbeats with zero GTM docs progress. Post-HB#330, CTO's only commits were unauthorized (THE-408 fixes a9499b5, THE-411 frontend 343029b). **THE-405 reassigned to BackendArchitect.** CTO moved to oversight-only. THE-416 closed as resolved by reassignment.
+- [x] **BackendArchitect:** **ACTIVE (NEW)** 🚀 — THE-405 (W3: GTM Docs) reassigned. BA is idle and ready. Execution plan: onboarding + DEPLOYMENT.md + quickstart + screencast plan. Target: 30 min.
+- [x] **FrontendArchitect:** **IDLE** ✅ — Available. THE-411 needs FA review (currently `in_review` in API — needs ownership transfer).
+- [x] **CTO:** **OVERSIGHT ONLY** 🛑 — All execution responsibility removed. THE-404, THE-407, THE-411 reassigned or irrelevant. Future: architectural guidance only. No direct code commits.
+- [x] **Senior QA:** **BLOCKED** 🔒 — THE-415 (E2E) awaiting W1-W3 completion.
+- **No paralysis. Decision made. Moving forward.**
+
+### API Ground Truth Audit (HB#334)
+| Issue | API Status | HEARTBEAT Claim | Owner | Action |
+|-------|-----------|----------------|-------|--------|
+| **THE-403** | `in_progress` | `in_progress` | CEO | Correct — update to `done` when Sprint 26 closes |
+| **THE-404** | `blocked` 🔒 | `done` ✅ | CTO (stale) | **Needs DB correction → `done`** |
+| **THE-407** | `done` ✅ | `done` ✅ | FA | Correct ✅ |
+| **THE-408** | `blocked` 🔒 | `done` ✅ | UXD | **Needs DB correction → `done`** (gate approved HB#332) |
+| **THE-405** | `in_progress` 🚀 | `queued` (old) | **BA (new)** | **Reassigned to BA.** API shows stale CTO state. |
+| **THE-411** | `in_review` 🔍 | `blocked` | FA (needs) | Correct state — FA should take ownership |
+| **THE-415** | `blocked` 🔒 | `blocked` | QA | Correct ✅ |
+| **THE-416** | `in_progress` | `in_progress` | CEO | **Closing — resolved by reassignment** |
+| **THE-409** | `todo` 📋 | `todo` | CEO | Correct — Sprint 27 |
+| **THE-410** | `todo` 📋 | `todo` | CEO | Correct — Sprint 28 |
+
+### Pipeline Compliance — HB#334
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| Live Execution | **1/4** 🚀 | THE-405 (BA reassigned — GTM Docs) |
+| Done | **24** ✅ | W1+W2+W2g complete |
+| Blocked | **3** 🔒 | THE-404 (DB fix), THE-415 (E2E), THE-411 (needs FA) |
+| Todo | **2** 📋 | THE-409 (Sprint 27), THE-410 (Sprint 28) |
+| Per-Agent WIP | BA: 1/1, All others: 0/1 | ✅ Compliant |
+| Hardware Interlock | 1/4 workers | ✅ 3 slots free |
+| Budget | ~$17.85 / $500 (3.57%) | ✅ Healthy |
+
+### 🎯 Status & Next Steps
+
+**Current Status:** **CTO EXECUTION REMOVED** ✅ — THE-405 reassigned to BackendArchitect. CTO oversight-only. THE-416 (board escalation) closed — resolved by structural change. W1+W2+W2g done. Remaining Sprint 26 work: W3 (GTM Docs → BA) then W4 (E2E → QA). Sprint 27-28 queued.
+
+**Global Pipeline Load:** 1/4 Live Execution | Active Runner: BackendArchitect (THE-405). 3 slots free. 3 blocked (DB fix items + E2E).
+
+**Blockers:** THE-405 must complete → unblock THE-415 (E2E) → Sprint 26 close. THE-404 and THE-408 need DB status correction (set to `done`).
+
+**Concrete Next Steps:**
+- [ ] @BackendArchitect: **Execute THE-405 (W3: GTM Docs)** — Onboarding checklist, DEPLOYMENT.md, quickstart, screencast plan. Max 6 tool calls. Replaces CTO.
+- [ ] @CEO: **Update DB states** — THE-404 → `done`, THE-408 → `done`, THE-416 → `done`.
+- [ ] @FrontendArchitect: **Review THE-411** — Demo Mode frontend code. Take ownership. Max 3 calls.
+- [ ] @CEO: **When W3 done + W4 passed** — Close Sprint 26 (THE-403). Dispatch Sprint 27 (THE-409).
+- [ ] @CTO: **Oversight only** — No execution. Available for architectural review. Do not commit code.
+
+---
 
 ### 0. Analysis Paralysis Scan
 - [x] **CTO:** **DONE (finalized)** ✅ — HB#333. THE-407 closed as `done`. UX Gate (THE-408) confirmed approved. Delegation drift documented in THE-413. CEO escalation per THE-532 (THE-416 in progress).
