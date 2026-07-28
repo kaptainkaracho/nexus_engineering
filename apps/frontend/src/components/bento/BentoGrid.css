@@ -14,16 +14,17 @@
 
 /* ============================================
    Landing Page Feature Grid
-   6 features: 2 featured (large) + 4 standard
+   6 features: 1 featured (large) + 5 standard
    ============================================ */
 
-/* Desktop: 3-column asymmetric */
+/* Desktop: 3-column, 3 rows */
 .bento-feature-grid {
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: auto auto;
+  grid-template-rows: auto auto auto;
   grid-template-areas:
     "feature-main feature-main feature-side"
-    "feature-wide feature-square feature-square";
+    "feature-wide feature-tall feature-wide-2"
+    "feature-square-2 feature-square-2 feature-square-2";
 }
 
 /* Tablet: 2-column */
@@ -34,7 +35,8 @@
     grid-template-areas:
       "feature-main feature-main"
       "feature-side feature-wide"
-      "feature-square feature-square";
+      "feature-tall feature-wide-2"
+      "feature-square-2 feature-square-2";
   }
 }
 
@@ -47,7 +49,9 @@
       "feature-main"
       "feature-side"
       "feature-wide"
-      "feature-square";
+      "feature-tall"
+      "feature-wide-2"
+      "feature-square-2";
   }
 }
 
@@ -100,6 +104,8 @@
 .bento-cell[data-area="feature-side"] { grid-area: feature-side; }
 .bento-cell[data-area="feature-wide"] { grid-area: feature-wide; }
 .bento-cell[data-area="feature-tall"] { grid-area: feature-tall; }
+.bento-cell[data-area="feature-wide-2"] { grid-area: feature-wide-2; }
+.bento-cell[data-area="feature-square-2"] { grid-area: feature-square-2; }
 .bento-cell[data-area="feature-square"] { grid-area: feature-square; }
 .bento-cell[data-area="adr-main"] { grid-area: adr-main; }
 .bento-cell[data-area="adr-side"] { grid-area: adr-side; }

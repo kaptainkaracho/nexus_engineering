@@ -218,11 +218,27 @@ export function LandingPage() {
                     variant="standard"
                   />
                 </BentoCell>
-                <BentoCell area="feature-square" className="min-h-[180px]">
+                <BentoCell area="feature-tall" className="min-h-[180px]">
                   <BentoFeatureCard
                     icon={BarChart3}
                     title={features[3].title}
                     description={features[3].description}
+                    variant="standard"
+                  />
+                </BentoCell>
+                <BentoCell area="feature-wide-2" className="min-h-[180px]">
+                  <BentoFeatureCard
+                    icon={Shield}
+                    title={features[4].title}
+                    description={features[4].description}
+                    variant="standard"
+                  />
+                </BentoCell>
+                <BentoCell area="feature-square-2" className="min-h-[180px]">
+                  <BentoFeatureCard
+                    icon={Rocket}
+                    title={features[5].title}
+                    description={features[5].description}
                     variant="standard"
                   />
                 </BentoCell>

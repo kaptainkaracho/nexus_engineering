@@ -7,6 +7,8 @@ export type BentoArea =
   | 'feature-side'
   | 'feature-wide'
   | 'feature-tall'
+  | 'feature-wide-2'
+  | 'feature-square-2'
   | 'feature-square'
   | 'adr-main'
   | 'adr-side'
