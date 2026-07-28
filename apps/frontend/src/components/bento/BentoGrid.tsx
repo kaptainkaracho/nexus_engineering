@@ -80,7 +80,7 @@ export function BentoCell({ area, span, className, children }: BentoCellProps) {
   if (span) style.gridColumn = span;
 
   return (
-    <div className={cn('bento-cell', className)} style={style}>
+    <div className={cn('bento-cell', className)} style={style} data-area={area}>
       {children}
     </div>
   );

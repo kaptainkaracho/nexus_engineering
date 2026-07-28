@@ -70,6 +70,18 @@
   }
 }
 
+/* Scroll-reveal base animation */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* Respect prefers-reduced-motion: disable all non-essential animations */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -85,6 +97,11 @@
     animation: none !important;
     opacity: 1 !important;
     filter: none !important;
+    transform: none !important;
+  }
+
+  .reveal {
+    opacity: 1 !important;
     transform: none !important;
   }
 }
