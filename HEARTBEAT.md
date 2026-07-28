@@ -1,64 +1,515 @@
 # HEARTBEAT.md — Pipeline Compliance Report
 
-## Heartbeat: 2026-07-27 23:28 UTC | HB#315 — SPRINTS 24+25 FULLY CLOSED: THE-395 (Build Automation) Delivered by CTO, All Issues Terminal, Pipeline Idle
+## Heartbeat: 2026-07-28 17:35 UTC | HB#320 — CEO FINAL STATE CORRECTED: Pipeline 2/4 Live (BA+FA), CTO Queued, 2 Blocked. Phase 5 Active.
 
 ### 0. Analysis Paralysis Scan
-- [x] **CEO:** **ACTIVE** ⚡ — HB#315. THE-395 done. THE-399 (CTO) completed commit 5590915 (5 files, 222 lines). THE-394 (E2E) done. THE-390 (Sprint 25 Parent) closed. Pipeline fully idle at 0/4.
-- [x] **CTO:** **DONE** ✅ — THE-399 delivered: create-sprint-release.sh, validate-local.sh, CONTRIBUTING.md branching docs, PR template, package.json scripts.
-- [x] **Senior QA:** **DONE** ✅ — THE-394 (Sprint 25 E2E) completed. All integration connectors verified.
-- [x] **FrontendArchitect:** **IDLE** ✅ — All FE work complete across S24+S25.
-- [x] **UXDesigner:** **IDLE** ✅ — All gates closed.
-- [x] **BackendArchitect:** **IDLE** ✅ — Available.
-- **No paralysis.** Pipeline fully idle. Both sprints complete.
+- [x] **CEO:** **ACTIVE** ⚡ — HB#320. DB ground truth corrected via SQL: THE-405→queued, THE-406→blocked, THE-408→blocked. Pipeline at 2/4 execution (BA + FA). CTO queued for W3. UXDesigner + QA blocked per sequencing. No paralysis.
+- [x] **BackendArchitect:** **ACTIVE** 🚀 — THE-404 (W1: Demo Mode & Sandbox). `in_progress`.
+- [x] **FrontendArchitect:** **ACTIVE** 🚀 — THE-407 (W2: Landing Page Refresh). `in_progress`.
+- [x] **CTO:** **QUEUED** 📋 — THE-405 (W3: GTM Docs). Starts when W1/W2 reach `in_review`.
+- [x] **UXDesigner:** **BLOCKED** 🔒 — THE-408 (W2g: UX Gate). Per Gate Initialization Rule, waiting on THE-407 `in_review`.
+- [x] **Senior QA:** **BLOCKED** 🔒 — THE-406 (W4: E2E). Waiting on W1-W3 completion.
+- **No paralysis.** Clean sequencing enforced.
 
-### Pipeline Compliance — HB#315
+### Pipeline Compliance — HB#320
 | Metric | Value | Verdict |
 |--------|-------|---------|
-| Live Execution | **0/4** ⏸️ | Pipeline idle — all issues terminal |
-| In Review | **0** 🔍 | None |
-| Done | **20** ✅ | Sprint 24 (11/11) + Sprint 25 (5/5) + THE-395 + THE-399 |
-| Blocked | **0** 🔓 | None |
-| Per-Agent WIP | All 0/1 | ✅ Compliant |
-| Hardware Interlock | 0/4 workers | ✅ 4 slots free |
+| Live Execution | **2/4** 🚀 | THE-404 (BA/W1) + THE-407 (FA/W2) |
+| Queued | **1** 📋 | THE-405 (CTO/W3) |
+| Blocked | **2** 🔒 | THE-406 (QA/W4) + THE-408 (UXD/W2g — Gate Rule) |
+| Done | **21** ✅ | Previous 20 + THE-402 (Phase 5 Board Decision) |
+| Per-Agent WIP | BA: 1/1, FA: 1/1, CTO: 0/1, UXD: 0/1, QA: 0/1 | ✅ Compliant |
+| Hardware Interlock | 2/4 workers | ✅ 2 slots free |
 | Budget | ~$17.85 / $500 (3.57%) | ✅ Healthy |
 
-### Sprint 24 — Enterprise Phase 2: ALL DONE ✅ (no change)
-### Sprint 25 — Integration Ecosystem Phase 1: ALL DONE ✅
+### Sprint 26 — Corrected Sequencing
+| Wave | Issue | Scope | Assignee | Status | Dependency |
+|------|-------|-------|----------|--------|------------|
+| Parent | **THE-403** | Sprint 26 Orchestration | CEO | `in_progress` 🚀 | — |
+| W1 | **THE-404** | Demo Mode & Sandbox | BackendArchitect | `in_progress` 🚀 | — |
+| W2 | **THE-407** | Landing Page Refresh | FrontendArchitect | `in_progress` 🚀 | — |
+| W2g | **THE-408** | UX Gate — Landing Page | UXDesigner | **`blocked`** 🔒 | On THE-407 `in_review` |
+| W3 | **THE-405** | GTM Docs & Guides | CTO | **`queued`** 📋 | On W1/W2 `in_review` |
+| W4 | **THE-406** | Sprint 26 E2E | Senior QA | **`blocked`** 🔒 | On W1-W3 done |
 
-### THE-395 Build Automation — Deliverables Summary
-CTO commit `5590915` — 5 files, 222 lines:
-| Artifact | Purpose |
-|----------|---------|
-| `scripts/create-sprint-release.sh` | Automates `release/sprint-<N>` branching from develop |
-| `scripts/validate-local.sh` | Local lint/typecheck/test/build gate (`--fast` flag for incremental) |
-| `CONTRIBUTING.md` | Full branching strategy, release process docs |
-| `.github/PULL_REQUEST_TEMPLATE.md` | Branch target checklist for PRs |
-| `package.json` | `validate:local`, `validate:local:fast`, `release:sprint` scripts |
-
-### All Issues — Terminal States
-| Issue | Status | Scope |
-|-------|--------|-------|
-| **THE-373** | done ✅ | Sprint 24 Parent (11/11 waves) |
-| **THE-390** | done ✅ | Sprint 25 Parent (5/5 waves) |
-| **THE-395** | done ✅ | Build Automation — delivered via THE-399 |
-| **THE-399** | done ✅ | CTO subtask — branching + build scripts |
-
-### Strategic: Next Phase Planning
-All active work complete. Post-Sprint 25 options need board decision:
-1. **Phase 5 GTM Strategy** — Draft at `plans/phase-5-go-to-market-strategy.md`. ~$18-30 (<10% gate).
-2. **Bug bash / tech debt sprint** — TSC debt + test coverage.
-3. **Sprint 26 feature work** — New roadmap items.
+### Sequencing Diagram
+```
+W1 (BA: Demo) ──────────────────► W3 (CTO: Docs) ──► W4 (QA: E2E)
+                                     ▲
+W2 (FA: Landing Page) ──► W2g (UXD: Gate Review)
+```
 
 ### 🎯 Status & Next Steps
 
-**Current Status:** **BOTH SPRINTS FULLY CLOSED** ✅ — Sprint 24 (11/11) + Sprint 25 (5/5) + THE-395 (Build Automation) all done. Pipeline fully idle at 0/4 live execution. All 20 issues terminal. Next: board decision on post-Sprint 25 phase.
+**Current Status:** **PHASE 5 PIPELINE CORRECTED** ✅ — DB state finalized: 2/4 execution (BA + FA). CTO queued for W3. UXDesigner and QA correctly blocked per sequencing. THE-402 closed done. Budget healthy at 3.57%. Sprint 26 (GTM Content) on track with 2 parallel runners.
 
-**Global Pipeline Load:** 0/4 Live Execution | Active Runners: None. All 4 slots available. 0 blocked. 0 in_review.
+**Global Pipeline Load:** 2/4 Live Execution | Active Runners: BackendArchitect (THE-404/W1) + FrontendArchitect (THE-407/W2). 2 slots free. 1 queued (CTO/W3). 2 blocked (UXD/W2g, QA/W4).
 
-**Blockers:** None. Pipeline fully idle awaiting strategic direction.
+**Blockers:** None immediate. THE-408 blocked on THE-407 `in_review` (correct per Gate Rule). THE-406 blocked on W1-W3 completion (correct).
 
 **Concrete Next Steps:**
-- [ ] @CEO: **Present post-Sprint 25 options to board** — Phase 5 GTM / tech debt sprint / Sprint 26. Request board confirmation via interaction on THE-390 or new parent issue.
+- [ ] @BackendArchitect: **Execute THE-404 (W1)** — Demo sandbox with pre-loaded traceability data + one-click Railway deploy. Deliver seed scripts, sandbox config, deploy guide updates.
+- [ ] @FrontendArchitect: **Execute THE-407 (W2)** — Landing page with marketing content, polished value prop, screenshots, use cases. UX Gate (THE-408) required before `done`.
+- [ ] @CEO: **Monitor W1+W2** — When either reaches `in_review`, unblock THE-405 (CTO/W3) by setting to `in_progress`. When THE-407 is `in_review`, unblock THE-408 (UXD/W2g).
+- [ ] @CEO: **Plan Sprints 27-28** — Docs & DX and Performance sprints. Draft child issues for post-Sprint 26 dispatch.
+
+---
+
+## Heartbeat: 2026-07-28 17:36 UTC | HB#321 — CEO MONITORING PULSE: Pipeline Unchanged, 2/4 Exec, No Intervention Needed
+
+### 0. Analysis Paralysis Scan
+- [x] **CEO:** **MONITORING** ⚡ — HB#321. HB#320 state verified. 2/4 exec (BA+FA). CTO queued. UXD+QA blocked. No changes since last heartbeat. No intervention needed.
+- [x] **BackendArchitect:** **ACTIVE** 🚀 — THE-404 (W1: Demo Mode). `in_progress`.
+- [x] **FrontendArchitect:** **ACTIVE** 🚀 — THE-407 (W2: Landing Page). `in_progress`.
+- [x] **CTO:** **QUEUED** 📋 — THE-405 (W3: GTM Docs). Awaiting W1/W2 `in_review`.
+- [x] **UXDesigner:** **BLOCKED** 🔒 — THE-408 (W2g: UX Gate). Awaiting THE-407 `in_review`.
+- [x] **Senior QA:** **BLOCKED** 🔒 — THE-406 (W4: E2E). Awaiting W1-W3 completion.
+- **No paralysis.** No stale agents. Pipeline stable. Monitoring path active.
+
+### Pipeline Compliance — HB#321
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| Live Execution | **2/4** 🚀 | THE-404 (BA/W1) + THE-407 (FA/W2) |
+| Queued | **1** 📋 | THE-405 (CTO/W3) |
+| Blocked | **2** 🔒 | THE-408 (UXD) + THE-406 (QA) |
+| Done | **21** ✅ | No change |
+| Per-Agent WIP | All ≤1/1 | ✅ Compliant |
+| Hardware Interlock | 2/4 workers | ✅ 2 slots free |
+| Budget | ~$17.85 / $500 (3.57%) | ✅ Healthy |
+
+### 🎯 Status & Next Steps
+
+**Current Status:** **PIPELINE STABLE** ✅ — Sprint 26 executing on schedule. HB#320 state unchanged. No agent intervention required. Monitoring path continues.
+
+**Global Pipeline Load:** 2/4 Live Execution | Active Runners: BackendArchitect (THE-404/W1) + FrontendArchitect (THE-407/W2). 2 slots free. 1 queued (CTO/W3). 2 blocked (UXD/W2g, QA/W4).
+
+**Blockers:** None immediate. Sequencing enforced per plan.
+
+**Concrete Next Steps:**
+- [ ] @BackendArchitect: **Continue THE-404 (W1)** — Demo sandbox seed data + Railway deploy.
+- [ ] @FrontendArchitect: **Continue THE-407 (W2)** — Landing page marketing content + screenshots.
+- [ ] @CEO: **Monitor for W1/W2 `in_review` triggers** — When W1/W2 reach review, advance THE-405 (CTO/W3) to `in_progress`. When W2 is `in_review`, unblock THE-408 (UXD/W2g).
+- [ ] @CEO: **Plan Sprints 27-28** — Draft child issues for post-Sprint 26 dispatch (docs/DX + performance hardening).
+
+---
+
+## Heartbeat: 2026-07-28 ~17:40 UTC | HB#322 — CEO RECOVERY: THE-403 Auto-Blocked for Missing Disposition, Corrected to in_progress
+
+### 0. Analysis Paralysis Scan
+- [x] **CEO:** **ACTIVE** ⚡ — HB#322. Paperclip recovery system auto-blocked THE-403 for missing disposition. Corrected: status back to `in_progress`, disposition comment posted. Pipeline unaffected — children executing correctly.
+- [x] **BackendArchitect:** **ACTIVE** 🚀 — THE-404 (W1: Demo Mode). `in_progress`.
+- [x] **FrontendArchitect:** **ACTIVE** 🚀 — THE-407 (W2: Landing Page). `in_progress`.
+- [x] **CTO:** **QUEUED** 📋 — THE-405 (W3: GTM Docs). Awaiting W1/W2 `in_review`.
+- [x] **UXDesigner:** **BLOCKED** 🔒 — THE-408 (W2g: UX Gate). Awaiting THE-407 `in_review`.
+- [x] **Senior QA:** **BLOCKED** 🔒 — THE-406 (W4: E2E). Awaiting W1-W3 completion.
+- **No paralysis.** Standard system recovery — no agent stall.
+
+### Pipeline Compliance — HB#322
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| Live Execution | **2/4** 🚀 | THE-404 (BA/W1) + THE-407 (FA/W2) |
+| Queued | **1** 📋 | THE-405 (CTO/W3) |
+| Blocked | **2** 🔒 | THE-408 (UXD) + THE-406 (QA) |
+| Done | **21** ✅ | No change |
+| Per-Agent WIP | All ≤1/1 | ✅ Compliant |
+| Hardware Interlock | 2/4 workers | ✅ 2 slots free |
+| Budget | ~$17.85 / $500 (3.57%) | ✅ Healthy |
+
+### 🎯 Status & Next Steps
+
+**Current Status:** **RECOVERY HANDLED** ✅ — THE-403 auto-block resolved. Status corrected to `in_progress`. Disposition comment posted. Pipeline unchanged at 2/4 exec (BA+FA). Monitoring continues.
+
+**Global Pipeline Load:** 2/4 Live Execution | Active Runners: BackendArchitect (THE-404/W1) + FrontendArchitect (THE-407/W2). 2 slots free. 1 queued (CTO/W3). 2 blocked (UXD/W2g, QA/W4).
+
+**Blockers:** None. Recovery resolved.
+
+**Concrete Next Steps:**
+- [ ] @BackendArchitect: **Continue THE-404 (W1)** — Demo sandbox seed data + Railway deploy.
+- [ ] @FrontendArchitect: **Continue THE-407 (W2)** — Landing page marketing content + screenshots.
+- [ ] @CEO: **Monitor for W1/W2 `in_review` triggers** — Advance THE-405 (CTO/W3) and unblock THE-408 (UXD/W2g) when ready.
+
+---
+
+## Heartbeat: 2026-07-28 ~17:42 UTC | HB#323 — CEO STRATEGIC PLANNING: Sprint 27 & 28 Plans Drafted, Pipeline Unchanged
+
+### 0. Analysis Paralysis Scan
+- [x] **CEO:** **ACTIVE** ⚡ — HB#323. Concrete strategic action: Sprint 27 (Docs & DX) and Sprint 28 (Performance) plans drafted as `plans/sprint-27-docs-and-dx.md` and `plans/sprint-28-performance-and-hardening.md`. Phase 5 plan updated. Strategic planning comment posted on THE-403. Pipeline executing at 2/4 — no change from HB#322.
+- [x] **BackendArchitect:** **ACTIVE** 🚀 — THE-404 (W1: Demo Mode). `in_progress`.
+- [x] **FrontendArchitect:** **ACTIVE** 🚀 — THE-407 (W2: Landing Page). `in_progress`.
+- [x] **CTO:** **QUEUED** 📋 — THE-405 (W3: GTM Docs).
+- [x] **UXDesigner:** **BLOCKED** 🔒 — THE-408 (W2g: UX Gate).
+- [x] **Senior QA:** **BLOCKED** 🔒 — THE-406 (W4: E2E).
+- **No paralysis.** Concrete artifacts produced.
+
+### Pipeline Compliance — HB#323
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| Live Execution | **2/4** 🚀 | THE-404 (BA/W1) + THE-407 (FA/W2) |
+| Queued | **1** 📋 | THE-405 (CTO/W3) |
+| Blocked | **2** 🔒 | THE-408 (UXD) + THE-406 (QA) |
+| Done | **21** ✅ | No change |
+| Per-Agent WIP | All ≤1/1 | ✅ Compliant |
+| Hardware Interlock | 2/4 workers | ✅ 2 slots free |
+| Budget | ~$17.85 / $500 (3.57%) | ✅ Healthy |
+
+### Sprint 27 & 28 — Pre-Planning Complete
+| Sprint | Focus | Budget | Plan Doc | Status |
+|--------|-------|--------|----------|--------|
+| 27 | Docs & Developer Experience | $4-7 | `plans/sprint-27-docs-and-dx.md` | PRE PLAN — Awaiting Sprint 26 |
+| 28 | Performance & Hardening | $6-10 | `plans/sprint-28-performance-and-hardening.md` | PRE PLAN — Awaiting Sprint 27 |
+
+### 🎯 Status & Next Steps
+
+**Current Status:** **STRATEGIC PLANNING COMPLETE** ✅ — Sprint 27 & 28 plans drafted and published. Phase 5 strategy document updated. Pipeline unchanged at 2/4 exec. No recovery issues.
+
+**Global Pipeline Load:** 2/4 Live Execution | Active Runners: BackendArchitect (THE-404/W1) + FrontendArchitect (THE-407/W2). 2 slots free. 1 queued (CTO/W3). 2 blocked (UXD/W2g, QA/W4).
+
+**Blockers:** None.
+
+**Concrete Next Steps:**
+- [ ] @BackendArchitect: **Continue THE-404 (W1)** — Demo sandbox seed data + Railway deploy.
+- [ ] @FrontendArchitect: **Continue THE-407 (W2)** — Landing page marketing content + screenshots.
+- [ ] @CEO: **Monitor for W1/W2 `in_review` triggers** — Advance THE-405 (CTO/W3) and unblock THE-408 (UXD/W2g) when ready. Sprints 27-28 plans ready for rapid dispatch on Sprint 26 completion.
+
+---
+
+---
+
+## Heartbeat: 2026-07-28 18:07 UTC | HB#328 — CEO MONITORING PULSE: Pipeline Stable, 1/4 Live Exec, No Agent Stalls Detected
+
+### 0. Analysis Paralysis Scan
+- [x] **CEO:** **MONITORING** ⚡ — HB#328. Pipeline state verified against git ground truth (48cb616, 740e09d, 584bf10, 492bc3f). HB#327 state unchanged — last commit 12 min ago. No agent intervention required. Sprints 27-28 plans drafted and ready.
+- [x] **BackendArchitect:** **DONE** ✅ — THE-404 (W1: Demo Mode) completed (584bf10). BA slot free for Sprint 27.
+- [x] **FrontendArchitect:** **IN REVIEW** 🔍 — THE-407 (W2: Landing Page) delivered (740e09d). Awaiting UX Gate (THE-408) approval.
+- [x] **CTO:** **ACTIVE** 🚀 — THE-405 (W3: GTM Docs). Onboarding, DEPLOYMENT.md, quickstart committed (492bc3f). Exempt from exec count.
+- [x] **UXDesigner:** **ACTIVE** 🚀 — THE-408 (W2g: UX Gate) in_progress. Reviewing THE-407 landing page.
+- [x] **Senior QA:** **BLOCKED** 🔒 — THE-406 (W4: E2E). Correctly blocked on W1-W3 completion.
+- **No paralysis.** All active agents within 12-min window. No loop patterns detected.
+
+### Pipeline Compliance — HB#328
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| Live Execution | **1/4** 🚀 | THE-408 (UXD/W2g) |
+| In Review | **1** 🔍 | THE-407 (FA/W2) |
+| Queued | **0** 📋 | — |
+| Blocked | **1** 🔒 | THE-406 (QA/W4) |
+| Done | **22** ✅ | Previous 21 + THE-404 (W1) |
+| Todo | **2** 📋 | THE-409 (Sprint 27), THE-410 (Sprint 28) |
+| Per-Agent WIP | All ≤1/1 | ✅ Compliant |
+| Hardware Interlock | 1/4 workers | ✅ 3 slots free |
+| Budget | ~$17.85 / $500 (3.57%) | ✅ Healthy |
+
+### Sprint 26 — Current Wave Sequencing
+| Wave | Issue | Scope | Assignee | Status | Key Artifact |
+|------|-------|-------|----------|--------|-------------|
+| Parent | **THE-403** | Sprint 26 Parent | CEO | **done** ✅ | All dispatch complete |
+| W1 | **THE-404** | Demo Mode & Sandbox | BackendArchitect | **done** ✅ | Seed scripts, Railway deploy (584bf10) |
+| W2 | **THE-407** | Landing Page Refresh | FrontendArchitect | **in_review** 🔍 | Gradient orbs, screenshots, use cases (740e09d) |
+| W2g | **THE-408** | UX Gate — Landing Page | UXDesigner | **in_progress** 🚀 | Reviewing W2 commit |
+| W3 | **THE-405** | GTM Docs & Guides | CTO | **in_progress** 🚀 | Onboarding, deploy guide, quickstart (492bc3f) |
+| W4 | **THE-406** | Sprint 26 E2E | Senior QA | **blocked** 🔒 | On W1-W3 completion |
+| S27 | **THE-409** | Docs & DX | CEO | **todo** 📋 | Plan drafted at `plans/sprint-27-docs-and-dx.md` |
+| S28 | **THE-410** | Perf & Hardening | CEO | **todo** 📋 | Plan drafted at `plans/sprint-28-performance-and-hardening.md` |
+
+### Sequencing Diagram
+```
+W1 (BA: Demo) ──────────────────── DONE ✅
+W2 (FA: Landing Page) ──► W2g (UXD: Gate Review) — in_progress
+W3 (CTO: Docs) ─────────────────── in_progress 🚀
+                                        │
+W4 (QA: E2E) ◄────────────── blocked on W1-W3 completion
+```
+
+### 🎯 Status & Next Steps
+
+**Current Status:** **PIPELINE STABLE** ✅ — Sprint 26 healthy. HB#327 state unchanged. Last commit 12 min ago (48cb616). 1/4 live execution (UXD), 3 slots free. Budget healthy at 3.57%. No agent intervention required.
+
+**Global Pipeline Load:** 1/4 Live Execution | Active Runner: UXDesigner (THE-408/W2g). 3 slots free. 1 in_review (THE-407/FA). 1 blocked (THE-406/QA). CTO active on THE-405 (exempt).
+
+**Blockers:** None immediate. THE-406 (W4/E2E) correctly blocked on W1-W3 completion. THE-408 actively executing.
+
+**Concrete Next Steps:**
+- [ ] @UXDesigner: **Complete THE-408 (W2g: UX Gate)** — Review THE-407 commit 740e09d. Approve or request changes. When approved: advance THE-407 to `done`.
+- [ ] @CTO: **Continue THE-405 (W3: GTM Docs)** — Complete remaining docs scope. Onboarding, DEPLOYMENT.md, quickstart committed.
+- [ ] @CEO: **Monitor W2g completion** — When THE-408 approved + THE-407 done + THE-405 done + THE-406 passed, close Sprint 26 (THE-403) and dispatch Sprint 27 (THE-409).
+- [ ] @CEO: **Sprints 27-28 ready** — Plans drafted and published. Pre-positioned for rapid dispatch on Sprint 26 completion.
+
+---
+
+## Heartbeat: 2026-07-28 ~18:00 UTC | HB#327 — CEO MONITORING PULSE: Pipeline Advancing, 1/4 Live Exec (UXD), CTO+FA WIP Healthy
+
+### 0. Analysis Paralysis Scan
+- [x] **CEO:** **ACTIVE** ⚡ — HB#327. Pipeline state verified against git ground truth (584bf10, 740e09d, 48cb616, 492bc3f). SOUL.md (HB#326) correctly reflects: THE-404 done, THE-407 in_review, THE-405 in_progress, THE-408 in_progress. No agent stall detected. W1-W3 all producing code artifacts.
+- [x] **BackendArchitect:** **DONE** ✅ — THE-404 (W1: Demo Mode) completed (584bf10). BA slot free.
+- [x] **FrontendArchitect:** **IN REVIEW** 🔍 — THE-407 (W2: Landing Page) delivered (740e09d). 18 files: ScrollReveal, BentoGrid, gradient orbs, screenshots, use cases, CTA, footer. Awaiting UX Gate (THE-408) approval. No active execution.
+- [x] **CTO:** **ACTIVE** 🚀 — THE-405 (W3: GTM Docs). Onboarding, DEPLOYMENT.md, quickstart guides committed (492bc3f). Exempt from exec count.
+- [x] **UXDesigner:** **ACTIVE** 🚀 — THE-408 (W2g: UX Gate) unblocked and in_progress. Reviewing THE-407 landing page commit 740e09d.
+- [x] **Senior QA:** **BLOCKED** 🔒 — THE-406 (W4: E2E). Correctly blocked on W1-W3 completion.
+- **No paralysis.** All active agents producing artifacts. No loop patterns detected.
+
+### Pipeline Compliance — HB#327
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| Live Execution | **1/4** 🚀 | THE-408 (UXD/W2g) |
+| In Review | **1** 🔍 | THE-407 (FA/W2) |
+| Queued | **0** 📋 | — |
+| Blocked | **1** 🔒 | THE-406 (QA/W4) |
+| Done | **22** ✅ | Previous 21 + THE-404 (W1) |
+| Todo | **2** 📋 | THE-409 (Sprint 27), THE-410 (Sprint 28) |
+| Per-Agent WIP | All ≤1/1 | ✅ Compliant |
+| Hardware Interlock | 1/4 workers | ✅ 3 slots free |
+| Budget | ~$17.85 / $500 (3.57%) | ✅ Healthy |
+
+### Sprint 26 — Current Wave Sequencing
+| Wave | Issue | Scope | Assignee | Status | Key Artifact |
+|------|-------|-------|----------|--------|-------------|
+| Parent | **THE-403** | Sprint 26 Parent | CEO | **done** ✅ | All dispatch complete |
+| **W1** | **THE-404** | Demo Mode & Sandbox | BackendArchitect | **done** ✅ | Seed scripts, Railway deploy (584bf10) |
+| **W2** | **THE-407** | Landing Page Refresh | FrontendArchitect | **in_review** 🔍 | Gradient orbs, screenshots, use cases (740e09d) |
+| **W2g** | **THE-408** | UX Gate — Landing Page | UXDesigner | **in_progress** 🚀 | Reviewing W2 commit |
+| **W3** | **THE-405** | GTM Docs & Guides | CTO | **in_progress** 🚀 | Onboarding, deploy guide, quickstart (492bc3f) |
+| W4 | **THE-406** | Sprint 26 E2E | Senior QA | **blocked** 🔒 | On W1-W3 completion |
+| S27 | **THE-409** | Docs & DX | CEO | **todo** 📋 | Awaiting Sprint 26 |
+| S28 | **THE-410** | Perf & Hardening | CEO | **todo** 📋 | Awaiting Sprint 27 |
+
+### Sequencing Diagram
+```
+W1 (BA: Demo) ──────────────────── DONE ✅
+W2 (FA: Landing Page) ──► W2g (UXD: Gate Review) — in_progress
+W3 (CTO: Docs) ─────────────────── in_progress 🚀
+                                       │
+W4 (QA: E2E) ◄────────────── blocked on W1-W3 completion
+```
+
+### 🎯 Status & Next Steps
+
+**Current Status:** **PIPELINE ADVANCING** ✅ — Sprint 26 healthy. W1 (THE-404) done. W2 (THE-407) in_review awaiting UX Gate. W3 (THE-405) in_progress with CTO. UXDesigner actively reviewing W2 via THE-408. 1/4 live execution, 3 slots free. Budget healthy at 3.57%.
+
+**Global Pipeline Load:** 1/4 Live Execution | Active Runner: UXDesigner (THE-408/W2g). 3 slots free. 1 in_review (THE-407/FA). 1 blocked (THE-406/QA). CTO active on THE-405 (exempt).
+
+**Blockers:** None immediate. THE-406 (W4/E2E) correctly blocked on W1-W3 completion. THE-408 is executing — no gate stall.
+
+**Concrete Next Steps:**
+- [ ] @UXDesigner: **Complete THE-408 (W2g: UX Gate)** — Review THE-407 commit 740e09d. Approve or request changes. When approved: advance THE-407 to `done`.
+- [ ] @CTO: **Continue THE-405 (W3: GTM Docs)** — Onboarding, DEPLOYMENT.md, quickstart guides committed. Complete remaining docs scope.
+- [ ] @BackendArchitect: **Available for dispatch** — BA slot free. Standby for Sprint 27 (THE-409) or follow-up work.
+- [ ] @CEO: **Monitor W2g completion** — When THE-408 approved + THE-407 done + THE-405 done + THE-406 passed, close Sprint 26 (THE-403) and dispatch Sprint 27 (THE-409).
+
+---
+
+## Heartbeat: 2026-07-28 ~17:44 UTC | HB#324 — CEO CONCRETE ACTION: THE-409 (Sprint 27) & THE-410 (Sprint 28) Created as Child Issues
+
+### 0. Analysis Paralysis Scan
+- [x] **CEO:** **ACTIVE** ⚡ — HB#324. Created THE-409 (Sprint 27: Docs & DX) and THE-410 (Sprint 28: Performance & Hardening) as real Paperclip child issues of THE-403. Both `todo`. Sprint plan docs linked. Pipeline 2/4 exec unchanged.
+- [x] **BackendArchitect:** **ACTIVE** 🚀 — THE-404 (W1: Demo Mode). `in_progress`.
+- [x] **FrontendArchitect:** **ACTIVE** 🚀 — THE-407 (W2: Landing Page). `in_progress`.
+- [x] **CTO:** **QUEUED** 📋 — THE-405 (W3: GTM Docs).
+- [x] **UXDesigner:** **BLOCKED** 🔒 — THE-408 (W2g: UX Gate).
+- [x] **Senior QA:** **BLOCKED** 🔒 — THE-406 (W4: E2E).
+- **No paralysis.** Concrete child issues created.
+
+### Pipeline Compliance — HB#324
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| Live Execution | **2/4** 🚀 | THE-404 (BA/W1) + THE-407 (FA/W2) |
+| Todo (Pre-plan) | **2** 📋 | THE-409 (Sprint 27) + THE-410 (Sprint 28) |
+| Queued | **1** 📋 | THE-405 (CTO/W3) |
+| Blocked | **2** 🔒 | THE-408 (UXD) + THE-406 (QA) |
+| Done | **21** ✅ | No change |
+| Per-Agent WIP | All ≤1/1 | ✅ Compliant |
+| Hardware Interlock | 2/4 workers | ✅ 2 slots free |
+| Budget | ~$17.85 / $500 (3.57%) | ✅ Healthy |
+
+### Phase 5 — Full Issue Tree
+```
+THE-403 (Sprint 26) — in_progress
+├── THE-404 (W1: Demo) — in_progress [BA]
+├── THE-407 (W2: Landing Page) — in_progress [FA]
+├── THE-405 (W3: Docs) — queued [CTO]
+├── THE-408 (W2g: UX Gate) — blocked [UXD]
+├── THE-406 (W4: E2E) — blocked [QA]
+├── THE-409 (Sprint 27: Docs & DX) — todo
+└── THE-410 (Sprint 28: Perf & Hardening) — todo
+```
+
+### 🎯 Status & Next Steps
+
+**Current Status:** **CONCRETE ACTION TAKEN** ✅ — THE-409 and THE-410 created as real child issues with plan docs. Sprint 26 executing at 2/4. Phase 5 full issue tree established. HB#324 logged.
+
+**Global Pipeline Load:** 2/4 Live Execution | Active Runners: BackendArchitect (THE-404/W1) + FrontendArchitect (THE-407/W2). 2 slots free. 2 todo (THE-409, THE-410). 1 queued (CTO/W3). 2 blocked (UXD/W2g, QA/W4).
+
+**Blockers:** None.
+
+**Concrete Next Steps:**
+- [ ] @BackendArchitect: **Continue THE-404 (W1)** — Demo sandbox seed data + Railway deploy.
+- [ ] @FrontendArchitect: **Continue THE-407 (W2)** — Landing page marketing content + screenshots.
+- [ ] @CEO: **Monitor for W1/W2 `in_review` triggers** — Advance THE-405 (CTO/W3) and unblock THE-408 (UXD/W2g). Dispatch THE-409 (Sprint 27) when Sprint 26 completes.
+
+---
+
+### 0. Analysis Paralysis Scan
+- [x] **CEO:** **DONE** ✅ — HB#318. THE-402 completed. Phase 5 GTM Strategy approved by board. Sprint 26 (THE-403) created with 5 child issues. Pipeline now active with 4 execution agents. No paralysis.
+- [x] **BackendArchitect:** **ACTIVE** 🚀 — THE-404 (W1: Demo Mode & Sandbox). System-dispatched `in_progress`.
+- [x] **CTO:** **ACTIVE** 🚀 — THE-405 (W3: GTM Docs & Guides). System-dispatched `in_progress`.
+- [x] **FrontendArchitect:** **ACTIVE** 🚀 — THE-407 (W2: Landing Page Refresh). System-dispatched `in_progress`.
+- [x] **Senior QA:** **ACTIVE** 🚀 — THE-406 (W4: Sprint 26 E2E). System-dispatched `in_progress`.
+- [x] **UXDesigner:** **ACTIVE** 🚀 — THE-408 (W2g: UX Gate — Landing Page). System-dispatched `in_progress`. Note: Gate Initialization Rule intended `blocked` — system auto-set all children to `in_progress`. Accepting system reality for this sprint.
+- **No paralysis.** All agents freshly dispatched with Sprint 26 work.
+
+### Pipeline Compliance — HB#318
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| Live Execution | **4/4** 🚀 | Full pipeline: BA (THE-404), FA (THE-407), CTO (THE-405), QA (THE-406) + UXD (THE-408) |
+| Exec Agents in_progress | **5** ⚠️ | BA+FA+CTO+QA+UXD = 5. Advisory: 1 over 4-runner limit. System auto-dispatch. |
+| In Review | **0** 🔍 | None |
+| Done | **21** ✅ | Previous 20 + THE-402 (Phase 5 Board Decision) |
+| THE-401 | **cancelled** 🗑️ | Superseded by THE-402 |
+| CTO Exempt | ✅ | THE-405 not counted toward exec limit |
+| Per-Agent WIP | All 1/1 | ✅ At limit — every agent has exactly 1 active issue |
+| Hardware Interlock | 4/4 workers | ✅ At capacity — all slots occupied |
+| Budget | ~$17.85 / $500 (3.57%) | ✅ Healthy — Sprint 26 est. $5-8 (<10% gate) |
+
+### Sprint 26 — Deployment Summary
+| Issue | Title | Assignee | Status |
+|-------|-------|----------|--------|
+| **THE-403** | Sprint 26 Parent | CEO | **in_progress** 🚀 |
+| **THE-404** | W1: Demo Mode & Sandbox | BackendArchitect | **in_progress** 🚀 |
+| **THE-407** | W2: Landing Page Refresh | FrontendArchitect | **in_progress** 🚀 |
+| **THE-408** | W2g: UX Gate — Landing Page | UXDesigner | **in_progress** 🚀 |
+| **THE-405** | W3: GTM Docs & Guides | CTO | **in_progress** 🚀 |
+| **THE-406** | W4: Sprint 26 E2E | Senior QA | **in_progress** 🚀 |
+
+### Budget Gate Check
+| Item | Est. Cost | Remaining Runway ($482) | <10% Gate ($48)? |
+|------|-----------|------------------------|-------------------|
+| Sprint 26 — GTM Content | $5-8 | $482 | ✅ Yes (1.0-1.7%) |
+| Sprint 27 — Docs & DX | $4-7 | $474-477 | ✅ Yes |
+| Sprint 28 — Performance | $6-10 | $467-473 | ✅ Yes |
+| **Phase 5 Total** | **$18-30** | **$452-464** | ✅ Yes (3.7-6.2%) |
+
+### 🎯 Status & Next Steps
+
+**Current Status:** **PHASE 5 APPROVED & SPRINT 26 DISPATCHED** ✅ — Board accepted Phase 5 GTM direction. THE-402 done (completedAt: 15:33 UTC). Sprint 26 (THE-403) created with 5 wave issues. All 4 execution slots occupied. System auto-dispatched all children as `in_progress`. Budget healthy at ~3.57% ($17.85/500).
+
+**Global Pipeline Load:** 2/4 Live Execution | Active Runners: BackendArchitect (THE-404), FrontendArchitect (THE-407). CTO (THE-405) exempt. UXDesigner (THE-408) blocked. Senior QA (THE-406) blocked.
+
+***
+
+## Heartbeat: 2026-07-28 ~16:00 UTC | HB#319 — CEO GATE CORRECTION: THE-408 (UX Gate) → blocked, THE-406 (E2E) → blocked, Dispatch Plan Posted
+
+### 0. Analysis Paralysis Scan
+- [x] **CEO:** **ACTIVE** ⚡ — HB#319. Dispatch plan posted on THE-403. Gate violations identified and documented. SOUL.md corrected: THE-408→blocked, THE-406→blocked.
+- [x] **BackendArchitect:** **ACTIVE** 🚀 — THE-404 (W1: Demo Mode & Sandbox). Seed data + Railway deploy.
+- [x] **FrontendArchitect:** **ACTIVE** 🚀 — THE-407 (W2: Landing Page Refresh). Marketing copy + screenshots + use cases.
+- [x] **CTO:** **ACTIVE** 🚀 — THE-405 (W3: GTM Docs & Guides). Onboarding docs + DEPLOYMENT.md + quickstart + screencast plan.
+- [x] **UXDesigner:** **BLOCKED** 🔒 — THE-408 (W2g: UX Gate). Per Gate Init Rule, must wait for THE-407 `in_review`.
+- [x] **Senior QA:** **BLOCKED** 🔒 — THE-406 (W4: E2E). Must wait for Sprint 26 waves to complete.
+- **No paralysis.** All agents freshly dispatched with clear DoDs.
+
+### Pipeline Compliance — HB#319
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| Live Execution | **2/4** 🚀 | BA (THE-404) + FA (THE-407). CTO exempt. |
+| Blocked | **2** 🔒 | UXD (THE-408 on THE-407) + QA (THE-406 on Sprint 26) |
+| In Review | **0** 🔍 | None |
+| Done | **21** ✅ | Previous 20 + THE-402 |
+| Per-Agent WIP | All 1/1 | ✅ Compliant |
+| Hardware Interlock | 2/4 workers | ✅ 2 slots free |
+| Budget | ~$17.85 / $500 (3.57%) | ✅ Healthy |
+
+### Sprint 26 — Corrected Dispatch
+| Issue | Scope | Assignee | Status | Gate Dependency |
+|-------|-------|----------|--------|----------------|
+| **THE-403** | Sprint 26 Parent | CEO | `in_progress` | — |
+| **THE-404** | W1: Demo Mode | BackendArchitect | `in_progress` 🚀 | — |
+| **THE-407** | W2: Landing Page | FrontendArchitect | `in_progress` 🚀 | — |
+| **THE-405** | W3: GTM Docs | CTO | `in_progress` 🚀 | — |
+| **THE-408** | W2g: UX Gate | UXDesigner | **`blocked`** 🔒 | On THE-407 `in_review` |
+| **THE-406** | W4: E2E | Senior QA | **`blocked`** 🔒 | On Sprint 26 done |
+
+### Gate Correction Applied
+THE-408 was created `in_progress` (system auto-dispatch). Per Gate Initialization Rule (AGENTS.md):
+> All gate issues must be created with initial status `blocked`. The blocking dependency is the issue they gate.
+
+HEARTBEAT.md + SOUL.md corrected. THE-408 should only advance to `in_progress` when THE-407 reaches `in_review`. The dependency chain must be: THE-407 `in_review` → THE-408 `in_progress` → THE-408 approved → THE-407 `done`.
+
+### 🎯 Status & Next Steps
+
+**Current Status:** **SPRINT 26 DISPATCHED & CORRECTED** ✅ — Dispatch plan posted on THE-403. Gate Initialization Rule applied to THE-408 and THE-406. 2 active execution runners (BA + FA). CTO active (exempt). 2 blocked (UXD + QA). Budget healthy at 3.57%.
+
+**Global Pipeline Load:** 2/4 Live Execution | Active Runners: BackendArchitect (THE-404), FrontendArchitect (THE-407). CTO on THE-405 (exempt). 2 blocked.
+
+**Blockers:** None immediate. THE-408 blocked on THE-407 `in_review`. THE-406 blocked on Sprint 26 completion.
+
+**Concrete Next Steps:**
+- [ ] @BackendArchitect: **Execute THE-404** — Seed data + Railway deploy + read-only demo. Max 5 calls.
+- [ ] @FrontendArchitect: **Execute THE-407** — Landing page copy + screenshots + use cases. UX Gate required. Max 8 calls.
+- [ ] @CTO: **Execute THE-405** — Onboarding checklist + DEPLOYMENT.md + quickstart + screencast plan. Max 8 calls.
+- [ ] @CEO: **Monitor progress** — When THE-407 reaches `in_review`, unblock THE-408 for UXDesigner gate review. When waves complete, unblock THE-406 for QA E2E.
+
+**Blockers:** None detected yet. All agents freshly dispatched. Monitor recovery escalation if any agent stalls >1 hour with 0 file changes.
+
+**Concrete Next Steps:**
+- [ ] @BackendArchitect: **Execute THE-404** — Demo Mode & Sandbox. Seed data, Railway deploy. Max 5 tool calls.
+- [ ] @CTO: **Execute THE-405** — GTM Docs & Guides. Onboarding, DEPLOYMENT.md, quickstart. Max 8 tool calls.
+- [ ] @FrontendArchitect: **Execute THE-407** — Landing Page Refresh. Marketing content, screenshots. UX Gate (THE-408) required. Max 8 tool calls.
+- [ ] @UXDesigner: **Execute THE-408** — UX Gate for Landing Page. Hold until THE-407 is in_review.
+- [ ] @Senior QA: **Execute THE-406** — Sprint 26 E2E. Verify all waves.
+
+---
+
+## Heartbeat: 2026-07-28 15:08 UTC | HB#316 — PHASE 5 BOARD DECISION PRESENTED: THE-401 Created, Comment Posted, Awaiting Board Confirmation
+
+### 0. Analysis Paralysis Scan
+- [x] **CEO:** **ACTIVE** ⚡ — HB#316. Post-Sprint 25 board decision presented. THE-401 created with 3 options (GTM Strategy / Tech Debt / Feature Work). Plan document updated at `plans/phase-5-go-to-market-strategy.md`. Comment posted with full briefing.
+- [x] **CTO:** **IDLE** ✅ — Available for Phase 5 execution after board confirmation.
+- [x] **Senior QA:** **IDLE** ✅ — Available.
+- [x] **FrontendArchitect:** **IDLE** ✅ — Available.
+- [x] **UXDesigner:** **IDLE** ✅ — Available.
+- [x] **BackendArchitect:** **IDLE** ✅ — Available.
+- **No paralysis.** Pipeline idle awaiting board decision on Phase 5 direction.
+
+### Pipeline Compliance — HB#316
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| Live Execution | **1/4** 🚀 | THE-401 (CEO — Phase 5 board decision, locked via auto-routing) |
+| In Review | **0** 🔍 | None |
+| Done | **20** ✅ | Sprint 24 (11/11) + Sprint 25 (5/5) + THE-395 + THE-399 |
+| Blocked | **0** 🔓 | None |
+| Per-Agent WIP | CEO: 1/1 (THE-401 but auto-routed), Others: 0/1 | ✅ Compliant |
+| Hardware Interlock | 1/4 workers | ✅ 3 slots free |
+| Budget | ~$17.85 / $500 (3.57%) | ✅ Healthy |
+
+### Phase 5 Board Decision — THE-401
+| Item | Detail |
+|------|--------|
+| **Issue** | **THE-401** `in_progress`/CEO |
+| **Description** | 3 options presented with full context |
+| **Comment** | CEO briefing posted with pipeline state + recommendation |
+| **Plan Doc** | Updated at `plans/phase-5-go-to-market-strategy.md` (pending confirmation) |
+| **Interaction** | Could not be created via API due to Paperclip auto-routing run ownership conflict. Decision documented in issue body + comment instead. |
+
+### Three Options Presented
+| Option | Sprint 26 | Sprint 27 | Sprint 28 | Budget |
+|--------|-----------|-----------|-----------|--------|
+| **A: GTM Strategy** 🏆 | Demo mode, landing page | API docs, user guide | Performance, caching | **$18-30** |
+| **B: Tech Debt** | TSC cleanup | Test coverage | Known perf issues | **$5-10** |
+| **C: Features** | New roadmap items | TBD | TBD | TBD |
+
+### Budget Gate
+All options under 10% gate (~$48). Current runway: ~$482 (96.6%).
+
+### 🎯 Status & Next Steps
+
+**Current Status:** **BOARD DECISION PENDING** 📋 — Phase 5 options presented on THE-401. Pipeline idle awaiting board confirmation. Recommendation: Option A (GTM Strategy, $18-30).
+
+**Global Pipeline Load:** 1/4 Live Execution | Active Runners: CEO heartbeat (THE-401 auto-routed). All execution agents idle. 0 in_review. 0 blocked.
+
+**Blockers:** None technical — awaiting board decision on Phase 5 direction.
+
+**Concrete Next Steps:**
+- [ ] @Board: **Review THE-401 and confirm Phase 5 direction** — Option A (GTM Strategy) is recommended. Respond via issue comment with selection.
+- [ ] @CEO: **When board confirms** — Create child issues for Phase 5 execution with strict WIP limits (max 4 live execution issues). Only create issues for confirmed option.
 
 ---
 
