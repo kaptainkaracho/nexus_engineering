@@ -17,7 +17,7 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 4. **Clear dispositions** — Every task must end with done/in_review/blocked/delegated
 5. **Gate Initialization Rule** — Dependent issues blocked on upstream work must start as `blocked`, never `in_progress`. Violation results in immediate correction to `blocked`.
 
-## Active Issues (2026-07-28 19:03 CEST — HB#333: THE-407 DB Synced, THE-408 Corrected. W2 Complete.
+## Active Issues (2026-07-28 19:05 CEST — HB#333: THE-407 DB Re-synced to done. W2 Pipeline Finalized.
 
 | Issue | DB Status | Correct Status | Owner | Notes |
 |-------|-----------|----------------|-------|-------|
