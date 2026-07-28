@@ -4,7 +4,7 @@
 import { FileMetadata, ScanOptions, ScanReport, ScanResult, RepositoryReader, FileEntry } from '@nexus-engineering/shared'
 import { artifactDetector } from './artifactDetector'
 import { scanMetadataStore } from './scanMetadata'
-import { ArtifactRegistry } from '../artifacts/repository'
+import { artifactRegistry } from '../artifacts/repository'
 
 export class RepositoryScanner implements RepositoryReader {
   async scan(rootPath: string, options: ScanOptions = {}): Promise<ScanResult> {
@@ -62,7 +62,6 @@ export class RepositoryScanner implements RepositoryReader {
     // Write artifacts to persistent registry so they flow through lifecycle tracking
     // Use try-catch to prevent scan failures from breaking detection
     try {
-      const artifactRegistry = new ArtifactRegistry()
       for (const art of artifacts) {
         artifactRegistry.createFromDetected(art, rootPath)
       }

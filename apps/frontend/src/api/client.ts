@@ -165,16 +165,26 @@ export interface FileDetail {
 /** Scan a repository directory and return tree structure */
 export async function scanRepository(directoryPath: string): Promise<ScanResult> {
   try {
-    const res = await fetch(`${BASE}/api/scan`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ repositoryPath: directoryPath }),
-    });
+    const res = await fetch(`${BASE}/api/scan/tree?repositoryPath=${encodeURIComponent(directoryPath)}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-    return res.json();
+    const json = await res.json();
+    const tree = transformTree(json.root?.children ?? []);
+    return { files: [], tree, warnings: [] };
   } catch {
     return { files: [], tree: [], warnings: ['Failed to load repository'] };
   }
+}
+
+function transformTree(nodes: any[]): TreeNode[] {
+  return nodes.map((n: any) => ({
+    id: n.id,
+    name: n.name,
+    type: n.type === 'directory' ? 'folder' : 'file',
+    path: n.path,
+    fileSize: n.size,
+    language: n.extension,
+    children: n.children ? transformTree(n.children) : undefined,
+  }));
 }
 
 /** Get file content for a specific file path */

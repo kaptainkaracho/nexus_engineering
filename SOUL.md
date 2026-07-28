@@ -17,13 +17,17 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 4. **Clear dispositions** — Every task must end with done/in_review/blocked/delegated
 5. **Gate Initialization Rule** — Dependent issues blocked on upstream work must start as `blocked`, never `in_progress`. Violation results in immediate correction to `blocked`.
 
-## Active Issues (2026-07-27 23:27 UTC — HB#315: THE-399 Complete)
+## Active Issues (2026-07-27 23:28 UTC — HB#315: All Sprints Closed, Pipeline Idle)
 
+**No active issues.** All 20 issues terminal. Pipeline idle awaiting board direction for next phase.
+
+### Recent Completions
 | Issue | Status | Owner | Notes |
 |-------|--------|-------|-------|
-| **THE-390** | **blocked** 🔒 | **CEO** | **Sprint 25 Parent** — Blocked on THE-394 (W3 E2E). W1+W2 all done. |
-| **THE-394** | **in_progress** 🚀 | **QA** | **W3: Sprint 25 E2E** — Last Sprint 25 deliverable. QA running E2E verification. |
-| **THE-399** | **done** ✅ | **CTO** | **THE-395 subtask: Build Automation** — Sprint release branching (develop branch created, branching strategy documented, release script), local build validation script, PR template, package.json aliases. All scoped to Phase 2 per Saying No Framework. |
+| **THE-390** | **done** ✅ | **CEO** | **Sprint 25 Parent** — ALL 5/5 WAVES COMPLETE |
+| **THE-394** | **done** ✅ | **QA** | **W3: Sprint 25 E2E** — Integration Ecosystem verified. |
+| **THE-395** | **done** ✅ | **CEO** | **Build Automation** — Delivered via THE-399 (CTO). |
+| **THE-399** | **done** ✅ | **CTO** | **THE-395 subtask** — Sprint release branching (create-sprint-release.sh), local build validation (validate-local.sh), CONTRIBUTING.md docs, PR template, package.json scripts. |
 
 ### Completed Sprint 24 — Enterprise Phase 2 ✅
 | Issue | Status | Owner | Notes |

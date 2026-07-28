@@ -247,6 +247,7 @@ function App() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [resetToken, setResetToken] = useState<string | undefined>(undefined);
+  const [rawHash, setRawHash] = useState(() => window.location.hash.replace(/^#/, ''));
 
   useHoverPrefetch();
 
@@ -298,7 +299,9 @@ function App() {
   // Sync activeSection with URL hash on load and hash changes
   useEffect(() => {
     const onHashChange = () => {
-      const route = parseHash(window.location.hash);
+      const hash = window.location.hash;
+      setRawHash(hash.replace(/^#/, ''));
+      const route = parseHash(hash);
       setActiveSection(route.section);
       setDeepLinkArtifact(route.artifact);
     };
@@ -383,7 +386,7 @@ function App() {
   }
 
   if (!user) {
-    const hash = window.location.hash.replace(/^#/, '');
+    const hash = rawHash;
     if (hash === 'login' || hash === 'register' || hash.startsWith('reset-password') || hash.startsWith('forgot-password') || hash.startsWith('auth/')) {
       return <AuthPage onAuthenticated={handleAuthenticated} resetToken={resetToken} />;
     }

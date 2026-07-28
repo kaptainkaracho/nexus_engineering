@@ -66,6 +66,73 @@ export interface TraceabilityGraph {
   totalEdges: number;
 }
 
+// ── RBAC types (mirrored from @nexus-engineering/shared) ──────────────────
+
+export interface RbacRole {
+  id: string;
+  name: string;
+  description: string | null;
+  isSystem: boolean;
+  createdAt: string;
+}
+
+export interface RbacPermission {
+  id: string;
+  name: string;
+  description: string | null;
+  resource: string;
+  action: string;
+}
+
+export interface RbacUserWithRole {
+  id: string;
+  email: string;
+  displayName: string | null;
+  roleId: string;
+  isActive: boolean;
+  emailVerified: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ── Compliance types (mirrored from app api client) ──────────────────────
+
+export interface ComplianceReport {
+  id: string;
+  title: string;
+  report_type: string;
+  format: string;
+  status: string;
+  created_at: string;
+  completed_at: string | null;
+  created_by: string;
+  file_path: string | null;
+}
+
+export interface ComplianceAggregation {
+  generatedAt: string;
+  summary: { totalNodes: number; totalEdges: number };
+  coverage: { overallCoveragePercent: number; byType: Record<string, number> };
+  soc2?: {
+    totalMappings: number;
+    compliant: number;
+    nonCompliant: number;
+    notAssessed: number;
+    byCategory: Record<string, { compliant: number; nonCompliant: number; notAssessed: number }>;
+  };
+}
+
+export interface Soc2ControlMapping {
+  id: string;
+  category: string;
+  artifact_type: string;
+  artifact_id: string;
+  status: string;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 function emptySummary(): RegistrySummary {
   return {
     total: 0,
@@ -92,7 +159,10 @@ class ApiController {
 
   private async dispatch(route: Route): Promise<void> {
     const path = new URL(route.request().url()).pathname;
-    const handler = this.handlers.get(path);
+    const method = route.request().method();
+    // Try method-specific handler first, then method-agnostic
+    let handler = this.handlers.get(`${method} ${path}`);
+    if (!handler) handler = this.handlers.get(path);
     if (handler) return handler(route);
     // Default: a scan that completes immediately with no artifacts.
     if (path.startsWith('/api/scan')) {
@@ -182,6 +252,106 @@ class ApiController {
         contentType: 'application/json',
         body: JSON.stringify({ error: 'gate evaluation error' }),
       }),
+    );
+  }
+  // ── RBAC handlers ───────────────────────────────────────────────────────
+
+  roles(response: { roles: RbacRole[]; total: number }): void {
+    this.handlers.set('/api/roles', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(response) }),
+    );
+  }
+
+  permissions(response: { permissions: RbacPermission[]; total: number }): void {
+    this.handlers.set('/api/permissions', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(response) }),
+    );
+  }
+
+  usersWithRoles(response: { users: RbacUserWithRole[]; total: number }): void {
+    this.handlers.set('/api/users/roles', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(response) }),
+    );
+  }
+
+  createRole(response: RbacRole): void {
+    this.handlers.set('POST /api/roles', (route) =>
+      route.fulfill({ status: 201, contentType: 'application/json', body: JSON.stringify(response) }),
+    );
+  }
+
+  updateRole(id: string, response: RbacRole): void {
+    this.handlers.set(`PUT /api/roles/${id}`, (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(response) }),
+    );
+  }
+
+  deleteRole(id: string): void {
+    this.handlers.set(`DELETE /api/roles/${id}`, (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ message: 'Role deleted successfully' }) }),
+    );
+  }
+
+  setRolePermissions(id: string, response: RbacRole & { permissions: RbacPermission[] }): void {
+    this.handlers.set(`PUT /api/roles/${id}/permissions`, (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(response) }),
+    );
+  }
+
+  // ── Compliance handlers ─────────────────────────────────────────────────
+
+  complianceReports(response: { data: ComplianceReport[]; total: number; hasMore: boolean }): void {
+    this.handlers.set('GET /api/compliance/reports', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(response) }),
+    );
+  }
+
+  createComplianceReport(response: ComplianceReport): void {
+    this.handlers.set('POST /api/compliance/reports', (route) =>
+      route.fulfill({ status: 201, contentType: 'application/json', body: JSON.stringify(response) }),
+    );
+  }
+
+  deleteComplianceReport(id: string): void {
+    this.handlers.set(`DELETE /api/compliance/reports/${id}`, (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ message: `Report ${id} deleted` }) }),
+    );
+  }
+
+  complianceAggregations(response: ComplianceAggregation): void {
+    this.handlers.set('/api/compliance/aggregations', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(response) }),
+    );
+  }
+
+  soc2Mappings(response: Soc2ControlMapping[]): void {
+    this.handlers.set('/api/compliance/soc2/mappings', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(response) }),
+    );
+  }
+  // ── Integrations handlers ─────────────────────────────────────────────────
+
+  integrationsSyncStatus(response: {
+    jira: { configured: boolean; status: string };
+    linear: { configured: boolean; status: string };
+    github: { configured: boolean; status: string };
+    lastSyncTime: string;
+    syncHealth: string;
+  }): void {
+    this.handlers.set('/api/integrations/sync-status', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: response }) }),
+    );
+  }
+
+  integrationsSyncStatusError(status = 500): void {
+    this.handlers.set('/api/integrations/sync-status', (route) =>
+      route.fulfill({ status, contentType: 'application/json', body: JSON.stringify({ error: 'sync status error' }) }),
+    );
+  }
+
+  integrationsTestConnection(connector: string, response: { success: boolean; error?: string }): void {
+    this.handlers.set(`POST /api/integrations/${connector}/test`, (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(response) }),
     );
   }
 }
