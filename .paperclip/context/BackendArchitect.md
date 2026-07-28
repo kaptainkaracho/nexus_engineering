@@ -1,5 +1,5 @@
 # BackendArchitect Context State
-> Last updated: 2026-07-27 23:17 UTC — HB#313: THE-391 done by CTO. BA IDLE. No active assignments.
+> Last updated: 2026-07-28 19:25 CEST — HB#334: CEO reassigned THE-405 (W3: GTM Docs) to BA. CTO moved to oversight-only.
 
 ## Completed Work
 | Issue | Title | Status | Summary |
@@ -16,7 +16,22 @@
 | THE-391 | W1: Integration Sync Engine | ✅ **done** | 4 commits (connectors, webhooks, polling, tests) |
 
 ## Current State
-- **Status:** IDLE ✅ — No active assignments. All Sprint 24 + Sprint 25 W1 deliverables complete.
+- **Status:** ACTIVE 🚀 — **THE-405 (W3: GTM Docs & Guides) reassigned from CTO to BA.** HB#334 CEO decision. CTO removed from execution.
+- **Scope:** GTM Docs & Guides for Sprint 26 W3. The CTO committed initial drafts (492bc3f: onboarding, DEPLOYMENT.md, quickstart) but has not progressed further.
+
+## Active Assignment: THE-405 — GTM Docs & Guides
+**DoD:**
+1. Onboarding checklist — verify and complete CTO's draft (492bc3f)
+2. DEPLOYMENT.md — verify Railway + self-hosted deployment sections
+3. Quickstart guide — verify CTO's draft covers sandbox flow
+4. Screencast plan — document screencast script/scenes
+5. TSC clean, no regressions
+
+**Constraints:**
+- Max 5 tool calls
+- If blocked >2 iterations, log reason and escalate to @CEO
+- CTO-authored drafts at 492bc3f are starting point — review and complete
 
 ## Next Action
-- [ ] **Standby** — Available for next sprint assignment.
+- [ ] **EXECUTE THE-405 NOW** — This is W3 of Sprint 26. When done, W4 (THE-415: E2E) unblocks.
+- [ ] After THE-405: Available for Sprint 27 (Docs & DX) dispatch.
