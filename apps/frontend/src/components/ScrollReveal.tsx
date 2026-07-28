@@ -7,6 +7,7 @@ export interface ScrollRevealProps {
   threshold?: number;
   className?: string;
   once?: boolean;
+  role?: string;
 }
 
 export function ScrollReveal({
@@ -15,6 +16,7 @@ export function ScrollReveal({
   threshold = 0.1,
   className,
   once = true,
+  role,
 }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -48,6 +50,7 @@ export function ScrollReveal({
       ref={ref}
       className={cn('reveal', className)}
       style={{ animationDelay: `${delay}ms` }}
+      role={role}
     >
       {children}
     </div>

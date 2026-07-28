@@ -254,8 +254,9 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section className="py-12 px-4">
+        <section className="py-12 px-4" aria-labelledby="screenshot-heading">
           <div className="max-w-6xl mx-auto">
+            <h2 id="screenshot-heading" className="sr-only">Platform dashboard preview</h2>
             <ScrollReveal>
               <div className="relative rounded-2xl border border-border overflow-hidden shadow-2xl bg-surface-primary">
                 <div className="flex items-center gap-2 px-4 py-3 bg-surface-primary border-b border-border">
@@ -301,10 +302,10 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section className="py-20 px-4">
+        <section className="py-20 px-4" aria-labelledby="features-heading">
           <div className="max-w-6xl mx-auto">
             <ScrollReveal>
-              <h2 className="text-3xl md:text-4xl font-bold text-text-primary text-center mb-2">
+              <h2 id="features-heading" className="text-3xl md:text-4xl font-bold text-text-primary text-center mb-2">
                 Everything you need to engineer<br />
                 with confidence
               </h2>
@@ -348,11 +349,12 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section className="bg-surface-primary border-y border-border py-16 px-4">
+        <section className="bg-surface-primary border-y border-border py-16 px-4" aria-labelledby="stats-heading">
           <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <h2 id="stats-heading" className="sr-only">Platform statistics</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center" role="list">
               {stats.map((stat) => (
-                <div key={stat.label}>
+                <div key={stat.label} role="listitem">
                   <p className="text-3xl md:text-4xl font-bold text-primary-600">{stat.value}</p>
                   <p className="text-sm text-text-secondary mt-1">{stat.label}</p>
                 </div>
@@ -361,17 +363,17 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section className="py-20 px-4">
+        <section className="py-20 px-4" aria-labelledby="use-cases-heading">
           <div className="max-w-6xl mx-auto">
             <ScrollReveal>
-              <h2 className="text-3xl md:text-4xl font-bold text-text-primary text-center mb-3">
+              <h2 id="use-cases-heading" className="text-3xl md:text-4xl font-bold text-text-primary text-center mb-3">
                 Built for every stage of your workflow
               </h2>
               <p className="text-lg text-text-secondary text-center max-w-2xl mx-auto mb-12">
                 Whether you're tracking requirements, discovering artifacts, or auditing compliance—Nexus scales with your team.
               </p>
             </ScrollReveal>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" role="list" aria-label="Use cases by workflow stage">
               {[
                 { icon: Layers, title: 'Requirement Management', desc: 'Capture and trace requirements from ideation through deployment with full bidirectional traceability.', use: 'Best for QA leads and systems engineers managing complex compliance frameworks.' },
                 { icon: GitBranch, title: 'Artifact Discovery', desc: 'Automatically discover and index artifacts across connected registries, repos, and CI pipelines.', use: 'Ideal for DevOps teams maintaining multi-repo microservice architectures.' },
@@ -380,7 +382,7 @@ export function LandingPage() {
                 { icon: Zap, title: 'Quality Analytics', desc: 'Real-time quality scores, trend analysis, and actionable insights to drive continuous improvement.', use: 'Built for engineering directors needing executive-level dashboards and reports.' },
                 { icon: Globe, title: 'Multi-Cloud Deployment', desc: 'Track deployments across AWS, GCP, Azure, and on-prem with unified release management.', use: 'Essential for platform teams managing hybrid and multi-cloud infrastructures.' },
               ].map((useCase, i) => (
-                <ScrollReveal key={useCase.title} delay={i * 80}>
+                <ScrollReveal key={useCase.title} delay={i * 80} role="listitem">
                   <div className="h-full p-6 rounded-2xl border border-border bg-surface-primary hover:shadow-lg hover:border-border-hover transition-all duration-200 group">
                     <div className="flex items-start gap-4">
                       <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-primary-50 dark:bg-primary-950 flex items-center justify-center group-hover:bg-primary-100 dark:group-hover:bg-primary-900/50 transition-colors">
@@ -399,14 +401,14 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section className="relative bg-gradient-to-b from-surface-secondary to-primary-50/30 dark:to-primary-950/30 py-20 px-4 overflow-hidden">
+        <section className="relative bg-gradient-to-b from-surface-secondary to-primary-50/30 dark:to-primary-950/30 py-20 px-4 overflow-hidden" aria-labelledby="cta-heading">
           <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
             <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-96 h-96 bg-primary-200/20 dark:bg-primary-700/15 rounded-full blur-3xl" />
             <div className="absolute -bottom-20 left-1/4 w-72 h-72 bg-accent-200/15 dark:bg-accent-700/10 rounded-full blur-3xl" />
           </div>
           <div className="relative max-w-2xl mx-auto text-center">
             <ScrollReveal>
-              <h2 className="text-3xl md:text-4xl font-bold text-text-primary">
+              <h2 id="cta-heading" className="text-3xl md:text-4xl font-bold text-text-primary">
                 Ready to transform your engineering workflow?
               </h2>
             </ScrollReveal>
@@ -439,8 +441,7 @@ export function LandingPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="col-span-2 md:col-span-1">
               <p className="font-bold text-lg text-text-primary">Nexus</p>
-              <p className="text-sm text-text-tertiary mt-2">Nexus Engineering</p>
-              <p className="text-sm text-text-tertiary">&copy; 2026 Nexus Engineering. All rights reserved.</p>
+              <p className="text-sm text-text-tertiary mt-2">Engineering Intelligence Platform</p>
               <div className="flex gap-4 mt-6">
                 <a href="#" className="text-text-tertiary hover:text-text-primary transition-colors" aria-label="GitHub">
                   <GithubIcon className="w-5 h-5" />
