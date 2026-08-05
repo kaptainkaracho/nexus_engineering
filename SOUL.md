@@ -17,9 +17,9 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 4. **Clear dispositions** — Every task must end with done/in_review/blocked/delegated
 5. **Gate Initialization Rule** — Gates start `blocked`, advance only when implementation is `in_review`
 
-## Active Issues (2026-08-05 ~15:42 UTC — HB#338)
+## Active Issues (2026-08-05 ~15:45 UTC — HB#339)
 
-### Sprint 26 — GTM Content (1 fix remaining)
+### Sprint 26 — Fixes Complete, E2E Active
 | Issue | DB Status | Owner | Notes |
 |-------|-----------|-------|-------|
 | **THE-403** | `in_progress` | CEO | Sprint 26 Parent — close on E2E pass |
@@ -28,34 +28,34 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 | **THE-408** | `done` ✅ | UXD | W2g: UX Gate approved |
 | **THE-405** | `done` ✅ | CTO | W3: GTM Docs (492bc3f) |
 | **THE-411** | `done` ✅ | FA | Demo Mode Frontend (343029b) |
-| **THE-423** | `in_progress` 🚀 | BA | THE-406a: store.test.ts — 4/5 fixes done, uncommitted |
+| **THE-423** | `done` ✅ | BA | THE-406a: store.test.ts — committed 3f2ec07, tsc clean |
 | **THE-424** | `done` ✅ | BA | THE-406b: EACCES fix (de67bef) |
-| **THE-406** | `blocked` 🔒 | Senior QA | W4: E2E — blocked on THE-423 |
+| **THE-406** | `in_progress` 🚀 | **Senior QA** | W4: E2E — unblocked, fixes complete |
 
-### Sprint 27 — Docs & DX (3/5 waves)
+### Sprint 27 — Docs & DX (2/5 waves done)
 | Issue | DB Status | Owner | Notes |
 |-------|-----------|-------|-------|
 | **THE-409** | `in_progress` | CEO | Sprint 27 Parent |
-| **THE-426** | `in_review` 🔍 | BA | W1: OpenAPI spec (openapi.yaml 15.1K) |
+| **THE-426** | `done` ✅ | BA | W1: OpenAPI + Swagger UI — committed 3f2ec07 |
 | **THE-425** | `in_review` 🔍 | FA | W2: User Guide — delivered |
 | **THE-428** | `in_progress` 🚀 | UXD | W2g: UX Gate — active (THE-425 in_review) ✅ |
 | **THE-427** | `todo` 📋 | FA | W3: Quickstart — queued after UX Gate |
-| **THE-429** | `blocked` 🔒 | Senior QA | W4: E2E — blocked on W1-W3 |
+| **THE-429** | `blocked` 🔒 | Senior QA | W4: E2E — blocked on W2g+W3 |
 
 ### Sprint 28 — Performance (queued)
 | Issue | DB Status | Owner |
 |-------|-----------|-------|
 | **THE-410** | `todo` 📋 | CEO |
 
-### Agent Status (HB#338)
+### Agent Status (HB#339)
 | Agent | WIP | Status | Issue |
 |-------|-----|--------|-------|
 | CEO | 2 (mgmt) | Active | THE-403 + THE-409 |
-| BackendArchitect | 1 active | Working | THE-423 (in_progress) |
-| FrontendArchitect | 0 active | Idle | THE-425 (in_review) |
-| UXDesigner | 1 active | Reviewing | THE-428 (in_progress) |
+| BackendArchitect | 0/1 | **Idle** | All done — ready for next |
+| FrontendArchitect | 0/1 | Idle | THE-425 (in_review) |
+| UXDesigner | 1/1 | Active | THE-428 (in_progress) |
 | CTO | 0 | Oversight | Per HB#334 |
-| Senior QA | 0 | Blocked | THE-406 |
+| Senior QA | 1/1 | Active | THE-406 (in_progress) |
 | Minerva | 0 | Error | — |
 
 ## Communication Style

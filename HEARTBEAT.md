@@ -26,10 +26,10 @@
 | **THE-415** | `done` ✅ | `done` ✅ | — | E2E Smoke Test |
 | **THE-423** | `done` ✅ | `done` ✅ | BA | **THE-406a: store.test.ts — committed 3f2ec07** |
 | **THE-424** | `done` ✅ | `done` ✅ | BA | THE-406b: EACCES fix (de67bef) |
-| **THE-425** | `in_review` 🔍 | `in_review` 🔍 | FA | Sprint 27 W2: User Guide |
+| **THE-425** | `in_progress` 🚀 | `in_progress` 🚀 | FA | Sprint 27 W2: User Guide — Changes Requested by UX Gate |
 | **THE-426** | `done` ✅ | `done` ✅ | BA | **Sprint 27 W1: OpenAPI + Swagger UI — committed 3f2ec07** |
 | **THE-427** | `todo` 📋 | `todo` 📋 | FA | Sprint 27 W3: Quickstart — queued after UX Gate |
-| **THE-428** | `in_progress` 🚀 | `in_progress` 🚀 | UXD | Sprint 27 W2g: UX Gate |
+| **THE-428** | `in_progress` 🚀 | `in_progress` 🚀 | UXD | Sprint 27 W2g: UX Gate — Changes Requested posted |
 | **THE-429** | `blocked` 🔒 | `blocked` 🔒 | Senior QA | Sprint 27 W4: E2E |
 
 ### Pipeline Compliance — HB#339

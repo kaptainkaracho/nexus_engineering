@@ -1,6 +1,6 @@
 # Sprint 27: Docs & Developer Experience (Phase 5, Sprint 2 of 3)
 
-**Status:** ACTIVE — Partially dispatched. W1 queued, W2 in_progress, W2g blocked, W3 reassigned to FA (CTO oversight-only), W4 blocked.
+**Status:** ACTIVE — 2/5 waves done. W1 (API Docs) done, W2 (User Guide) in_review, W2g (UX Gate) in_progress, W3 (Quickstart) queued, W4 (E2E) blocked.
 **Prerequisite:** Sprint 26 (THE-403) — GTM Content & Market Readiness must be fully closed.
 **Parent Issue:** THE-409
 **Budget:** Est. $4-7 (well under 10% runway gate of ~$48).
