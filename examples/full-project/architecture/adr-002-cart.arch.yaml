@@ -1,0 +1,27 @@
+nexus:
+  schema: arch-doc/v1
+  metadata:
+    domain: E-Commerce
+    version: 1.0.0
+    source: examples/full-project/architecture/adr-002-cart.arch.yaml
+    documentId: FULL-ADR-002
+    author: FrontendArchitect
+    createdAt: "2026-08-05"
+    updatedAt: "2026-08-05"
+
+adr:
+  id: ADR-002
+  title: Use Redis for cart persistence
+  status: accepted
+  context: |
+    Shopping carts need fast read/write access with automatic expiration.
+    PostgreSQL is overkill for ephemeral cart data that doesn't require
+    complex queries.
+  decision: |
+    Store cart data in Redis with TTL-based expiration. Use Redis hashes
+    for efficient field-level updates. Serialize cart as JSON.
+  consequences:
+    - Sub-millisecond read/write latency
+    - Automatic expiration via TTL (24h for guests, 30d for logged-in)
+    - No complex queries needed for cart operations
+    - Redis failure degrades cart functionality but doesn't affect orders

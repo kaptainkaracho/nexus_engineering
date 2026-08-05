@@ -1,0 +1,26 @@
+nexus:
+  schema: arch-doc/v1
+  metadata:
+    domain: E-Commerce
+    version: 1.0.0
+    source: examples/full-project/architecture/adr-003-payment.arch.yaml
+    documentId: FULL-ADR-003
+    author: FrontendArchitect
+    createdAt: "2026-08-05"
+    updatedAt: "2026-08-05"
+
+adr:
+  id: ADR-003
+  title: Use Stripe for payment processing
+  status: accepted
+  context: |
+    We need PCI-compliant payment processing without handling card data
+    directly. Building custom payment infrastructure is complex and risky.
+  decision: |
+    Integrate Stripe as the payment processor. Use Stripe Elements for
+    frontend card input and Stripe API for backend payment processing.
+  consequences:
+    - PCI compliance handled by Stripe
+    - Support for multiple payment methods (cards, wallets, BNPL)
+    - Webhook-based payment status updates
+    - Transaction fees per payment (2.9% + $0.30)

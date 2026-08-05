@@ -1,0 +1,149 @@
+nexus:
+  schema: trace-links/v1
+  metadata:
+    domain: E-Commerce
+    version: 1.0.0
+    source: examples/full-project/trace-links/trace-links.yaml
+    documentId: FULL-TRACE-001
+    author: FrontendArchitect
+    createdAt: "2026-08-05"
+    updatedAt: "2026-08-05"
+
+traceLinks:
+  # Product Search traces
+  - id: TL-001
+    source:
+      id: REQ-PROD-001
+      type: requirement
+    target:
+      id: ADR-001
+      type: architecture
+    relationship: satisfies
+    confidence: high
+    description: "Elasticsearch search satisfies product search requirement"
+
+  - id: TL-002
+    source:
+      id: REQ-PROD-001
+      type: requirement
+    target:
+      id: SPEC-SEARCH-001
+      type: specification
+    relationship: verified-by
+    confidence: high
+    description: "Search specification verifies product search requirement"
+
+  - id: TL-003
+    source:
+      id: SPEC-SEARCH-001
+      type: specification
+    target:
+      id: TC-SEARCH-001
+      type: test
+    relationship: implemented-by
+    confidence: high
+    description: "Test case implements search specification"
+
+  # Product Details traces
+  - id: TL-004
+    source:
+      id: REQ-PROD-002
+      type: requirement
+    target:
+      id: SPEC-PROD-001
+      type: specification
+    relationship: verified-by
+    confidence: high
+    description: "Product specification verifies product details requirement"
+
+  # Cart traces
+  - id: TL-005
+    source:
+      id: REQ-ORD-001
+      type: requirement
+    target:
+      id: ADR-002
+      type: architecture
+    relationship: satisfies
+    confidence: high
+    description: "Redis cart persistence satisfies cart requirement"
+
+  - id: TL-006
+    source:
+      id: REQ-ORD-001
+      type: requirement
+    target:
+      id: SPEC-CART-001
+      type: specification
+    relationship: verified-by
+    confidence: high
+    description: "Cart specification verifies cart requirement"
+
+  - id: TL-007
+    source:
+      id: SPEC-CART-001
+      type: specification
+    target:
+      id: TC-CART-001
+      type: test
+    relationship: implemented-by
+    confidence: high
+    description: "Test case implements cart specification"
+
+  # Checkout traces
+  - id: TL-008
+    source:
+      id: REQ-ORD-002
+      type: requirement
+    target:
+      id: ADR-003
+      type: architecture
+    relationship: satisfies
+    confidence: high
+    description: "Stripe payment satisfies checkout requirement"
+
+  - id: TL-009
+    source:
+      id: REQ-ORD-002
+      type: requirement
+    target:
+      id: SPEC-CHECKOUT-001
+      type: specification
+    relationship: verified-by
+    confidence: high
+    description: "Checkout specification verifies checkout requirement"
+
+  - id: TL-010
+    source:
+      id: SPEC-CHECKOUT-001
+      type: specification
+    target:
+      id: TC-CHECKOUT-001
+      type: test
+    relationship: implemented-by
+    confidence: high
+    description: "Test case implements checkout specification"
+
+  # Order History traces
+  - id: TL-011
+    source:
+      id: REQ-ORD-003
+      type: requirement
+    target:
+      id: SPEC-ORD-001
+      type: specification
+    relationship: verified-by
+    confidence: high
+    description: "Order history specification verifies order history requirement"
+
+  # Cross-domain traces
+  - id: TL-012
+    source:
+      id: REQ-PROD-003
+      type: requirement
+    target:
+      id: ADR-001
+      type: architecture
+    relationship: constrained-by
+    confidence: medium
+    description: "Search performance requirement constrains Elasticsearch architecture"

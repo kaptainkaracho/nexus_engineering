@@ -1,0 +1,46 @@
+nexus:
+  schema: spec-doc/v1
+  metadata:
+    domain: E-Commerce
+    version: 1.0.0
+    source: examples/full-project/specs/shopping-cart.spec.yaml
+    documentId: FULL-SPEC-002
+    author: FrontendArchitect
+    createdAt: "2026-08-05"
+    updatedAt: "2026-08-05"
+
+spec:
+  id: SPEC-ORD-001
+  title: Shopping Cart Specification
+  version: 1.0.0
+  status: active
+  requirements:
+    - id: SPEC-CART-001
+      title: Add to cart works correctly
+      priority: P0
+      status: implemented
+      references:
+        - type: req
+          id: REQ-ORD-001
+        - type: arch
+          id: ADR-002
+        - type: test
+          id: TC-CART-001
+    - id: SPEC-CART-002
+      title: Cart persists for logged-in users
+      priority: P0
+      status: implemented
+      references:
+        - type: req
+          id: REQ-ORD-001
+        - type: test
+          id: TC-CART-002
+    - id: SPEC-CART-003
+      title: Guest cart expires after 24 hours
+      priority: P1
+      status: implemented
+      references:
+        - type: req
+          id: REQ-ORD-001
+        - type: test
+          id: TC-CART-003

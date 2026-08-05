@@ -1,21 +1,23 @@
 # FrontendArchitect Context State
-> Last updated: 2026-08-05T16:30:00Z
+> Last updated: 2026-08-05T17:45:00Z
 
 ## Last Run
-- Issue: THE-425
-- Timestamp: 2026-08-05T16:30:00Z
-- Status: wrote 2 files, 0 errors
+- Issue: THE-427
+- Timestamp: 2026-08-05T17:45:00Z
+- Status: In progress — quickstart rewritten, examples created
 
 ## Files Created/Modified
-- apps/frontend/src/views/UserGuide/index.tsx (created — User Guide view with 3 workflow walkthroughs)
-- apps/frontend/src/App.tsx (modified — added #user-guide route, lazy import, Section type, VALID_SECTIONS)
-
-## Verification
-- tsc -b: clean (0 errors)
-- eslint: clean (0 errors in UserGuide)
+- docs/quickstart.md (rewritten — reduced to <5 commands)
+- examples/simple-project/ (created — 3 documents, 3 trace links)
+- examples/full-project/ (created — 8 documents, 12 trace links)
+- README.md (modified — quickstart simplified, examples table added)
 
 ## Status
-- THE-425: in_progress — core view built, pending UX gate review
+- THE-427: in_progress
+- Quickstart: <5 commands ✅
+- Example repos: 3 published (simple, full, tac-samples) ✅
+- README links: added ✅
 
 ## Next Action
-- Hand off to UXDesigner for UX Quality Gate review
+- Verify quickstart works on clean clone
+- Commit and push changes

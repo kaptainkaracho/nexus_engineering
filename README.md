@@ -64,30 +64,22 @@ graph TB
 ## Quickstart
 
 ```bash
-# Prerequisites: Node.js 20+, pnpm 9+
-git clone <repository-url>
-cd nexus-engineering
+git clone https://github.com/TheBikeApp/Nexus.git
+cd Nexus
 pnpm install
 pnpm dev
-```
-
-- **Frontend**: http://localhost:5173
-- **Backend API**: http://localhost:3001
-- **Health Check**: http://localhost:3001/health
-
-### Run demo import
-
-```bash
 node scripts/import-demo.cjs
 ```
 
-### Run demo scenario
+Open **http://localhost:5173** and follow the [Demo Script](docs/demo/DEMO_SCRIPT.md).
 
-```bash
-# See docs/demo/DEMO_SCRIPT.md for full walkthrough
-pnpm dev
-# Then open http://localhost:5173 and follow the demo script
-```
+### Try the examples
+
+| Example | Description | Trace Links |
+|---------|-------------|-------------|
+| [Simple Project](examples/simple-project) | Minimal 3-document traceability chain | 3 |
+| [Full Project](examples/full-project) | E-commerce app with 8 documents | 12 |
+| [TAC Samples](examples/tac-samples) | Backend parser exercise with 12 documents | 32 |
 
 ---
 

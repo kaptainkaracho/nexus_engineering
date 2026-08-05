@@ -1,0 +1,55 @@
+nexus:
+  schema: spec-doc/v1
+  metadata:
+    domain: E-Commerce
+    version: 1.0.0
+    source: examples/full-project/specs/product-search.spec.yaml
+    documentId: FULL-SPEC-001
+    author: FrontendArchitect
+    createdAt: "2026-08-05"
+    updatedAt: "2026-08-05"
+
+spec:
+  id: SPEC-PROD-001
+  title: Product Search Specification
+  version: 1.0.0
+  status: active
+  requirements:
+    - id: SPEC-SEARCH-001
+      title: Text search returns relevant results
+      priority: P0
+      status: implemented
+      references:
+        - type: req
+          id: REQ-PROD-001
+        - type: arch
+          id: ADR-001
+        - type: test
+          id: TC-SEARCH-001
+    - id: SPEC-SEARCH-002
+      title: Category filtering works correctly
+      priority: P0
+      status: implemented
+      references:
+        - type: req
+          id: REQ-PROD-001
+        - type: test
+          id: TC-SEARCH-002
+    - id: SPEC-SEARCH-003
+      title: Price range filtering works correctly
+      priority: P1
+      status: implemented
+      references:
+        - type: req
+          id: REQ-PROD-001
+        - type: test
+          id: TC-SEARCH-003
+    - id: SPEC-SEARCH-004
+      title: Pagination works correctly
+      priority: P1
+      status: implemented
+      references:
+        - type: req
+          id: REQ-PROD-001
+        - type: test
+          id: TC-SEARCH-004

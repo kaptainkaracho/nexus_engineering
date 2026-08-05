@@ -1,0 +1,55 @@
+nexus:
+  schema: spec-doc/v1
+  metadata:
+    domain: E-Commerce
+    version: 1.0.0
+    source: examples/full-project/specs/checkout.spec.yaml
+    documentId: FULL-SPEC-003
+    author: FrontendArchitect
+    createdAt: "2026-08-05"
+    updatedAt: "2026-08-05"
+
+spec:
+  id: SPEC-ORD-002
+  title: Checkout Process Specification
+  version: 1.0.0
+  status: active
+  requirements:
+    - id: SPEC-CHECKOUT-001
+      title: Shipping form validates correctly
+      priority: P0
+      status: implemented
+      references:
+        - type: req
+          id: REQ-ORD-002
+        - type: test
+          id: TC-CHECKOUT-001
+    - id: SPEC-CHECKOUT-002
+      title: Inventory validation before payment
+      priority: P0
+      status: implemented
+      references:
+        - type: req
+          id: REQ-ORD-002
+        - type: test
+          id: TC-CHECKOUT-002
+    - id: SPEC-CHECKOUT-003
+      title: Payment processing via Stripe
+      priority: P0
+      status: implemented
+      references:
+        - type: req
+          id: REQ-ORD-002
+        - type: arch
+          id: ADR-003
+        - type: test
+          id: TC-CHECKOUT-003
+    - id: SPEC-CHECKOUT-004
+      title: Order confirmation displayed
+      priority: P1
+      status: implemented
+      references:
+        - type: req
+          id: REQ-ORD-002
+        - type: test
+          id: TC-CHECKOUT-004
