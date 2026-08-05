@@ -1,0 +1,27 @@
+nexus:
+  schema: arch-doc/v1
+  metadata:
+    domain: E-Commerce
+    version: 1.0.0
+    source: examples/full-project/architecture/adr-001-search.arch.yaml
+    documentId: FULL-ADR-001
+    author: FrontendArchitect
+    createdAt: "2026-08-05"
+    updatedAt: "2026-08-05"
+
+adr:
+  id: ADR-001
+  title: Use Elasticsearch for product search
+  status: accepted
+  context: |
+    We need full-text search with filtering, sorting, and pagination.
+    PostgreSQL full-text search lacks advanced features and performance
+    at scale.
+  decision: |
+    Deploy Elasticsearch as the primary search engine. Sync product
+    data from PostgreSQL to Elasticsearch via Change Data Capture (CDC).
+  consequences:
+    - Full-text search with relevancy scoring
+    - Advanced filtering by multiple fields
+    - Requires infrastructure for Elasticsearch cluster
+    - Data consistency between PostgreSQL and Elasticsearch via CDC

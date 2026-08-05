@@ -1,0 +1,73 @@
+nexus:
+  schema: req-doc/v1
+  metadata:
+    domain: E-Commerce
+    version: 1.0.0
+    source: examples/full-project/requirements/orders.req.yaml
+    documentId: FULL-REQ-002
+    author: FrontendArchitect
+    createdAt: "2026-08-05"
+    updatedAt: "2026-08-05"
+
+requirements:
+  - id: REQ-ORD-001
+    type: functional
+    title: Shopping Cart
+    description: |
+      Users MUST be able to add products to a shopping cart.
+      The cart MUST persist across sessions for logged-in users.
+      Guest carts MUST persist for 24 hours.
+    priority: critical
+    status: approved
+    tags:
+      - cart
+      - persistence
+    acceptanceCriteria:
+      - "Given a user, when they add a product, then it appears in the cart"
+      - "Given a logged-in user, when they return, then their cart is restored"
+      - "Given a guest, when they return within 24 hours, then their cart is restored"
+    dependencies: []
+    relatedIssues: []
+    notes: |
+      Cart data stored in Redis with TTL.
+
+  - id: REQ-ORD-002
+    type: functional
+    title: Checkout Process
+    description: |
+      Users MUST be able to complete checkout with shipping and payment information.
+      The system MUST validate inventory before processing payment.
+    priority: critical
+    status: approved
+    tags:
+      - checkout
+      - payment
+    acceptanceCriteria:
+      - "Given a user with items in cart, when they checkout, then shipping form is displayed"
+      - "Given a user, when they submit payment, then inventory is validated"
+      - "Given a user, when payment succeeds, then order confirmation is shown"
+    dependencies:
+      - REQ-ORD-001
+    relatedIssues: []
+    notes: |
+      Payment processing via Stripe.
+
+  - id: REQ-ORD-003
+    type: functional
+    title: Order History
+    description: |
+      Users MUST be able to view their order history with status and details.
+      Orders MUST be searchable by date range and order number.
+    priority: medium
+    status: approved
+    tags:
+      - orders
+      - history
+    acceptanceCriteria:
+      - "Given a user, when they view order history, then all orders are listed"
+      - "Given a user, when they search by date, then matching orders are shown"
+    dependencies:
+      - REQ-ORD-002
+    relatedIssues: []
+    notes: |
+      Order data retained for 7 years for compliance.

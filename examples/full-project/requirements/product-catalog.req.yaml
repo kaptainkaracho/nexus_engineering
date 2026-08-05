@@ -1,0 +1,70 @@
+nexus:
+  schema: req-doc/v1
+  metadata:
+    domain: E-Commerce
+    version: 1.0.0
+    source: examples/full-project/requirements/product-catalog.req.yaml
+    documentId: FULL-REQ-001
+    author: FrontendArchitect
+    createdAt: "2026-08-05"
+    updatedAt: "2026-08-05"
+
+requirements:
+  - id: REQ-PROD-001
+    type: functional
+    title: Product Search
+    description: |
+      Users MUST be able to search products by name, category, and price range.
+      Search results MUST be paginated with 20 items per page.
+    priority: high
+    status: approved
+    tags:
+      - search
+      - catalog
+    acceptanceCriteria:
+      - "Given a user, when they enter a search term, then matching products are displayed"
+      - "Given a user, when they filter by category, then only products in that category appear"
+      - "Given a user, when they filter by price, then products within the range are shown"
+    dependencies: []
+    relatedIssues: []
+    notes: |
+      Search uses Elasticsearch for full-text search capabilities.
+
+  - id: REQ-PROD-002
+    type: functional
+    title: Product Details
+    description: |
+      Users MUST be able to view detailed product information including
+      name, description, price, images, and availability status.
+    priority: high
+    status: approved
+    tags:
+      - catalog
+      - ui
+    acceptanceCriteria:
+      - "Given a user, when they click a product, then the detail page loads"
+      - "Given a user, when they view a product, then all required fields are displayed"
+    dependencies:
+      - REQ-PROD-001
+    relatedIssues: []
+    notes: |
+      Product images are served from CDN.
+
+  - id: REQ-PROD-003
+    type: non-functional
+    title: Search Performance
+    description: |
+      Search queries MUST return results within 200ms at the 95th percentile.
+      The system MUST handle 1000 concurrent search requests.
+    priority: medium
+    status: proposed
+    tags:
+      - performance
+      - search
+    acceptanceCriteria:
+      - "Given 1000 concurrent users, when they search, then all results return within 200ms"
+    dependencies:
+      - REQ-PROD-001
+    relatedIssues: []
+    notes: |
+      Performance targets based on industry benchmarks.
