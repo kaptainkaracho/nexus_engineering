@@ -43,6 +43,7 @@ const ScimSettings = lazy(() => import('./views/ScimSettings'));
 const LandingPage = lazy(() => import('./views/LandingPage').then(m => ({ default: m.LandingPage })));
 const OnboardingFlow = lazy(() => import('./views/OnboardingFlow').then(m => ({ default: m.OnboardingFlow })));
 const DemoMode = lazy(() => import('./views/DemoMode').then(m => ({ default: m.DemoMode })));
+const UserGuide = lazy(() => import('./views/UserGuide').then(m => ({ default: m.UserGuide })));
 const GateConfigPanel = lazy(() => import('./components/trace-gate').then(m => ({ default: m.GateConfigPanel })));
 
 // Test results (chunk-analysis family)
@@ -78,7 +79,8 @@ type Section =
   | 'org'
   | 'landing'
   | 'onboarding'
-  | 'demo';
+  | 'demo'
+  | 'user-guide';
 
 const VALID_SECTIONS: Section[] = [
   'overview',
@@ -111,6 +113,7 @@ const VALID_SECTIONS: Section[] = [
   'landing',
   'onboarding',
   'demo',
+  'user-guide',
 ];
 
 const ADMIN_SUB_ROUTES: Record<string, Section> = {
@@ -596,6 +599,12 @@ function App() {
         return (
           <Suspense fallback={<RouteLoadingSkeleton variant="grid" />}>
             <DemoMode />
+          </Suspense>
+        );
+      case 'user-guide':
+        return (
+          <Suspense fallback={<RouteLoadingSkeleton variant="form" />}>
+            <UserGuide />
           </Suspense>
         );
       default:
