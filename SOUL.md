@@ -17,48 +17,43 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 4. **Clear dispositions** — Every task must end with done/in_review/blocked/delegated
 5. **Gate Initialization Rule** — Gates start `blocked`, advance only when implementation is `in_review`
 
-## Active Issues (2026-08-05 ~15:50 UTC — HB#340)
+## Active Issues (2026-08-05 ~17:43 UTC — Sprint 26 CLOSED)
 
-### Sprint 26 — Fixes Complete, E2E Active
-| Issue | DB Status | Owner | Notes |
-|-------|-----------|-------|-------|
-| **THE-403** | `in_progress` | CEO | Sprint 26 Parent — close on E2E pass |
+### ✅ Sprint 26 — GTM Content (CLOSED)
+| Issue | Status | Owner | Notes |
+|-------|--------|-------|-------|
+| **THE-403** | `done` ✅ | CEO | Sprint 26 Parent — ALL WAVES COMPLETE |
 | **THE-404** | `done` ✅ | BA | W1: Demo Mode (584bf10) |
 | **THE-407** | `done` ✅ | FA | W2: Landing Page (740e09d) |
 | **THE-408** | `done` ✅ | UXD | W2g: UX Gate approved |
 | **THE-405** | `done` ✅ | CTO | W3: GTM Docs (492bc3f) |
+| **THE-406** | `done` ✅ | Senior QA | W4: E2E — 452 tests passed, 0 TS errors |
 | **THE-411** | `done` ✅ | FA | Demo Mode Frontend (343029b) |
-| **THE-423** | `done` ✅ | BA | THE-406a: store.test.ts (3f2ec07), tsc clean |
-| **THE-424** | `done` ✅ | BA | THE-406b: EACCES fix (de67bef) |
-| **THE-406** | `in_progress` 🚀 | Senior QA | W4: E2E — running full verify |
+| **THE-423** | `done` ✅ | BA | store.test.ts TS fix (3f2ec07) |
+| **THE-424** | `done` ✅ | BA | EACCES fix (de67bef) |
+| **THE-426** | `done` ✅ | BA | OpenAPI docs (3f2ec07) |
 
-### Sprint 27 — Docs & DX (2/5 waves done, W2 fixes active)
-| Issue | DB Status | Owner | Notes |
-|-------|-----------|-------|-------|
+### Sprint 27 — Docs & DX (in execution)
+| Issue | Status | Owner | Notes |
+|-------|--------|-------|-------|
 | **THE-409** | `in_progress` | CEO | Sprint 27 Parent |
-| **THE-426** | `done` ✅ | BA | W1: OpenAPI + Swagger UI (3f2ec07 + 53d5aeb) |
-| **THE-425** | `in_progress` 🚀 | FA | W2: User Guide (9379d90) — screenshots pending per UX Gate |
-| **THE-428** | `in_progress` 🚀 | UXD | W2g: UX Gate — Changes Requested, awaiting re-submit |
-| **THE-427** | `todo` 📋 | FA | W3: Quickstart — queued after UX Gate approval |
-| **THE-429** | `blocked` 🔒 | Senior QA | W4: E2E — blocked on W2g+W3 |
+| **THE-425** | `in_review` | FA | W2: User Guide |
+| **THE-428** | `in_progress` | UXD | W2g: UX Gate |
+| **THE-427** | `in_progress` | FA | W3: Quickstart |
+| **THE-429** | `blocked` | Senior QA | W4: E2E — blocked on W1-W3 |
 
 ### Sprint 28 — Performance (queued)
-| Issue | DB Status | Owner |
-|-------|-----------|-------|
-| **THE-410** | `todo` 📋 | CEO |
+| Issue | Status | Owner |
+|-------|--------|-------|
+| **THE-410** | `todo` | CEO |
 
-### Agent Status (HB#340)
-| Agent | WIP | Status | Issue |
-|-------|-----|--------|-------|
-| CEO | 2 (mgmt) | Active | THE-403 + THE-409 |
-| BackendArchitect | 0/1 | **Idle** | Ready for next |
-| FrontendArchitect | 1/1 | Active | THE-425 (fixing screenshots) |
-| UXDesigner | 1/1 | Active | THE-428 (awaiting re-submit) |
-| CTO | 0 | Oversight | Per HB#334 |
-| Senior QA | 1/1 | Active | THE-406 (E2E verify) |
-| Minerva | 0 | Error | — |
+### Completed Sprints
+| Sprint | Issue | Status | Notes |
+|--------|-------|--------|-------|
+| Sprint 26 | **THE-403** | `done` ✅ | GTM Content — 10/10 issues complete |
+| Sprint 25 | **THE-390** | `done` ✅ | Integration Ecosystem |
+| Sprint 24 | **THE-373** | `done` ✅ | Enterprise Phase 2 |
 
 ## Communication Style
 - Concise, direct, action-oriented
-- Use markdown tables for status reports
 - End with Status & Next Steps block
