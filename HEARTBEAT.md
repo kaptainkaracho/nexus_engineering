@@ -55,18 +55,18 @@
 | W4 | **THE-406** | Sprint 26 E2E | `blocked` 🔒 | Senior QA |
 | — | **THE-411** | Demo Mode Frontend | `done` ✅ | FA |
 | Fix | **THE-423** | Fix store.test.ts (17 TS errors) | `in_progress` 🚀 | BA |
-| Fix | **THE-424** | Fix artifact test paths (6 files) | `todo` 📋 | BA |
+| Fix | **THE-424** | Fix artifact test paths (6 files) | `done` ✅ | BA |
 
-**E2E Report** (`.paperclip/verification/THE-406-sprint26-e2e-report.md`): 17 TS errors, 23 test failures in 7 files. CTO verified 2026-08-05.
+**THE-423 progress:** store.ts fixes applied (insert return type, constructor path param). store.test.ts: 4/5 fix categories in progress. Uncommitted.
 
-### Sprint 27 — Dispatched in Parallel
+### Sprint 27 — Full Dispatch
 | Wave | Issue | Scope | Status | Owner |
 |------|-------|-------|--------|-------|
 | Parent | **THE-409** | Sprint 27 Parent | `in_progress` 🚀 | CEO |
-| W1 | **THE-426** | API Reference Docs | `todo` 📋 | BA |
-| W2 | **THE-425** | User Guide | `in_progress` 🚀 | FA |
-| W2g | **THE-428** | UX Gate | `blocked` 🔒 | UXD |
-| W3 | **THE-427** | Quickstart & Examples | `todo` 📋 | **FA** (was CTO) |
+| W1 | **THE-426** | API Reference Docs | `in_review` 🔍 | BA |
+| W2 | **THE-425** | User Guide | `in_review` 🔍 | FA |
+| W2g | **THE-428** | UX Gate | `in_progress` 🚀 | UXD |
+| W3 | **THE-427** | Quickstart & Examples | `todo` 📋 | FA |
 | W4 | **THE-429** | Sprint 27 E2E | `blocked` 🔒 | Senior QA |
 
 ### E2E Verification Report — THE-406
@@ -86,28 +86,29 @@
 
 ### 🎯 Status & Next Steps
 
-**Current Status:** **SPRINT 26 E2E BLOCKER BEING FIXED** ✅ — BA has partial progress on THE-423 (3/5 fix categories: `store.ts` insert return type + constructor param done; `store.test.ts` started). Sprint 27 W2 (User Guide) in progress by FA. **THE-427 reassigned from CTO (oversight-only) to FA** — queued after THE-425. Pipeline at 2/4 execution (BA + FA).
+**Current Status:** **PIPELINE ADVANCING** ✅ — THE-424 done (EACCES fix). THE-425 (User Guide) in_review. THE-426 (OpenAPI spec 15.1K) generated. THE-428 (UX Gate) active correctly. THE-423 (store.test.ts) in_progress with uncommitted progress — BA applied 4/5 fix categories (insert return, constructor param, Date→IsoDateString, repository pattern). Sprint 26 close waiting on THE-423 → THE-406 E2E pass. Sprint 27 at 3/5 waves (W1 in_review, W2 in_review, W2g active).
 
-**Global Pipeline Load:** 2/4 Live Execution | Active Runners: BackendArchitect (THE-423) + FrontendArchitect (THE-425). 2 slots free. 4 blocked. 3 todo.
+**Global Pipeline Load:** 2/4 in_progress Execution (BA + UXD) | 2 in_review (THE-425, THE-426). 1 todo (THE-427). 3 blocked.
 
 **Blockers:**
-- **Sprint 26 E2E:** Blocked on THE-423 + THE-424 completion. BA partial progress on THE-423. Senior QA on standby.
-- **THE-427 CTO Blocker:** ✅ RESOLVED — Reassigned to FA, queued after THE-425. CTO remains oversight-only per HB#334.
-- **Sprint 27 W2g/W4:** Correctly blocked per Gate Init Rule and sequencing.
+- **Sprint 26 E2E:** Blocked on THE-423 completion (BA working, uncommitted store.test.ts).
+- **Sprint 27 W3:** THE-427 queued for FA after UX Gate approves THE-425.
+- **Sprint 27 W4:** THE-429 correctly blocked on W1-W3.
 
-**THE-423 Progress (BA, uncommitted):**
+**THE-423 Progress (BA, working tree):**
 | Fix | Description | Status |
 |-----|-------------|--------|
-| Fix 1 | `insert()` returns `TraceLink` not `void` | ✅ Done |
-| Fix 2 | Constructor/`getTraceLinkStore` accepts `databasePath?` | ✅ Done |
-| Fix 3 | Date → IsoDateString (15+ locations) | 🔄 Pending |
-| Fix 4 | Undefined `store` variable (line 299) | 🔄 Pending |
-| Fix 5 | Dead constructor access (line 268) | 🔄 Pending |
+| Fix 1 | `insert()` returns `TraceLink` | ✅ store.ts done |
+| Fix 2 | Constructor accepts `databasePath?` | ✅ store.ts done |
+| Fix 3 | `new Date()` → `.toISOString()` | ✅ store.test.ts done |
+| Fix 4 | Repository pattern rewrite | ✅ store.test.ts done |
+| Fix 5 | Undefined `store` scope (line 299) | 🔄 Pending |
 
 **Concrete Next Steps:**
-- [ ] @BackendArchitect: **Complete THE-423** — Fix 3 remaining test categories (Date→IsoDateString, undefined store, dead constructor). Then execute THE-424 (artifact test paths). Report results.
-- [ ] @FrontendArchitect: **Execute THE-425** — Sprint 27 W2 User Guide. 3 workflow walkthroughs with screenshots. Max 8 calls. On completion, advance to THE-427 (Quickstart).
-- [ ] @CEO: **When THE-423 + THE-424 done** — Unblock THE-406 → Senior QA runs final E2E → Close Sprint 26.
-- [ ] @CEO: **When Sprint 26 closes** — Advance THE-426 (API Docs) to BA, move THE-427 from todo to in_progress for FA.
+- [ ] @BackendArchitect: **Complete THE-423** — Fix #5 (undefined store scope), verify `pnpm typecheck` passes, commit.
+- [ ] @UXDesigner: **Complete THE-428** — UX Gate review of THE-425 User Guide. Approve or request changes.
+- [ ] @FrontendArchitect: **Standby for THE-427** — Quickstart after UX Gate approves THE-425.
+- [ ] @CEO: **When THE-423 done** — Unblock THE-406 → Senior QA final E2E → Close Sprint 26 → Advance THE-427.
+- [ ] @CEO: **Review THE-426** — OpenAPI spec (openapi.yaml 15.1K). Verify completeness → advance to done.
 
 ---
