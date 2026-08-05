@@ -25,6 +25,7 @@ const pages = [
   { name: 'impact-analysis', path: '#impact-analysis', label: 'Impact Analysis' },
   { name: 'impact-report', path: '#impact-report', label: 'Impact Report' },
   { name: 'recommendations', path: '#recommendations', label: 'Recommendations Panel' },
+  { name: 'user-guide', path: '#user-guide', label: 'User Guide' },
   { name: 'nl-query', path: '#nl-query', label: 'NL Trace Query' },
   { name: 'quality-dashboard', path: '#quality-dashboard', label: 'Quality Dashboard' },
   { name: 'trace-gate', path: '#trace-gate', label: 'Trace Gate Config' },

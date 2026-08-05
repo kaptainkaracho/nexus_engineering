@@ -1,23 +1,21 @@
 # FrontendArchitect Context State
-> Last updated: 2026-08-05T17:45:00Z
+> Last updated: 2026-08-05T17:00:00Z
 
 ## Last Run
-- Issue: THE-427
-- Timestamp: 2026-08-05T17:45:00Z
-- Status: In progress — quickstart rewritten, examples created
+- Issue: THE-425
+- Timestamp: 2026-08-05T17:00:00Z
+- Status: wrote 2 files, 0 errors
 
 ## Files Created/Modified
-- docs/quickstart.md (rewritten — reduced to <5 commands)
-- examples/simple-project/ (created — 3 documents, 3 trace links)
-- examples/full-project/ (created — 8 documents, 12 trace links)
-- README.md (modified — quickstart simplified, examples table added)
+- apps/frontend/src/views/UserGuide/index.tsx (restructured — workflow-first layout with sidebar nav, screenshots integrated)
+- capture-screenshots.mjs (added user-guide entry)
+
+## Verification
+- tsc -b: clean (0 errors)
+- eslint: clean (0 errors in UserGuide)
 
 ## Status
-- THE-427: in_progress
-- Quickstart: <5 commands ✅
-- Example repos: 3 published (simple, full, tac-samples) ✅
-- README links: added ✅
+- THE-425: in_progress — workflow-first restructuring complete, screenshots integrated, pending UX Gate review (THE-428)
 
 ## Next Action
-- Verify quickstart works on clean clone
-- Commit and push changes
+- Hand off to UXDesigner for UX Quality Gate re-review (THE-428)
