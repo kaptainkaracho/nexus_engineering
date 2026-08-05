@@ -32,11 +32,13 @@
 | **THE-428** | `in_progress` 🚀 | `in_progress` 🚀 | UXD | Sprint 27 W2g: UX Gate — Changes Requested posted |
 | **THE-429** | `blocked` 🔒 | `blocked` 🔒 | Senior QA | Sprint 27 W4: E2E |
 
-### Pipeline Compliance — HB#339
+### Pipeline Compliance — HB#340
 | Metric | Value | Verdict |
 |--------|-------|---------|
-| Live Execution | **2/4** 🚀 | THE-428 (UXD) + THE-406 (Senior QA) |
-| In Review | **1** 🔍 | THE-425 (FA/User Guide) |
+| Live Execution | **2/4** 🚀 | THE-425 (FA) + THE-428 (UXD) |
+| In Review | **0** | — |
+| Blocked | **3** 🔒 | THE-406, THE-427, THE-429 |
+| Done | **11** ✅ | Sprint 26 W1-W3+W2g + THE-424 + THE-426 + extras |
 | Todo | **2** 📋 | THE-427 (FA), THE-410 (CEO) |
 | Blocked | **1** 🔒 | THE-429 |
 | Done | **12** ✅ | S26 W1-W3+W2g + THE-411 + THE-415 + THE-423/424/426 |
@@ -64,7 +66,7 @@
 |------|-------|-------|--------|-------|
 | Parent | **THE-409** | Sprint 27 Parent | `in_progress` 🚀 | CEO |
 | W1 | **THE-426** | API Reference Docs | `done` ✅ | BA |
-| W2 | **THE-425** | User Guide | `in_review` 🔍 | FA |
+| W2 | **THE-425** | User Guide | `in_progress` 🚀 | FA |
 | W2g | **THE-428** | UX Gate | `in_progress` 🚀 | UXD |
 | W3 | **THE-427** | Quickstart & Examples | `todo` 📋 | FA |
 | W4 | **THE-429** | Sprint 27 E2E | `blocked` 🔒 | Senior QA |

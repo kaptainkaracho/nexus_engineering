@@ -1,0 +1,472 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Nexus Engineering API",
+    "description": "Auto-generated API documentation for the Nexus Engineering platform. Endpoints cover authentication, requirements management, artifact registry, scanning, traceability, and more.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Nexus Engineering Team"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3001",
+      "description": "Local development server"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "description": "Returns the health status of the backend service.",
+        "tags": ["System"],
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" },
+                "example": { "status": "ok" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "summary": "Register a new user",
+        "description": "Creates a new user account with email, password, and display name.",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password", "displayName"],
+                "properties": {
+                  "email": { "type": "string", "format": "email", "example": "user@example.com" },
+                  "password": { "type": "string", "minLength": 8, "example": "SecurePass123!" },
+                  "displayName": { "type": "string", "example": "Jane Doe" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "user": { "id": "usr_abc123", "email": "user@example.com", "displayName": "Jane Doe" },
+                  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid input" },
+          "409": { "description": "Email already registered" }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "Login user",
+        "description": "Authenticates a user with email and password, returns a JWT token.",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "format": "email", "example": "user@example.com" },
+                  "password": { "type": "string", "example": "SecurePass123!" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "user": { "id": "usr_abc123", "email": "user@example.com", "displayName": "Jane Doe" },
+                  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                }
+              }
+            }
+          },
+          "401": { "description": "Invalid credentials" }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "summary": "Get current user",
+        "description": "Returns the authenticated user's profile. Requires a valid JWT token.",
+        "tags": ["Authentication"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "User profile",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "user": { "id": "usr_abc123", "email": "user@example.com", "displayName": "Jane Doe", "role": "admin" }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/api/auth/roles": {
+      "get": {
+        "summary": "List available roles",
+        "description": "Returns all available RBAC roles. Requires authentication.",
+        "tags": ["Authentication"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "List of roles",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "roles": [
+                    { "id": "role_admin", "name": "Administrator", "description": "Full system access" },
+                    { "id": "role_editor", "name": "Editor", "description": "Can edit artifacts and requirements" }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/requirements": {
+      "get": {
+        "summary": "List all requirements",
+        "description": "Returns all loaded requirement documents mapped to frontend artefacts.",
+        "tags": ["Requirements"],
+        "responses": {
+          "200": {
+            "description": "List of requirements and related artefacts",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "artefacts": {
+                    "requirements": [
+                      { "id": "req_001", "title": "User authentication", "description": "Users must be able to authenticate via email and password", "priority": "high", "status": "draft" }
+                    ],
+                    "architectures": [],
+                    "components": [],
+                    "testCases": [],
+                    "traces": []
+                  },
+                  "total": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/requirements/:id": {
+      "get": {
+        "summary": "Get requirement by ID",
+        "description": "Returns a single requirement document by its ID.",
+        "tags": ["Requirements"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" }, "example": "req_001" }
+        ],
+        "responses": {
+          "200": { "description": "Requirement document", "content": { "application/json": { "schema": { "type": "object" } } } },
+          "404": { "description": "Requirement not found" }
+        }
+      }
+    },
+    "/api/requirements/domain/:domain": {
+      "get": {
+        "summary": "Filter requirements by domain",
+        "description": "Returns requirements filtered by a specific domain.",
+        "tags": ["Requirements"],
+        "parameters": [
+          { "name": "domain", "in": "path", "required": true, "schema": { "type": "string" }, "example": "authentication" }
+        ],
+        "responses": {
+          "200": { "description": "Filtered requirements", "content": { "application/json": { "schema": { "type": "object" } } } }
+        }
+      }
+    },
+    "/api/requirements/scan": {
+      "post": {
+        "summary": "Trigger requirements scan",
+        "description": "Triggers a rescan of the repository path and returns LoadResult.",
+        "tags": ["Requirements"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["repositoryPath"],
+                "properties": {
+                  "repositoryPath": { "type": "string", "example": "/home/user/projects/my-repo" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Scan results",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" },
+                "example": { "documents": [], "errors": {}, "message": "Scanned 3 requirement files" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/artifacts/registry": {
+      "get": {
+        "summary": "List all artifacts",
+        "description": "Returns all artifacts in the registry with a summary.",
+        "tags": ["Artifacts"],
+        "responses": {
+          "200": {
+            "description": "All artifacts and summary",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "data": [],
+                  "summary": { "total": 42, "byType": { "requirement": 20, "architecture": 10, "adr": 8, "spec": 4 } }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/artifacts/registry/type/:type": {
+      "get": {
+        "summary": "Filter artifacts by type",
+        "description": "Returns artifacts filtered by type (requirement, architecture, adr, spec).",
+        "tags": ["Artifacts"],
+        "parameters": [
+          { "name": "type", "in": "path", "required": true, "schema": { "type": "string", "enum": ["requirement", "architecture", "adr", "spec"] }, "example": "requirement" }
+        ],
+        "responses": {
+          "200": { "description": "Filtered artifacts", "content": { "application/json": { "schema": { "type": "object" } } } },
+          "400": { "description": "Invalid artifact type" }
+        }
+      }
+    },
+    "/api/artifacts/registry/:id": {
+      "get": {
+        "summary": "Get artifact by ID",
+        "description": "Returns a single artifact with full lifecycle details.",
+        "tags": ["Artifacts"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" }, "example": "art_abc123" }
+        ],
+        "responses": {
+          "200": { "description": "Artifact details", "content": { "application/json": { "schema": { "type": "object" } } } },
+          "404": { "description": "Artifact not found" }
+        }
+      },
+      "patch": {
+        "summary": "Update artifact lifecycle",
+        "description": "Updates the lifecycle state and/or metadata of an artifact.",
+        "tags": ["Artifacts"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "lifecycle": { "type": "string", "enum": ["discovered", "parsed", "indexed", "related", "error"] },
+                  "metadata": { "type": "object" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Updated artifact" },
+          "404": { "description": "Artifact not found" },
+          "409": { "description": "Invalid lifecycle transition" }
+        }
+      }
+    },
+    "/api/artifacts/registry/:id/reparse": {
+      "post": {
+        "summary": "Request artifact reparse",
+        "description": "Resets an artifact to discovered state and marks it for re-parse.",
+        "tags": ["Artifacts"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Reparse requested" },
+          "404": { "description": "Artifact not found" }
+        }
+      }
+    },
+    "/api/demo/sample-data": {
+      "get": {
+        "summary": "Get demo sample data",
+        "description": "Returns pre-loaded demo seed data (ADR samples, requirement trees, trace graphs). No authentication required.",
+        "tags": ["Demo"],
+        "responses": {
+          "200": {
+            "description": "Demo seed data",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "requirements": [],
+                  "adrs": [],
+                  "traceGraph": { "nodes": [], "edges": [] }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/demo/sample-data/:type": {
+      "get": {
+        "summary": "Get demo data by type",
+        "description": "Returns a specific category of demo seed data. Valid types: requirements, adrs, traceGraph.",
+        "tags": ["Demo"],
+        "parameters": [
+          { "name": "type", "in": "path", "required": true, "schema": { "type": "string", "enum": ["requirements", "adrs", "traceGraph"] }, "example": "requirements" }
+        ],
+        "responses": {
+          "200": { "description": "Demo data by type", "content": { "application/json": { "schema": { "type": "object" } } } },
+          "400": { "description": "Invalid demo data type" }
+        }
+      }
+    },
+    "/api/demo/status": {
+      "get": {
+        "summary": "Get demo mode status",
+        "description": "Returns demo mode status: read-only, no signup required, with seed data summary.",
+        "tags": ["Demo"],
+        "responses": {
+          "200": {
+            "description": "Demo mode status",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "demoMode": {
+                    "active": true,
+                    "readOnly": true,
+                    "noSignupRequired": true,
+                    "description": "Read-only demo sandbox with pre-loaded traceability data",
+                    "seedData": { "requirements": 10, "adrs": 5, "traceNodes": 50, "traceEdges": 75 }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/demo/deploy": {
+      "get": {
+        "summary": "Get deploy flow documentation",
+        "description": "Returns the one-click Railway deploy flow documentation. No authentication required.",
+        "tags": ["Demo"],
+        "responses": {
+          "200": { "description": "Deploy flow steps", "content": { "application/json": { "schema": { "type": "object" } } } }
+        }
+      }
+    },
+    "/api/liveness/reclassify": {
+      "post": {
+        "summary": "Reclassify liveness runs",
+        "description": "Reclassifies heartbeat runs with new status values.",
+        "tags": ["Liveness"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["runs"],
+                "properties": {
+                  "runs": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["id", "status"],
+                      "properties": {
+                        "id": { "type": "string" },
+                        "status": { "type": "string" }
+                      }
+                    }
+                  },
+                  "options": { "type": "object" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Reclassification report" }
+        }
+      }
+    },
+    "/api/liveness/reconcile": {
+      "post": {
+        "summary": "Reconcile liveness run",
+        "description": "Reconciles a single liveness run with an issue status.",
+        "tags": ["Liveness"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["run", "issueStatus"],
+                "properties": {
+                  "run": {
+                    "type": "object",
+                    "required": ["id", "status"]
+                  },
+                  "issueStatus": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Reconciliation result" }
+        }
+      }
+    }
+  }
+}
