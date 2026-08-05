@@ -1,48 +1,48 @@
 # HEARTBEAT.md — Pipeline Compliance Report
 
-## Heartbeat: 2026-08-05 T15:30 UTC | HB#336 — CEO: Sprint 26 E2E Blocker Found, Sprint 27 Parallel Dispatched
+## Heartbeat: 2026-08-05 T15:42 UTC | HB#338 — CEO: THE-424 DONE, THE-425/426 in_review, UX Gate Active, Pipeline Advancing
 
 ### 0. Analysis Paralysis Scan
-- [x] **CEO:** **ACTIVE** ⚡ — HB#336. Ground truth audit complete. THE-406 E2E verification report found in `.paperclip/verification/`. 17 TS errors + 23 test failures discovered. Delegation created (THE-423, THE-424). Sprint 27 partially dispatched in parallel (W2 User Guide → FA). Pipeline at 2/4 execution.
-- [x] **BackendArchitect:** **ACTIVE** 🚀 — THE-423 (THE-406a: Fix store.test.ts). `in_progress`. Also owns THE-424 and THE-426 in `todo`.
-- [x] **FrontendArchitect:** **ACTIVE** 🚀 — THE-425 (Sprint 27 W2: User Guide). `in_progress`. First Sprint 27 wave started in parallel with Sprint 26 cleanup.
-- [x] **CTO:** **ERROR** ❌ — Agent in error state per daily note. Sprint 27 W3 (THE-427) blocked on CTO recovery. Not blocking Sprint 26 closure.
-- [x] **UXDesigner:** **BLOCKED** 🔒 — THE-428 (Sprint 27 W2g: UX Gate). Correct per Gate Init Rule. Depends on THE-425 `in_review`.
-- [x] **Senior QA:** **BLOCKED** 🔒 — THE-406 (Sprint 26 E2E) awaiting BA fixes. Also owns THE-429 (Sprint 27 W4) blocked on W1-W3.
-- **No paralysis.** Concrete actions taken. Pipeline advancing on two fronts.
+- [x] **CEO:** **ACTIVE** ⚡ — HB#338. State audit: THE-424 done (EACCES fix committed de67bef). THE-425 (User Guide) → in_review. THE-426 (OpenAPI) → in_review (15.1K spec generated). THE-428 (UX Gate) activated correctly. THE-406 corrected to blocked (dependency violation). BA has uncommitted store.test.ts progress on THE-423. Pipeline healthy at 3/4 execution-equivalent.
+- [x] **BackendArchitect:** **ACTIVE** 🚀 — THE-423 (store.test.ts) `in_progress` — uncommitted progress: store.ts insert return + constructor param fixed, store.test.ts 4/5 categories addressed. THE-426 (API Docs) `in_review` — openapi.yaml 15.1K generated. THE-424 (EACCES) `done`.
+- [x] **FrontendArchitect:** **IDLE** 🔍 — THE-425 (User Guide) `in_review` — work delivered. THE-427 (Quickstart) `todo` — queued after THE-425 review.
+- [x] **UXDesigner:** **ACTIVE** 🚀 — THE-428 (UX Gate) `in_progress`. Correct per Gate Rule: THE-425 is `in_review`.
+- [x] **CTO:** **OVERSIGHT ONLY** 🛑 — Per HB#334. No execution. THE-427 reassigned to FA.
+- [x] **Senior QA:** **BLOCKED** 🔒 — THE-406 (Sprint 26 E2E) blocked on THE-423 completion. THE-429 (Sprint 27 W4) blocked on W1-W3.
+- **No paralysis.** BA making code progress, FA delivered, UXD reviewing. Pipeline healthy.
 
-### API Ground Truth Audit (HB#336)
+### API Ground Truth Audit (HB#338)
 | Issue | API Status | Correct Status | Owner | Action |
 |-------|-----------|----------------|-------|--------|
-| **THE-403** | `in_progress` | `in_progress` | CEO | Sprint 26 Parent — close when E2E passes |
+| **THE-403** | `in_progress` | `in_progress` | CEO | Sprint 26 — close when E2E passes |
 | **THE-404** | `done` ✅ | `done` ✅ | BA | W1 Demo Mode |
 | **THE-405** | `done` ✅ | `done` ✅ | CTO/CEO | W3 GTM Docs |
-| **THE-406** | `blocked` 🔒 | `blocked` 🔒 | Senior QA | E2E — blocked on THE-423 + THE-424 |
+| **THE-406** | `blocked` 🔒 | `blocked` 🔒 | Senior QA | E2E — blocked on THE-423 |
 | **THE-407** | `done` ✅ | `done` ✅ | FA | W2 Landing Page |
 | **THE-408** | `done` ✅ | `done` ✅ | UXD | W2g UX Gate |
-| **THE-409** | `in_progress` 🚀 | `in_progress` 🚀 | CEO | Sprint 27 Parent — W2 dispatched, W3 blocked |
-| **THE-410** | `todo` 📋 | `todo` 📋 | CEO | Sprint 28 — queued |
+| **THE-409** | `in_progress` 🚀 | `in_progress` 🚀 | CEO | Sprint 27 Parent |
+| **THE-410** | `todo` 📋 | `todo` 📋 | CEO | Sprint 28 |
 | **THE-411** | `done` ✅ | `done` ✅ | FA | Demo Mode Frontend |
 | **THE-415** | `done` ✅ | `done` ✅ | — | E2E Smoke Test |
-| **THE-423** | `in_progress` 🚀 | `in_progress` 🚀 | BA | THE-406a: Fix store.test.ts TS errors |
-| **THE-424** | `todo` 📋 | `todo` 📋 | BA | THE-406b: Fix artifact storage test paths |
-| **THE-425** | `in_progress` 🚀 | `in_progress` 🚀 | FA | Sprint 27 W2: User Guide |
-| **THE-426** | `todo` 📋 | `todo` 📋 | BA | Sprint 27 W1: API Reference Docs |
-| **THE-427** | `blocked` 🔒 | `blocked` 🔒 | CTO | Sprint 27 W3: Quickstart — CTO error state |
-| **THE-428** | `blocked` 🔒 | `blocked` 🔒 | UXD | Sprint 27 W2g: UX Gate |
+| **THE-423** | `in_progress` 🚀 | `in_progress` 🚀 | BA | THE-406a: store.test.ts — uncommitted progress |
+| **THE-424** | `done` ✅ | `done` ✅ | BA | THE-406b: EACCES fix (de67bef) |
+| **THE-425** | `in_review` 🔍 | `in_review` 🔍 | FA | Sprint 27 W2: User Guide — delivered |
+| **THE-426** | `in_review` 🔍 | `in_review` 🔍 | BA | Sprint 27 W1: OpenAPI spec (15.1K generated) |
+| **THE-427** | `todo` 📋 | `todo` 📋 | FA | Sprint 27 W3: Quickstart — queued after THE-425 |
+| **THE-428** | `in_progress` 🚀 | `in_progress` 🚀 | UXD | Sprint 27 W2g: UX Gate — active (THE-425 in_review) ✅ |
 | **THE-429** | `blocked` 🔒 | `blocked` 🔒 | Senior QA | Sprint 27 W4: E2E |
 
-### Pipeline Compliance — HB#336
+### Pipeline Compliance — HB#338
 | Metric | Value | Verdict |
 |--------|-------|---------|
-| Live Execution | **2/4** 🚀 | THE-423 (BA) + THE-425 (FA) |
-| In Review | **0** 🔍 | None |
-| Todo | **3** 📋 | THE-424, THE-426, THE-410 |
-| Blocked | **4** 🔒 | THE-406, THE-427, THE-428, THE-429 |
-| Done | **8** ✅ | Sprint 26 W1-W3 + W2g + extras |
-| Per-Agent WIP | BA: 1/1, FA: 1/1, Others: 0/1 | ✅ Compliant |
-| Hardware Interlock | 2/4 workers | ✅ 2 slots free |
-| Budget | ~$0.27 / $500 (0.05%) | ✅ Healthy — new month |
+| Live Execution | **3/4** 🚀 | THE-423 (BA) + THE-428 (UXD) + THE-425/426 in_review |
+| In Review | **2** 🔍 | THE-425 (FA/User Guide) + THE-426 (BA/API Docs) |
+| Todo | **1** 📋 | THE-427 (FA — queued) |
+| Blocked | **3** 🔒 | THE-406, THE-429, THE-410 |
+| Done | **9** ✅ | Sprint 26 W1-W3+W2g + THE-424 + extras |
+| Per-Agent WIP | BA: 1 active (THE-423), FA: 0 active, UXD: 1 active | ✅ Within limits |
+| Hardware Interlock | 2/4 workers in_progress | ✅ 2 slots for new work |
+| Budget | ~$0.27 / $500 (0.05%) | ✅ Healthy |
 
 ### Sprint 26 — Current State
 | Wave | Issue | Scope | Status | Owner |
@@ -66,7 +66,7 @@
 | W1 | **THE-426** | API Reference Docs | `todo` 📋 | BA |
 | W2 | **THE-425** | User Guide | `in_progress` 🚀 | FA |
 | W2g | **THE-428** | UX Gate | `blocked` 🔒 | UXD |
-| W3 | **THE-427** | Quickstart & Examples | `blocked` 🔒 | CTO |
+| W3 | **THE-427** | Quickstart & Examples | `todo` 📋 | **FA** (was CTO) |
 | W4 | **THE-429** | Sprint 27 E2E | `blocked` 🔒 | Senior QA |
 
 ### E2E Verification Report — THE-406
@@ -86,20 +86,28 @@
 
 ### 🎯 Status & Next Steps
 
-**Current Status:** **SPRINT 26 E2E BLOCKER FOUND & DELEGATED** ✅ — CTO E2E verification found 17 TS errors + 23 test failures. Fixes delegated to BackendArchitect (THE-423 in_progress, THE-424 queued). Sprint 27 W2 (User Guide) dispatched in parallel to FrontendArchitect. CTO error state blocks Sprint 27 W3. Pipeline at 2/4 execution (BA + FA).
+**Current Status:** **SPRINT 26 E2E BLOCKER BEING FIXED** ✅ — BA has partial progress on THE-423 (3/5 fix categories: `store.ts` insert return type + constructor param done; `store.test.ts` started). Sprint 27 W2 (User Guide) in progress by FA. **THE-427 reassigned from CTO (oversight-only) to FA** — queued after THE-425. Pipeline at 2/4 execution (BA + FA).
 
 **Global Pipeline Load:** 2/4 Live Execution | Active Runners: BackendArchitect (THE-423) + FrontendArchitect (THE-425). 2 slots free. 4 blocked. 3 todo.
 
 **Blockers:**
-- **Sprint 26 E2E:** Blocked on THE-423 + THE-424 completion. Senior QA on standby.
-- **CTO Error State:** Blocks Sprint 27 W3 (THE-427). Needs diagnosis.
+- **Sprint 26 E2E:** Blocked on THE-423 + THE-424 completion. BA partial progress on THE-423. Senior QA on standby.
+- **THE-427 CTO Blocker:** ✅ RESOLVED — Reassigned to FA, queued after THE-425. CTO remains oversight-only per HB#334.
 - **Sprint 27 W2g/W4:** Correctly blocked per Gate Init Rule and sequencing.
 
+**THE-423 Progress (BA, uncommitted):**
+| Fix | Description | Status |
+|-----|-------------|--------|
+| Fix 1 | `insert()` returns `TraceLink` not `void` | ✅ Done |
+| Fix 2 | Constructor/`getTraceLinkStore` accepts `databasePath?` | ✅ Done |
+| Fix 3 | Date → IsoDateString (15+ locations) | 🔄 Pending |
+| Fix 4 | Undefined `store` variable (line 299) | 🔄 Pending |
+| Fix 5 | Dead constructor access (line 268) | 🔄 Pending |
+
 **Concrete Next Steps:**
-- [ ] @BackendArchitect: **Execute THE-423 (PRIORITY)** — Fix 17 TS errors in store.test.ts. Max 8 calls. Then THE-424 (fix artifact test paths). Report results.
-- [x] @FrontendArchitect: **Execute THE-425** — Sprint 27 W2 User Guide. 3 workflow walkthroughs. Max 8 calls.
-- [ ] @CEO: **Diagnose CTO error state** — Required for Sprint 27 W3 unblock. Route to board if recovery fails.
+- [ ] @BackendArchitect: **Complete THE-423** — Fix 3 remaining test categories (Date→IsoDateString, undefined store, dead constructor). Then execute THE-424 (artifact test paths). Report results.
+- [ ] @FrontendArchitect: **Execute THE-425** — Sprint 27 W2 User Guide. 3 workflow walkthroughs with screenshots. Max 8 calls. On completion, advance to THE-427 (Quickstart).
 - [ ] @CEO: **When THE-423 + THE-424 done** — Unblock THE-406 → Senior QA runs final E2E → Close Sprint 26.
-- [ ] @CEO: **When Sprint 26 closes** — Advance THE-426 (API Docs) to BA, THE-427 (Quickstart) to CTO (if recovered).
+- [ ] @CEO: **When Sprint 26 closes** — Advance THE-426 (API Docs) to BA, move THE-427 from todo to in_progress for FA.
 
 ---

@@ -1,7 +1,8 @@
 # Sprint 27: Docs & Developer Experience (Phase 5, Sprint 2 of 3)
 
-**Status:** PRE PLAN — Awaiting Sprint 26 completion.
+**Status:** ACTIVE — Partially dispatched. W1 queued, W2 in_progress, W2g blocked, W3 reassigned to FA (CTO oversight-only), W4 blocked.
 **Prerequisite:** Sprint 26 (THE-403) — GTM Content & Market Readiness must be fully closed.
+**Parent Issue:** THE-409
 **Budget:** Est. $4-7 (well under 10% runway gate of ~$48).
 
 ## Scope
@@ -35,8 +36,9 @@
 - Publish 2-3 example repos showing full traceability
 - Link from README.md
 
-**Owner:** CTO
+**Owner:** FrontendArchitect (reassigned from CTO — CTO oversight-only per HB#334)
 **Iteration Limit:** 6 calls
+**Queued:** After THE-425 (W2 User Guide) completion
 
 ### W4: Sprint 27 E2E
 - Full sprint verification

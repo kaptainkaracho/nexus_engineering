@@ -17,7 +17,7 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 4. **Clear dispositions** — Every task must end with done/in_review/blocked/delegated
 5. **Gate Initialization Rule** — Dependent issues blocked on upstream work must start as `blocked`, never `in_progress`. Violation results in immediate correction to `blocked`.
 
-## Active Issues (2026-08-05 ~15:30 UTC — HB#336)
+## Active Issues (2026-08-05 ~15:35 UTC — HB#337)
 
 ### Sprint 26 — GTM Content (1 blocker remains)
 | Issue | DB Status | Correct Status | Owner | Notes |
@@ -36,10 +36,10 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 ### Sprint 27 — Docs & DX (parallel dispatch)
 | Issue | DB Status | Correct Status | Owner | Notes |
 |-------|-----------|----------------|-------|-------|
-| **THE-409** | `in_progress` 🚀 | 🚀 | **CEO** | **Sprint 27 Parent** — W2+W2g+W4 dispatched. W3 blocked on CTO error. |
+| **THE-409** | `in_progress` 🚀 | 🚀 | **CEO** | **Sprint 27 Parent** — W2+W2g+W4 dispatched. W3 reassigned to FA (CTO oversight-only). |
 | **THE-425** | `in_progress` 🚀 | 🚀 | FA | W2: User Guide (3 workflow walkthroughs) |
 | **THE-426** | `todo` 📋 | 📋 | BA | W1: API Reference Docs (starts after THE-423/424) |
-| **THE-427** | `blocked` 🔒 | 🔒 | CTO | W3: Quickstart — CTO in error state |
+| **THE-427** | `todo` 📋 | 📋 | **FA** (was CTO) | W3: Quickstart — reassigned from CTO, queued after THE-425 |
 | **THE-428** | `blocked` 🔒 | 🔒 | UXD | W2g: UX Gate — dep on THE-425 `in_review` |
 | **THE-429** | `blocked` 🔒 | 🔒 | Senior QA | W4: E2E — dep on W1-W3 |
 
@@ -48,16 +48,15 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 |-------|-----------|-------|
 | **THE-410** | `todo` 📋 | CEO |
 
-### Agent Status (HB#336)
+### Agent Status (HB#337)
 | Agent | WIP | Status | Issue |
 |-------|-----|--------|-------|
 | CEO | 2 (management) | Active | THE-403 + THE-409 |
 | BackendArchitect | 1/1 | Active | THE-423 |
 | FrontendArchitect | 1/1 | Active | THE-425 |
-| CTO | 0/1 | **ERROR** | — |
+| CTO | 0/1 | **OVERSIGHT ONLY** 🛑 | — |
 | UXDesigner | 0/1 | Blocked | THE-428 |
 | Senior QA | 0/1 | Blocked | THE-406 |
-| Minerva | 0/1 | **ERROR** | — |
 
 ### Completed Sprints
 | Sprint | Issue | Status | Notes |
