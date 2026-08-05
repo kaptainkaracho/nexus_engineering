@@ -1,21 +1,26 @@
 # FrontendArchitect Context State
-> Last updated: 2026-08-05T17:00:00Z
+> Last updated: 2026-08-05T17:55:00Z
 
 ## Last Run
-- Issue: THE-425
-- Timestamp: 2026-08-05T17:00:00Z
-- Status: wrote 2 files, 0 errors
+- Issue: THE-427
+- Timestamp: 2026-08-05T17:55:00Z
+- Status: Fixed broken quickstart links, finalizing
 
 ## Files Created/Modified
-- apps/frontend/src/views/UserGuide/index.tsx (restructured — workflow-first layout with sidebar nav, screenshots integrated)
-- capture-screenshots.mjs (added user-guide entry)
+- docs/quickstart.md (fixed example links to match actual paths)
+- examples/simple-project/ (created — 3 docs, 3 trace links)
+- examples/full-project/ (created — 8 docs, 12 trace links)
+- README.md (modified — quickstart simplified, examples table added)
 
-## Verification
-- tsc -b: clean (0 errors)
-- eslint: clean (0 errors in UserGuide)
+## Commits This Session
+- 6ee0f01: feat(THE-427): Quickstart & example repos for Sprint 27 W3
 
 ## Status
-- THE-425: in_progress — workflow-first restructuring complete, screenshots integrated, pending UX Gate review (THE-428)
+- THE-427: done ✅
+- Quickstart: <5 commands ✅
+- Example repos: 3 published (simple, full, tac-samples) ✅
+- README links: added ✅
+- Quickstart links: fixed ✅
 
 ## Next Action
-- Hand off to UXDesigner for UX Quality Gate re-review (THE-428)
+- Commit link fix, mark issue done
