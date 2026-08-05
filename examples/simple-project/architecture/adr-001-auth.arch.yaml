@@ -1,0 +1,25 @@
+nexus:
+  schema: arch-doc/v1
+  metadata:
+    domain: Authentication
+    version: 1.0.0
+    source: examples/simple-project/architecture/adr-001-auth.arch.yaml
+    documentId: SIMPLE-ADR-001
+    author: FrontendArchitect
+    createdAt: "2026-08-05"
+    updatedAt: "2026-08-05"
+
+adr:
+  id: ADR-001
+  title: Use JWT for session management
+  status: accepted
+  context: |
+    We need a stateless authentication mechanism that works across
+    multiple services without shared session storage.
+  decision: |
+    Use short-lived JWT access tokens (15 minutes) signed with RS256.
+    Refresh tokens rotate on each use and are stored server-side.
+  consequences:
+    - Services can validate tokens locally without network calls
+    - Revocation has up to 15-minute window for access tokens
+    - Refresh token store (Redis) required for revocation

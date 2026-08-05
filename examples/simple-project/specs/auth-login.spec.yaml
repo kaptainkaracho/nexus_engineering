@@ -1,0 +1,37 @@
+nexus:
+  schema: spec-doc/v1
+  metadata:
+    domain: Authentication
+    version: 1.0.0
+    source: examples/simple-project/specs/auth-login.spec.yaml
+    documentId: SIMPLE-SPEC-001
+    author: FrontendArchitect
+    createdAt: "2026-08-05"
+    updatedAt: "2026-08-05"
+
+spec:
+  id: SPEC-AUTH-001
+  title: Login Specification
+  version: 1.0.0
+  status: active
+  requirements:
+    - id: SPEC-AUTH-LOGIN-001
+      title: Valid credentials create session
+      priority: P0
+      status: implemented
+      references:
+        - type: req
+          id: REQ-AUTH-001
+        - type: arch
+          id: ADR-001
+        - type: test
+          id: TC-AUTH-LOGIN-001
+    - id: SPEC-AUTH-LOGIN-002
+      title: Invalid credentials show error
+      priority: P0
+      status: implemented
+      references:
+        - type: req
+          id: REQ-AUTH-001
+        - type: test
+          id: TC-AUTH-LOGIN-002

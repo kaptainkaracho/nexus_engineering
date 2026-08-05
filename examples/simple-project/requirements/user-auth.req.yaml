@@ -1,0 +1,30 @@
+nexus:
+  schema: req-doc/v1
+  metadata:
+    domain: Authentication
+    version: 1.0.0
+    source: examples/simple-project/requirements/user-auth.req.yaml
+    documentId: SIMPLE-AUTH-001
+    author: FrontendArchitect
+    createdAt: "2026-08-05"
+    updatedAt: "2026-08-05"
+
+requirements:
+  - id: REQ-AUTH-001
+    type: functional
+    title: User Login
+    description: |
+      Users MUST be able to log in with email and password.
+      Sessions expire after 15 minutes of inactivity.
+    priority: high
+    status: approved
+    tags:
+      - auth
+      - security
+    acceptanceCriteria:
+      - "Given a registered user, when valid credentials are entered, then a session is created"
+      - "Given a user, when invalid credentials are entered, then an error message is shown"
+    dependencies: []
+    relatedIssues: []
+    notes: |
+      Password hashing uses Argon2id.
