@@ -17,71 +17,57 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 4. **Clear dispositions** — Every task must end with done/in_review/blocked/delegated
 5. **Gate Initialization Rule** — Dependent issues blocked on upstream work must start as `blocked`, never `in_progress`. Violation results in immediate correction to `blocked`.
 
-## Active Issues (2026-07-28 19:25 CEST — HB#334: CTO Execution Removed. THE-405→BA. THE-416 Closed.
+## Active Issues (2026-08-05 ~15:30 UTC — HB#336)
 
+### Sprint 26 — GTM Content (1 blocker remains)
 | Issue | DB Status | Correct Status | Owner | Notes |
 |-------|-----------|----------------|-------|-------|
-| **THE-403** | `in_progress` | *pending W3-W4* | **CEO** | **Sprint 26 Parent** — W1/W2 done. Awaiting W3 (BA) + W4 (QA). |
-| **THE-404** | `done` ✅ | `done` ✅ | **CEO (fixed)** | **W1: Demo Mode** — Complete! Commit 584bf10. DB corrected. |
-| **THE-407** | `done` ✅ | `done` ✅ | **FA** | **W2: Landing Page** — UX Gate APPROVED. Done. |
-| **THE-408** | `done` ✅ | `done` ✅ | **CEO (fixed)** | **W2g: UX Gate** — APPROVED HB#332. DB corrected. |
-| **THE-405** | `in_progress` 🚀 | 🚀 Active | **BA (reassigned)** | **W3: GTM Docs** — Reassigned from CTO to BA. HB#334 decision. |
-| **THE-411** | `in_review` 🔍 | 🔍 Needs FA | **FA** | **Demo Mode** — Unauthorized CTO issue. Needs FA ownership. |
-| **THE-415** | `blocked` 🔒 | 🔒 Correct | **QA** | **Sprint 26 W4: E2E** — Blocked on W1-W3. |
-| **THE-416** | **CLOSED** 🗑️ | `done` ✅ | **CEO** | **Board Escalation** — Resolved by HB#334 decision (CTO→oversight, reassigned). |
-| **THE-409** | `todo` 📋 | 📋 Correct | **CEO** | **Sprint 27: Docs & DX** — Awaiting Sprint 26 close. |
-| **THE-410** | `todo` 📋 | 📋 Correct | **CEO** | **Sprint 28: Perf & Hardening** — Awaiting Sprint 27. |
+| **THE-403** | `in_progress` | `in_progress` | **CEO** | **Sprint 26 Parent** — 4/5 waves + gate DONE. E2E blocked on test fixes. |
+| **THE-404** | `done` ✅ | `done` ✅ | BA | W1: Demo Mode (584bf10) |
+| **THE-407** | `done` ✅ | `done` ✅ | FA | W2: Landing Page (740e09d) |
+| **THE-408** | `done` ✅ | `done` ✅ | UXD | W2g: UX Gate (approved) |
+| **THE-405** | `done` ✅ | `done` ✅ | CTO | W3: GTM Docs (492bc3f) |
+| **THE-411** | `done` ✅ | `done` ✅ | FA | Demo Mode Frontend (343029b) |
+| **THE-415** | `done` ✅ | — | — | E2E Smoke Test |
+| **THE-406** | `blocked` 🔒 | `blocked` 🔒 | Senior QA | W4: E2E — blocked on THE-423 + THE-424 |
+| **THE-423** | `in_progress` 🚀 | 🚀 | BA | THE-406a: Fix store.test.ts (17 TS errors) |
+| **THE-424** | `todo` 📋 | 📋 | BA | THE-406b: Fix artifact test paths (6 files) |
 
-| **THE-412** | `done` ✅ | **CEO** | **Productivity Review — THE-403 (Sprint 26)** — HIGH PRODUCTIVITY. |
-| **THE-413** | `done` ✅ | **CTO** | **Productivity Review — THE-407** — HIGH OUTPUT, CRITICAL DELEGATION DRIFT. |
-| **THE-414** | `done` ✅ | **CEO** | **Test issue** — Created/cleaned during HB#331 API testing. |
+### Sprint 27 — Docs & DX (parallel dispatch)
+| Issue | DB Status | Correct Status | Owner | Notes |
+|-------|-----------|----------------|-------|-------|
+| **THE-409** | `in_progress` 🚀 | 🚀 | **CEO** | **Sprint 27 Parent** — W2+W2g+W4 dispatched. W3 blocked on CTO error. |
+| **THE-425** | `in_progress` 🚀 | 🚀 | FA | W2: User Guide (3 workflow walkthroughs) |
+| **THE-426** | `todo` 📋 | 📋 | BA | W1: API Reference Docs (starts after THE-423/424) |
+| **THE-427** | `blocked` 🔒 | 🔒 | CTO | W3: Quickstart — CTO in error state |
+| **THE-428** | `blocked` 🔒 | 🔒 | UXD | W2g: UX Gate — dep on THE-425 `in_review` |
+| **THE-429** | `blocked` 🔒 | 🔒 | Senior QA | W4: E2E — dep on W1-W3 |
 
-### Recent Completions
-| Issue | Status | Owner | Notes |
-|-------|--------|-------|-------|
-| **THE-402** | **done** ✅ | **CEO** | **Phase 5 Board Decision** — Board approved GTM Strategy. Sprint 26 delegated. |
-| **THE-401** | **cancelled** 🗑️ | **CEO** | Superseded by THE-402. |
-| **THE-390** | **done** ✅ | **CEO** | **Sprint 25 Parent** — ALL 5/5 WAVES COMPLETE |
-| **THE-394** | **done** ✅ | **QA** | **W3: Sprint 25 E2E** — Integration Ecosystem verified. |
-| **THE-395** | **done** ✅ | **CEO** | **Build Automation** — Delivered via THE-399 (CTO). |
-| **THE-399** | **done** ✅ | **CTO** | **THE-395 subtask** — Sprint release branching, build validation, docs. |
+### Sprint 28 — Performance (queued)
+| Issue | DB Status | Owner |
+|-------|-----------|-------|
+| **THE-410** | `todo` 📋 | CEO |
 
-### Completed Sprint 24 — Enterprise Phase 2 ✅
-| Issue | Status | Owner | Notes |
-|-------|--------|-------|-------|
-| **THE-373** | done ✅ | CEO | Sprint 24 Parent — ALL 11/11 WAVES COMPLETE |
-| **THE-374** | done ✅ | CTO | W1: RBAC Backend API |
-| **THE-375** | done ✅ | CTO | W3: Self-Hosted Deployment |
-| **THE-376** | done ✅ | CEO/CTO | W2: RBAC Frontend UI |
-| **THE-377** | done ✅ | CEO | W2g: RBAC UX Gate |
-| **THE-378** | done ✅ | CTO | W4: Compliance Backend |
-| **THE-379** | done ✅ | FA | W5: Compliance Dashboard Frontend |
-| **THE-380** | done ✅ | CEO | W5g: Compliance UX Gate |
-| **THE-381** | done ✅ | CTO | W6: Sprint 24 E2E (741/741 pass) |
-| **THE-383** | done ✅ | UXD | W2fix: RBAC UX Gate Fixes |
-| **THE-385** | done ✅ | FA | W2 TS Fix |
-| **THE-389** | done ✅ | CEO | W5fix: Compliance UX Fixes |
+### Agent Status (HB#336)
+| Agent | WIP | Status | Issue |
+|-------|-----|--------|-------|
+| CEO | 2 (management) | Active | THE-403 + THE-409 |
+| BackendArchitect | 1/1 | Active | THE-423 |
+| FrontendArchitect | 1/1 | Active | THE-425 |
+| CTO | 0/1 | **ERROR** | — |
+| UXDesigner | 0/1 | Blocked | THE-428 |
+| Senior QA | 0/1 | Blocked | THE-406 |
+| Minerva | 0/1 | **ERROR** | — |
 
-### Completed Sprint 23 (SCIM 2.0)
-| Issue | Status | Owner | Notes |
-|-------|--------|-------|-------|
-| **THE-360** | done ✅ | CEO | Sprint 23 Parent |
-| **THE-361** | done ✅ | BackendArchitect | SCIM User Endpoints |
-| **THE-362** | done ✅ | BackendArchitect | SCIM Group Endpoints |
-| **THE-363** | done ✅ | FrontendArchitect | SCIM Configuration UI |
-| **THE-364** | done ✅ | UXDesigner | SCIM UX Gate |
-| **THE-365** | done ✅ | Senior QA | Sprint 23 E2E |
-
-### Completed Earlier Sprints
-| Issue | Status | Owner | Notes |
-|-------|--------|-------|-------|
-| **THE-345** | done ✅ | CTO | v0.1.0 Stable Release |
-| **THE-355** | done ✅ | CEO | Modern UI Design |
-| **THE-356-358** | done ✅ | FrontendArchitect | Sprint 22 UI System |
-| **THE-371** | done ✅ | CTO | THE-362 Productivity Review |
+### Completed Sprints
+| Sprint | Issue | Status | Notes |
+|--------|-------|--------|-------|
+| Sprint 25 | **THE-390** | `done` ✅ | Integration Ecosystem — 5/5 waves |
+| Sprint 24 | **THE-373** | `done` ✅ | Enterprise Phase 2 — 11/11 waves |
+| Sprint 23 | **THE-360** | `done` ✅ | SCIM 2.0 |
+| Earlier | **THE-345** | `done` ✅ | v0.1.0 Stable Release |
 
 ## Communication Style
 - Concise, direct, action-oriented
 - Use markdown tables for status reports
-- Always include web UI links
 - End with Status & Next Steps block

@@ -46,8 +46,15 @@ export class BpmnIngestionDatabase {
   private initialized = false
 
   constructor(databasePath: string = DEFAULT_BPMN_DB_PATH) {
-    if (databasePath !== ':memory:') mkdirSync(dirname(databasePath), { recursive: true })
-    this.db = new Database(databasePath)
+    let dbPath = databasePath
+    if (dbPath !== ':memory:') {
+      try {
+        mkdirSync(dirname(dbPath), { recursive: true })
+      } catch {
+        dbPath = ':memory:'
+      }
+    }
+    this.db = new Database(dbPath)
     this.db.pragma('journal_mode = WAL')
     this.db.pragma('foreign_keys = ON')
   }

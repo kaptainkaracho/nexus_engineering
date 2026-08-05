@@ -15,8 +15,15 @@ export class AuditLogDatabase {
   private retentionConfig: AuditLogRetentionConfig = { ttlDays: DEFAULT_RETENTION_TTL_DAYS, enabled: true }
 
   constructor(databasePath: string = DEFAULT_AUDIT_DB_PATH) {
-    if (databasePath !== ':memory:') mkdirSync(dirname(databasePath), { recursive: true })
-    this.db = new Database(databasePath)
+    let dbPath = databasePath
+    if (dbPath !== ':memory:') {
+      try {
+        mkdirSync(dirname(dbPath), { recursive: true })
+      } catch {
+        dbPath = ':memory:'
+      }
+    }
+    this.db = new Database(dbPath)
     this.db.pragma('journal_mode = WAL')
     this.db.pragma('foreign_keys = ON')
   }
