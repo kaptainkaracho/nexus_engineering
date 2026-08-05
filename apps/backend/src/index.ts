@@ -28,6 +28,7 @@ import { scimRoutes } from './routes/scim'
 import { rbacRoutes } from './routes/rbac'
 import { licenseRoutes } from './routes/license'
 import { demoRoutes } from './routes/demoRoutes'
+import { docsRoutes } from './routes/docsRoutes'
 
 const server = fastify({ logger: true })
 
@@ -91,6 +92,7 @@ const start = async () => {
     rbacRoutes(server)
     licenseRoutes(server)
     demoRoutes(server)
+    await docsRoutes(server)
 
     // SPA fallback: serve index.html for any non-API GET route in production.
     if (process.env.NODE_ENV === 'production' && existsSync(frontendDist)) {

@@ -29,26 +29,24 @@ describe('TraceLinkStore', () => {
   })
 
     it('should insert a trace link and retrieve it', async () => {
-     const { getTraceLinkStore } = await import('../traceabilityLinks/store')
-    
-    // Create fresh instance with test path
+    const { getTraceLinkStore } = await import('../traceabilityLinks/store')
     const store1 = getTraceLinkStore(TEST_DB_PATH)
     
-    const now = new Date()
+    const now = new Date().toISOString()
     const link: TraceLink = {
       id: 'test-001',
       version: '1.0',
       createdAt: now,
       updatedAt: now,
-      source: 'API',
-      sourceId: 'req-123',
-      sourceType: 'requirement',
-      targetId: 'artifact-456',
-      targetType: 'architectureModel',
-      relationshipType: 'satisfies',
-      confidence: 'high',
-      description: 'Test link'
-    }
+        source: 'API',
+        sourceId: 'req-123',
+        sourceType: 'requirement',
+        targetId: 'artifact-456',
+        targetType: 'architectureModel',
+        relationshipType: 'satisfies',
+        confidence: 'high',
+        description: 'Test link'
+      }
     
     const result = store1.insert(link)
     assert.strictEqual(result.id, 'test-001')
@@ -66,8 +64,8 @@ describe('TraceLinkStore', () => {
     const link: TraceLink = {
       id: 'test-002',
       version: '1.0',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       source: 'API',
       sourceId: 'req-1',
       sourceType: 'requirement',
@@ -75,7 +73,7 @@ describe('TraceLinkStore', () => {
       targetType: 'architectureModel',
       relationshipType: 'tracesTo',
       confidence: 'medium'
-    }
+    })
     
     store.insert(link)
     assert.throws(() => store.insert(link), /already exists/)
@@ -85,15 +83,16 @@ describe('TraceLinkStore', () => {
     const { getTraceLinkStore } = await import('../traceabilityLinks/store')
     const store = getTraceLinkStore(TEST_DB_PATH)
     
+    const now = new Date().toISOString()
     store.insert({
-      id: 'tl-001', version: '1.0', createdAt: new Date(), updatedAt: new Date(),
+      id: 'tl-001', version: '1.0', createdAt: now, updatedAt: now,
       source: 'API', sourceId: 'req-1', sourceType: 'requirement' as const,
       targetId: 'a-1', targetType: 'architectureModel' as const,
       relationshipType: 'satisfies' as const, confidence: 'high' as const
     } as TraceLink)
     
     store.insert({
-      id: 'tl-002', version: '1.0', createdAt: new Date(), updatedAt: new Date(),
+      id: 'tl-002', version: '1.0', createdAt: now, updatedAt: now,
       source: 'API', sourceId: 'req-2', sourceType: 'requirement' as const,
       targetId: 'a-2', targetType: 'softwareComponent' as const,
       relationshipType: 'verifies', confidence: 'low'
@@ -108,8 +107,9 @@ describe('TraceLinkStore', () => {
     const { getTraceLinkStore } = await import('../traceabilityLinks/store')
     const store = getTraceLinkStore(TEST_DB_PATH)
     
+    const now = new Date().toISOString()
     store.insert({
-      id: 'tl-003', version: '1.0', createdAt: new Date(), updatedAt: new Date(),
+      id: 'tl-003', version: '1.0', createdAt: now, updatedAt: now,
       source: 'API', sourceId: 'req-1', sourceType: 'requirement',
       targetId: 'a-1', targetType: 'architectureModel',
       relationshipType: 'satisfies', confidence: 'high'
@@ -124,8 +124,9 @@ describe('TraceLinkStore', () => {
     const { getTraceLinkStore } = await import('../traceabilityLinks/store')
     const store = getTraceLinkStore(TEST_DB_PATH)
     
+    const now = new Date().toISOString()
     store.insert({
-      id: 'tl-004', version: '1.0', createdAt: new Date(), updatedAt: new Date(),
+      id: 'tl-004', version: '1.0', createdAt: now, updatedAt: now,
       source: 'API', sourceId: 'req-1', sourceType: 'requirement',
       targetId: 'a-1', targetType: 'architectureModel',
       relationshipType: 'satisfies', confidence: 'high'
@@ -149,8 +150,9 @@ describe('TraceLinkStore', () => {
     const { getTraceLinkStore } = await import('../traceabilityLinks/store')
     const store = getTraceLinkStore(TEST_DB_PATH)
     
+    const now = new Date().toISOString()
     store.insert({
-      id: 'tl-005', version: '1.0', createdAt: new Date(), updatedAt: new Date(),
+      id: 'tl-005', version: '1.0', createdAt: now, updatedAt: now,
       source: 'API', sourceId: 'req-1', sourceType: 'requirement',
       targetId: 'a-1', targetType: 'architectureModel',
       relationshipType: 'satisfies', confidence: 'high'
@@ -172,7 +174,7 @@ describe('TraceLinkStore', () => {
     const store = getTraceLinkStore(TEST_DB_PATH)
     
     store.insert({
-      id: 'tl-006', version: '1.0', createdAt: new Date(), updatedAt: new Date(),
+      id: 'tl-006', version: '1.0', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
       source: 'API', sourceId: 'req-1', sourceType: 'requirement',
       targetId: 'a-1', targetType: 'architectureModel',
       relationshipType: 'satisfies', confidence: 'high'
@@ -186,7 +188,7 @@ describe('TraceLinkStore', () => {
     const { getTraceLinkStore } = await import('../traceabilityLinks/store')
     const store = getTraceLinkStore(TEST_DB_PATH)
     
-    const now = new Date()
+    const now = new Date().toISOString()
     store.insert({
       id: 'tl-010', version: '1.0', createdAt: now, updatedAt: now,
       source: 'API', sourceId: 'req-1', sourceType: 'requirement',
@@ -194,7 +196,7 @@ describe('TraceLinkStore', () => {
       relationshipType: 'satisfies', confidence: 'high'
     })
     
-    const later = new Date(now.getTime() + 1000)
+    const later = new Date(Date.now() + 1000).toISOString()
     store.insert({
       id: 'tl-011', version: '1.0', createdAt: now, updatedAt: later,
       source: 'API', sourceId: 'req-2', sourceType: 'requirement',
@@ -209,17 +211,18 @@ describe('TraceLinkStore', () => {
   })
 
    it('should persist to disk and survive reload', async () => {
-     // First write with fresh instance
-     const { getTraceLinkStore } = await import('../traceabilityLinks/store')
-     
-     // Write data
-     const store1 = getTraceLinkStore(TEST_DB_PATH)
-     store1.insert({
-       id: 'tl-020', version: '1.0', createdAt: new Date(), updatedAt: new Date(),
-       source: 'API', sourceId: 'req-1', sourceType: 'requirement',
-       targetId: 'a-1', targetType: 'architectureModel',
-       relationshipType: 'tracesTo', confidence: 'medium'
-     })
+      // First write with fresh instance
+      const { getTraceLinkStore } = await import('../traceabilityLinks/store')
+      
+      // Write data
+      const store1 = getTraceLinkStore(TEST_DB_PATH)
+      const now = new Date().toISOString()
+      store1.insert({
+        id: 'tl-020', version: '1.0', createdAt: now, updatedAt: now,
+        source: 'API', sourceId: 'req-1', sourceType: 'requirement',
+        targetId: 'a-1', targetType: 'architectureModel',
+        relationshipType: 'tracesTo', confidence: 'medium'
+      })
      
      // Verify file exists
      assert.ok(fs.existsSync(TEST_DB_PATH))
@@ -261,14 +264,15 @@ describe('TraceLink Repository Pattern Test', () => {
   })
 
   it('should create and list trace links via repository', async () => {
-    const { getTraceLinkStore } = await import('../traceabilityLinks/store')
-    const { TraceLinkRepository, traceLinkRepository } = await import('../traceabilityLinks/repository')
+    const { TraceLinkRepository } = await import('../traceabilityLinks/repository')
     
-    // Use test store path via fresh instance creation pattern
-    const testStore = new (await import('../traceabilityLinks/store')).constructor()
-    // We verify through the store directly since singleton is a concern
+    const repository = new TraceLinkRepository()
     
     const linkData = {
+      id: 'test-repo-link',
+      version: '1.0',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       sourceId: 'req-100',
       sourceType: 'requirement',
       targetId: 'art-200',
@@ -277,42 +281,27 @@ describe('TraceLink Repository Pattern Test', () => {
       confidence: 'high' as const
     }
     
-    assert.ok(linkData.sourceId)
-    assert.ok(linkData.targetId)
-    assert.ok(linkData.relationshipType)
-    assert.ok(linkData.confidence !== undefined)
+    const created = await repository.createTraceLink(linkData)
+    assert.ok(created)
+    assert.ok(created.id)
+    assert.strictEqual(created.sourceId, 'req-100')
+    assert.strictEqual(created.targetId, 'art-200')
   })
 
   it('should validate required trace link fields', async () => {
-    // Validate that trace links require proper fields per TraceLink schema
-    const validLink = {
-      sourceId: 'req-1',
-      sourceType: 'requirement' as const,
-      targetId: 'art-1',
-      targetType: 'architectureModel' as const,
-      relationshipType: 'satisfies' as const,
-      confidence: 'high' as const
+    const { getTraceLinkStore } = await import('../traceabilityLinks/store')
+    const store = getTraceLinkStore(TEST_REPO_PATH)
+
+    try {
+      store.insert({
+        id: 'tl-021', version: '1.0', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+        source: 'API', sourceId: 'req-1', sourceType: 'requirement',
+        targetId: 'a-1', targetType: 'architectureModel',
+        relationshipType: 'tracesTo', confidence: undefined as any
+      })
+      assert.fail('Should have thrown error for missing required field')
+    } catch (e) {
+      assert.match((e as Error).message, /Missing required field/i)
     }
-
-      // Test with confidence = undefined should fail validation
-      try {
-        store.insert({
-          id: 'tl-021', version: '1.0', createdAt: new Date(), updatedAt: new Date(),
-          source: 'API', sourceId: 'req-1', sourceType: 'requirement',
-          targetId: 'a-1', targetType: 'architectureModel',
-          relationshipType: 'tracesTo', confidence: undefined as any
-        })
-        assert.fail('Should have thrown error for missing required field')
-      } catch (e) {
-        assert.match((e as Error).message, /Missing required field/i)
-      }
-
-
-    function hasConfidence(l: Partial<{ confidence?: string }>): l is Required<Pick<typeof l, 'confidence'>> {
-      return l.confidence !== undefined && l.confidence !== null
-    }
-
-    assert.strictEqual(typeof (validLink as any).sourceId, 'string')
-    assert.strictEqual(typeof (validLink as any).targetId, 'string')
   })
 })

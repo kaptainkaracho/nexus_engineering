@@ -8,7 +8,7 @@ export interface TraceLinkStore {
   findAll(): TraceLink[]
   findBySource(sourceType: string, sourceId: string): TraceLink[]
   findByTarget(targetType: string, targetId: string): TraceLink[]
-  insert(traceLink: TraceLink): void
+  insert(traceLink: TraceLink): TraceLink
   update(id: string, updates: Partial<TraceLink>): TraceLink | undefined
   delete(id: string): boolean
   clear(): void
@@ -17,8 +17,8 @@ export interface TraceLinkStore {
 class SQLiteTraceLinkStore implements TraceLinkStore {
   private database: ReturnType<typeof getTraceLinkDatabase>
 
-  constructor() {
-    this.database = getTraceLinkDatabase()
+  constructor(databasePath?: string) {
+    this.database = getTraceLinkDatabase(databasePath)
   }
 
   findById(id: string): TraceLink | undefined {
@@ -37,8 +37,8 @@ class SQLiteTraceLinkStore implements TraceLinkStore {
     return this.database.findByTarget(targetType, targetId)
   }
 
-  insert(traceLink: TraceLink): void {
-    this.database.insert(traceLink)
+  insert(traceLink: TraceLink): TraceLink {
+    return this.database.insert(traceLink)
   }
 
   update(id: string, updates: Partial<TraceLink>): TraceLink | undefined {
@@ -54,9 +54,9 @@ class SQLiteTraceLinkStore implements TraceLinkStore {
   }
 }
 
-export function getTraceLinkStore(): TraceLinkStore {
+export function getTraceLinkStore(databasePath?: string): TraceLinkStore {
   if (!storeInstance) {
-    storeInstance = new SQLiteTraceLinkStore()
+    storeInstance = new SQLiteTraceLinkStore(databasePath)
   }
   return storeInstance
 }
