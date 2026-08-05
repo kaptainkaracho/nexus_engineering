@@ -37,10 +37,10 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 | Issue | Status | Owner | Notes |
 |-------|--------|-------|-------|
 | **THE-409** | `in_progress` | CEO | Sprint 27 Parent |
-| **THE-425** | `in_review` | FA | W2: User Guide |
-| **THE-428** | `in_progress` | UXD | W2g: UX Gate |
-| **THE-427** | `in_progress` | FA | W3: Quickstart |
-| **THE-429** | `blocked` | Senior QA | W4: E2E — blocked on W1-W3 |
+| **THE-425** | `in_progress` | FA | W2: User Guide — UX Gate changes req (screenshots) |
+| **THE-428** | `in_progress` | UXD | W2g: UX Gate — awaiting THE-425 re-submit |
+| **THE-427** | `todo` | FA | W3: Quickstart — committed 360d5b9, queued after UX Gate |
+| **THE-429** | `blocked` | Senior QA | W4: E2E — blocked on W2g+W3 |
 
 ### Sprint 28 — Performance (queued)
 | Issue | Status | Owner |
