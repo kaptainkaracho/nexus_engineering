@@ -221,7 +221,7 @@ export async function getTraceabilityDependencies (request: FastifyRequest, repl
     if (includeMetadata === 'true') {
       response.metadata = {
         includeMetadata: true,
-        seedNode: artifactId ? { id: artifactId, type: result.nodes.find(n => n.id === artifactId)?.type, title: result.nodes.find(n => n.id === artifactId)?.title || result.nodes.find(n => n.id === artifactId)?.name } : undefined,
+        seedNode: artifactId ? { id: artifactId, type: result.nodes.find(n => n.id === artifactId)?.type || 'unknown', title: result.nodes.find(n => n.id === artifactId)?.title || result.nodes.find(n => n.id === artifactId)?.name || 'Unknown' } : undefined,
       }
     }
 
