@@ -1,14 +1,19 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Button, Card, Container, Stack, Alert } from '@nexus-engineering/shared';
 import {
   FileText,
   TestTube,
   CheckCircle,
   ArrowRight,
-  ArrowLeft,
   BookOpen,
   Layers,
+  ChevronRight,
+  Image,
 } from 'lucide-react';
+
+import requirementsScreenshot from '../../assets/screenshots/trace-gate-desktop.png';
+import architectureScreenshot from '../../assets/screenshots/landing-page-desktop.png';
+import testsScreenshot from '../../assets/screenshots/ux-gate-THE-408-desktop.png';
 
 type WorkflowTab = 'requirements' | 'architecture' | 'tests';
 
@@ -21,21 +26,24 @@ interface Step {
   screenshot?: string;
 }
 
-const WORKFLOWMeta: Record<WorkflowTab, { label: string; icon: React.ReactNode; description: string }> = {
+const WORKFLOWMeta: Record<WorkflowTab, { label: string; icon: React.ReactNode; description: string; anchor: string }> = {
   requirements: {
     label: 'Requirements-as-Code',
     icon: <FileText className="h-5 w-5" />,
     description: 'Define, manage, and trace requirements directly in your Git repository using YAML files.',
+    anchor: 'requirements-workflow',
   },
   architecture: {
     label: 'Architecture-as-Code',
     icon: <Layers className="h-5 w-5" />,
     description: 'Document architecture decisions and system models as version-controlled code artifacts.',
+    anchor: 'architecture-workflow',
   },
   tests: {
     label: 'Test-as-Code',
     icon: <TestTube className="h-5 w-5" />,
     description: 'Connect test cases to requirements and architecture for end-to-end traceability.',
+    anchor: 'tests-workflow',
   },
 };
 
@@ -268,17 +276,32 @@ testCases:
   },
 ];
 
+const SCREENSHOT_SOURCES: Record<WorkflowTab, string> = {
+  requirements: requirementsScreenshot,
+  architecture: architectureScreenshot,
+  tests: testsScreenshot,
+};
+
 const WORKFLOW_STEPS: Record<WorkflowTab, Step[]> = {
   requirements: REQUIREMENTS_STEPS,
   architecture: ARCHITECTURE_STEPS,
   tests: TEST_STEPS,
 };
 
-function ScreenshotPlaceholder({ label }: { label: string }) {
+const TAB_ORDER: WorkflowTab[] = ['requirements', 'architecture', 'tests'];
+
+function ScreenshotPlaceholder({ label, src }: { label: string; src?: string }) {
+  if (src) {
+    return (
+      <div className="overflow-hidden rounded-lg border border-border bg-surface-tertiary">
+        <img src={src} alt={label} className="w-full" loading="lazy" />
+      </div>
+    );
+  }
   return (
     <div className="flex items-center justify-center rounded-lg border-2 border-dashed border-border bg-surface-tertiary p-8">
       <div className="text-center">
-        <BookOpen className="mx-auto h-8 w-8 text-text-tertiary" />
+        <Image className="mx-auto h-8 w-8 text-text-tertiary" />
         <p className="mt-2 text-sm font-medium text-text-tertiary">{label}</p>
       </div>
     </div>
@@ -314,12 +337,91 @@ function StepCard({ step, isLast }: { step: Step; isLast: boolean }) {
   );
 }
 
+function WorkflowSection({
+  tab,
+  completedSteps,
+  onToggleStep,
+  screenshotSrc,
+}: {
+  tab: WorkflowTab;
+  completedSteps: Record<WorkflowTab, Set<number>>;
+  onToggleStep: (tab: WorkflowTab, stepNumber: number) => void;
+  screenshotSrc?: string;
+}) {
+  const steps = WORKFLOW_STEPS[tab];
+  const meta = WORKFLOWMeta[tab];
+  const doneCount = completedSteps[tab].size;
+  const totalSteps = steps.length;
+  const progress = totalSteps > 0 ? Math.round((doneCount / totalSteps) * 100) : 0;
+
+  return (
+    <section id={meta.anchor} className="scroll-mt-24">
+      <Stack gap={6}>
+        <Card variant="outlined" padding="md">
+          <div className="flex items-center justify-between">
+            <Stack gap={1}>
+              <div className="flex items-center gap-2">
+                {meta.icon}
+                <h2 className="text-lg font-semibold text-text-primary">{meta.label}</h2>
+              </div>
+              <p className="text-sm text-text-secondary">{meta.description}</p>
+            </Stack>
+            <div className="hidden text-right sm:block">
+              <p className="text-xs text-text-tertiary">
+                {doneCount} of {totalSteps} steps
+              </p>
+              <div className="mt-1 h-2 w-24 overflow-hidden rounded-full bg-surface-tertiary">
+                <div
+                  className="h-full rounded-full bg-primary-500 transition-all duration-300"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        <Stack gap={4}>
+          {steps.map((step, i) => (
+            <div key={step.number} className="flex items-start gap-4">
+              <div className="mt-4 shrink-0">
+                <button
+                  onClick={() => onToggleStep(tab, step.number)}
+                  aria-label={`Mark step ${step.number} as ${completedSteps[tab].has(step.number) ? 'incomplete' : 'complete'}`}
+                  className={`flex h-5 w-5 items-center justify-center rounded border-2 transition-colors ${
+                    completedSteps[tab].has(step.number)
+                      ? 'border-success-500 bg-success-500 text-text-inverse'
+                      : 'border-border hover:border-primary-300'
+                  }`}
+                >
+                  {completedSteps[tab].has(step.number) && (
+                    <CheckCircle className="h-3 w-3" />
+                  )}
+                </button>
+              </div>
+              <div className="flex-1">
+                <StepCard step={step} isLast={i === steps.length - 1} />
+              </div>
+            </div>
+          ))}
+        </Stack>
+
+        <ScreenshotPlaceholder label={`${meta.label} — Screenshot (1440×900)`} src={screenshotSrc} />
+      </Stack>
+    </section>
+  );
+}
+
 export function UserGuide() {
-  const [activeTab, setActiveTab] = useState<WorkflowTab>('requirements');
   const [completedSteps, setCompletedSteps] = useState<Record<WorkflowTab, Set<number>>>({
     requirements: new Set(),
     architecture: new Set(),
     tests: new Set(),
+  });
+  const [activeSidebar, setActiveSidebar] = useState<WorkflowTab>('requirements');
+  const sectionRefs = useRef<Record<WorkflowTab, HTMLElement | null>>({
+    requirements: null,
+    architecture: null,
+    tests: null,
   });
 
   const toggleStep = useCallback((tab: WorkflowTab, stepNumber: number) => {
@@ -334,168 +436,127 @@ export function UserGuide() {
     });
   }, []);
 
-  const steps = WORKFLOW_STEPS[activeTab];
-  const meta = WORKFLOWMeta[activeTab];
-  const doneCount = completedSteps[activeTab].size;
-  const totalSteps = steps.length;
-  const progress = totalSteps > 0 ? Math.round((doneCount / totalSteps) * 100) : 0;
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const tab = TAB_ORDER.find((t) => WORKFLOWMeta[t].anchor === entry.target.id);
+            if (tab) setActiveSidebar(tab);
+          }
+        }
+      },
+      { rootMargin: '-20% 0px -60% 0px' }
+    );
 
-  const tabOrder: WorkflowTab[] = ['requirements', 'architecture', 'tests'];
-  const currentIndex = tabOrder.indexOf(activeTab);
-  const prevTab = currentIndex > 0 ? tabOrder[currentIndex - 1] : null;
-  const nextTab = currentIndex < tabOrder.length - 1 ? tabOrder[currentIndex + 1] : null;
+    TAB_ORDER.forEach((tab) => {
+      const el = document.getElementById(WORKFLOWMeta[tab].anchor);
+      if (el) {
+        sectionRefs.current[tab] = el;
+        observer.observe(el);
+      }
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const scrollToWorkflow = (tab: WorkflowTab) => {
+    const el = document.getElementById(WORKFLOWMeta[tab].anchor);
+    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   return (
     <div className="min-h-screen bg-surface-secondary">
       <Container size="lg">
-        <Stack gap={8} className="py-8">
-          <Stack gap={3}>
-            <div className="flex items-center gap-2">
-              <BookOpen className="h-6 w-6 text-primary-500" />
-              <h1 className="text-3xl font-bold text-text-primary">User Guide</h1>
+        <div className="flex gap-8 py-8">
+          <aside className="hidden w-56 shrink-0 lg:block">
+            <div className="sticky top-24">
+              <Stack gap={1}>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-text-tertiary">
+                  Workflows
+                </p>
+                {TAB_ORDER.map((tab) => {
+                  const meta = WORKFLOWMeta[tab];
+                  const isActive = activeSidebar === tab;
+                  const done = completedSteps[tab].size;
+                  const total = WORKFLOW_STEPS[tab].length;
+                  return (
+                    <button
+                      key={tab}
+                      onClick={() => scrollToWorkflow(tab)}
+                      className={`flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${
+                        isActive
+                          ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400'
+                          : 'text-text-secondary hover:bg-surface-tertiary hover:text-text-primary'
+                      }`}
+                    >
+                      {meta.icon}
+                      <span className="flex-1 truncate">{meta.label}</span>
+                      {done === total && total > 0 && (
+                        <CheckCircle className="h-4 w-4 shrink-0 text-success-500" />
+                      )}
+                    </button>
+                  );
+                })}
+              </Stack>
             </div>
-            <p className="max-w-2xl text-text-secondary">
-              Step-by-step walkthroughs for the three core Engineering-as-Code workflows. Each guide
-              covers the full lifecycle from creating artifacts to analyzing traceability.
-            </p>
-          </Stack>
+          </aside>
 
-          <div role="tablist" aria-label="Workflow guides" className="flex gap-1 border-b border-border">
-            {tabOrder.map((tab) => {
-              const tabMeta = WORKFLOWMeta[tab];
-              const isActive = tab === activeTab;
-              const tabDone = completedSteps[tab].size;
-              const tabTotal = WORKFLOW_STEPS[tab].length;
-              return (
-                <button
-                  key={tab}
-                  role="tab"
-                  id={`tab-${tab}`}
-                  aria-selected={isActive}
-                  aria-controls={`panel-${tab}`}
-                  tabIndex={isActive ? 0 : -1}
-                  onClick={() => setActiveTab(tab)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'ArrowRight' && currentIndex < tabOrder.length - 1) {
-                      setActiveTab(tabOrder[currentIndex + 1]);
-                    } else if (e.key === 'ArrowLeft' && currentIndex > 0) {
-                      setActiveTab(tabOrder[currentIndex - 1]);
-                    }
-                  }}
-                  className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'border-primary-500 text-primary-600 dark:text-primary-400'
-                      : 'border-transparent text-text-tertiary hover:text-text-secondary'
-                  }`}
-                >
-                  {tabMeta.icon}
-                  <span className="hidden sm:inline">{tabMeta.label}</span>
-                  {tabDone === tabTotal && tabTotal > 0 && (
-                    <CheckCircle className="h-4 w-4 text-success-500" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-          <div
-            role="tabpanel"
-            id={`panel-${activeTab}`}
-            aria-labelledby={`tab-${activeTab}`}
-          >
-            <Stack gap={6}>
-              <Card variant="outlined" padding="md">
-                <div className="flex items-center justify-between">
-                  <Stack gap={1}>
-                    <h2 className="text-lg font-semibold text-text-primary">{meta.label}</h2>
-                    <p className="text-sm text-text-secondary">{meta.description}</p>
-                  </Stack>
-                  <div className="hidden text-right sm:block">
-                    <p className="text-xs text-text-tertiary">
-                      {doneCount} of {totalSteps} steps
-                    </p>
-                    <div className="mt-1 h-2 w-24 overflow-hidden rounded-full bg-surface-tertiary">
-                      <div
-                        className="h-full rounded-full bg-primary-500 transition-all duration-300"
-                        style={{ width: `${progress}%` }}
-                      />
-                    </div>
-                  </div>
+          <main className="min-w-0 flex-1">
+            <Stack gap={12}>
+              <Stack gap={3}>
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-6 w-6 text-primary-500" />
+                  <h1 className="text-3xl font-bold text-text-primary">User Guide</h1>
                 </div>
-              </Card>
-
-              <Stack gap={4}>
-                {steps.map((step, i) => (
-                  <div key={step.number} className="flex items-start gap-4">
-                    <div className="mt-4 shrink-0">
-                      <button
-                        onClick={() => toggleStep(activeTab, step.number)}
-                        aria-label={`Mark step ${step.number} as ${completedSteps[activeTab].has(step.number) ? 'incomplete' : 'complete'}`}
-                        className={`flex h-5 w-5 items-center justify-center rounded border-2 transition-colors ${
-                          completedSteps[activeTab].has(step.number)
-                            ? 'border-success-500 bg-success-500 text-text-inverse'
-                            : 'border-border hover:border-primary-300'
-                        }`}
-                      >
-                        {completedSteps[activeTab].has(step.number) && (
-                          <CheckCircle className="h-3 w-3" />
-                        )}
-                      </button>
-                    </div>
-                    <div className="flex-1">
-                      <StepCard step={step} isLast={i === steps.length - 1} />
-                    </div>
-                  </div>
-                ))}
+                <p className="max-w-2xl text-text-secondary">
+                  Step-by-step walkthroughs for the three core Engineering-as-Code workflows. Each guide
+                  covers the full lifecycle from creating artifacts to analyzing traceability.
+                </p>
               </Stack>
 
-              <ScreenshotPlaceholder label={`${meta.label} — Screenshot placeholder`} />
+              {TAB_ORDER.map((tab) => (
+                <WorkflowSection
+                  key={tab}
+                  tab={tab}
+                  completedSteps={completedSteps}
+                  onToggleStep={toggleStep}
+                  screenshotSrc={SCREENSHOT_SOURCES[tab]}
+                />
+              ))}
 
-              <Alert variant="info" title="What's next?">
-                <div className="flex items-center gap-2">
-                  <span>
-                    {nextTab
-                      ? `Continue to the ${WORKFLOWMeta[nextTab].label} workflow →`
-                      : 'You have completed all workflows! Explore the Trace Graph to see your full traceability chain.'}
-                  </span>
-                  {nextTab && (
+              <Card variant="outlined" padding="lg">
+                <Stack gap={4}>
+                  <h2 className="text-lg font-semibold text-text-primary">What&apos;s Next?</h2>
+                  <p className="text-sm text-text-secondary">
+                    After completing all three workflows, explore the Trace Graph to see your full
+                    traceability chain connecting requirements, architecture, and tests.
+                  </p>
+                  <div className="flex flex-wrap gap-3">
                     <Button
-                      variant="ghost"
+                      variant="primary"
                       size="sm"
-                      onClick={() => setActiveTab(nextTab)}
+                      onClick={() => window.location.hash = '#trace-graph'}
                       icon={<ArrowRight className="h-4 w-4" />}
                       iconPosition="right"
                     >
-                      Next
+                      Open Trace Graph
                     </Button>
-                  )}
-                </div>
-              </Alert>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => window.location.hash = '#quality-dashboard'}
+                      icon={<ChevronRight className="h-4 w-4" />}
+                      iconPosition="right"
+                    >
+                      Quality Dashboard
+                    </Button>
+                  </div>
+                </Stack>
+              </Card>
             </Stack>
-          </div>
-
-          <div className="flex items-center justify-between border-t border-border pt-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              disabled={!prevTab}
-              onClick={() => prevTab && setActiveTab(prevTab)}
-              icon={<ArrowLeft className="h-4 w-4" />}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="primary"
-              size="sm"
-              disabled={!nextTab}
-              onClick={() => nextTab && setActiveTab(nextTab)}
-              icon={<ArrowRight className="h-4 w-4" />}
-              iconPosition="right"
-            >
-              Next
-            </Button>
-          </div>
-        </Stack>
+          </main>
+        </div>
       </Container>
     </div>
   );
