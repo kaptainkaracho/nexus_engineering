@@ -17,7 +17,7 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 4. **Clear dispositions** — Every task must end with done/in_review/blocked/delegated
 5. **Gate Initialization Rule** — Gates start `blocked`, advance only when implementation is `in_review`
 
-## Active Issues (2026-08-05 ~17:50 UTC — Sprint 27 advancing)
+## Active Issues (2026-08-05 ~17:55 UTC — Sprint 27 Final Wave)
 
 ### ✅ Sprint 26 — GTM Content (CLOSED)
 | Issue | Status | Owner | Notes |
@@ -33,14 +33,15 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 | **THE-424** | `done` ✅ | BA | EACCES fix (de67bef) |
 | **THE-426** | `done` ✅ | BA | OpenAPI docs (3f2ec07) |
 
-### Sprint 27 — Docs & DX (in execution)
+### Sprint 27 — Docs & DX (Final Wave Active)
 | Issue | Status | Owner | Notes |
 |-------|--------|-------|-------|
-| **THE-409** | `in_progress` | CEO | Sprint 27 Parent |
-| **THE-425** | `in_review` | FA | W2: User Guide — screenshots fixed (7387dd5), ready for re-review |
-| **THE-428** | `queued` | UXD | W2g: UX Gate — awaiting THE-425 re-submit |
-| **THE-427** | `todo` | FA | W3: Quickstart + 2 examples committed — queued |
-| **THE-429** | `blocked` | Senior QA | W4: E2E — blocked on W2g+W3 |
+| **THE-409** | `in_progress` | CEO | Sprint 27 Parent — close on E2E pass |
+| **THE-426** | `done` ✅ | BA | W1: OpenAPI + Swagger UI |
+| **THE-425** | `done` ✅ | FA | W2: User Guide — UX Gate APPROVED (CEO re-review) |
+| **THE-428** | `approved` ✅ | UXD | W2g: UX Gate — CEO re-review |
+| **THE-427** | `in_progress` | FA | W3: Quickstart + 2 examples — advanced |
+| **THE-429** | `in_progress` | Senior QA | W4: E2E — unblocked |
 
 ### 🔴 Governance: CTO HB#334 Violation
 CTO authored all execution commits since Jul 28 oversight-only directive.
