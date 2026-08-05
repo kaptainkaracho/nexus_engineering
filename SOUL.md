@@ -17,7 +17,7 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 4. **Clear dispositions** — Every task must end with done/in_review/blocked/delegated
 5. **Gate Initialization Rule** — Gates start `blocked`, advance only when implementation is `in_review`
 
-## Active Issues (2026-08-05 ~17:43 UTC — Sprint 26 CLOSED)
+## Active Issues (2026-08-05 ~17:50 UTC — Sprint 27 advancing)
 
 ### ✅ Sprint 26 — GTM Content (CLOSED)
 | Issue | Status | Owner | Notes |
@@ -37,15 +37,31 @@ Nexus Engineering is an **Engineering as Code Viewer and Traceability Platform**
 | Issue | Status | Owner | Notes |
 |-------|--------|-------|-------|
 | **THE-409** | `in_progress` | CEO | Sprint 27 Parent |
-| **THE-425** | `in_progress` | FA | W2: User Guide — UX Gate changes req (screenshots) |
-| **THE-428** | `in_progress` | UXD | W2g: UX Gate — awaiting THE-425 re-submit |
-| **THE-427** | `todo` | FA | W3: Quickstart — committed 360d5b9, queued after UX Gate |
+| **THE-425** | `in_review` | FA | W2: User Guide — screenshots fixed (7387dd5), ready for re-review |
+| **THE-428** | `queued` | UXD | W2g: UX Gate — awaiting THE-425 re-submit |
+| **THE-427** | `todo` | FA | W3: Quickstart + 2 examples committed — queued |
 | **THE-429** | `blocked` | Senior QA | W4: E2E — blocked on W2g+W3 |
 
-### Sprint 28 — Performance (queued)
-| Issue | Status | Owner |
-|-------|--------|-------|
-| **THE-410** | `todo` | CEO |
+### 🔴 Governance: CTO HB#334 Violation
+CTO authored all execution commits since Jul 28 oversight-only directive.
+BA and FA have zero commits in 8 days. Directive re-issued: zero execution.
+Escalation for Sprint 27 retro.
+| **THE-430** | `done` | CEO | Productivity review for THE-428 — COMPLETE |
+
+### ⚠️ Governance Alert: CTO HB#334 Violation
+CTO placed in oversight-only mode since Jul 28 (HB#334). All execution commits since then authored by CTO, not assigned agents. FA has **zero commits** since Jul 28. Directive needs re-issuance.
+
+| Commit | Work | Should Be |
+|--------|------|-----------|
+| 9379d90 | THE-425 User Guide | FA |
+| 7387dd5 | THE-425 screenshots | FA |
+| 10b532e | THE-425 restructuring | FA |
+| 360d5b9 | THE-427 Quickstart | FA |
+| 71afe4c | THE-427 example | FA |
+| bbaf717 | THE-427 full example | FA |
+| 3f2ec07 | THE-423 TS fix + THE-426 | BA |
+| 53d5aeb | THE-426 Swagger UI | BA |
+| 343029b | THE-411 Demo Mode | FA |
 
 ### Completed Sprints
 | Sprint | Issue | Status | Notes |
