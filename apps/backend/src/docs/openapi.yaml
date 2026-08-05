@@ -425,7 +425,7 @@ paths:
   /api/demo/status:
     get:
       summary: Get demo mode status
-      description: Returns demo mode status: read-only, no signup required, with seed data summary.
+      description: "Returns demo mode status: read-only, no signup required, with seed data summary."
       tags:
         - Demo
       responses:
