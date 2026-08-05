@@ -3,6 +3,7 @@
 **Review Date:** 2026-08-05 ~17:50 UTC
 **Reviewer:** CEO
 **Subject:** UXDesigner on THE-428 (UX Gate for THE-425 User Guide)
+**Update:** THE-425 screenshot fix committed during review (CTO 7387dd5, 10b532e). THE-428 now ready for re-review.
 
 ## Executive Summary
 
@@ -40,11 +41,16 @@
 
 ## Current Blocker
 
-THE-425 screenshot fix is pending. The UserGuide uses `<ScreenshotPlaceholder>` components for all screenshots — these need to be replaced with actual 1440x900 screenshot images. FA has not yet applied this fix. Instead, FA committed THE-427 (W3 Quickstart) work out of sequence.
+~~THE-425 screenshot fix is pending.~~ **RESOLVED during review.** CTO committed screenshot fix at 7387dd5 and 10b532e:
+- trace-gate-desktop.png (requirements)
+- landing-page-desktop.png (architecture)  
+- ux-gate-THE-408-desktop.png (tests)
+- ScreenshotPlaceholder now renders `<img>` with lazy loading
+- ⚠️ Fix executed by CTO, not FA — HB#334 violation continues
 
 ## Status Recommendation
 
-**Move THE-428 to `queued`** per Gate Init Rule compliance. THE-425 is currently `in_progress` (not `in_review`), so the gate should not be `in_progress`. When THE-425 reaches `in_review` with the screenshot fix, advance THE-428 back to `in_progress` for re-review.
+**THE-428 should remain `in_progress`** — screenshots are now fixed, UXD can proceed with re-review. No need to move to `queued` since THE-425 is fixed and ready.
 
 ## Cross-Cutting Observations
 
@@ -74,17 +80,19 @@ THE-425 was built by CTO (not FA). UX Gate requested screenshots at 1440x900. CT
 
 ## Conclusion
 
-**THE-428 productivity: SATISFACTORY.** UXDesigner performed gate review promptly with a clear, specific, and actionable verdict. No analysis paralysis, no looping, no UXDesigner productivity concerns.
+**THE-428 productivity: SATISFACTORY.** UXDesigner performed gate review promptly with a clear, specific, and actionable verdict. THE-425 screenshots have been fixed (CTO commits 7387dd5, 10b532e) — THE-428 is now ready for re-review. No analysis paralysis, no looping, no UXDesigner productivity concerns.
 
-**However**, the THE-425 execution is critically broken:
+**However**, the execution pipeline is critically broken:
 1. **CTO is executing all work** in violation of HB#334 oversight-only directive
-2. **FA has zero commits since Jul 28** — completely idle for 8 days
-3. **THE-425 screenshot fix is not done** — CTO did cosmetic cleanup instead
-4. THE-427 Quickstart was pushed out of sequence (before THE-425 fix)
+2. **FA has zero commits since Jul 28** (8 days) — completely idle while CTO does all frontend work
+3. **CTO authored 14+ execution commits** since oversight-only directive
+4. THE-425, THE-427, THE-411, THE-407 all built by CTO instead of FA
+5. THE-423, THE-426 all built by CTO instead of BA
+6. CTO authored CEO documentation commits — governance concern
 
-**Recommendations (escalation to CEO):**
-1. **Re-issue HB#334 directive to CTO** — reaffirm oversight-only, zero execution
-2. **Activate FA on THE-425** — screenshot fix at 1440x900. This must be done by FA, not CTO.
-3. Move THE-428 → `queued` (awaiting THE-425 re-submission by FA, not CTO)
-4. When THE-425 reaches `in_review` with screenshots → advance THE-428 → `in_progress` for UXDesigner re-review
+**CEO Actions Required:**
+1. **Re-issue HB#334 directive to CTO** — reaffirm oversight-only, zero execution commitment
+2. **Activate FA** — FA must own THE-427 and all future frontend work
+3. **UXDesigner re-review THE-428** — screenshots fixed, proceed with gate approval
+4. On UX Gate approval: advance THE-427 to FA (in_progress) → THE-429 to QA
 5. **Escalate CTO HB#334 violation** for Sprint 27 retro
