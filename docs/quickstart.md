@@ -29,9 +29,9 @@ This seeds the database with sample requirements, ADRs, features, test results, 
 |------|------|
 | Scan your own repo | Go to **Scanner** → enter a path → click **Scan** |
 | See traceability | Go to **Graph View** → explore the demo trace links |
-| Try requirements-as-code | See [examples/requirements-as-code](../examples/requirements-as-code) |
-| Try architecture-as-code | See [examples/architecture-as-code](../examples/architecture-as-code) |
-| Full traceability demo | See [examples/full-traceability](../examples/full-traceability) |
+| Minimal traceability example | See [examples/simple-project](../examples/simple-project) |
+| Full e-commerce traceability | See [examples/full-project](../examples/full-project) |
+| Backend parser exercise | See [examples/tac-samples](../examples/tac-samples) |
 | Deploy to Railway | See [Deployment Guide](DEPLOYMENT.md) |
 
 ## Quick reference
