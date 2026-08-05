@@ -1,19 +1,13 @@
 import { useState, useCallback } from 'react';
-import { Button, Card, Container, Stack, Grid, Alert } from '@nexus-engineering/shared';
+import { Button, Card, Container, Stack, Alert } from '@nexus-engineering/shared';
 import {
   FileText,
-  GitBranch,
   TestTube,
   CheckCircle,
   ArrowRight,
   ArrowLeft,
   BookOpen,
-  Lightbulb,
-  Terminal,
   Layers,
-  Link2,
-  Target,
-  ChevronRight,
 } from 'lucide-react';
 
 type WorkflowTab = 'requirements' | 'architecture' | 'tests';

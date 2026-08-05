@@ -1,22 +1,21 @@
 # FrontendArchitect Context State
-> Last updated: 2026-08-05T15:21:00Z
+> Last updated: 2026-08-05T16:30:00Z
 
 ## Last Run
-- Issue: THE-411
-- Timestamp: 2026-08-05T15:21:00Z
-- Status: Done — CEO closure acknowledged
+- Issue: THE-425
+- Timestamp: 2026-08-05T16:30:00Z
+- Status: wrote 2 files, 0 errors
 
 ## Files Created/Modified
-- apps/frontend/src/views/DemoMode/index.tsx (created — 380 lines)
-- apps/frontend/src/App.tsx (modified — routing, Section type, VALID_SECTIONS)
-- apps/frontend/src/views/OnboardingFlow/index.tsx (modified — redirect + API fix)
+- apps/frontend/src/views/UserGuide/index.tsx (created — User Guide view with 3 workflow walkthroughs)
+- apps/frontend/src/App.tsx (modified — added #user-guide route, lazy import, Section type, VALID_SECTIONS)
 
-## Commits This Session
-- 343029b: feat(THE-411): Demo Mode frontend — route, page component, OnboardingFlow fix
+## Verification
+- tsc -b: clean (0 errors)
+- eslint: clean (0 errors in UserGuide)
 
 ## Status
-- THE-411: done ✅
-- Sprint 26 W1 frontend complete
+- THE-425: in_progress — core view built, pending UX gate review
 
 ## Next Action
-- Awaiting next issue assignment
+- Hand off to UXDesigner for UX Quality Gate review
